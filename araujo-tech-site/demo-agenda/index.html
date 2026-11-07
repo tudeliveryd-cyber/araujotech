@@ -233,6 +233,7 @@ const H=()=>({0:null,1:["08:00","20:00"],2:["08:00","20:00"],3:["08:00","20:00"]
 const LOLI_LOGO="";
 let SALON={name:"Salón Aurora",logo:"",phone:"0982 086171",address:"Av. Mcal. López 1240, Santa Rita",instagram:"araujo_tech_sistemas",maps:"https://maps.google.com/?q=Santa+Rita+Alto+Parana+Paraguay",photos:[],brand:"#8a2d49",lang:"es",step:30,
   policy:"Para cancelar o cambiar su turno, avise con al menos 3 horas de anticipación por WhatsApp."};
+const PLAN_PROS=0; /* límite de profesionales del plan (0 = sin límite) */
 let PROS=[{id:"p1",name:"Laura Benítez",role:"Colorista",color:"#b5476b",svc:["s1","s3","s4","s5"],hours:H()},
  {id:"p2",name:"Camila Ortiz",role:"Estilista",color:"#3f7fb5",svc:["s1","s2","s5","s6"],hours:Object.assign(H(),{3:null})},
  {id:"p3",name:"Rocío Giménez",role:"Uñas",color:"#3c9a72",svc:["s9","s10","s11","s13"],hours:Object.assign(H(),{1:["13:00","20:00"],2:["13:00","20:00"]})},
@@ -321,7 +322,7 @@ let sb=null;
 function fromPanel(S){if(!S||!S.cfg)return;const live=a=>a.status!=="cancelled"&&a.status!=="noshow";const from=ymd(new Date());
   SALON=Object.assign({},SALON,{name:S.cfg.name,logo:S.cfg.logo||"",cover:S.cfg.cover||"",phone:S.cfg.phone||"",address:S.cfg.address||"",brand:S.cfg.brand,instagram:S.cfg.instagram||"",maps:S.cfg.maps||"",photos:S.cfg.photos||[],step:+S.cfg.step||30,open:S.cfg.open,close:S.cfg.close,lang:S.cfg.lang,policy:S.cfg.policy||""});
   if(S.services&&S.services.length)SERVICES=S.services.map(s=>({id:s.id,name:s.name,cat:s.cat||"General",dur:s.dur,price:s.price,desc:s.desc||""}));
-  const pr=(S.pros||[]).filter(p=>p.active!==false);if(pr.length)PROS=pr.map(p=>({id:p.id,name:p.name,role:p.role||"",color:p.color,hours:p.hours,svc:p.svc&&p.svc.length?p.svc:null}));
+  const pr=(S.pros||[]).filter(p=>p.active!==false).slice(0,PLAN_PROS||Infinity);if(pr.length)PROS=pr.map(p=>({id:p.id,name:p.name,role:p.role||"",color:p.color,hours:p.hours,svc:p.svc&&p.svc.length?p.svc:null}));
   BUSY=(S.appts||[]).filter(a=>a.date>=from&&live(a)).map(a=>({p:a.proId,d:a.date,s:a.start,u:a.dur}))}
 async function cloudLoad(){
   if(!SB_URL||!SB_KEY){try{const S=JSON.parse(localStorage.getItem("araujo_demo_agenda"));if(S&&S.cfg){fromPanel(S);applyBrand();render()}}catch(e){}return}

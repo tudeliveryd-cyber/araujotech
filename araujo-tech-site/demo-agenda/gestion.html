@@ -654,7 +654,7 @@ function compressImg(file,max,square,cb){const r=new FileReader();r.onload=()=>{
 const proOf=id=>S.pros.find(p=>p.id===id)||{name:"—",color:"#888",commission:0,hours:defHours()};
 const cliOf=id=>S.clients.find(c=>c.id===id)||{name:"—",phone:""};
 const svcNames=a=>a.serviceIds.map(id=>(S.services.find(s=>s.id===id)||{}).name).filter(Boolean).join(" + ");
-const activePros=()=>S.pros.filter(p=>p.active!==false);
+const activePros=()=>S.pros.filter(p=>p.active!==false).slice(0,proLimit());
 const isOwner=()=>ui.user&&ui.user.role==="owner";
 const visiblePros=()=>isOwner()?activePros():S.pros.filter(p=>p.id===ui.user.proId);
 const live=a=>a.status!=="cancelled"&&a.status!=="noshow";
@@ -663,7 +663,7 @@ const pill=s=>`<span class="pill st-${s}">${t(s)}</span>`;
 const proHours=(p,dow)=>(p.hours&&p.hours[dow]!==undefined)?p.hours[dow]:[S.cfg.open,S.cfg.close];
 const payTotal=a=>a.paid?a.paid.amount+(a.paid.items||[]).reduce((s,i)=>s+i.price*i.qty,0):0;
 const visitsOf=cid=>S.appts.filter(a=>a.clientId===cid&&a.paid).length;
-const loyaltyReady=cid=>S.cfg.loyalty.on&&visitsOf(cid)>0&&(visitsOf(cid)+1)%(S.cfg.loyalty.every||10)===0;
+const loyaltyReady=cid=>can("loyalty")&&S.cfg.loyalty.on&&visitsOf(cid)>0&&(visitsOf(cid)+1)%(S.cfg.loyalty.every||10)===0;
 const snap=()=>JSON.stringify(S);
 const ML={cash:"cashM",transfer:"transfer",card:"card"};
 
@@ -724,7 +724,7 @@ function wzFinish(){
 }
 
 /* ---------- Ingreso ---------- */
-function allUsers(){return [...S.users,...S.pros.filter(p=>p.active!==false).map(p=>({id:"pro_"+p.id,name:p.name,role:"pro",proId:p.id,pin:p.pin||"0000",color:p.color}))]}
+function allUsers(){return [...S.users,...(can("proLogin")?activePros():[]).map(p=>({id:"pro_"+p.id,name:p.name,role:"pro",proId:p.id,pin:p.pin||"0000",color:p.color}))]}
 function brandBlock(){const sub=S.cfg.sub&&S.cfg.sub!==T.es.sub&&S.cfg.sub!==T.pt.sub?S.cfg.sub:t("sub");return `<div class="brand">${S.cfg.logo?`<img class="logo" src="${S.cfg.logo}" alt="">`:""}<b>${esc(S.cfg.name)}</b><span>${esc(sub)}</span></div>`}
 function renderLogin(){
   const us=allUsers();const sel=us.find(u=>u.id===ui.loginSel);
@@ -755,6 +755,22 @@ function renderAuth(){
 }
 
 /* ---------- Estructura ---------- */
+/* ---------- Plan contratado (lo define Araújo Tech al instalar) ---------- */
+const PLAN_ID="premium";
+const PLANS={esencial:{n:"Esencial",pros:2,off:["proLogin","commissions","reports","products","loyalty","promos"]},crecimiento:{n:"Crecimiento",pros:6,off:[]},premium:{n:"Premium",pros:0,off:[]}};
+const PLAN=PLANS[PLAN_ID]||PLANS.premium;
+const can=f=>!PLAN.off.includes(f);
+const proLimit=()=>PLAN.pros||Infinity;
+const LOCK_VIEW={products:"products",reports:"reports"};
+const lockedView=v=>LOCK_VIEW[v]&&!can(LOCK_VIEW[v]);
+const AT_WA="595982086171";
+function upMsg(){const es=LG()!=="pt";return encodeURIComponent((es?"Hola, quiero mejorar el plan de ":"Olá, quero melhorar o plano de ")+S.cfg.name+(es?" (plan actual: ":" (plano atual: ")+PLAN.n+").")}
+function lockCard(title,txt){const es=LG()!=="pt";return `<section class="panel lockcard"><div class="panel-b" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:36px 20px">
+  <span style="width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)">${ic("lock")}</span>
+  <h2 style="margin:0;font-size:19px">${esc(title)}</h2><p style="margin:0;color:var(--muted);max-width:420px">${txt||(es?"Esta función está disponible a partir del plan Crecimiento.":"Esta função está disponível a partir do plano Crecimiento.")}</p>
+  <a class="btn pri" href="https://wa.me/${AT_WA}?text=${upMsg()}" target="_blank" rel="noopener">${ic("chat")}${es?"Mejorar mi plan":"Melhorar meu plano"}</a>
+  <small class="help">${es?"Su plan actual":"Seu plano atual"}: <b>${PLAN.n}</b></small></div></section>`}
+function proLimitMsg(){const es=LG()!=="pt";return (es?"Su plan "+PLAN.n+" permite hasta "+PLAN.pros+" profesionales activos.":"Seu plano "+PLAN.n+" permite até "+PLAN.pros+" profissionais ativos.")}
 const NAV_OWNER=[["dash","home"],["agenda","calendar"],["clients","users"],["reminders","bell"],["cash","wallet"],["products","box"],["services","scissors"],["pros","pro"],["reports","chart"],["settings","sliders"]];
 const NAV_PRO=[["dash","home"],["agenda","calendar"],["clients","users"],["reminders","bell"],["cash","wallet"]];
 const TABS=[["dash","home"],["agenda","calendar"],["clients","users"],["cash","wallet"],["more","grid"]];
@@ -766,7 +782,7 @@ function shell(){
   const nav=isOwner()?NAV_OWNER:NAV_PRO;const rc=remCount();
   const moreOn=!TABS.some(([v])=>v===ui.view);
   $("#root").innerHTML=`<div class="app"><aside class="side">${brandBlock()}
-    <nav class="nav">${nav.map(([v,i])=>`<button data-act="go" data-v="${v}" class="${ui.view===v?"on":""}">${ic(i)}${t(v)}${v==="reminders"&&rc?`<span class="badge">${rc}</span>`:""}</button>`).join("")}</nav>
+    <nav class="nav">${nav.map(([v,i])=>`<button data-act="go" data-v="${v}" class="${ui.view===v?"on":""}">${ic(i)}${t(v)}${v==="reminders"&&rc?`<span class="badge">${rc}</span>`:""}${lockedView(v)?`<span style="margin-left:auto;opacity:.5;display:inline-flex">${ic("lock")}</span>`:""}</button>`).join("")}</nav>
     <div class="side-foot">${prefsBar()}<div class="me"><span class="avatar" style="width:30px;height:30px;font-size:11px">${initials(ui.user.name)}</span><div class="grow"><b>${esc(ui.user.name)}</b>${cloudTag()}</div><button class="btn sm icon ghost" data-act="logout" title="${t("logout")}" aria-label="${t("logout")}">${ic("logout")}</button></div>
     <span>Desarrollado por <strong>Araújo Tech</strong></span></div></aside>
     <main class="main" id="main"></main></div>
@@ -815,10 +831,10 @@ V.dash=()=>{
         ${activePros().length?activePros().map(p=>{const h=proHours(p,dow);const span=h?toMin(h[1])-toMin(h[0]):0;const m=lv.filter(a=>a.proId===p.id).reduce((s,a)=>s+a.dur,0);const pc=span?Math.min(100,Math.round(m/span*100)):0;
           return `<div><div class="row" style="justify-content:space-between;margin-bottom:6px"><span style="font-weight:600">${esc(p.name)}</span><span class="num" style="color:var(--muted)">${h?pc+"%":t("closeT").toLowerCase()}</span></div><div class="bar" style="--pc:${p.color}"><i style="width:${pc}%"></i></div></div>`}).join(""):`<div class="help">—</div>`}
       </div></section>`:""}
-      ${isOwner()&&low.length?`<section class="panel"><div class="panel-h"><h2>${t("lowStock")}</h2>${ic("box")}</div><div class="list">${low.map(p=>`<div class="li"><div class="grow"><div class="t1">${esc(p.name)}</div></div><span class="pill st-low">${p.stock} ${t("stock").toLowerCase()}</span></div>`).join("")}</div></section>`:""}
-      <section class="panel"><div class="panel-h"><h2>${t("birthdays")}</h2>${ic("gift")}</div><div class="list">
+      ${isOwner()&&can("products")&&low.length?`<section class="panel"><div class="panel-h"><h2>${t("lowStock")}</h2>${ic("box")}</div><div class="list">${low.map(p=>`<div class="li"><div class="grow"><div class="t1">${esc(p.name)}</div></div><span class="pill st-low">${p.stock} ${t("stock").toLowerCase()}</span></div>`).join("")}</div></section>`:""}
+      ${can("promos")?`<section class="panel"><div class="panel-h"><h2>${t("birthdays")}</h2>${ic("gift")}</div><div class="list">
         ${bdays.length?bdays.map(c=>`<div class="li"><div class="avatar">${initials(c.name)}</div><div class="grow"><div class="t1">${esc(c.name)}</div><div class="t2">${short(addDays(d,week.indexOf(c.birth.slice(5))))}</div></div><button class="btn sm" data-act="bdayMsg" data-id="${c.id}" aria-label="${t("whats")}">${ic("chat")}</button></div>`).join(""):`<div class="empty">${t("noBday")}</div>`}
-      </div></section>
+      </div></section>`:""}
     </div>
   </div>`;
 };
@@ -893,14 +909,15 @@ V.products=()=>top(t("products"),"",`<button class="btn" data-act="sell">${ic("c
 
 V.pros=()=>{
   const d=today(), m0=d.slice(0,7), DL=DAYS[LG()]||DAYS.es;
-  return top(t("pros"),"",`<button class="btn pri" data-act="editPro">${ic("plus")}${t("addPro")}</button>`)+`
+  return top(t("pros"),"",`<button class="btn pri" data-act="editPro">${ic("plus")}${t("addPro")}</button>`)+(PLAN.pros||!can("proLogin")?`<div class="banner"><span>${ic("lock")} ${PLAN.pros?proLimitMsg()+" ":""}${can("proLogin")?"":(LG()!=="pt"?"El acceso propio de cada profesional está disponible desde el plan Crecimiento.":"O acesso próprio de cada profissional está disponível a partir do plano Crecimiento.")}</span><a class="btn sm" href="https://wa.me/${AT_WA}?text=${upMsg()}" target="_blank" rel="noopener">${LG()!=="pt"?"Mejorar plan":"Melhorar plano"}</a></div>`:"")+`
   <div class="cards">${S.pros.map(p=>{
     const td=S.appts.filter(a=>a.proId===p.id&&a.date===d&&live(a)).length;
     const mr=S.appts.filter(a=>a.proId===p.id&&a.paid&&a.date.startsWith(m0)).reduce((s,a)=>s+a.paid.amount,0);
     const days=[1,2,3,4,5,6,0].filter(i=>proHours(p,i)).map(i=>DL[i]).join(" ");
-    return `<div class="card" style="${p.active===false?"opacity:.55":""}"><div class="head"><div class="avatar" style="background:${p.color};color:#fff">${initials(p.name)}</div>
-      <div class="grow"><h3>${esc(p.name)}</h3><div style="color:var(--muted);font-size:13px">${esc(p.role||"")}${p.role?" · ":""}${days}</div></div><button class="btn sm icon" data-act="editPro" data-id="${p.id}" aria-label="${t("edit")}">${ic("edit")}</button></div>
-      <div class="meta"><div><small>${t("todayCount")}</small><b>${td}</b></div><div><small>${t("commission")}</small><b>${p.commission}%</b></div><div><small>${t("monthRev")}</small><b>${gs(mr)}</b></div></div></div>`}).join("")}</div>`;
+    const outP=p.active!==false&&!activePros().includes(p);
+    return `<div class="card" style="${p.active===false||outP?"opacity:.55":""}"><div class="head"><div class="avatar" style="background:${p.color};color:#fff">${initials(p.name)}</div>
+      <div class="grow"><h3>${esc(p.name)}</h3><div style="color:var(--muted);font-size:13px">${esc(p.role||"")}${p.role?" · ":""}${days}</div>${outP?`<span class="pill" style="margin-top:6px;display:inline-flex;gap:4px;align-items:center">${ic("lock")}${LG()!=="pt"?"Fuera del plan":"Fora do plano"}</span>`:""}</div><button class="btn sm icon" data-act="editPro" data-id="${p.id}" aria-label="${t("edit")}">${ic("edit")}</button></div>
+      <div class="meta"><div><small>${t("todayCount")}</small><b>${td}</b></div>${can("commissions")?`<div><small>${t("commission")}</small><b>${p.commission}%</b></div>`:""}<div><small>${t("monthRev")}</small><b>${gs(mr)}</b></div></div></div>`}).join("")}</div>`;
 };
 
 V.reminders=()=>{
@@ -927,7 +944,7 @@ V.cash=()=>{
   if(!isOwner()) return top(t("cash"),"","")+bar+`<div class="kpis"><div class="kpi"><span class="eyebrow">${t("revenue")}</span><b>${gs(svcTot)}</b><small>${paid.length} ${t("attended").toLowerCase()}</small></div><div class="kpi"><span class="eyebrow">${t("commissions")}</span><b>${gs(com)}</b><small>${proOf(ui.user.proId).commission}%</small></div></div>
     <section class="panel"><div class="panel-h"><h2>${t("received")}</h2></div><div class="list">${paid.length?paid.map(a=>`<div class="li"><span class="time">${a.start}</span><div class="grow"><div class="t1">${esc(cliOf(a.clientId).name)}</div><div class="t2">${esc(svcNames(a))} · ${t(ML[a.paid.method])}</div></div><b class="num">${gs(a.paid.amount)}</b></div>`).join(""):`<div class="empty">${t("noData")}</div>`}</div></section>
     ${unpaid.length?`<section class="panel" style="margin-top:16px"><div class="panel-h"><h2>${t("toCharge")}</h2></div><div class="list">${unpaid.map(a=>`<div class="li"><span class="time">${a.start}</span><div class="grow"><div class="t1">${esc(cliOf(a.clientId).name)}</div><div class="t2">${gs(a.price)}</div></div><button class="btn sm pri" data-act="checkout" data-id="${a.id}">${t("charge")}</button></div>`).join("")}</div></section>`:""}`;
-  return top(t("cash"),"",`<button class="btn" data-act="addExpense">${ic("minus")}${t("addExpense")}</button><button class="btn" data-act="sell">${ic("box")}${t("sell")}</button>${closing?`<button class="btn" data-act="reopen" data-d="${d}">${t("reopen")}</button>`:`<button class="btn pri" data-act="closeCash">${ic("lock")}${t("closeCash")}</button>`}`)+bar+
+  return top(t("cash"),"",`<button class="btn" data-act="addExpense">${ic("minus")}${t("addExpense")}</button>${can("products")?`<button class="btn" data-act="sell">${ic("box")}${t("sell")}</button>`:""}${closing?`<button class="btn" data-act="reopen" data-d="${d}">${t("reopen")}</button>`:`<button class="btn pri" data-act="closeCash">${ic("lock")}${t("closeCash")}</button>`}`)+bar+
   (closing?`<div class="banner ok">${ic("lock")}<span style="flex:1">${t("cashClosed")} · ${t("closedBy")} ${esc(closing.by)} ${closing.at} · ${t("counted")}: ${gs(closing.counted)} · ${t("difference")}: <b class="num">${gs(closing.counted-closing.expected)}</b></span></div>`:"")+`
   <div class="kpis">
     <div class="kpi"><span class="eyebrow">${t("total")}</span><b>${gs(tot)}</b><small>${gs(svcTot)} ${t("services").toLowerCase()} · ${gs(prodTot)} ${t("products").toLowerCase()}</small></div>
@@ -948,9 +965,9 @@ V.cash=()=>{
       <section class="panel"><div class="panel-h"><h2>${t("expenses")}</h2><b class="num">${gs(expTot)}</b></div><div class="list">
         ${exps.length?exps.map(e=>`<div class="li"><div class="grow"><div class="t1">${esc(e.desc)}</div></div><b class="num">−${gs(e.amount)}</b><button class="btn sm icon ghost" data-act="delExpense" data-id="${e.id}" aria-label="${t("del")}">${ic("trash")}</button></div>`).join(""):`<div class="empty">—</div>`}
       </div></section>
-      <section class="panel"><div class="panel-h"><h2>${t("commissions")}</h2></div><div class="list">
+      ${can("commissions")?`<section class="panel"><div class="panel-h"><h2>${t("commissions")}</h2></div><div class="list">
         ${activePros().map(p=>{const v=paid.filter(a=>a.proId===p.id).reduce((s,a)=>s+a.paid.amount,0);return `<div class="li"><span class="dot" style="background:${p.color}"></span><div class="grow"><div class="t1">${esc(p.name)}</div><div class="t2">${gs(v)} · ${p.commission}%</div></div><b class="num">${gs(v*p.commission/100)}</b></div>`}).join("")}
-      </div></section>
+      </div></section>`:""}
     </div>
   </div>`;
 };
@@ -1030,6 +1047,7 @@ alter publication supabase_realtime add table salon_state, reservas;`;
 V.settings=()=>{
   const c=S.cfg, fixed=!!SB_URL_FIXED;
   return top(t("settings"),"","")+`<div class="stack" style="max-width:780px">
+  <section class="panel"><div class="panel-b row" style="justify-content:space-between;gap:12px;flex-wrap:wrap"><div><span class="eyebrow">${LG()!=="pt"?"Su plan":"Seu plano"}</span><div style="font-size:18px;font-weight:700">${PLAN.n}</div><small class="help">${PLAN.pros?proLimitMsg():(LG()!=="pt"?"Profesionales ilimitados.":"Profissionais ilimitados.")}</small></div>${PLAN_ID==="premium"?"":`<a class="btn" href="https://wa.me/${AT_WA}?text=${upMsg()}" target="_blank" rel="noopener">${ic("chat")}${LG()!=="pt"?"Mejorar plan":"Melhorar plano"}</a>`}</div></section>
   <section class="panel"><div class="panel-h"><h2>${t("appearance")}</h2></div><div class="panel-b" style="display:flex;flex-direction:column;gap:16px">
     ${brandPreview(c.cover||c.photos[0],c.logo,c.name,c.address)}
     <div class="grid2">
@@ -1065,7 +1083,7 @@ V.settings=()=>{
     <div class="field"><label for="c-rem">${t("remTpl")}</label><textarea class="inp" id="c-rem" rows="3">${esc(c.remTpl)}</textarea></div>
     <div class="field"><label for="c-promo">${t("promo")}</label><textarea class="inp" id="c-promo" rows="2">${esc(c.promoTpl||t("promoTpl"))}</textarea><small class="help">${t("msgHelp")}</small></div>
   </div></section>
-  <section class="panel"><div class="panel-h"><h2>${t("loyaltyOn")}</h2><label class="row" style="gap:6px;cursor:pointer"><input type="checkbox" id="c-loy" ${c.loyalty.on?"checked":""} style="accent-color:var(--accent);width:16px;height:16px">${t("active")}</label></div><div class="panel-b">
+  ${can("loyalty")?"":lockCard(t("loyaltyOn"))}<section class="panel" ${can("loyalty")?"":"hidden"}><div class="panel-h"><h2>${t("loyaltyOn")}</h2><label class="row" style="gap:6px;cursor:pointer"><input type="checkbox" id="c-loy" ${c.loyalty.on?"checked":""} style="accent-color:var(--accent);width:16px;height:16px">${t("active")}</label></div><div class="panel-b">
     <div class="grid2"><div class="field"><label for="c-loyn">${t("loyaltyEvery")}</label><input class="inp num" type="number" min="2" id="c-loyn" value="${c.loyalty.every}"></div><div class="field"><label for="c-loyr">${t("loyaltyReward")}</label><input class="inp" id="c-loyr" value="${esc(c.loyalty.reward)}"></div></div>
   </div></section>
   <div><button class="btn pri" data-act="saveCfg">${ic("check")}${t("save")}</button></div>
@@ -1096,7 +1114,7 @@ V.more=()=>{
   const sub={reminders:es?"WhatsApp del día anterior":"WhatsApp do dia anterior",products:es?"Venta y stock":"Venda e estoque",services:es?"Precios y duraciones":"Preços e durações",pros:es?"Horarios, acceso y comisiones":"Horários, acesso e comissões",reports:es?"Resultados del negocio":"Resultados do negócio",settings:es?"Marca, página de reservas y nube":"Marca, página de reservas e nuvem"};
   const items=isOwner()?["reminders","products","services","pros","reports","settings"]:["reminders"];
   const icons={reminders:"bell",products:"box",services:"scissors",pros:"pro",reports:"chart",settings:"sliders"};
-  return top(t("moreTitle"),"","")+`<div class="more-grid">${items.map(v=>`<button data-act="go" data-v="${v}">${ic(icons[v])}${t(v)}${v==="reminders"&&remCount()?` <span class="tag" style="background:var(--accent);color:var(--accent-fg)">${remCount()}</span>`:""}<small>${sub[v]}</small></button>`).join("")}
+  return top(t("moreTitle"),"","")+`<div class="more-grid">${items.map(v=>`<button data-act="go" data-v="${v}">${ic(icons[v])}${t(v)}${v==="reminders"&&remCount()?` <span class="tag" style="background:var(--accent);color:var(--accent-fg)">${remCount()}</span>`:""}${lockedView(v)?` <span style="opacity:.5;display:inline-flex">${ic("lock")}</span>`:""}<small>${sub[v]}</small></button>`).join("")}
   <button data-act="logout">${ic("logout")}${t("logout")}<small>${esc(ui.user.name)}</small></button></div>
   <section class="panel" style="margin-top:12px"><div class="panel-b row" style="justify-content:space-between"><b>${t("appearance")}</b>${prefsBar()}</div></section>
   <p class="help" style="margin-top:24px">Desarrollado por <b>Araújo Tech</b></p>`;
@@ -1109,7 +1127,7 @@ function render(){
   if(!ui.user){renderLogin();return}
   if(!isOwner()&&!NAV_PRO.some(([v])=>v===ui.view)&&ui.view!=="more")ui.view="dash";
   shell();
-  $("#main").innerHTML=V[ui.view]();
+  $("#main").innerHTML=lockedView(ui.view)?top(t(ui.view),"","")+lockCard(t(ui.view)):V[ui.view]();
 }
 
 /* ---------- Ventanas ---------- */
@@ -1191,7 +1209,7 @@ function apptForm(a){
   };
 }
 function prodPicker(items){
-  return `<div class="field"><label for="pp-sel">${t("addProdLine")}</label><div class="prod-add"><select class="inp" id="pp-sel"><option value="">—</option>${S.products.filter(p=>p.stock>0).map(p=>`<option value="${p.id}">${esc(p.name)} · ${gs(p.price)} (${p.stock})</option>`).join("")}</select><input class="inp num" type="number" min="1" value="1" id="pp-qty" aria-label="${t("stock")}"><button class="btn icon" type="button" id="pp-add" aria-label="${t("addProdLine")}">${ic("plus")}</button></div></div><div id="pp-lines">${items.map(i=>`<div class="prod-line"><span>${i.qty}× ${esc(i.name)}</span><b class="num">${gs(i.price*i.qty)}</b></div>`).join("")}</div>`;
+  return `<div class="field" ${can("products")?"":"hidden"}><label for="pp-sel">${t("addProdLine")}</label><div class="prod-add"><select class="inp" id="pp-sel"><option value="">—</option>${S.products.filter(p=>p.stock>0).map(p=>`<option value="${p.id}">${esc(p.name)} · ${gs(p.price)} (${p.stock})</option>`).join("")}</select><input class="inp num" type="number" min="1" value="1" id="pp-qty" aria-label="${t("stock")}"><button class="btn icon" type="button" id="pp-add" aria-label="${t("addProdLine")}">${ic("plus")}</button></div></div><div id="pp-lines">${items.map(i=>`<div class="prod-line"><span>${i.qty}× ${esc(i.name)}</span><b class="num">${gs(i.price*i.qty)}</b></div>`).join("")}</div>`;
 }
 function bindPicker(items,onChange){
   $("#pp-add").onclick=()=>{const id=$("#pp-sel").value,q=+$("#pp-qty").value||1;const p=S.products.find(x=>x.id===id);if(!p)return;
@@ -1298,7 +1316,7 @@ function clientModal(c){
    <div><div class="eyebrow" style="margin-bottom:8px">${t("history")}</div><div class="panel"><div class="list">
      ${h.length?h.slice(0,12).map(a=>`<div class="li" data-act="openAppt" data-id="${a.id}" style="cursor:pointer"><span class="num" style="width:44px;color:var(--muted)">${short(a.date)}</span><div class="grow"><div class="t1">${esc(svcNames(a))}</div><div class="t2">${esc(proOf(a.proId).name)} · ${gs(a.paid?payTotal(a):a.price)}</div></div>${pill(a.status)}</div>`).join(""):`<div class="empty">—</div>`}
    </div></div></div>`;
-  modal(t("client"),body,`<div class="left"><button class="btn" data-act="editClient" data-id="${c.id}">${ic("edit")}${t("edit")}</button><button class="btn" data-act="promoMsg" data-id="${c.id}" aria-label="${t("whats")}">${ic("chat")}</button></div><button class="btn pri" data-act="newAppt" data-client="${c.id}">${ic("calendar")}${t("schedule")}</button>`);
+  modal(t("client"),body,`<div class="left"><button class="btn" data-act="editClient" data-id="${c.id}">${ic("edit")}${t("edit")}</button>${can("promos")?`<button class="btn" data-act="promoMsg" data-id="${c.id}" aria-label="${t("whats")}">${ic("chat")}</button>`:""}</div><button class="btn pri" data-act="newAppt" data-client="${c.id}">${ic("calendar")}${t("schedule")}</button>`);
 }
 function editClient(c){
   const isNew=!c;c=c||{name:"",phone:"",birth:"",notes:""};
@@ -1362,6 +1380,7 @@ function editPro(p){
   $("#r-save").onclick=()=>{const n=$("#r-name").value.trim();if(!n)return;
     const hours={};document.querySelectorAll("#r-hours .hrow").forEach(r=>{const on=r.querySelector("input[type=checkbox]").checked;const[a,b]=r.querySelectorAll("input[type=time]");hours[r.dataset.d]=on?[a.value,b.value]:null});
     const svc=[...document.querySelectorAll("#r-svcs input:checked")].map(i=>i.value);
+    const wantAct=$("#r-act").checked;if(wantAct&&(isNew||p.active===false)&&S.pros.filter(x=>x.active!==false&&x!==p).length>=proLimit()){toast(proLimitMsg());return}
     Object.assign(p,{name:n,role:$("#r-role").value.trim(),commission:+$("#r-com").value||0,pin:($("#r-pin").value.replace(/\D/g,"")||"0000").slice(0,4),email:$("#r-email").value.trim().toLowerCase(),color,active:$("#r-act").checked,hours,svc});
     if(isNew){p.id=uid();S.pros.push(p)}save();closeM();render();toast(t("saved"))};
   if(!isNew)$("#r-del").onclick=()=>{const u=snap();S.pros=S.pros.filter(x=>x.id!==p.id);save();closeM();render();undoable(t("deleted"),u)};
