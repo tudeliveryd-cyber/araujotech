@@ -306,7 +306,7 @@ function slots(date){
 }
 function nextFree(){for(let i=0;i<14;i++){const d=new Date();d.setDate(d.getDate()+i);const s=ymd(d);const f=slots(s).find(x=>x.free);if(f)return{date:s,time:toHM(f.m)}}return null}
 const freePro=(date,m)=>eligible().find(p=>fits(p,date,m));
-const dateLabel=s=>parse(s).toLocaleDateString(t("fmt"),{weekday:"long",day:"numeric",month:"long"});
+const dateLabel=s=>{const r=parse(s).toLocaleDateString(t("fmt"),{weekday:"long",day:"numeric",month:"long"});return r.charAt(0).toUpperCase()+r.slice(1)};
 const dayWord=s=>{const td=ymd(new Date()),tm=new Date();tm.setDate(tm.getDate()+1);return s===td?t("today"):s===ymd(tm)?t("tmrw"):parse(s).toLocaleDateString(t("fmt"),{weekday:"short",day:"numeric"})};
 function openStatus(){const n=new Date(),dow=n.getDay(),m=n.getHours()*60+n.getMinutes(),r=dayRange(dow);
   if(r&&m>=toMin(r[0])&&m<toMin(r[1]))return{on:true,txt:`${t("open")}`,sub:`· ${t("closes")} ${r[1]}`};
@@ -443,7 +443,7 @@ function renderSheet(){
 function summary(proName){return `<div class="summary"><div class="hd">${logoEl("logo")}<div><b>${esc(SALON.name)}</b><div class="note">${esc(SALON.address||"")}</div></div></div>
   <div class="row"><span>${t("service")}</span><span>${esc(sel().map(s=>s.name).join(" + "))}</span></div>
   <div class="row"><span>${t("pro")}</span><span>${esc(proName)}</span></div>
-  <div class="row"><span>${t("date")}</span><span style="text-transform:capitalize">${dateLabel(st.date)}</span></div>
+  <div class="row"><span>${t("date")}</span><span>${dateLabel(st.date)}</span></div>
   <div class="row"><span>${t("hour")}</span><span class="num">${st.time} · ${dur()} ${t("min")}</span></div>
   <div class="row tot"><span>${t("total")}</span><span class="num">${gs(total())}</span></div></div>`}
 function showPrivacy(){$("#layer").innerHTML=`<div class="ov" id="ov"><div class="modal" role="dialog" aria-modal="true" aria-label="${t("privacy")}"><h3>${t("privacy")}</h3><p>${esc(t("privacyT").replace("{salon}",SALON.name))}</p><button class="btn" id="ovx">${t("close")}</button></div></div>`;
