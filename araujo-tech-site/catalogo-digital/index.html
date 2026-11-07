@@ -201,5 +201,16 @@ function render(){const t=T[lang];document.documentElement.lang=lang==='pt'?'pt-
 document.querySelectorAll('[data-lang]').forEach(b=>b.addEventListener('click',()=>{lang=b.dataset.lang;try{localStorage.setItem('at_lang',lang)}catch(e){}render()}));
 render();
 </script>
+<script>
+/* contador de visitas (uma por sessão; pessoas únicas por dia). Não conta o dono (admin). */
+(function(){try{if(navigator.webdriver)return;let me=false;try{me=localStorage.getItem('at_me')==='1'}catch(e){}if(me)return;
+ const d=new Date(),id=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+ try{if(sessionStorage.getItem('at_vs')==='1')return;sessionStorage.setItem('at_vs','1')}catch(e){}
+ let first=true;try{first=localStorage.getItem('at_vday')!==id;localStorage.setItem('at_vday',id)}catch(e){}
+ const P='projects/araujotech-catalogos/databases/(default)/documents';
+ fetch('https://firestore.googleapis.com/v1/'+P+':commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({writes:[{update:{name:P+'/visitas/'+id,fields:{}},updateMask:{fieldPaths:[]},updateTransforms:[{fieldPath:'n',increment:{integerValue:'1'}},{fieldPath:'u',increment:{integerValue:first?'1':'0'}}]}]})}).catch(()=>{})
+}catch(e){}})();
+</script>
 </body>
 </html>
