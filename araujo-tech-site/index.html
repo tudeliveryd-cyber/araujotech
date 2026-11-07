@@ -310,12 +310,10 @@ html.anim .rv.in{opacity:1;transform:none}
 a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)}
 .cl img{width:52px;height:52px;border-radius:12px;object-fit:cover;flex:none}
 .cl b{display:block;font-size:15px}.cl small{font-size:13px;color:var(--muted)}
-.wafab{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:8px;background:#16A34A;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px 12px 14px;border-radius:999px;box-shadow:0 12px 30px rgba(22,163,74,.4);opacity:0;transform:translateY(20px) scale(.9);pointer-events:none;transition:opacity .3s,transform .3s}
+.wafab{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px 12px 14px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.22);opacity:0;transform:translateY(20px) scale(.9);pointer-events:none;transition:opacity .3s,transform .3s}
 .wafab.on{opacity:1;transform:none;pointer-events:auto}
-.wafab::before{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:waPulse 2.4s infinite}
-@keyframes waPulse{70%{box-shadow:0 0 0 14px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
-@media(max-width:560px){.wafab span{display:none}.wafab{padding:14px;right:14px;bottom:14px}.cl{width:100%;max-width:340px}}
-@media (prefers-reduced-motion:reduce){.wafab::before{animation:none}}
+.wafab:hover{background:#1FB959}
+@media(max-width:560px){.wafab span{display:none}.wafab{width:56px;height:56px;padding:0;justify-content:center;right:14px;bottom:16px}.cl{width:100%;max-width:340px}}
 </style>
 </head>
 <body>
@@ -746,7 +744,7 @@ render();
   body:JSON.stringify({writes:[{update:{name:P+'/visitas/'+id,fields:{}},updateMask:{fieldPaths:[]},updateTransforms:[{fieldPath:'n',increment:{integerValue:'1'}},{fieldPath:'u',increment:{integerValue:first?'1':'0'}}]}]})}).catch(()=>{})
 }catch(e){}})();
 </script>
-<a class="wafab js-wa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-13.4 7.9L3 21l1.1-4.6A9 9 0 1 1 21 12Z"/><path d="M9 9.5c.3 2.6 2.3 4.6 4.9 5l1.4-1.4-2-.9-.9.9a3.6 3.6 0 0 1-1.9-1.9l.9-.9-.9-2z"/></svg><span data-t="wa_fab">Escribinos</span></a>
+<a class="wafab js-wa" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 32 32" width="28" height="28" fill="currentColor" aria-hidden="true"><path d="M16.04 3C9.4 3 4 8.36 4 14.97c0 2.12.56 4.18 1.62 6L4 29l8.25-2.15A12.1 12.1 0 0 0 16.04 27C22.68 27 28 21.64 28 15.03 28 8.36 22.68 3 16.04 3Zm0 21.9c-1.8 0-3.56-.48-5.1-1.4l-.37-.22-4.9 1.27 1.3-4.75-.24-.39a9.8 9.8 0 0 1-1.52-5.24c0-5.47 4.47-9.92 9.96-9.92 5.47 0 9.88 4.45 9.88 9.98 0 5.47-4.44 9.67-9.01 9.67Zm5.46-7.42c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15s-.77.97-.94 1.17c-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.48.71.31 1.26.49 1.7.63.71.22 1.36.19 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35Z"/></svg><span data-t="wa_fab">Escribinos</span></a>
 <script>
 /* ===== vitrine, título animado e aparecer ao rolar ===== */
 (function(){
