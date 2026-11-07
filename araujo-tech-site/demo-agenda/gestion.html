@@ -578,8 +578,8 @@ function seed(){
     sv("s4","Mechas / Balayage","Color",180,450000),sv("s5","Hidratación profunda","Tratamientos",45,90000),sv("s6","Alisado progresivo","Tratamientos",180,400000),
     sv("s7","Corte masculino","Barbería",30,50000),sv("s8","Barba","Barbería",30,35000),sv("s9","Manicura","Uñas",45,50000),
     sv("s10","Pedicura","Uñas",60,70000),sv("s11","Esmaltado semipermanente","Uñas",60,90000),sv("s12","Maquillaje social","Estética",60,150000),sv("s13","Diseño de cejas","Estética",30,40000)];
-  const products=[{id:"pr1",name:"Pomada mate 100 g",price:65000,cost:38000,stock:9,min:3},{id:"pr2",name:"Shampoo sin sal 300 ml",price:85000,cost:50000,stock:2,min:3},
-    {id:"pr3",name:"Aceite para barba",price:55000,cost:30000,stock:6,min:2},{id:"pr4",name:"Agua / gaseosa",price:8000,cost:4000,stock:24,min:6}];
+  const products=[{id:"pr1",name:"Pomada mate 100 g",price:65000,cost:38000,stock:9,min:3,desc:"Fijación fuerte, acabado natural sin brillo."},{id:"pr2",name:"Shampoo sin sal 300 ml",price:85000,cost:50000,stock:2,min:3,desc:"Para uso diario, cuida el color."},
+    {id:"pr3",name:"Aceite para barba",price:55000,cost:30000,stock:6,min:2,desc:"Hidrata y suaviza. Aroma a madera."},{id:"pr4",name:"Agua / gaseosa",price:8000,cost:4000,stock:24,min:6,web:false}];
   const names=["María José Fernández","Andrea Cáceres","Lucía Benítez","Paola Martínez","Sofía Rolón","Valeria Duarte","Gabriela Acosta","Natalia Villalba","Carolina Ayala","Fernanda Silva","Juan Pablo Ortiz","Marcos Riveros","Daniela Franco","Patricia Báez","Rodrigo Gómez","Elena Sosa"];
   const T0=today(); let r=7;
   const rnd=()=>{r=(r*9301+49297)%233280;return r/233280};
@@ -757,11 +757,11 @@ function renderAuth(){
 /* ---------- Estructura ---------- */
 /* ---------- Plan contratado (lo define Araújo Tech al instalar) ---------- */
 const PLAN_ID="premium";
-const PLANS={esencial:{n:"Esencial",pros:2,off:["proLogin","commissions","reports","products","loyalty","promos"]},crecimiento:{n:"Crecimiento",pros:6,off:[]},premium:{n:"Premium",pros:0,off:[]}};
+const PLANS={esencial:{n:"Esencial",pros:2,off:["proLogin","commissions","reports","loyalty","promos","shop"]},crecimiento:{n:"Crecimiento",pros:6,off:[]},premium:{n:"Premium",pros:0,off:[]}};
 const PLAN=PLANS[PLAN_ID]||PLANS.premium;
 const can=f=>!PLAN.off.includes(f);
 const proLimit=()=>PLAN.pros||Infinity;
-const LOCK_VIEW={products:"products",reports:"reports"};
+const LOCK_VIEW={reports:"reports"};
 const lockedView=v=>LOCK_VIEW[v]&&!can(LOCK_VIEW[v]);
 const AT_WA="595982086171";
 function upMsg(){const es=LG()!=="pt";return encodeURIComponent((es?"Hola, quiero mejorar el plan de ":"Olá, quero melhorar o plano de ")+S.cfg.name+(es?" (plan actual: ":" (plano atual: ")+PLAN.n+").")}
@@ -902,9 +902,9 @@ V.services=()=>{
   </tbody></table></section>`).join(""):`<div class="panel empty">—</div>`);
 };
 
-V.products=()=>top(t("products"),"",`<button class="btn" data-act="sell">${ic("cash")}${t("sell")}</button><button class="btn pri" data-act="editProd">${ic("plus")}${t("addProd")}</button>`)+`
+V.products=()=>top(t("products"),"",`<button class="btn" data-act="sell">${ic("cash")}${t("sell")}</button><button class="btn pri" data-act="editProd">${ic("plus")}${t("addProd")}</button>`)+(can("shop")?"":`<div class="banner"><span>${ic("lock")} ${LG()!=="pt"?"Mostrar sus productos en la página de reservas (vitrina online) está disponible desde el plan Crecimiento.":"Mostrar seus produtos na página de reservas (vitrine online) está disponível a partir do plano Crecimiento."}</span><a class="btn sm" href="https://wa.me/${AT_WA}?text=${upMsg()}" target="_blank" rel="noopener">${LG()!=="pt"?"Mejorar plan":"Melhorar plano"}</a></div>`)+`
   <section class="panel tbl-wrap"><table><thead><tr><th>${t("name")}</th><th class="r">${t("price")}</th><th class="r">${t("cost")}</th><th class="r">${t("stock")}</th><th></th></tr></thead><tbody>
-  ${S.products.length?S.products.map(p=>`<tr class="click" data-act="editProd" data-id="${p.id}"><td><b>${esc(p.name)}</b></td><td class="r num">${gs(p.price)}</td><td class="r num" style="color:var(--muted)">${gs(p.cost)}</td><td class="r num"><b>${p.stock}</b></td><td>${p.stock<=(p.min||0)?`<span class="pill st-low">${t("lowStock")}</span>`:`<span class="pill st-ok">OK</span>`}</td></tr>`).join(""):`<tr><td colspan="5" class="empty">—</td></tr>`}
+  ${S.products.length?S.products.map(p=>`<tr class="click" data-act="editProd" data-id="${p.id}"><td><div class="row" style="gap:10px"><span style="width:36px;height:36px;border-radius:9px;background:var(--surface2);display:grid;place-items:center;overflow:hidden;flex:none">${p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover" alt="">`:ic("box")}</span><div><b>${esc(p.name)}</b>${can("shop")&&p.web!==false?`<div style="font-size:12px;color:var(--muted)">${LG()!=="pt"?"Visible en la página de reservas":"Visível na página de reservas"}</div>`:""}</div></div></td><td class="r num">${gs(p.price)}</td><td class="r num" style="color:var(--muted)">${gs(p.cost)}</td><td class="r num"><b>${p.stock}</b></td><td>${p.stock<=(p.min||0)?`<span class="pill st-low">${t("lowStock")}</span>`:`<span class="pill st-ok">OK</span>`}</td></tr>`).join(""):`<tr><td colspan="5" class="empty">—</td></tr>`}
   </tbody></table></section>`;
 
 V.pros=()=>{
@@ -1036,7 +1036,8 @@ create policy "equipo_crea" on public_info for insert to authenticated with chec
 create policy "equipo_actualiza" on public_info for update to authenticated using (true);
 
 -- 3. Reservas: el público solo puede crear, el equipo lee y procesa
-create table if not exists reservas (id uuid primary key default gen_random_uuid(), created_at timestamptz default now(), nombre text, telefono text, servicios text[], profesional text, fecha date, hora text, duracion int, precio int, procesada boolean default false);
+create table if not exists reservas (id uuid primary key default gen_random_uuid(), created_at timestamptz default now(), nombre text, telefono text, servicios text[], profesional text, fecha date, hora text, duracion int, precio int, productos jsonb, procesada boolean default false);
+alter table reservas add column if not exists productos jsonb;
 alter table reservas enable row level security;
 create policy "publico_crea" on reservas for insert to anon, authenticated with check (procesada = false);
 create policy "equipo_lee" on reservas for select to authenticated using (true);
@@ -1218,7 +1219,7 @@ function bindPicker(items,onChange){
 }
 function stockOut(items){items.forEach(i=>{const p=S.products.find(x=>x.id===i.id);if(p)p.stock=Math.max(0,p.stock-i.qty)})}
 function checkout(a){
-  let method="cash";const items=[];
+  let method="cash";const items=(a.items||[]).filter(i=>S.products.some(p=>p.id===i.id)).map(i=>({...i}));
   const svs=a.serviceIds.map(id=>S.services.find(s=>s.id===id)).filter(Boolean);
   const reward=loyaltyReady(a.clientId);
   const body=`<div><b>${esc(cliOf(a.clientId).name)}</b><div style="color:var(--muted)">${fmtDate(a.date,{day:"numeric",month:"long"})} · ${a.start} · ${esc(proOf(a.proId).name)}</div></div>
@@ -1353,10 +1354,17 @@ function editProd(p){
     <div class="grid2"><div class="field"><label for="q-price">${t("price")} (₲)</label><input class="inp num" type="number" min="0" step="1000" id="q-price" value="${p.price}"></div>
     <div class="field"><label for="q-cost">${t("cost")} (₲)</label><input class="inp num" type="number" min="0" step="1000" id="q-cost" value="${p.cost}"></div></div>
     <div class="grid2"><div class="field"><label for="q-stock">${t("stock")}</label><input class="inp num" type="number" min="0" id="q-stock" value="${p.stock}"></div>
-    <div class="field"><label for="q-min">${t("minStock")}</label><input class="inp num" type="number" min="0" id="q-min" value="${p.min}"></div></div>`,
+    <div class="field"><label for="q-min">${t("minStock")}</label><input class="inp num" type="number" min="0" id="q-min" value="${p.min}"></div></div>
+    <div ${can("shop")?"":"hidden"} style="display:flex;flex-direction:column;gap:12px">
+    <label class="row" style="gap:8px;cursor:pointer"><input type="checkbox" id="q-web" ${p.web!==false?"checked":""} style="accent-color:var(--accent);width:16px;height:16px">${LG()!=="pt"?"Mostrar en la página de reservas":"Mostrar na página de reservas"}</label>
+    <div class="field"><label for="q-desc">${LG()!=="pt"?"Descripción corta":"Descrição curta"}</label><input class="inp" id="q-desc" maxlength="90" value="${esc(p.desc||"")}"></div>
+    <div class="field"><label>${LG()!=="pt"?"Foto":"Foto"}</label><div class="row" style="gap:12px"><span id="q-ph" style="width:64px;height:64px;border-radius:12px;background:var(--surface2);display:grid;place-items:center;overflow:hidden;flex:none">${p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover">`:ic("box")}</span><label class="btn sm" style="cursor:pointer">${ic("upload")}${LG()!=="pt"?"Subir foto":"Enviar foto"}<input type="file" accept="image/*" id="q-file" hidden></label>${p.photo?`<button class="btn sm" type="button" id="q-noph">${t("del")}</button>`:""}</div></div></div>`,
     `${isNew?"":`<div class="left"><button class="btn danger" id="q-del">${ic("trash")}${t("del")}</button></div>`}<button class="btn" data-act="closeM">${t("cancel")}</button><button class="btn pri" id="q-save">${t("save")}</button>`,"sm");
+  let photo=p.photo||"";
+  $("#q-file").onchange=e=>{const f=e.target.files[0];if(f)compressImg(f,600,true,d=>{photo=d;$("#q-ph").innerHTML=`<img src="${d}" style="width:100%;height:100%;object-fit:cover">`})};
+  if($("#q-noph"))$("#q-noph").onclick=()=>{photo="";$("#q-ph").innerHTML=ic("box")};
   $("#q-save").onclick=()=>{const n=$("#q-name").value.trim();if(!n)return;
-    Object.assign(p,{name:n,price:+$("#q-price").value||0,cost:+$("#q-cost").value||0,stock:+$("#q-stock").value||0,min:+$("#q-min").value||0});
+    Object.assign(p,{name:n,price:+$("#q-price").value||0,cost:+$("#q-cost").value||0,stock:+$("#q-stock").value||0,min:+$("#q-min").value||0,web:$("#q-web").checked,desc:$("#q-desc").value.trim(),photo});
     if(isNew){p.id=uid();S.products.push(p)}save();closeM();render();toast(t("saved"))};
   if(!isNew)$("#q-del").onclick=()=>{const u=snap();S.products=S.products.filter(x=>x.id!==p.id);save();closeM();render();undoable(t("deleted"),u)};
 }
@@ -1392,6 +1400,7 @@ function publicInfo(){
   return {cfg:{name:S.cfg.name,logo:S.cfg.logo,phone:S.cfg.phone,address:S.cfg.address,brand:S.cfg.brand,instagram:S.cfg.instagram,maps:S.cfg.maps,photos:S.cfg.photos,cover:S.cfg.cover||"",step:S.cfg.step,open:S.cfg.open,close:S.cfg.close,lang:S.cfg.lang,policy:S.cfg.policy||""},
     services:S.services.map(s=>({id:s.id,name:s.name,cat:s.cat,dur:s.dur,price:s.price,desc:s.desc||""})),
     pros:activePros().map(p=>({id:p.id,name:p.name,role:p.role,color:p.color,hours:p.hours,svc:p.svc&&p.svc.length?p.svc:null})),
+    products:can("shop")?S.products.filter(p=>p.web!==false).map(p=>({id:p.id,name:p.name,price:p.price,stock:p.stock,desc:p.desc||"",photo:p.photo||""})):[],
     busy:S.appts.filter(a=>a.date>=from&&a.date<=to&&live(a)).map(a=>({p:a.proId,d:a.date,s:a.start,u:a.dur}))};
 }
 function cloudPush(){
@@ -1444,7 +1453,8 @@ async function importBookings(rows){
     const dur=r.duracion||svs.reduce((s,v)=>s+v.dur,0);
     let proId=r.profesional&&r.profesional!=="any"?r.profesional:null;
     if(!proId){const d=toMin(r.hora);proId=(activePros().find(p=>!S.appts.some(a=>a.proId===p.id&&a.date===r.fecha&&live(a)&&d<toMin(a.start)+a.dur&&d+dur>toMin(a.start)))||activePros()[0]||{}).id}
-    S.appts.push({id:"rv_"+r.id,clientId:c.id,proId,serviceIds:svs.map(s=>s.id),date:r.fecha,start:r.hora,dur,price:r.precio||svs.reduce((s,v)=>s+v.price,0),status:"pending",notes:"Reserva online",paid:null,deposit:0});
+    const items=(Array.isArray(r.productos)?r.productos:[]).map(i=>{const p=S.products.find(x=>x.id===i.id);return p?{id:p.id,name:p.name,price:p.price,qty:Math.max(1,+i.qty||1)}:null}).filter(Boolean);
+    S.appts.push({id:"rv_"+r.id,clientId:c.id,proId,serviceIds:svs.map(s=>s.id),date:r.fecha,start:r.hora,dur,price:r.precio||svs.reduce((s,v)=>s+v.price,0),status:"pending",notes:"Reserva online"+(items.length?" · "+(LG()!=="pt"?"Separar: ":"Separar: ")+items.map(i=>i.qty+"× "+i.name).join(", "):""),paid:null,deposit:0,...(items.length?{items}:{})});
     n++;try{await sb.from("reservas").update({procesada:true}).eq("id",r.id)}catch(e){}}
   if(n){ui.newBookings+=n;save();if(!$("#layer").innerHTML)render()}
 }
