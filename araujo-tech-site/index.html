@@ -263,6 +263,45 @@ footer a:hover{color:#fff;text-decoration:underline;text-underline-offset:4px}
 /* rodapé centralizado (computador e celular) */
 footer{text-align:center}footer .flogo{display:block;margin:0 auto 16px}footer p{margin-inline:auto}footer ul{justify-items:center}.fgrid{justify-items:center}.fbot{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px}
 .fgrid{display:flex!important;justify-content:center;flex-wrap:wrap;gap:40px 80px}.fgrid>div{flex:0 1 auto}.fgrid>div:first-child{flex-basis:100%;max-width:520px}@media (max-width:600px){.fgrid{flex-direction:column;align-items:center;gap:28px}}
+
+/* ===== vitrine no topo ===== */
+.hero .wrap.hgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center}
+.hero .hgrid h1{font-size:clamp(40px,4.6vw,66px);line-height:1.02;margin-bottom:14px;max-width:12ch}
+.hero .hgrid h1,.hero .hgrid .ctas,.hero .hgrid p{animation:none}
+.hero h1 .w{display:inline-block;opacity:0;transform:translateY(.45em) rotate(2deg);filter:blur(6px);animation:wIn .7s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i)*70ms + .05s)}
+@keyframes wIn{to{opacity:1;transform:none;filter:none}}
+@keyframes upIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.hrot{font-family:var(--display);font-weight:800;font-size:clamp(20px,2vw,28px);margin:0 0 22px;color:rgba(255,255,255,.75);display:flex;gap:.35em;align-items:baseline;flex-wrap:wrap;opacity:0;animation:upIn .7s .45s cubic-bezier(.2,.7,.2,1) forwards}
+.hrot .rw{position:relative;display:inline-block;color:#fff;background:linear-gradient(90deg,#C4B5FD,#F0ABFC);-webkit-background-clip:text;background-clip:text;color:transparent;transition:opacity .35s,transform .35s,filter .35s}
+.hrot .rw.out{opacity:0;transform:translateY(-.4em);filter:blur(4px)}
+.hrot .rw::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:3px;border-radius:3px;background:linear-gradient(90deg,#A78BFA,#F0ABFC);transform-origin:left;animation:uline 4s linear infinite}
+@keyframes uline{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.hero .hgrid p{opacity:0;animation:upIn .8s .55s cubic-bezier(.2,.7,.2,1) forwards}
+.hero .hgrid .ctas{opacity:0;animation:upIn .8s .68s cubic-bezier(.2,.7,.2,1) forwards}
+.show{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;opacity:0;animation:shIn 1s .3s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes shIn{from{opacity:0;transform:translateY(30px) scale(.96)}to{opacity:1;transform:none}}
+.show .glow{position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.45),transparent 65%);top:6%;filter:blur(10px);pointer-events:none;animation:glow 6s ease-in-out infinite}
+@keyframes glow{50%{transform:scale(1.12);opacity:.7}}
+.sh-phone{position:relative;width:228px;aspect-ratio:600/1298;border-radius:36px;border:9px solid #0b0614;background:#0b0614;box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.12);overflow:hidden;touch-action:pan-y;animation:float 7s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+.sh-track{display:flex;height:100%;transition:transform .7s cubic-bezier(.4,.1,.2,1)}
+.sh-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;object-position:top;display:block;background:#1b1030}
+.sh-cap{text-align:center;min-height:84px;position:relative;z-index:1;transition:opacity .3s}
+.sh-cap.out{opacity:0}
+.sh-cap small{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#C4B5FD}
+.sh-cap b{display:block;font-family:var(--display);font-size:21px;margin:4px 0 10px}
+.sh-cap a{display:inline-flex;align-items:center;gap:6px;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:8px 16px;transition:background .15s}
+.sh-cap a:hover{background:rgba(255,255,255,.12)}
+.sh-dots{display:flex;gap:8px;position:relative;z-index:1}
+.sh-dots button{width:9px;height:9px;border-radius:9px;border:0;background:rgba(255,255,255,.35);padding:0;cursor:pointer;transition:width .3s,background .3s}
+.sh-dots button[aria-current="true"]{width:26px;background:#fff}
+.sh-all{position:relative;z-index:1;color:rgba(255,255,255,.8);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+@media(min-width:901px){.hero{padding:120px 0 70px}}
+@media(max-width:900px){.hero .wrap.hgrid{grid-template-columns:1fr;gap:34px}.sh-phone{width:220px}.show .glow{width:300px;height:300px}}
+/* aparecer ao rolar */
+html.anim .rv{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+html.anim .rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.hero h1 .w,.hrot,.hero .hgrid p,.hero .hgrid .ctas,.show{opacity:1!important;animation:none!important;filter:none!important;transform:none!important}.sh-phone,.show .glow,.hrot .rw::after{animation:none!important}html.anim .rv{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -290,18 +329,23 @@ footer{text-align:center}footer .flogo{display:block;margin:0 auto 16px}footer p
 <main>
 <div class="hero" id="inicio">
   <img class="mark" src="img/simbolo-roxo.svg" alt="" aria-hidden="true">
-  <div class="wrap">
+  <div class="wrap hgrid"><div class="hl">
     <h1 data-t="h1">Sistemas a la medida de su negocio</h1>
+    <div class="hrot" aria-live="polite"><span data-t="rot_pre">Para</span> <span class="rw" id="rotW">comercios</span></div>
     <p data-t="h_p">Hacemos aplicaciones y sistemas web para comercios, empresas de delivery e iglesias. Funcionan en el celular y en la computadora, en español y en portugués.</p>
     <div class="ctas">
       <a href="#" class="btn btn-white js-wa"><svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-13.4 7.9L3 21l1.1-4.6A9 9 0 1 1 21 12Z"/></svg><span data-t="h_b1">Escribir por WhatsApp</span></a>
       <a href="catalogo-digital/" class="btn btn-line" data-t="h_b2">Ver el catálogo digital</a>
     </div>
-    <a class="hero-feat" href="catalogo-digital/#rubros">
-      <span class="hf-tag" data-t="hf_tag">Nuevo</span>
-      <span class="hf-txt"><b data-t="hf_t">Catálogo digital con pedidos por WhatsApp</b><span data-t="hf_p">Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar</span></span>
-      <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-    </a>
+  </div>
+  <div class="show" id="show"><span class="glow"></span>
+    <div class="sh-phone"><div class="sh-track" id="shTrack">
+      <img src="img/sistemas/catalogo-cel.jpg" alt="Catálogo digital" width="600" height="1298"><img data-src="img/sistemas/agenda-cel.jpg" alt="Agenda para Salones y Barberías" width="600" height="1298"><img data-src="img/sistemas/pulpito-cel.jpg" alt="Meu Púlpito" width="600" height="1298"><img data-src="img/sistemas/caja-cel.jpg" alt="Caja de Entregas" width="600" height="1298">
+    </div></div>
+    <div class="sh-cap" id="shCap"></div>
+    <div class="sh-dots" id="shDots"></div>
+    <a class="sh-all" href="#sistemas" data-t="sh_all">Ver todos los sistemas</a>
+  </div>
   </div>
 </div>
 
@@ -488,7 +532,7 @@ es:{
  n1:"Sistemas",n2:"Quiénes somos",n3:"Cómo trabajamos",n4:"Preguntas",n5:"Pedir presupuesto",
  h1:"Sistemas a la medida de su negocio",
  h_p:"Hacemos aplicaciones y sistemas web para comercios, empresas de delivery e iglesias. Funcionan en el celular y en la computadora, en español y en portugués.",
- h_b1:"Escribir por WhatsApp",h_b2:"Ver el catálogo digital",hf_tag:"Nuevo",hf_t:"Catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar",hf_tag:"Nuevo",hf_t:"Catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar",h_where:"Desde Santa Rita, Alto Paraná, para Paraguay y Brasil.",
+ h_b1:"Escribir por WhatsApp",h_b2:"Ver el catálogo digital",rot_pre:"Para",sh_all:"Ver todos los sistemas",hf_tag:"Nuevo",hf_t:"Catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar",hf_tag:"Nuevo",hf_t:"Catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar",h_where:"Desde Santa Rita, Alto Paraná, para Paraguay y Brasil.",
  s_h:"Sistemas",s_p:"Cada uno nació para resolver un problema real y se usa todos los días. Todos se pueden adaptar a su negocio.",
  ok:"Disponible",dev:"En desarrollo",open:"Abrir",demo:"Ver demostración",mas:"Ver todas las funciones",ask:"Pedir una demostración",soon:"Quiero saber más",
  s_more:"¿Su negocio necesita algo que no está en esta lista? Cuéntenos qué le hace falta.",s_more_b:"Contar mi idea",
@@ -523,7 +567,7 @@ pt:{
  n1:"Sistemas",n2:"Quem somos",n3:"Como trabalhamos",n4:"Perguntas",n5:"Pedir orçamento",
  h1:"Sistemas sob medida para o seu negócio",
  h_p:"Fazemos aplicativos e sistemas web para comércios, empresas de delivery e igrejas. Funcionam no celular e no computador, em português e em espanhol.",
- h_b1:"Falar no WhatsApp",h_b2:"Ver o catálogo digital",hf_tag:"Novo",hf_t:"Catálogo digital com pedidos pelo WhatsApp",hf_p:"Para restaurantes, lojas, farmácias e todo tipo de comércio · 30 exemplos para testar",h_where:"De Santa Rita, Alto Paraná, para o Paraguai e o Brasil.",
+ h_b1:"Falar no WhatsApp",h_b2:"Ver o catálogo digital",rot_pre:"Para",sh_all:"Ver todos os sistemas",hf_tag:"Novo",hf_t:"Catálogo digital com pedidos pelo WhatsApp",hf_p:"Para restaurantes, lojas, farmácias e todo tipo de comércio · 30 exemplos para testar",h_where:"De Santa Rita, Alto Paraná, para o Paraguai e o Brasil.",
  s_h:"Sistemas",s_p:"Cada um nasceu para resolver um problema real e é usado todos os dias. Todos podem ser adaptados ao seu negócio.",
  ok:"Disponível",dev:"Em desenvolvimento",open:"Abrir",demo:"Ver demonstração",mas:"Ver todas as funções",ask:"Pedir uma demonstração",soon:"Quero saber mais",
  s_more:"Seu negócio precisa de algo que não está nesta lista? Conte o que está faltando.",s_more_b:"Contar minha ideia",
@@ -676,6 +720,40 @@ render();
  fetch('https://firestore.googleapis.com/v1/'+P+':commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},
   body:JSON.stringify({writes:[{update:{name:P+'/visitas/'+id,fields:{}},updateMask:{fieldPaths:[]},updateTransforms:[{fieldPath:'n',increment:{integerValue:'1'}},{fieldPath:'u',increment:{integerValue:first?'1':'0'}}]}]})}).catch(()=>{})
 }catch(e){}})();
+</script>
+<script>
+/* ===== vitrine, título animado e aparecer ao rolar ===== */
+(function(){
+ const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const S=[
+  {l:'catalogo-digital/',es:['comercios','Comercios','Catálogo digital'],pt:['comércios','Comércios','Catálogo digital']},
+  {l:'demo-agenda/',es:['salones y barberías','Salones y barberías','Agenda de turnos'],pt:['salões e barbearias','Salões e barbearias','Agenda de horários']},
+  {l:'https://meupulpito.com',es:['pastores','Pastores y predicadores','Meu Púlpito'],pt:['pastores','Pastores e pregadores','Meu Púlpito']},
+  {l:'#sistemas',es:['empresas de delivery','Empresas de delivery','Caja de Entregas'],pt:['empresas de delivery','Empresas de delivery','Caixa de Entregas']}];
+ const tr=document.getElementById('shTrack'),cap=document.getElementById('shCap'),dots=document.getElementById('shDots'),rw=document.getElementById('rotW');
+ if(!tr)return;let i=0,tm=null;
+ dots.innerHTML=S.map(x=>'<button aria-label="'+x.es[2]+'"></button>').join('');
+ const L=()=>typeof lang!=='undefined'&&lang==='pt'?'pt':'es';
+ const arrow='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+ function paint(anim){const x=S[i],t=x[L()];const set=()=>{cap.innerHTML='<small>'+t[1]+'</small><b>'+t[2]+'</b><a href="'+x.l+'"'+(x.l.startsWith('http')?' target="_blank" rel="noopener"':'')+'>'+(L()==='pt'?'Ver demonstração':'Ver demostración')+' '+arrow+'</a>';rw.textContent=t[0];cap.classList.remove('out');rw.classList.remove('out')};
+  if(anim&&!RM){cap.classList.add('out');rw.classList.add('out');setTimeout(set,300)}else set();
+  [...dots.children].forEach((b,k)=>b.setAttribute('aria-current',k===i))}
+ function go(k,anim){i=(k+S.length)%S.length;tr.style.transform='translateX(-'+(i*100)+'%)';paint(anim!==false)}
+ function auto(){clearInterval(tm);if(!RM)tm=setInterval(()=>{if(!document.hidden)go(i+1)},4000)}
+ dots.addEventListener('click',e=>{const k=[...dots.children].indexOf(e.target);if(k>-1){go(k);auto()}});
+ const ph=tr.parentElement;let x0=null;
+ ph.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;clearInterval(tm)},{passive:true});
+ ph.addEventListener('touchend',e=>{if(x0==null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>40)go(i+(dx<0?1:-1));x0=null;auto()});
+ ph.addEventListener('mouseenter',()=>clearInterval(tm));ph.addEventListener('mouseleave',auto);
+ addEventListener('load',()=>tr.querySelectorAll('img[data-src]').forEach(im=>{im.src=im.dataset.src;im.removeAttribute('data-src')}));
+ // título palavra por palavra
+ function splitH1(){const h=document.querySelector('.hero h1');if(!h||RM)return;const w=h.textContent.trim().split(/\s+/);h.setAttribute('aria-label',h.textContent.trim());h.innerHTML=w.map((x,k)=>'<span class="w" aria-hidden="true" style="--i:'+k+'">'+x.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</span>').join(' ')}
+ // aparecer ao rolar
+ let io=null;if(!RM&&'IntersectionObserver' in window){document.documentElement.classList.add('anim');io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px'})}
+ function reveal(){if(!io)return;document.querySelectorAll('.sec-head,.sys,.step,#quienes .grid,.group,#faqList details,.tq,#contacto .wrap > *').forEach(el=>{if(!el.classList.contains('rv')){el.classList.add('rv');io.observe(el)}})}
+ const _r=render;render=function(){_r.apply(this,arguments);splitH1();paint(false);reveal()};
+ splitH1();go(0,false);auto();reveal();
+})();
 </script>
 </body>
 </html>
