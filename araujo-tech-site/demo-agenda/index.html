@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Reservas · Demostración</title>
+<link rel="icon" href="../favicon.png">
+<style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: perfil del negocio estilo app (portada, tarjeta superpuesta, pestañas) y reserva en una hoja a pantalla completa */
+:root{
+  --brand:#8a2d49; --brand-fg:#ffffff;
+  --bg:#ffffff; --surface:#ffffff; --surface2:color-mix(in srgb,var(--brand) 5%,#f3f3f4);
+  --fg:#141316; --muted:#6c6970; --line:color-mix(in srgb,var(--brand) 7%,#e6e6e8);
+  --accent:var(--brand); --accent-fg:var(--brand-fg); --accent-soft:color-mix(in srgb,var(--brand) 10%,#ffffff);
+  --good:#1f8a5b; --bad:#c0392b; --shade:rgb(20 10 20 / .5);
+  --f:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif; --r:14px;
+  --sh:0 1px 2px rgb(0 0 0 / .05), 0 8px 28px rgb(0 0 0 / .08);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f0f11; --surface:color-mix(in srgb,var(--brand) 5%,#18181b); --surface2:color-mix(in srgb,var(--brand) 8%,#232326);
+  --fg:#f3f2f4; --muted:#a29fa6; --line:color-mix(in srgb,var(--brand) 9%,#2e2e32);
+  --accent:color-mix(in srgb,var(--brand) 60%,#ffffff); --accent-fg:#141316; --accent-soft:color-mix(in srgb,var(--brand) 22%,#18181b);
+  --good:#5cc192; --bad:#ef7d72; --sh:0 1px 2px rgb(0 0 0 / .5); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f0f11; --surface:color-mix(in srgb,var(--brand) 5%,#18181b); --surface2:color-mix(in srgb,var(--brand) 8%,#232326);
+  --fg:#f3f2f4; --muted:#a29fa6; --line:color-mix(in srgb,var(--brand) 9%,#2e2e32);
+  --accent:color-mix(in srgb,var(--brand) 60%,#ffffff); --accent-fg:#141316; --accent-soft:color-mix(in srgb,var(--brand) 22%,#18181b);
+  --good:#5cc192; --bad:#ef7d72; --sh:0 1px 2px rgb(0 0 0 / .5); color-scheme:dark }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.page{max-width:760px;margin:0 auto;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Portada */
+.cover{position:relative;height:220px;background:linear-gradient(135deg,color-mix(in srgb,var(--brand) 92%,#000) 0%,color-mix(in srgb,var(--brand) 70%,#000) 55%,color-mix(in srgb,var(--brand) 45%,#000) 100%);overflow:hidden}
+.cover::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgb(255 255 255 / .18),transparent 45%),radial-gradient(circle at 10% 110%,rgb(255 255 255 / .12),transparent 40%)}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgb(0 0 0 / .25),transparent 40%,rgb(0 0 0 / .35))}
+.cover .tools{position:absolute;z-index:2;top:calc(12px + env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));display:flex;gap:8px}
+.roundw{width:34px;height:34px;border-radius:50%;border:0;background:rgb(255 255 255 / .92);color:#141316;display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 8px rgb(0 0 0 / .15)}
+.chipbtn{height:34px;padding:0 4px;border-radius:99px;background:rgb(255 255 255 / .92);color:#141316;display:inline-flex;align-items:center;gap:2px;box-shadow:0 2px 8px rgb(0 0 0 / .15)}
+.chipbtn button{border:0;background:none;height:26px;padding:0 10px;border-radius:99px;font-weight:700;font-size:12px;cursor:pointer;color:#6c6970}
+.chipbtn button.on{background:#141316;color:#fff}
+.count{position:absolute;z-index:2;bottom:12px;right:max(12px,env(safe-area-inset-right,0px));background:rgb(0 0 0 / .55);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;display:inline-flex;gap:6px;align-items:center}
+
+/* Tarjeta del negocio */
+.biz{position:relative;margin-top:-44px;z-index:3}
+.biz .card{background:var(--surface);border-radius:20px;box-shadow:var(--sh);padding:18px;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line)}
+.biz .top{display:flex;gap:14px;align-items:center;min-width:0}
+.biz .logo{width:64px;height:64px;border-radius:16px;object-fit:cover;flex:none;background:#fff;border:1px solid var(--line)}
+.biz .logo.ph{display:grid;place-items:center;font-weight:800;font-size:22px;background:var(--brand);color:var(--brand-fg);border:0}
+.biz h1{margin:0;font-size:22px;letter-spacing:-.03em;line-height:1.15;text-wrap:balance}
+.biz .addr{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:5px;margin-top:2px}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.status small{color:var(--muted);font-weight:500}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.act{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:12px;background:var(--surface2);color:var(--fg);text-decoration:none;font-size:12px;font-weight:600;border:0;cursor:pointer}
+.act svg{width:20px;height:20px;color:var(--accent)}
+
+/* Pestañas */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--bg);border-bottom:1px solid var(--line);margin-top:14px}
+.tabs .in{display:flex;gap:4px}
+.tabs button{flex:1;border:0;background:none;padding:14px 0 12px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;font-size:14px}
+.tabs button.on{color:var(--fg);border-bottom-color:var(--accent)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:11;background:var(--bg)}
+.section{padding-top:16px;display:flex;flex-direction:column;gap:12px}
+.search{position:relative}
+.search svg{position:absolute;left:14px;top:13px;color:var(--muted)}
+.search input{width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 14px 0 42px;font-size:15px}
+.search input:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+.cats{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.cats::-webkit-scrollbar{display:none}
+.cats button{flex:none;height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:13px;cursor:pointer}
+.cats button.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.cat-t{font-size:17px;font-weight:800;letter-spacing:-.02em;margin:10px 0 0}
+.srv{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.srv:last-child{border-bottom:0}
+.srv .tx{flex:1;min-width:0}
+.srv b{display:block;font-size:15px;font-weight:700}
+.srv .meta{color:var(--muted);font-size:13px}
+.srv .desc{color:var(--muted);font-size:13px;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.srv .pr{font-weight:700;font-size:15px;margin-top:6px}
+.pillbtn{flex:none;height:36px;padding:0 16px;border-radius:99px;border:1.5px solid var(--fg);background:var(--surface);font-weight:700;font-size:13px;cursor:pointer;color:var(--fg)}
+.pillbtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.team{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+.mem{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 8px;border-radius:var(--r);border:1px solid var(--line);background:var(--surface);cursor:pointer;text-align:center}
+.mem .av{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:20px;color:#fff;background:var(--pc)}
+.mem b{font-size:14px;line-height:1.2}
+.mem small{color:var(--muted);font-size:12px}
+.info h3{margin:6px 0 0;font-size:17px;letter-spacing:-.02em}
+.hours{display:flex;flex-direction:column}
+.hours div{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.hours div.today{font-weight:700}
+.hours span:last-child{font-variant-numeric:tabular-nums}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;display:block;max-width:100%}
+.policy{display:flex;gap:10px;padding:14px;border-radius:12px;background:var(--surface2);font-size:13px}
+.policy svg{color:var(--muted);margin-top:1px}
+.credit{text-align:center;font-size:12px;color:var(--muted);padding:20px 0 6px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.credit button{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px;padding:0}
+
+/* Barra inferior */
+.cta{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.cta .in{max-width:728px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.cta .sum{flex:1;min-width:0}
+.cta .sum b{display:block;font-size:16px;font-variant-numeric:tabular-nums}
+.cta .sum small{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:50px;padding:0 24px;border-radius:12px;border:0;background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;text-decoration:none}
+.btn.full{width:100%}
+.btn.sec{background:var(--surface2);color:var(--fg)}
+.btn:disabled{opacity:.45;cursor:default}
+
+/* Hoja de reserva */
+.sheet{position:fixed;inset:0;z-index:40;background:var(--shade);display:flex;justify-content:center;align-items:flex-end}
+.sheet .panel{background:var(--bg);width:100%;max-width:560px;height:100%;display:flex;flex-direction:column}
+@media (min-width:700px){.sheet{align-items:center;padding:24px}.sheet .panel{height:auto;max-height:100%;border-radius:20px;overflow:hidden}}
+.sh-h{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px))}
+.sh-h h2{flex:1;margin:0;font-size:17px;font-weight:800;letter-spacing:-.02em;text-align:center}
+.round{width:40px;height:40px;border-radius:50%;border:0;background:var(--surface2);display:grid;place-items:center;cursor:pointer;color:var(--fg);flex:none}
+.prog{height:3px;background:var(--line);margin:0 max(16px,env(safe-area-inset-left,0px))}
+.prog i{display:block;height:100%;background:var(--accent);border-radius:2px;transition:width .25s}
+.sh-b{flex:1;overflow-y:auto;padding-top:18px;padding-bottom:18px;display:flex;flex-direction:column;gap:16px}
+.sh-f{border-top:1px solid var(--line);padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;align-items:center;gap:12px;background:var(--surface)}
+.sh-f .sum{flex:1;min-width:0}
+.sh-f .sum b{display:block;font-size:16px;font-variant-numeric:tabular-nums}
+.sh-f .sum small{display:block;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbl{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.pick{display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;text-align:left}
+.pick.on{border-color:var(--accent);background:var(--accent-soft)}
+.pick .tx{flex:1;min-width:0}
+.pick b{display:block;font-weight:700;font-size:14px}
+.pick small{color:var(--muted);font-size:13px}
+.pick .ck{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;flex:none}
+.pick.on .ck{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.pick .ck svg{width:13px;height:13px;stroke-width:2.8}
+.avs{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px}
+.avs::-webkit-scrollbar{display:none}
+.avb{flex:none;width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;cursor:pointer;font-size:12px;font-weight:600;text-align:center;line-height:1.2}
+.avb .av{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:18px;color:#fff;background:var(--pc);box-shadow:0 0 0 2px var(--bg),0 0 0 2px transparent}
+.avb.any .av{background:var(--surface2);color:var(--fg)}
+.avb.on .av{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
+.avb small{color:var(--muted);font-weight:500}
+.month{display:flex;align-items:center;justify-content:space-between}
+.month b{font-size:16px}
+.days{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.days::-webkit-scrollbar{display:none}
+.day{flex:none;width:58px;padding:10px 0;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;text-align:center;line-height:1.2}
+.day small{display:block;font-size:12px;color:var(--muted);text-transform:capitalize}
+.day b{display:block;font-size:19px;font-weight:800;margin-top:4px}
+.day.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.day.on small{color:inherit;opacity:.85}
+.day:disabled{opacity:.35;cursor:default}
+.quick{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;border-radius:12px;background:var(--accent-soft);cursor:pointer;text-align:left;color:var(--fg)}
+.quick svg{color:var(--accent)}
+.quick b{display:block;font-size:14px}
+.quick small{color:var(--muted);font-size:12px}
+.tgroup{font-size:13px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px}
+.times{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:8px}
+.tm{height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-weight:700;font-variant-numeric:tabular-nums}
+.tm.on{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.tm:disabled{display:none}
+.empty{padding:18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;font-size:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13px;font-weight:600;color:var(--muted)}
+.inp{height:50px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);width:100%;font-size:16px}
+.inp:focus{border-color:var(--accent);outline:none}
+.summary{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--surface)}
+.summary .hd{display:flex;gap:12px;align-items:center;padding:14px;border-bottom:1px solid var(--line)}
+.summary .hd .logo{width:44px;height:44px;border-radius:12px;object-fit:cover;background:#fff;flex:none}
+.summary .hd .logo.ph{display:grid;place-items:center;font-weight:800;background:var(--brand);color:var(--brand-fg)}
+.summary .row{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;font-size:14px}
+.summary .row span:first-child{color:var(--muted)}
+.summary .row span:last-child{text-align:right;font-weight:600}
+.summary .tot{border-top:1px solid var(--line);font-size:16px}
+.summary .tot span{color:var(--fg)!important;font-weight:800!important}
+.warn{padding:10px 12px;border-radius:10px;font-size:13px;background:color-mix(in srgb,var(--bad) 12%,transparent);color:var(--bad)}
+.note{font-size:13px;color:var(--muted)}
+.done{display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;padding-top:20px}
+.done .ok{width:76px;height:76px;border-radius:50%;background:color-mix(in srgb,var(--good) 15%,transparent);color:var(--good);display:grid;place-items:center}
+.done .ok svg{width:36px;height:36px;stroke-width:2.2}
+.done h2{margin:0;font-size:24px;letter-spacing:-.03em}
+.done .summary,.done .btn{width:100%}
+.ov{position:fixed;inset:0;z-index:60;background:var(--shade);display:flex;align-items:flex-end;justify-content:center}
+.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:560px;padding:22px 20px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.modal h3{margin:0;font-size:18px}
+.modal p{margin:0;font-size:14px;color:var(--muted)}
+@media (min-width:700px){.ov{align-items:center}.modal{border-radius:20px}}
+@media (prefers-reduced-motion:no-preference){.sheet .panel{animation:up .25s cubic-bezier(.2,.8,.2,1)}@keyframes up{from{transform:translateY(24px);opacity:.4}}}
+</style>
+</head>
+<body>
+<div style="background:#5b2bb5;color:#fff;font:600 13px/1.35 system-ui,-apple-system,sans-serif;text-align:center;padding:8px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px));position:relative;z-index:30">Demostración de <b>Araújo Tech</b> · datos de ejemplo · <a href="../#contacto" style="color:#fff;text-decoration:underline">Quiero este sistema</a></div>
+<div class="page" id="page"></div>
+<div class="cta" id="cta"></div>
+<div id="sheet"></div>
+<div id="layer"></div>
+
+<script>
+(function(){
+"use strict";
+/* Nube: pegue aquí la misma URL y clave anon del panel. Vacío = datos de ejemplo. */
+const SB_URL="", SB_KEY="";
+const P={check:'<path d="m5 12.5 4.5 4.5L19 7"/>',pin:'<path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',chat:'<path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/>',
+ insta:'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8"/>',map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+ bolt:'<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',cal:'<rect x="3" y="4.5" width="18" height="16.5" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M12 13v5M9.5 15.5h5"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',x:'<path d="M6 6l12 12M18 6 6 18"/>',left:'<path d="m15 5-7 7 7 7"/>',image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.7.7 2.7 2.4 3 5.2"/>'};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${P[n]}</svg>`;
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)};
+const toMin=h=>{const[a,b]=h.split(":").map(Number);return a*60+b};
+const toHM=m=>`${pad(Math.floor(m/60))}:${pad(m%60)}`;
+const gs=n=>"₲ "+Math.round(n).toLocaleString("es-PY");
+const $=s=>document.querySelector(s);
+const ini=n=>esc(String(n||"").split(/\s+/).filter(Boolean).map(w=>w[0]).join("").slice(0,2).toUpperCase());
+
+/* Datos de ejemplo (se reemplazan por los del panel cuando la nube está conectada) */
+const H=()=>({0:null,1:["08:00","20:00"],2:["08:00","20:00"],3:["08:00","20:00"],4:["08:00","20:00"],5:["08:00","20:00"],6:["08:00","17:00"]});
+const LOLI_LOGO="";
+let SALON={name:"Salón Aurora",logo:"",phone:"0982 086171",address:"Av. Mcal. López 1240, Santa Rita",instagram:"araujo_tech_sistemas",maps:"https://maps.google.com/?q=Santa+Rita+Alto+Parana+Paraguay",photos:[],brand:"#8a2d49",lang:"es",step:30,
+  policy:"Para cancelar o cambiar su turno, avise con al menos 3 horas de anticipación por WhatsApp."};
+let PROS=[{id:"p1",name:"Laura Benítez",role:"Colorista",color:"#b5476b",svc:["s1","s3","s4","s5"],hours:H()},
+ {id:"p2",name:"Camila Ortiz",role:"Estilista",color:"#3f7fb5",svc:["s1","s2","s5","s6"],hours:Object.assign(H(),{3:null})},
+ {id:"p3",name:"Rocío Giménez",role:"Uñas",color:"#3c9a72",svc:["s9","s10","s11","s13"],hours:Object.assign(H(),{1:["13:00","20:00"],2:["13:00","20:00"]})},
+ {id:"p4",name:"Diego Ramírez",role:"Barbero",color:"#c08a2e",svc:["s7","s8"],hours:H()}];
+let SERVICES=[["s1","Corte femenino","Cabello",60,80000,"Lavado, corte y secado. Traiga una foto si tiene un estilo en mente."],["s2","Brushing","Cabello",45,60000,""],["s3","Coloración completa","Color",120,250000,"Color de raíz a puntas con productos sin amoníaco. Incluye lavado."],
+ ["s4","Mechas / Balayage","Color",180,450000,"Aclarado a mano alzada para un resultado natural. Consulta previa incluida."],["s5","Hidratación profunda","Tratamientos",45,90000,""],["s6","Alisado progresivo","Tratamientos",180,400000,"Alisado con reducción de volumen. Venga con el cabello limpio y seco."],
+ ["s7","Corte masculino","Barbería",30,50000,"Corte a máquina y tijera, con terminación a navaja."],["s8","Barba","Barbería",30,35000,""],["s9","Manicura","Uñas",45,50000,""],["s10","Pedicura","Uñas",60,70000,""],
+ ["s11","Esmaltado semipermanente","Uñas",60,90000,"Esmaltado de larga duración, hasta 3 semanas."],["s12","Maquillaje social","Estética",60,150000,""],["s13","Diseño de cejas","Estética",30,40000,""]]
+ .map(([id,name,cat,dur,price,desc])=>({id,name,cat,dur,price,desc}));
+let BUSY=null;
+function busy(proId,date){
+  if(BUSY)return BUSY.filter(b=>b.p===proId&&b.d===date).map(b=>[toMin(b.s),toMin(b.s)+b.u]);
+  const seed=[...(proId+date)].reduce((a,c)=>a*31+c.charCodeAt(0)>>>0,7);let r=seed;const out=[];
+  const rnd=()=>{r=(r*1103515245+12345)>>>0;return(r>>>8)/16777216};
+  for(let m=toMin("08:00");m<toMin("20:00");m+=30)if(rnd()<.38)out.push([m,m+(rnd()<.5?30:60)]);return out}
+
+const T={es:{tag:"Reserve su turno en un minuto",tabSvc:"Servicios",tabTeam:"Equipo",tabInfo:"Información",search:"Buscar servicio",all:"Todos",book:"Reservar",added:"Elegido",
+  open:"Abierto ahora",closes:"cierra",closedNow:"Cerrado ahora",opens:"abre",directions:"Cómo llegar",whats:"WhatsApp",photos:"fotos",
+  hoursT:"Horarios",addressT:"Dirección",photosT:"Fotos",policyT:"Política de cancelación",about:"Sobre nosotros",
+  stepSvc:"Servicios",stepWhen:"Fecha y hora",stepYou:"Confirmar",pickSvc:"Servicios elegidos",pickPro:"Profesional",any:"Sin preferencia",anyS:"más rápido",
+  noPro:"Ningún profesional hace todos esos servicios juntos. Quite uno y reserve el otro aparte.",quick:"Primer horario libre",
+  morning:"Mañana",afternoon:"Tarde",noSlot:"No quedan horarios libres este día. Pruebe otro día o con otro profesional.",
+  you:"Sus datos",name:"Nombre y apellido",phone:"WhatsApp",remember:"Guardamos sus datos en este celular para la próxima vez.",
+  next:"Continuar",confirm:"Confirmar reserva",reserveCta:"Reservar turno",sum0:"Elija un servicio",need:"Complete su nombre y WhatsApp.",fail:"No se pudo enviar. Intente de nuevo.",
+  doneT:"¡Turno reservado!",doneS:"Le confirmamos por WhatsApp en breve.",sendWa:"Avisar por WhatsApp",addCal:"Agregar a mi calendario",again:"Volver al inicio",
+  service:"Servicio",pro:"Profesional",date:"Fecha",hour:"Hora",total:"Total",min:"min",closed:"Cerrado",
+  wa:"Hola, quiero reservar en {salon}:\n• {svc}\n• {pro}\n• {date} a las {hour}\nNombre: {name}\nWhatsApp: {phone}",
+  fmt:"es-PY",dayNames:["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"],today:"Hoy",tmrw:"Mañana",privacy:"Privacidad",close:"Entendido",
+  privacyT:"Usamos su nombre y su número de WhatsApp solo para gestionar su reserva y enviarle confirmaciones o recordatorios de {salon}. No compartimos sus datos con terceros. Si quiere que borremos sus datos, escríbanos por WhatsApp."},
+ pt:{tag:"Reserve seu horário em um minuto",tabSvc:"Serviços",tabTeam:"Equipe",tabInfo:"Informações",search:"Buscar serviço",all:"Todos",book:"Reservar",added:"Escolhido",
+  open:"Aberto agora",closes:"fecha",closedNow:"Fechado agora",opens:"abre",directions:"Como chegar",whats:"WhatsApp",photos:"fotos",
+  hoursT:"Horários",addressT:"Endereço",photosT:"Fotos",policyT:"Política de cancelamento",about:"Sobre nós",
+  stepSvc:"Serviços",stepWhen:"Data e hora",stepYou:"Confirmar",pickSvc:"Serviços escolhidos",pickPro:"Profissional",any:"Sem preferência",anyS:"mais rápido",
+  noPro:"Nenhum profissional faz todos esses serviços juntos. Tire um e reserve o outro à parte.",quick:"Primeiro horário livre",
+  morning:"Manhã",afternoon:"Tarde",noSlot:"Não há horários livres neste dia. Tente outro dia ou outro profissional.",
+  you:"Seus dados",name:"Nome e sobrenome",phone:"WhatsApp",remember:"Guardamos seus dados neste celular para a próxima vez.",
+  next:"Continuar",confirm:"Confirmar reserva",reserveCta:"Reservar horário",sum0:"Escolha um serviço",need:"Preencha seu nome e WhatsApp.",fail:"Não foi possível enviar. Tente de novo.",
+  doneT:"Horário reservado!",doneS:"Confirmamos pelo WhatsApp em breve.",sendWa:"Avisar pelo WhatsApp",addCal:"Adicionar à minha agenda",again:"Voltar ao início",
+  service:"Serviço",pro:"Profissional",date:"Data",hour:"Hora",total:"Total",min:"min",closed:"Fechado",
+  wa:"Olá, quero reservar no {salon}:\n• {svc}\n• {pro}\n• {date} às {hour}\nNome: {name}\nWhatsApp: {phone}",
+  fmt:"pt-BR",dayNames:["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"],today:"Hoje",tmrw:"Amanhã",privacy:"Privacidade",close:"Entendi",
+  privacyT:"Usamos seu nome e seu número de WhatsApp só para gerenciar sua reserva e enviar confirmações ou lembretes do {salon}. Não compartilhamos seus dados com terceiros. Se quiser que apaguemos seus dados, fale com a gente pelo WhatsApp."}};
+const st={lang:null,tab:"svc",q:"",cat:"all",svc:[],pro:"any",date:null,time:null,name:"",phone:"",sheet:false,step:0,sent:false};
+try{st.lang=localStorage.getItem("reserva_lang");const me=JSON.parse(localStorage.getItem("reserva_me")||"{}");st.name=me.name||"";st.phone=me.phone||""}catch(e){}
+const LG=()=>st.lang||SALON.lang||"es";
+let THEME=null;try{THEME=localStorage.getItem("reserva_theme")}catch(e){}
+const isDark=()=>THEME?THEME==="dark":(document.documentElement.getAttribute("data-theme")==="dark"||(!document.documentElement.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches));
+function applyTheme(){if(THEME)document.documentElement.setAttribute("data-theme",THEME)}
+const t=k=>(T[LG()]||T.es)[k];
+
+function lum(hex){const n=parseInt(hex.slice(1),16);const f=c=>{c/=255;return c<=.03928?c/12.92:Math.pow((c+.055)/1.055,2.4)};return .2126*f(n>>16&255)+.7152*f(n>>8&255)+.0722*f(n&255)}
+function applyBrand(){const b=/^#[0-9a-f]{6}$/i.test(SALON.brand||"")?SALON.brand:"#8a2d49";const r=document.documentElement.style;r.setProperty("--brand",b);r.setProperty("--brand-fg",lum(b)>.42?"#141316":"#ffffff")}
+const waNum=p=>{let d=String(p||"").replace(/\D/g,"");if(d.startsWith("0"))d="595"+d.slice(1);else if(d&&d.length<=9)d="595"+d;return d};
+
+const sel=()=>st.svc.map(id=>SERVICES.find(s=>s.id===id)).filter(Boolean);
+const dur=()=>sel().reduce((a,s)=>a+s.dur,0), total=()=>sel().reduce((a,s)=>a+s.price,0);
+const canDo=p=>!p.svc||st.svc.every(id=>p.svc.includes(id));
+const eligible=()=>PROS.filter(canDo);
+const proH=(p,dow)=>(p.hours&&p.hours[dow]!==undefined)?p.hours[dow]:(dow===0?null:[SALON.open||"08:00",SALON.close||"20:00"]);
+const dayRange=dow=>{const hs=PROS.map(p=>proH(p,dow)).filter(Boolean);return hs.length?[hs.map(h=>h[0]).sort()[0],hs.map(h=>h[1]).sort().pop()]:null};
+const dayOpen=date=>!!dayRange(parse(date).getDay());
+function fits(p,date,m){const h=proH(p,parse(date).getDay()),d=dur();return h&&m>=toMin(h[0])&&m+d<=toMin(h[1])&&!busy(p.id,date).some(([a,b])=>m<b&&m+d>a)}
+function slots(date){
+  const dow=parse(date).getDay();if(!st.svc.length)return[];
+  const pros=(st.pro==="any"?eligible():PROS.filter(p=>p.id===st.pro)).filter(p=>proH(p,dow));
+  if(!pros.length)return[];
+  const out=[];const now=new Date();const isToday=date===ymd(now);const nowM=now.getHours()*60+now.getMinutes();
+  const lo=Math.min(...pros.map(p=>toMin(proH(p,dow)[0]))), hi=Math.max(...pros.map(p=>toMin(proH(p,dow)[1])));
+  for(let m=lo;m+dur()<=hi;m+=SALON.step||30){if(isToday&&m<nowM+60)continue;out.push({m,free:pros.some(p=>fits(p,date,m))})}
+  return out;
+}
+function nextFree(){for(let i=0;i<14;i++){const d=new Date();d.setDate(d.getDate()+i);const s=ymd(d);const f=slots(s).find(x=>x.free);if(f)return{date:s,time:toHM(f.m)}}return null}
+const freePro=(date,m)=>eligible().find(p=>fits(p,date,m));
+const dateLabel=s=>parse(s).toLocaleDateString(t("fmt"),{weekday:"long",day:"numeric",month:"long"});
+const dayWord=s=>{const td=ymd(new Date()),tm=new Date();tm.setDate(tm.getDate()+1);return s===td?t("today"):s===ymd(tm)?t("tmrw"):parse(s).toLocaleDateString(t("fmt"),{weekday:"short",day:"numeric"})};
+function openStatus(){const n=new Date(),dow=n.getDay(),m=n.getHours()*60+n.getMinutes(),r=dayRange(dow);
+  if(r&&m>=toMin(r[0])&&m<toMin(r[1]))return{on:true,txt:`${t("open")}`,sub:`· ${t("closes")} ${r[1]}`};
+  for(let i=0;i<8;i++){const d=(dow+i)%7,rr=dayRange(d);if(rr&&(i>0||m<toMin(rr[0])))return{on:false,txt:t("closedNow"),sub:`· ${t("opens")} ${i===0?"":i===1?t("tmrw").toLowerCase()+" ":t("dayNames")[d].toLowerCase()+" "}${rr[0]}`}}
+  return{on:false,txt:t("closedNow"),sub:""}}
+function gcal(){const d=st.date.replace(/-/g,""),a=toMin(st.time),b=a+dur(),f=m=>pad(Math.floor(m/60))+pad(m%60)+"00";
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent(sel().map(s=>s.name).join(" + ")+" · "+SALON.name)+
+    "&dates="+d+"T"+f(a)+"/"+d+"T"+f(b)+"&location="+encodeURIComponent(SALON.address||"")+"&details="+encodeURIComponent(SALON.policy||"")}
+const logoEl=cls=>SALON.logo?`<img class="${cls}" src="${esc(SALON.logo)}" alt="">`:`<div class="${cls} ph">${ini(SALON.name)}</div>`;
+
+let sb=null;
+function fromPanel(S){if(!S||!S.cfg)return;const live=a=>a.status!=="cancelled"&&a.status!=="noshow";const from=ymd(new Date());
+  SALON=Object.assign({},SALON,{name:S.cfg.name,logo:S.cfg.logo||"",cover:S.cfg.cover||"",phone:S.cfg.phone||"",address:S.cfg.address||"",brand:S.cfg.brand,instagram:S.cfg.instagram||"",maps:S.cfg.maps||"",photos:S.cfg.photos||[],step:+S.cfg.step||30,open:S.cfg.open,close:S.cfg.close,lang:S.cfg.lang,policy:S.cfg.policy||""});
+  if(S.services&&S.services.length)SERVICES=S.services.map(s=>({id:s.id,name:s.name,cat:s.cat||"General",dur:s.dur,price:s.price,desc:s.desc||""}));
+  const pr=(S.pros||[]).filter(p=>p.active!==false);if(pr.length)PROS=pr.map(p=>({id:p.id,name:p.name,role:p.role||"",color:p.color,hours:p.hours,svc:p.svc&&p.svc.length?p.svc:null}));
+  BUSY=(S.appts||[]).filter(a=>a.date>=from&&live(a)).map(a=>({p:a.proId,d:a.date,s:a.start,u:a.dur}))}
+async function cloudLoad(){
+  if(!SB_URL||!SB_KEY){try{const S=JSON.parse(localStorage.getItem("araujo_demo_agenda"));if(S&&S.cfg){fromPanel(S);applyBrand();render()}}catch(e){}return}
+  await new Promise(res=>{if(window.supabase)return res();const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";s.onload=res;s.onerror=res;document.head.appendChild(s)});
+  if(!window.supabase)return;
+  try{sb=window.supabase.createClient(SB_URL,SB_KEY);const {data}=await sb.from("public_info").select("data").eq("id","main").maybeSingle();
+    const I=data&&data.data;if(!I)return;
+    SALON=Object.assign({},SALON,I.cfg,{step:+I.cfg.step||30});
+    SERVICES=I.services.map(s=>Object.assign({cat:"General",desc:""},s));
+    PROS=I.pros;BUSY=I.busy||[];applyBrand();render();
+  }catch(e){console.warn(e)}
+}
+async function cloudSave(){
+  if(!sb)return true;
+  try{const {error}=await sb.from("reservas").insert({nombre:st.name,telefono:st.phone,servicios:st.svc,profesional:st.pro,fecha:st.date,hora:st.time,duracion:dur(),precio:total()});return !error}catch(e){return false}
+}
+
+/* ---------- Perfil del negocio ---------- */
+function render(){
+  document.title=SALON.name+" · Reservas";
+  const os=openStatus(), wn=waNum(SALON.phone), photos=SALON.photos||[];
+  const insta=(SALON.instagram||"").replace(/^@/,"");
+  let h=`<div class="cover">${(SALON.cover||photos[0])?`<img src="${esc(SALON.cover||photos[0])}" alt="">`:""}
+    <div class="tools"><div class="chipbtn" role="group" aria-label="Idioma"><button data-l="es" class="${LG()==="es"?"on":""}">ES</button><button data-l="pt" class="${LG()==="pt"?"on":""}">PT</button></div><button class="roundw" data-theme-btn="1" aria-label="Tema">${ic(isDark()?"sun":"moon")}</button></div>
+    ${photos.length>1?`<button class="count" data-tab="info">${ic("image")}${photos.length} ${t("photos")}</button>`:""}</div>
+  <div class="biz gut"><div class="card">
+    <div class="top">${logoEl("logo")}<div style="min-width:0"><h1>${esc(SALON.name)}</h1>${SALON.address?`<div class="addr">${ic("pin")}<span>${esc(SALON.address)}</span></div>`:""}</div></div>
+    <span class="status" style="--c:${os.on?"var(--good)":"var(--bad)"}">${os.txt} <small>${os.sub}</small></span>
+    <div class="actions">
+      ${wn?`<a class="act" href="https://wa.me/${wn}" target="_blank" rel="noopener">${ic("chat")}${t("whats")}</a>`:`<span class="act" style="opacity:.4">${ic("chat")}${t("whats")}</span>`}
+      ${insta?`<a class="act" href="https://instagram.com/${encodeURIComponent(insta)}" target="_blank" rel="noopener">${ic("insta")}Instagram</a>`:`<span class="act" style="opacity:.4">${ic("insta")}Instagram</span>`}
+      ${SALON.maps?`<a class="act" href="${esc(SALON.maps)}" target="_blank" rel="noopener">${ic("map")}${t("directions")}</a>`:`<button class="act" data-tab="info">${ic("map")}${t("directions")}</button>`}
+    </div></div></div>
+  <nav class="tabs"><div class="in gut">${[["svc","tabSvc"],["team","tabTeam"],["info","tabInfo"]].map(([k,l])=>`<button data-tab="${k}" class="${st.tab===k?"on":""}">${t(l)}</button>`).join("")}</div></nav>
+  <div class="gut">`;
+  if(st.tab==="svc"){
+    const cats=[...new Set(SERVICES.map(s=>s.cat))];const q=st.q.trim().toLowerCase();
+    const list=SERVICES.filter(s=>(st.cat==="all"||s.cat===st.cat)&&(!q||s.name.toLowerCase().includes(q)||(s.desc||"").toLowerCase().includes(q)));
+    h+=`<div class="section"><div class="search">${ic("search")}<input id="q" placeholder="${t("search")}" value="${esc(st.q)}" aria-label="${t("search")}"></div>
+      <div class="cats"><button data-cat="all" class="${st.cat==="all"?"on":""}">${t("all")}</button>${cats.map(c=>`<button data-cat="${esc(c)}" class="${st.cat===c?"on":""}">${esc(c)}</button>`).join("")}</div>
+      ${cats.filter(c=>list.some(s=>s.cat===c)).map(c=>`<div><div class="cat-t">${esc(c)}</div>${list.filter(s=>s.cat===c).map(s=>{const on=st.svc.includes(s.id);return `<div class="srv"><div class="tx"><b>${esc(s.name)}</b><div class="meta">${s.dur} ${t("min")}</div>${s.desc?`<div class="desc">${esc(s.desc)}</div>`:""}<div class="pr num">${gs(s.price)}</div></div><button class="pillbtn ${on?"on":""}" data-book="${s.id}">${on?t("added"):t("book")}</button></div>`}).join("")}</div>`).join("")||`<div class="empty">—</div>`}</div>`;
+  }
+  if(st.tab==="team"){
+    h+=`<div class="section"><div class="team">${PROS.map(p=>`<button class="mem" data-pro-start="${p.id}" style="--pc:${p.color}"><span class="av">${ini(p.name)}</span><b>${esc(p.name)}</b><small>${esc(p.role||"")}</small></button>`).join("")}</div></div>`;
+  }
+  if(st.tab==="info"){
+    const dn=t("dayNames"),td=new Date().getDay();
+    h+=`<div class="section info">
+      <h3>${t("hoursT")}</h3><div class="hours">${[1,2,3,4,5,6,0].map(i=>{const r=dayRange(i);return `<div class="${i===td?"today":""}"><span>${dn[i]}</span><span>${r?r[0]+" – "+r[1]:t("closed")}</span></div>`}).join("")}</div>
+      ${SALON.address?`<h3>${t("addressT")}</h3><p style="margin:0">${esc(SALON.address)}</p>${SALON.maps?`<a class="btn sec" href="${esc(SALON.maps)}" target="_blank" rel="noopener">${ic("map")}${t("directions")}</a>`:""}`:""}
+      ${SALON.policy?`<h3>${t("policyT")}</h3><div class="policy">${ic("info")}<span>${esc(SALON.policy)}</span></div>`:""}
+      ${photos.length?`<h3>${t("photosT")}</h3><div class="photos">${photos.map(p=>`<img src="${esc(p)}" alt="" loading="lazy">`).join("")}</div>`:""}</div>`;
+  }
+  h+=`<div class="credit"><span>Desarrollado por <b>Araújo Tech</b></span><span>·</span><button data-privacy="1">${t("privacy")}</button></div></div>`;
+  $("#page").innerHTML=h;
+  $("#cta").innerHTML=`<div class="in"><div class="sum">${st.svc.length?`<b>${gs(total())}</b><small>${esc(sel().map(s=>s.name).join(" + "))} · ${dur()} ${t("min")}</small>`:`<b>${esc(SALON.name)}</b><small>${t("tag")}</small>`}</div><button class="btn" data-open="1">${t("reserveCta")}</button></div>`;
+  $("#cta").hidden=st.sheet;
+  renderSheet();
+}
+
+/* ---------- Hoja de reserva ---------- */
+function renderSheet(){
+  const el=$("#sheet");
+  if(!st.sheet){el.innerHTML="";document.body.style.overflow="";return}
+  document.body.style.overflow="hidden";
+  const titles=[t("stepSvc"),t("stepWhen"),t("stepYou")];
+  let body="",foot="";
+  const sumHtml=()=>st.svc.length?`<b>${gs(total())}</b><small>${esc(sel().map(s=>s.name).join(" + "))} · ${dur()} ${t("min")}${st.time?" · "+dayWord(st.date)+" "+st.time:""}</small>`:`<small>${t("sum0")}</small>`;
+  if(st.sent){
+    const proName=st.pro==="any"?t("any"):(PROS.find(p=>p.id===st.pro)||{}).name, wn=waNum(SALON.phone);
+    const msg=t("wa").replace("{salon}",SALON.name).replace("{svc}",sel().map(x=>x.name).join(", ")).replace("{pro}",proName).replace("{date}",dateLabel(st.date)).replace("{hour}",st.time).replace("{name}",st.name).replace("{phone}",st.phone);
+    el.innerHTML=`<div class="sheet"><div class="panel" role="dialog" aria-modal="true" aria-label="${t("doneT")}"><div class="sh-h"><span style="width:40px"></span><h2></h2><button class="round" data-close="1" aria-label="${t("close")}">${ic("x")}</button></div>
+      <div class="sh-b gut"><div class="done"><div class="ok">${ic("check")}</div><h2>${t("doneT")}</h2><p class="note" style="margin:0">${t("doneS")}</p>
+      ${summary(proName)}
+      ${wn?`<a class="btn full" target="_blank" rel="noopener" href="https://wa.me/${wn}?text=${encodeURIComponent(msg)}">${ic("chat")}${t("sendWa")}</a>`:""}
+      <a class="btn sec full" target="_blank" rel="noopener" href="${gcal()}">${ic("cal")}${t("addCal")}</a>
+      ${SALON.policy?`<div class="policy" style="text-align:left;width:100%">${ic("info")}<span>${esc(SALON.policy)}</span></div>`:""}
+      <button class="btn sec full" data-close="1">${t("again")}</button></div></div></div></div>`;
+    return;
+  }
+  if(st.step===0){
+    const el2=eligible();
+    body=`<div class="lbl">${t("pickSvc")}</div><div style="display:flex;flex-direction:column;gap:8px">
+      ${SERVICES.filter(s=>st.pro==="any"||!(PROS.find(p=>p.id===st.pro)||{}).svc||(PROS.find(p=>p.id===st.pro).svc.includes(s.id))).map(s=>{const on=st.svc.includes(s.id);return `<button class="pick ${on?"on":""}" data-svc="${s.id}" aria-pressed="${on}"><span class="tx"><b>${esc(s.name)}</b><small>${s.dur} ${t("min")} · ${gs(s.price)}</small></span><span class="ck">${on?ic("check"):""}</span></button>`}).join("")}</div>
+      <div class="lbl">${t("pickPro")}</div>
+      <div class="avs"><button class="avb any ${st.pro==="any"?"on":""}" data-pro="any"><span class="av">${ic("users")}</span>${t("any")}<small>${t("anyS")}</small></button>
+      ${(st.svc.length?el2:PROS).map(p=>`<button class="avb ${st.pro===p.id?"on":""}" data-pro="${p.id}" style="--pc:${p.color}"><span class="av">${ini(p.name)}</span>${esc(p.name.split(" ")[0])}<small>${esc(p.role||"")}</small></button>`).join("")}</div>
+      ${st.svc.length&&!el2.length?`<div class="warn">${t("noPro")}</div>`:""}`;
+    foot=`<div class="sum">${sumHtml()}</div><button class="btn" data-next="1" ${st.svc.length&&eligible().length?"":"disabled"}>${t("next")}</button>`;
+  }
+  if(st.step===1){
+    const nf=nextFree();const days=[];const now=new Date();for(let i=0;i<21;i++){const d=new Date(now);d.setDate(now.getDate()+i);days.push(d)}
+    if(!st.date&&nf)st.date=nf.date;
+    let mon=parse(st.date||ymd(now)).toLocaleDateString(t("fmt"),{month:"long",year:"numeric"});mon=mon.charAt(0).toUpperCase()+mon.slice(1);
+    body=`${nf?`<button class="quick" data-quick="${nf.date}|${nf.time}">${ic("bolt")}<span><b>${t("quick")}: ${dayWord(nf.date)} ${nf.time}</b><small>${esc(sel().map(s=>s.name).join(" + "))}</small></span></button>`:""}
+      <div class="month"><b>${mon}</b></div>
+      <div class="days">${days.map(d=>{const s=ymd(d),open=dayOpen(s);return `<button class="day ${st.date===s?"on":""}" data-date="${s}" ${open?"":"disabled"}><small>${d.toLocaleDateString(t("fmt"),{weekday:"short"}).replace(".","")}</small><b>${d.getDate()}</b></button>`}).join("")}</div>`;
+    if(st.date){const sl=slots(st.date).filter(x=>x.free);
+      const grp=(lbl,icon,f)=>{const g=sl.filter(f);return g.length?`<div class="tgroup">${ic(icon)}${lbl}</div><div class="times">${g.map(x=>`<button class="tm ${st.time===toHM(x.m)?"on":""}" data-time="${toHM(x.m)}">${toHM(x.m)}</button>`).join("")}</div>`:""};
+      body+=sl.length?grp(t("morning"),"sun",x=>x.m<720)+grp(t("afternoon"),"moon",x=>x.m>=720):`<div class="empty">${t("noSlot")}</div>`}
+    foot=`<div class="sum">${sumHtml()}</div><button class="btn" data-next="1" ${st.time?"":"disabled"}>${t("next")}</button>`;
+  }
+  if(st.step===2){
+    const proName=st.pro==="any"?t("any"):(PROS.find(p=>p.id===st.pro)||{}).name;
+    body=`${summary(proName)}
+      <div class="lbl">${t("you")}</div>
+      <div class="field"><label for="nm">${t("name")}</label><input class="inp" id="nm" value="${esc(st.name)}" autocomplete="name"></div>
+      <div class="field"><label for="ph">${t("phone")}</label><input class="inp" id="ph" value="${esc(st.phone)}" inputmode="tel" placeholder="09xx xxx xxx" autocomplete="tel"></div>
+      <small class="note">${t("remember")}</small>
+      ${SALON.policy?`<div class="policy">${ic("info")}<span><b>${t("policyT")}.</b> ${esc(SALON.policy)}</span></div>`:""}<div id="err"></div>`;
+    foot=`<button class="btn full" data-confirm="1">${t("confirm")} · ${gs(total())}</button>`;
+  }
+  el.innerHTML=`<div class="sheet" data-shade="1"><div class="panel" role="dialog" aria-modal="true" aria-label="${titles[st.step]}">
+    <div class="sh-h"><button class="round" data-back="1" aria-label="${t("next")}">${ic("left")}</button><h2>${titles[st.step]}</h2><button class="round" data-close="1" aria-label="${t("close")}">${ic("x")}</button></div>
+    <div class="prog"><i style="width:${(st.step+1)/3*100}%"></i></div>
+    <div class="sh-b gut">${body}</div><div class="sh-f">${foot}</div></div></div>`;
+  const on=el.querySelector(".day.on");if(on)on.scrollIntoView({block:"nearest",inline:"center"});
+}
+function summary(proName){return `<div class="summary"><div class="hd">${logoEl("logo")}<div><b>${esc(SALON.name)}</b><div class="note">${esc(SALON.address||"")}</div></div></div>
+  <div class="row"><span>${t("service")}</span><span>${esc(sel().map(s=>s.name).join(" + "))}</span></div>
+  <div class="row"><span>${t("pro")}</span><span>${esc(proName)}</span></div>
+  <div class="row"><span>${t("date")}</span><span style="text-transform:capitalize">${dateLabel(st.date)}</span></div>
+  <div class="row"><span>${t("hour")}</span><span class="num">${st.time} · ${dur()} ${t("min")}</span></div>
+  <div class="row tot"><span>${t("total")}</span><span class="num">${gs(total())}</span></div></div>`}
+function showPrivacy(){$("#layer").innerHTML=`<div class="ov" id="ov"><div class="modal" role="dialog" aria-modal="true" aria-label="${t("privacy")}"><h3>${t("privacy")}</h3><p>${esc(t("privacyT").replace("{salon}",SALON.name))}</p><button class="btn" id="ovx">${t("close")}</button></div></div>`;
+  $("#ovx").onclick=()=>$("#layer").innerHTML="";$("#ov").onclick=e=>{if(e.target.id==="ov")$("#layer").innerHTML=""}}
+function openSheet(step){st.sheet=true;st.sent=false;st.step=step||0;render()}
+function closeSheet(){if(st.sent){Object.assign(st,{svc:[],pro:"any",date:null,time:null,sent:false})}st.sheet=false;render()}
+function confirm(){
+  st.name=$("#nm").value.trim();st.phone=$("#ph").value.trim();
+  if(!st.name||!st.phone){$("#err").innerHTML=`<div class="warn">${t("need")}</div>`;(st.name?$("#ph"):$("#nm")).focus();return}
+  try{localStorage.setItem("reserva_me",JSON.stringify({name:st.name,phone:st.phone}))}catch(e){}
+  if(st.pro==="any"){const p=freePro(st.date,toMin(st.time));if(p)st.pro=p.id}
+  const b=$("[data-confirm]");b.disabled=true;
+  cloudSave().then(ok=>{if(!ok){b.disabled=false;$("#err").innerHTML=`<div class="warn">${t("fail")}</div>`;return}st.sent=true;renderSheet()});
+}
+
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button,[data-shade]");if(!b)return;const d=b.dataset;
+  if(d.shade){if(e.target===b&&window.innerWidth>=700)closeSheet();return}
+  if(b.disabled)return;
+  const nm=$("#nm");if(nm){st.name=nm.value;st.phone=$("#ph").value}
+  if(d.l){st.lang=d.l;try{localStorage.setItem("reserva_lang",d.l)}catch(x){}render()}
+  else if(d.themeBtn){THEME=isDark()?"light":"dark";try{localStorage.setItem("reserva_theme",THEME)}catch(x){}applyTheme();render()}
+  else if(d.tab){st.tab=d.tab;render();const tb=$(".tabs");if(tb&&tb.getBoundingClientRect().top>60)tb.scrollIntoView({behavior:"smooth"})}
+  else if(d.cat){st.cat=d.cat;render()}
+  else if(d.book){if(!st.svc.includes(d.book))st.svc.push(d.book);st.time=null;if(st.pro!=="any"&&!canDo(PROS.find(p=>p.id===st.pro)||{}))st.pro="any";openSheet(0)}
+  else if(d.proStart){st.pro=d.proStart;st.svc=st.svc.filter(id=>{const p=PROS.find(x=>x.id===d.proStart);return !p.svc||p.svc.includes(id)});st.time=null;openSheet(0)}
+  else if(d.open){openSheet(0)}
+  else if(d.close){closeSheet()}
+  else if(d.back){if(st.step===0)closeSheet();else{st.step--;renderSheet()}}
+  else if(d.next){st.step++;renderSheet();$(".sh-b").scrollTop=0}
+  else if(d.svc){const i=st.svc.indexOf(d.svc);i<0?st.svc.push(d.svc):st.svc.splice(i,1);st.time=null;if(st.pro!=="any"&&!canDo(PROS.find(p=>p.id===st.pro)||{}))st.pro="any";render()}
+  else if(d.pro){st.pro=d.pro;st.time=null;renderSheet()}
+  else if(d.date){st.date=d.date;st.time=null;renderSheet()}
+  else if(d.time){st.time=d.time;renderSheet();const f=$(".sh-f .btn");if(f)f.focus()}
+  else if(d.quick){const[a,c]=d.quick.split("|");st.date=a;st.time=c;st.step=2;renderSheet()}
+  else if(d.confirm){confirm()}
+  else if(d.privacy){showPrivacy()}
+});
+document.addEventListener("input",e=>{if(e.target.id==="q"){st.q=e.target.value;const pos=e.target.selectionStart;render();const i=$("#q");i.focus();i.setSelectionRange(pos,pos)}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#layer").innerHTML)$("#layer").innerHTML="";else if(st.sheet)closeSheet()}});
+applyTheme();applyBrand();
+render();
+cloudLoad();
+})();
+</script>
+</body>
+</html>
