@@ -419,7 +419,7 @@ const CONFIG = {
   email:     "contacto@araujotechsistemas.com",
   instagram: "araujo_tech_sistemas",
   ciudad:    "Santa Rita, Alto Paraná, Paraguay",
-  foto:      ""                       // foto de Jean Carlos para "Quiénes somos" (ej.: "img/jean-carlos.jpg")
+  foto:      "img/jean-carlos.jpg"                       // foto de Jean Carlos para "Quiénes somos" (ej.: "img/jean-carlos.jpg")
 };
 
 /* =========================================================
@@ -645,7 +645,7 @@ render();
  const dv=v=>{if(!v)return null;if('stringValue'in v)return v.stringValue;if('booleanValue'in v)return v.booleanValue;if('integerValue'in v)return +v.integerValue;if('doubleValue'in v)return v.doubleValue;if('nullValue'in v)return null;if('arrayValue'in v)return(v.arrayValue.values||[]).map(dv);if('mapValue'in v){const o={};Object.entries(v.mapValue.fields||{}).forEach(([k,x])=>o[k]=dv(x));return o}return null};
  const url='https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U';
  const apply=c=>{if(!c)return;const K=['h1','h_p','a_p1','a_p2','a_p3','bk_p','hf_t','hf_p'];
-  if(c.contacto){['whatsapp','email','instagram','ciudad','foto'].forEach(k=>{if(typeof c.contacto[k]==='string'&&(c.contacto[k].trim()||k==='foto'))CONFIG[k]=c.contacto[k].trim()})}
+  if(c.contacto){['whatsapp','email','instagram','ciudad','foto'].forEach(k=>{if(typeof c.contacto[k]==='string'&&c.contacto[k].trim())CONFIG[k]=c.contacto[k].trim()})}
   if(c.txt)['es','pt'].forEach(L=>{const o=c.txt[L]||{};const OLD=["Comencé Tu Delivery solo, con una moto. Cuando la empresa creció, controlar la caja y las comisiones de cada repartidor en papel ya no funcionaba, así que hice el sistema que necesitaba. Como pastor, hice lo mismo con mis sermones: así nació Meu Púlpito.","Comecei a Tu Delivery sozinho, com uma moto. Quando a empresa cresceu, controlar o caixa e as comissões de cada entregador no papel já não funcionava, então fiz o sistema de que precisava. Como pastor, fiz o mesmo com os meus sermões: assim nasceu o Meu Púlpito.","Araújo Tech forma parte del grupo de Tu Delivery, empresa de entregas de Santa Rita. Cada sistema se usa primero en un negocio real antes de ofrecerlo.","A Araújo Tech faz parte do grupo da Tu Delivery, empresa de entregas de Santa Rita. Cada sistema é usado primeiro em um negócio real antes de ser oferecido."];K.forEach(k=>{if(typeof o[k]==='string'&&o[k].trim()&&!OLD.includes(o[k].trim()))T[L][k]=o[k].trim()})});
   if(Array.isArray(c.sis))c.sis.forEach(x=>{const s=SISTEMAS.find(z=>z.nombre===x.nombre);if(!s)return;if(x.status==='ok'||x.status==='dev')s.status=x.status;if(typeof x.link==='string')s.link=x.link.trim();
    ['es','pt'].forEach(L=>{const o=x[L]||{};if(o.para&&o.para.trim())s[L].para=o.para.trim();if(o.desc&&o.desc.trim())s[L].desc=o.desc.trim();if(Array.isArray(o.puntos)&&o.puntos.length)s[L].puntos=o.puntos})});
