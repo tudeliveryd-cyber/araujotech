@@ -167,7 +167,7 @@ h2{font-family:var(--display);font-weight:900;font-size:clamp(32px,4.2vw,54px);l
 .about .story h2+p{font-family:var(--display);font-weight:700;font-size:clamp(24px,2.4vw,30px);line-height:1.3;letter-spacing:-.015em}
 .about .sign{margin-top:30px;font-weight:700}
 .about .sign span{display:block;font-weight:400;color:var(--muted);font-size:16px}
-.backed{display:flex;align-items:center;gap:20px;margin-top:34px;padding:20px 22px;border-radius:16px;background:#fff;border:1px solid rgba(76,29,149,.12);max-width:640px}.backed img{height:76px;width:auto;flex:none}.backed b{display:block;font-size:17px;margin-bottom:4px}.backed span{font-size:15px;line-height:1.5;color:var(--muted)}@media (max-width:600px){.backed{flex-direction:column;align-items:flex-start;gap:14px}}
+.group{margin-top:34px;padding:22px;border-radius:18px;background:#fff;border:1px solid rgba(76,29,149,.12);max-width:680px}.g-head{display:flex;align-items:center;gap:18px}.g-logo{height:84px;width:auto;flex:none}.g-head b{display:block;font-size:18px;margin-bottom:4px}.g-head span{font-size:15px;line-height:1.5;color:var(--muted)}.g-cos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}.g-co{position:relative;border:1px solid var(--line);border-radius:14px;padding:16px 14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}.g-co img{height:46px;width:auto;max-width:100%;object-fit:contain}.g-co img[alt="Tu Delivery"]{height:58px}.g-co small{font-size:13px;color:var(--muted);line-height:1.35}.g-co.me{border-color:var(--purple);background:var(--lilac)}.g-co em{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--purple);color:#fff;font-style:normal;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}@media(max-width:560px){.g-head{flex-direction:column;align-items:flex-start;gap:12px}.g-logo{height:70px}.g-co img{height:36px}}.backed img{height:76px;width:auto;flex:none}.backed b{display:block;font-size:17px;margin-bottom:4px}.backed span{font-size:15px;line-height:1.5;color:var(--muted)}@media (max-width:600px){}
 .about .solo .story{max-width:780px}
 
 /* ---------- steps (real sequence) ---------- */
@@ -217,7 +217,7 @@ h2{font-family:var(--display);font-weight:900;font-size:clamp(32px,4.2vw,54px);l
 /* ---------- footer ---------- */
 footer{background:var(--ink);color:#B9AFC6;padding:64px 0 32px;font-size:15px}
 .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.12)}
-footer .flogo{height:48px;width:auto;margin-bottom:16px}@media (max-width:600px){.flogo{height:34px;margin-bottom:12px}}
+footer .flogo{height:48px;width:auto;margin-bottom:16px}.fgrp{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 0 4px;margin-top:10px;font-size:14px;opacity:.9}.fgrp img{height:40px;width:auto}@media (max-width:600px){.flogo{height:34px;margin-bottom:12px}}
 footer p{max-width:30em}
 footer h4{font-family:var(--display);font-weight:700;color:#fff;font-size:16px;margin-bottom:14px}
 footer ul{list-style:none;display:grid;gap:9px}
@@ -326,10 +326,10 @@ footer{text-align:center}footer .flogo{display:block;margin:0 auto 16px}footer p
       <div class="story">
         <h2 data-t="a_h">Quiénes somos</h2>
         <p data-t="a_p1">Araújo Tech empezó dentro de una empresa de delivery en Santa Rita.</p>
-        <p data-t="a_p2">Comencé Tu Delivery solo, con una moto. Cuando la empresa creció, controlar la caja y las comisiones de cada repartidor en papel ya no funcionaba, así que hice el sistema que necesitaba. Como pastor, hice lo mismo con mis sermones: así nació Meu Púlpito.</p>
+        <p data-t="a_p2">Comencé Tu Delivery solo, con una moto. Cuando la empresa creció, controlar la caja y las comisiones de cada repartidor en papel ya no funcionaba, así que hice el sistema que necesitaba. Después vinieron otros, como Meu Púlpito, para preparar y predicar sermones.</p>
         <p data-t="a_p3">Hoy desarrollo esos sistemas para otros comercios, empresas e iglesias. Sé lo que es atender un negocio todos los días, y por eso cada sistema tiene que ser simple de usar.</p>
         <div class="sign">Jean Carlos Borges de Araújo<span data-t="a_sign">Fundador de Araújo Tech</span></div>
-        <div class="backed"><img src="img/tu-delivery.png" alt="Tu Delivery"><div><b data-t="bk_t">Con el respaldo de Tu Delivery</b><span data-t="bk_p">Araújo Tech forma parte del grupo de Tu Delivery, empresa de entregas de Santa Rita. Cada sistema se usa primero en un negocio real antes de ofrecerlo.</span></div></div>
+        <div class="group"><div class="g-head"><img class="g-logo" src="img/araujo-group.png" alt="Araújo Group"><div><b data-t="bk_t">Parte de Araújo Group</b><span data-t="bk_p">Una familia de empresas conectadas por la innovación y el emprendimiento. Cada sistema se usa primero en un negocio real del grupo antes de ofrecerlo.</span></div></div><div class="g-cos"><div class="g-co me"><img src="img/logo-completo.png" alt="Araújo Tech Sistemas"><small data-t="grp_at">Sistemas y aplicaciones web</small><em data-t="grp_here">Estás acá</em></div><div class="g-co"><img src="img/tu-delivery.png" alt="Tu Delivery"><small data-t="grp_td">Entregas en Santa Rita · De confianza</small></div></div></div>
       </div>
     </div>
   </div>
@@ -405,6 +405,7 @@ footer{text-align:center}footer .flogo{display:block;margin:0 auto 16px}footer p
         <li class="js-city"></li>
       </ul></div>
     </div>
+    <div class="fgrp"><img src="img/araujo-group-blanco.png" alt="Araújo Group"><span data-t="ft_grp">Una empresa de Araújo Group</span></div>
     <div class="fbot"><span>© <span id="yr">2026</span> Araújo Tech Sistemas</span><span data-t="ft_tag">Tecnología que transforma negocios</span></div>
   </div>
 </footer>
@@ -493,9 +494,9 @@ es:{
  s_more:"¿Su negocio necesita algo que no está en esta lista? Cuéntenos qué le hace falta.",s_more_b:"Contar mi idea",
  a_h:"Quiénes somos",
  a_p1:"Araújo Tech empezó dentro de una empresa de delivery en Santa Rita.",
- a_p2:"Comencé Tu Delivery solo, con una moto. Cuando la empresa creció, controlar la caja y las comisiones de cada repartidor en papel ya no funcionaba, así que hice el sistema que necesitaba. Como pastor, hice lo mismo con mis sermones: así nació Meu Púlpito.",
+ a_p2:"Comencé Tu Delivery solo, con una moto. Cuando la empresa creció, controlar la caja y las comisiones de cada repartidor en papel ya no funcionaba, así que hice el sistema que necesitaba. Después vinieron otros, como Meu Púlpito, para preparar y predicar sermones.",
  a_p3:"Hoy desarrollo esos sistemas para otros comercios, empresas e iglesias. Sé lo que es atender un negocio todos los días, y por eso cada sistema tiene que ser simple de usar.",
- a_sign:"Fundador de Araújo Tech",bk_t:"Con el respaldo de Tu Delivery",bk_p:"Araújo Tech forma parte del grupo de Tu Delivery, empresa de entregas de Santa Rita. Cada sistema se usa primero en un negocio real antes de ofrecerlo.",
+ a_sign:"Fundador de Araújo Tech",bk_t:"Parte de Araújo Group",grp_here:"Estás acá",grp_at:"Sistemas y aplicaciones web",grp_td:"Entregas en Santa Rita · De confianza",ft_grp:"Una empresa de Araújo Group",bk_p:"Una familia de empresas conectadas por la innovación y el emprendimiento. Cada sistema se usa primero en un negocio real del grupo antes de ofrecerlo.",
  c_h:"Cómo trabajamos",
  c1:"Conversamos",c1p:"Usted nos cuenta cómo funciona su negocio y qué quiere resolver.",
  c2:"Le mostramos las pantallas",c2p:"Antes de programar, aprueba cómo se va a ver cada pantalla.",
@@ -528,9 +529,9 @@ pt:{
  s_more:"Seu negócio precisa de algo que não está nesta lista? Conte o que está faltando.",s_more_b:"Contar minha ideia",
  a_h:"Quem somos",
  a_p1:"A Araújo Tech começou dentro de uma empresa de delivery em Santa Rita.",
- a_p2:"Comecei a Tu Delivery sozinho, com uma moto. Quando a empresa cresceu, controlar o caixa e as comissões de cada entregador no papel já não funcionava, então fiz o sistema de que precisava. Como pastor, fiz o mesmo com os meus sermões: assim nasceu o Meu Púlpito.",
+ a_p2:"Comecei a Tu Delivery sozinho, com uma moto. Quando a empresa cresceu, controlar o caixa e as comissões de cada entregador no papel já não funcionava, então fiz o sistema de que precisava. Depois vieram outros, como o Meu Púlpito, para preparar e pregar sermões.",
  a_p3:"Hoje desenvolvo esses sistemas para outros comércios, empresas e igrejas. Sei o que é tocar um negócio todos os dias, e por isso cada sistema tem que ser simples de usar.",
- a_sign:"Fundador da Araújo Tech",bk_t:"Com o respaldo da Tu Delivery",bk_p:"A Araújo Tech faz parte do grupo da Tu Delivery, empresa de entregas de Santa Rita. Cada sistema é usado primeiro em um negócio real antes de ser oferecido.",
+ a_sign:"Fundador da Araújo Tech",bk_t:"Parte do Araújo Group",grp_here:"Você está aqui",grp_at:"Sistemas e aplicativos web",grp_td:"Entregas em Santa Rita · De confiança",ft_grp:"Uma empresa do Araújo Group",bk_p:"Uma família de empresas conectadas pela inovação e pelo empreendedorismo. Cada sistema é usado primeiro em um negócio real do grupo antes de ser oferecido.",
  c_h:"Como trabalhamos",
  c1:"Conversamos",c1p:"Você conta como funciona o seu negócio e o que quer resolver.",
  c2:"Mostramos as telas",c2p:"Antes de programar, você aprova como cada tela vai ficar.",
@@ -645,7 +646,7 @@ render();
  const url='https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U';
  const apply=c=>{if(!c)return;const K=['h1','h_p','a_p1','a_p2','a_p3','bk_p','hf_t','hf_p'];
   if(c.contacto){['whatsapp','email','instagram','ciudad','foto'].forEach(k=>{if(typeof c.contacto[k]==='string'&&(c.contacto[k].trim()||k==='foto'))CONFIG[k]=c.contacto[k].trim()})}
-  if(c.txt)['es','pt'].forEach(L=>{const o=c.txt[L]||{};K.forEach(k=>{if(typeof o[k]==='string'&&o[k].trim())T[L][k]=o[k].trim()})});
+  if(c.txt)['es','pt'].forEach(L=>{const o=c.txt[L]||{};const OLD=["Comencé Tu Delivery solo, con una moto. Cuando la empresa creció, controlar la caja y las comisiones de cada repartidor en papel ya no funcionaba, así que hice el sistema que necesitaba. Como pastor, hice lo mismo con mis sermones: así nació Meu Púlpito.","Comecei a Tu Delivery sozinho, com uma moto. Quando a empresa cresceu, controlar o caixa e as comissões de cada entregador no papel já não funcionava, então fiz o sistema de que precisava. Como pastor, fiz o mesmo com os meus sermões: assim nasceu o Meu Púlpito.","Araújo Tech forma parte del grupo de Tu Delivery, empresa de entregas de Santa Rita. Cada sistema se usa primero en un negocio real antes de ofrecerlo.","A Araújo Tech faz parte do grupo da Tu Delivery, empresa de entregas de Santa Rita. Cada sistema é usado primeiro em um negócio real antes de ser oferecido."];K.forEach(k=>{if(typeof o[k]==='string'&&o[k].trim()&&!OLD.includes(o[k].trim()))T[L][k]=o[k].trim()})});
   if(Array.isArray(c.sis))c.sis.forEach(x=>{const s=SISTEMAS.find(z=>z.nombre===x.nombre);if(!s)return;if(x.status==='ok'||x.status==='dev')s.status=x.status;if(typeof x.link==='string')s.link=x.link.trim();
    ['es','pt'].forEach(L=>{const o=x[L]||{};if(o.para&&o.para.trim())s[L].para=o.para.trim();if(o.desc&&o.desc.trim())s[L].desc=o.desc.trim();if(Array.isArray(o.puntos)&&o.puntos.length)s[L].puntos=o.puntos})});
   if(Array.isArray(c.testi)){TESTIMONIOS.length=0;c.testi.forEach(x=>{if(x&&x.nombre&&x.texto&&(x.texto.es||x.texto.pt))TESTIMONIOS.push({nombre:x.nombre,cargo:x.cargo||'',foto:x.foto||'',texto:{es:x.texto.es||x.texto.pt,pt:x.texto.pt||x.texto.es}})})}
