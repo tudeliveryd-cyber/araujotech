@@ -310,10 +310,10 @@ html.anim .rv.in{opacity:1;transform:none}
 a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)}
 .cl img{width:52px;height:52px;border-radius:12px;object-fit:cover;flex:none}
 .cl b{display:block;font-size:15px}.cl small{font-size:13px;color:var(--muted)}
-.wafab{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px 12px 14px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.22);opacity:0;transform:translateY(20px) scale(.9);pointer-events:none;transition:opacity .3s,transform .3s}
-.wafab.on{opacity:1;transform:none;pointer-events:auto}
+.wafab{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px 12px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.2);transform:translateY(140px);transition:transform .35s cubic-bezier(.2,.7,.2,1);-webkit-tap-highlight-color:transparent}
+.wafab.on{transform:none}
 .wafab:hover{background:#1FB959}
-@media(max-width:560px){.wafab span{display:none}.wafab{width:56px;height:56px;padding:0;justify-content:center;right:14px;bottom:16px}.cl{width:100%;max-width:340px}}
+@media(max-width:560px){.wafab span{display:none}.wafab{width:54px;height:54px;padding:0;justify-content:center;right:16px;bottom:20px}.wafab svg{width:30px;height:30px}.cl{width:100%;max-width:340px}}
 </style>
 </head>
 <body>
