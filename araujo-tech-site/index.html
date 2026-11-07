@@ -655,5 +655,16 @@ render();
  fetch(url).then(r=>r.ok?r.json():null).then(d=>{if(d&&d.fields)apply(dv({mapValue:{fields:d.fields}}))}).catch(()=>{});
 })();
 </script>
+<script>
+/* Sempre abrir no topo; menu rola sem deixar #seção no endereço */
+(function(){try{if('scrollRestoration' in history)history.scrollRestoration='manual'}catch(e){}
+ const clean=()=>{try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}};
+ const fromSite=document.referrer&&document.referrer.indexOf(location.host)>-1&&document.referrer.split('#')[0]!==location.href.split('#')[0];
+ const go=()=>{const h=location.hash;if(h&&fromSite){const el=document.getElementById(h.slice(1));if(el){el.scrollIntoView();clean();return}}if(h)clean();window.scrollTo(0,0)};
+ go();addEventListener('load',()=>{if(!fromSite)window.scrollTo(0,0)});
+ addEventListener('pageshow',e=>{if(e.persisted)window.scrollTo(0,0)});
+ document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;const id=a.getAttribute('href').slice(1);if(!id)return;const el=document.getElementById(id);if(!el)return;e.preventDefault();el.scrollIntoView({behavior:'smooth'});clean()});
+})();
+</script>
 </body>
 </html>
