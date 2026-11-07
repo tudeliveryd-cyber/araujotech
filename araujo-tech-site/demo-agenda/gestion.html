@@ -179,7 +179,7 @@ tbody tr.click:hover td{background:var(--surface2)}
 
 /* Agenda */
 .agbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-.agbar .date-t{font-weight:700;font-size:16px;margin:0 6px;text-transform:capitalize}
+.agbar .date-t{font-weight:700;font-size:16px;margin:0 6px}
 .grid-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .ag{display:grid;grid-template-columns:58px repeat(var(--cols), minmax(158px,1fr));min-width:min-content}
 .ag-h{position:sticky;top:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--line);padding:10px;display:flex;align-items:center;gap:8px;font-weight:700;min-width:0}
@@ -539,7 +539,7 @@ const nowHM=()=>{const n=new Date();return toHM(n.getHours()*60+n.getMinutes())}
 const toMin=h=>{const[a,b]=h.split(":").map(Number);return a*60+b};
 const toHM=m=>`${pad(Math.floor(m/60))}:${pad(m%60)}`;
 const gs=n=>"₲ "+Math.round(n||0).toLocaleString("es-PY");
-const fmtDate=(s,o)=>parse(s).toLocaleDateString(t("dateFmt"),o||{weekday:"long",day:"numeric",month:"long"});
+const fmtDate=(s,o)=>{const r=parse(s).toLocaleDateString(t("dateFmt"),o||{weekday:"long",day:"numeric",month:"long"});return r.charAt(0).toUpperCase()+r.slice(1)};
 const short=s=>parse(s).toLocaleDateString(t("dateFmt"),{day:"2-digit",month:"2-digit"});
 const initials=n=>String(n||"?").split(/\s+/).filter(w=>/^\p{L}/u.test(w)).slice(0,2).map(w=>w[0].toUpperCase()).join("");
 const PRO_COLORS=["#b5476b","#3f7fb5","#3c9a72","#c08a2e","#7d5cc4","#cf6a3e","#2f9aa6","#8a8f3a"];
