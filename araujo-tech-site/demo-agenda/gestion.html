@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex">
 <title>Agenda para salones · Demostración</title>
+<meta name="robots" content="noindex">
 <link rel="icon" href="../favicon.png">
 <style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -1379,18 +1379,43 @@ function cloudPush(){
   if(!sb||pulling||!ui.user)return;clearTimeout(pushTimer);setCloud("saving");
   pushTimer=setTimeout(pushNow,800);
 }
+/* Junta tres versiones: la última sincronizada (base), la de este equipo (local) y la de la nube (remote).
+   Gana el cambio de cada uno en lo que tocó: dos personas pueden guardar al mismo tiempo sin borrar lo del otro. */
+const SYNC_COLS=["users","pros","services","products","clients","appts","sales","expenses"];
+function merge3(base,local,remote){
+  const j=x=>JSON.stringify(x),out=JSON.parse(j(remote)),strip=c=>{const o=Object.assign({},c||{});delete o.sb;return o};
+  if(j(strip(local.cfg))!==j(strip(base.cfg)))out.cfg=Object.assign({},local.cfg);
+  ["sample","welcomeSeen"].forEach(k=>{if(local[k]!==base[k])out[k]=local[k]});
+  SYNC_COLS.forEach(k=>{
+    const b=new Map((base[k]||[]).map(x=>[x.id,j(x)])),l=new Map((local[k]||[]).map(x=>[x.id,x]));
+    let arr=(out[k]||[]).filter(x=>!(b.has(x.id)&&!l.has(x.id)));
+    l.forEach((x,id)=>{if(b.get(id)!==j(x)){const i=arr.findIndex(y=>y.id===id);if(i>=0)arr[i]=x;else arr.push(x)}});
+    out[k]=arr;
+  });
+  const bc=base.closings||{},lc=local.closings||{};out.closings=Object.assign({},remote.closings||{});
+  Object.keys(bc).forEach(d=>{if(!(d in lc))delete out.closings[d]});
+  Object.keys(lc).forEach(d=>{if(j(lc[d])!==j(bc[d]))out.closings[d]=lc[d]});
+  return out;
+}
+function localPlain(){const d=JSON.parse(JSON.stringify(S));delete d.cfg.sb;return d}
+function adoptMerged(d){pulling=true;const keep=S.cfg.sb;S=normalize(d);S.cfg.sb=keep||{url:"",key:""};S.welcomeSeen=true;
+  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}pulling=false;applyBrand();if(ui.user&&!$("#layer").innerHTML)render()}
 async function pushNow(){
-  try{const data=JSON.parse(JSON.stringify(S));delete data.cfg.sb;const json=JSON.stringify(data);
+  try{let data=localPlain(),json=JSON.stringify(data);
     if(json===lastRemote){setCloud("on");return}
+    const cur=await sb.from("salon_state").select("data").eq("id","main").maybeSingle();if(cur.error)throw cur.error;
+    const remote=cur.data&&cur.data.data;
+    if(remote&&lastRemote&&JSON.stringify(remote)!==lastRemote){data=merge3(JSON.parse(lastRemote),data,remote);json=JSON.stringify(data);adoptMerged(JSON.parse(json))}
     const at=new Date().toISOString();
     const r1=await sb.from("salon_state").upsert({id:"main",data,updated_at:at});if(r1.error)throw r1.error;lastRemote=json;
     const r2=await sb.from("public_info").upsert({id:"main",data:publicInfo(),updated_at:at});setCloud(r2.error?"err":"on");
   }catch(e){console.warn(e);setCloud("err")}
 }
 function applyRemote(data){
-  if(!data||!data.cfg)return;const json=JSON.stringify(data);if(json===lastRemote)return;lastRemote=json;pulling=true;
-  const keep=S.cfg.sb;S=normalize(data);S.cfg.sb=keep||{url:"",key:""};S.welcomeSeen=true;
-  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}pulling=false;applyBrand();if(ui.user&&!$("#layer").innerHTML)render();
+  if(!data||!data.cfg)return;const json=JSON.stringify(data);if(json===lastRemote)return;
+  const loc=localPlain(),pending=lastRemote&&JSON.stringify(loc)!==lastRemote;
+  const next=pending?merge3(JSON.parse(lastRemote),loc,data):data;
+  lastRemote=json;adoptMerged(next);if(pending)cloudPush();
 }
 async function importBookings(rows){
   let n=0;for(const r of rows){if(r.procesada||S.appts.some(a=>a.id==="rv_"+r.id))continue;
