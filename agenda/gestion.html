@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="/agenda/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Loli Gestión">
+<meta name="apple-mobile-web-app-title" content="Agenda">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#000000">
 <style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
@@ -362,7 +362,7 @@ code.sql{display:block;white-space:pre-wrap;font-family:ui-monospace,SFMono-Regu
 @media (prefers-reduced-motion:no-preference){.modal{animation:up .18s ease-out}@keyframes up{from{transform:translateY(12px);opacity:.6}}}
 </style>
 </head>
-<body><script>/* endereço limpo: nome.araujotechsistemas.com e /gestion */if(/\/agenda\//.test(location.pathname))history.replaceState(null,"",(/gestion/.test(location.pathname)?"/gestion":"/")+location.hash);</script>
+<body><script>/* endereço limpo: nome.araujotechsistemas.com e /gestion */if(/\/agenda\//.test(location.pathname))history.replaceState(null,"",(/gestion/.test(location.pathname)?"/gestion":"/")+location.search+location.hash);</script>
 <div id="root"></div>
 <div id="layer"></div>
 
@@ -629,14 +629,14 @@ function seed(){
   const inact=["c15","c16"];appts.forEach(a=>{if(inact.includes(a.clientId)&&a.date>addDays(T0,-36))a.clientId="c1"});
   const descs={s1:"Lavado, corte y secado. Traiga una foto si tiene un estilo en mente.",s3:"Color de raíz a puntas con productos sin amoníaco. Incluye lavado.",s4:"Aclarado a mano alzada para un resultado natural. Consulta previa incluida.",s6:"Alisado con reducción de volumen. Venga con el cabello limpio y seco.",s7:"Corte a máquina y tijera, con terminación a navaja.",s11:"Esmaltado de larga duración, hasta 3 semanas."};
   services.forEach(s=>{if(descs[s.id])s.desc=descs[s.id]});
-  return normalize({sample:true,cfg:Object.assign(baseCfg("es"),{name:"Barbería Loli",sub:"",logo:LOLI_LOGO,brand:"#1c1c1e",phone:"0981 000000",address:"Av. Mcal. López 1240, Santa Rita",instagram:"",policy:"Para cancelar o cambiar su turno, avise con al menos 3 horas de anticipación por WhatsApp."}),
+  return normalize({sample:true,cfg:Object.assign(baseCfg("es"),{name:"Agenda y gestión",sub:"",logo:"",brand:"#1c1c1e",phone:"0981 000000",address:"Av. Mcal. López 1240, Santa Rita",instagram:"",policy:"Para cancelar o cambiar su turno, avise con al menos 3 horas de anticipación por WhatsApp."}),
     users:[{id:"u1",name:"Patricia (dueña)",role:"owner",pin:"1234"}],pros,services,products,clients,appts,sales:[],expenses:[],closings:{}});
 }
 
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
 if(!S||!S.cfg||S.v!==2) S=seed();
 normalize(S);
-if(S.sample&&S.cfg.name==="Salón Aurora"){S.cfg.name="Barbería Loli";S.cfg.sub="";if(!S.cfg.logo)S.cfg.logo=LOLI_LOGO;S.cfg.brand="#1c1c1e";S.cfg.instagram=""}
+if(false){S.cfg.name="Barbería Loli";S.cfg.sub="";if(!S.cfg.logo)S.cfg.logo=LOLI_LOGO;S.cfg.brand="#1c1c1e";S.cfg.instagram=""}
 
 const ui={view:"dash",date:today(),agMode:"grid",q:"",cf:"all",period:"month",cashDate:today(),user:null,loginSel:null,pin:"",pinErr:false,cloud:"off",newBookings:0,cloudMode:false,authErr:"",authEmail:"",wz:null};
 ui.cloudMode=FB_ON||!!(sbCfg().url&&sbCfg().key);
