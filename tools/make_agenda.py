@@ -26,13 +26,13 @@ def build(name, out, publico):
     s = open(os.path.join(SRC, name), encoding='utf-8').read()
     f = name
     if publico:
-        s = rep(s, 'const AG_ID="loreni",', 'const AG_ID=' + AGJS + ',', f)
-        s = rep(s, '<script src="https://araujotechsistemas.com/licencia.js" data-cliente="loreni" data-publico="1"></script>', lic(True), f)
+        s = re.sub(r'const AG_ID="[a-z0-9-]*",', lambda m: 'const AG_ID=' + AGJS + ',', s, count=1)
+        s = rep(s, re.search(r'<script src="https://araujotechsistemas.com/licencia.js" data-cliente="[^"]*" data-publico="1"></script>', s).group(0), lic(True), f)
         s = rep(s, '<title>Barbería Loli · Reservas</title>', '<title>Reservas</title>', f)
         s = rep(s, '<link rel="manifest" href="manifest.json">\n', '', f)
     else:
-        s = rep(s, 'const AG_ID="loreni";', 'const AG_ID=' + AGJS + ';', f)
-        s = rep(s, '<script src="https://araujotechsistemas.com/licencia.js" data-cliente="loreni"></script>', lic(False), f)
+        s = re.sub(r'const AG_ID="[a-z0-9-]*";', lambda m: 'const AG_ID=' + AGJS + ';', s, count=1)
+        s = rep(s, re.search(r'<script src="https://araujotechsistemas.com/licencia.js" data-cliente="[^"]*"></script>', s).group(0), lic(False), f)
         s = rep(s, '<title>Barbería Loli · Gestión</title>', '<title>Agenda y gestión</title>', f)
         s = rep(s, '<link rel="manifest" href="manifest-gestion.json">\n', '', f)
     s = rep(s, '<link rel="icon" href="icon-192.png" type="image/png">', '<link rel="icon" href="/agenda/favicon.png" type="image/png">', f)
