@@ -1475,23 +1475,28 @@ async function fbPush(){
     const e2=extImgs(publicInfo());await upImgs(e2.imgs);await FA.putPub(JSON.stringify(e2.o));setCloud("on");
   }catch(e){console.warn(e);setCloud("err")}
 }
-function askUpload(){const es=LG()!=="pt";return new Promise(res=>{
+function askUpload(over){const es=LG()!=="pt";if(over)return askReplace();return new Promise(res=>{
   modal(es?"Subir los datos de este equipo":"Enviar os dados deste aparelho",`<p class="help" style="margin:0;font-size:14px">${es?`Este equipo tiene datos guardados: <b>${S.clients.length}</b> clientes, <b>${S.appts.length}</b> turnos y <b>${S.pros.length}</b> profesionales. ¿Los subimos a la nube del negocio? Desde ahí aparecen en todos los equipos.`:`Este aparelho tem dados guardados: <b>${S.clients.length}</b> clientes, <b>${S.appts.length}</b> horários e <b>${S.pros.length}</b> profissionais. Enviamos para a nuvem do negócio? De lá aparecem em todos os aparelhos.`}</p><p class="help" style="margin:8px 0 0">${es?"Hacelo en el equipo donde está la agenda real del negocio.":"Faça isso no aparelho onde está a agenda real do negócio."}</p>`,
    `<button class="btn" id="up-no">${es?"Empezar sin datos":"Começar sem dados"}</button><button class="btn pri" id="up-yes">${ic("cloud")}${es?"Subir a la nube":"Enviar para a nuvem"}</button>`,"sm");
+  $("#up-yes").onclick=()=>{closeM();res(true)};$("#up-no").onclick=()=>{closeM();res(false)}})}
+function askReplace(){const es=LG()!=="pt";return new Promise(res=>{
+  modal(es?"Este equipo tiene datos propios":"Este aparelho tem dados próprios",`<p class="help" style="margin:0;font-size:14px">${es?`En este equipo hay <b>${S.clients.length}</b> clientes, <b>${S.appts.length}</b> turnos y <b>${S.pros.length}</b> profesionales que todavía no están en la nube. La nube ya tiene otros datos (por ejemplo, de prueba).`:`Neste aparelho há <b>${S.clients.length}</b> clientes, <b>${S.appts.length}</b> horários e <b>${S.pros.length}</b> profissionais que ainda não estão na nuvem. A nuvem já tem outros dados (por exemplo, de teste).`}</p><p class="help" style="margin:8px 0 0">${es?"Si este es el equipo con la agenda real del negocio, elegí <b>Subir los de este equipo</b>: reemplaza lo que está en la nube.":"Se este é o aparelho com a agenda real do negócio, escolha <b>Enviar os deste aparelho</b>: substitui o que está na nuvem."}</p>`,
+   `<button class="btn" id="up-no">${es?"Usar los de la nube":"Usar os da nuvem"}</button><button class="btn pri" id="up-yes">${ic("cloud")}${es?"Subir los de este equipo":"Enviar os deste aparelho"}</button>`,"sm");
   $("#up-yes").onclick=()=>{closeM();res(true)};$("#up-no").onclick=()=>{closeM();res(false)}})}
 let fbWatch=false;
 async function fbAfterAuth(user){
   let acc=null;try{acc=await FA.myAccess(user.uid)}catch(e){console.warn(e)}
   if(!acc||acc.ag!==AG_ID){ui.user=null;ui.authErr=t("noAccess");try{await FA.logout()}catch(e){}render();return}
   let cur=null;try{cur=await FA.getState()}catch(e){ui.authErr=t("cloudErr");ui.cloud="err";render();return}
-  let fresh=false;
-  if(cur){lastRemote="";applyRemote(await resImgs(JSON.parse(cur)))}
+  let fresh=false,replaceUp=false;const mk=KEY+"_ag_"+AG_ID;let synced=false;try{synced=!!localStorage.getItem(mk)}catch(e){}
+  if(cur){lastRemote="";if(!synced&&hasRealData()&&await askUpload(true)){replaceUp=true}else applyRemote(await resImgs(JSON.parse(cur)))}
   else{lastRemote="";fresh=true;if(hasRealData()){const ok=await askUpload();if(!ok){S=normalize({});S.sample=false;ui.wz=newWz()}}else{S.sample=false;ui.wz=newWz()}S.welcomeSeen=true}
   if(acc.role==="owner")ui.user={id:"owner:"+user.uid,name:(S.users[0]&&S.users[0].name)||acc.name||"Admin",role:"owner"};
   else{const p=S.pros.find(p=>p.id===acc.proId&&p.active!==false);if(!p){ui.user=null;ui.authErr=t("noAccess");try{await FA.logout()}catch(e){}render();return}ui.user={id:"pro_"+p.id,name:p.name,role:"pro",proId:p.id}}
   let ok0=false;try{ok0=!!localStorage.getItem(KEY+"_mc_"+user.uid)}catch(e){}
   ui.mc=!!acc.mc&&!ok0;ui.authErr="";ui.cloud="on";sb={fb:true};
-  if(fresh&&!ui.wz)await fbPush();
+  if((fresh&&!ui.wz)||replaceUp){lastRemote="";await fbPush()}
+  try{localStorage.setItem(mk,"1")}catch(e){}
   if(!fbWatch){fbWatch=true;FA.watchState(async j=>{try{applyRemote(await resImgs(JSON.parse(j)))}catch(e){console.warn(e)}});FA.watchBookings(rows=>{if(rows.length)importBookings(rows)})}
   ui.view="dash";render();
 }
