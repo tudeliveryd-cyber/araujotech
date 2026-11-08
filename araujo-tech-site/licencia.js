@@ -43,9 +43,25 @@
     try { document.documentElement.style.overflow = ''; } catch (e) {}
   }
   function apply(st, name) { if (st === 'suspenso') show(name); else hide(); }
+  // Plan y funciones (Agenda): el sistema escucha el evento 'atlic' y aplica lo que el admin activó
+  function fv(v) {
+    if (!v) return null;
+    if ('stringValue' in v) return v.stringValue;
+    if ('booleanValue' in v) return v.booleanValue;
+    if ('integerValue' in v) return +v.integerValue;
+    if ('doubleValue' in v) return v.doubleValue;
+    if ('mapValue' in v) { var o = {}, f = v.mapValue.fields || {}; for (var k in f) o[k] = fv(f[k]); return o; }
+    if ('arrayValue' in v) return (v.arrayValue.values || []).map(fv);
+    return null;
+  }
+  function emit(p) {
+    if (!p || !p.plan) return;
+    window.ATLIC = p;
+    try { window.dispatchEvent(new CustomEvent('atlic', { detail: p })); } catch (e) {}
+  }
 
   // estado guardado: bloqueia mesmo sem internet
-  try { var c = JSON.parse(localStorage.getItem(CK) || 'null'); if (c && c.s) apply(c.s, c.n); } catch (e) {}
+  try { var c = JSON.parse(localStorage.getItem(CK) || 'null'); if (c && c.s) apply(c.s, c.n); if (c && c.p) emit(c.p); } catch (e) {}
 
   function check() {
     fetch(URL, { cache: 'no-store' }).then(function (r) {
@@ -56,8 +72,10 @@
       var f = d.fields || {};
       var st = f.status && f.status.stringValue || 'activo';
       var nm = f.name && f.name.stringValue || '';
-      try { localStorage.setItem(CK, JSON.stringify({ s: st, n: nm, t: Date.now() })); } catch (e) {}
+      var pl = f.plan ? { plan: fv(f.plan), pros: f.pros ? fv(f.pros) : null, feats: f.feats ? fv(f.feats) : {} } : null;
+      try { localStorage.setItem(CK, JSON.stringify({ s: st, n: nm, p: pl, t: Date.now() })); } catch (e) {}
       apply(st, nm);
+      emit(pl);
     }).catch(function () {});
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check); else check();

@@ -758,7 +758,13 @@ function renderAuth(){
 /* ---------- Plan contratado (lo define Araújo Tech al instalar) ---------- */
 const PLAN_ID="premium";
 const PLANS={esencial:{n:"Esencial",pros:2,off:["proLogin","commissions","reports","loyalty","promos","shop"]},crecimiento:{n:"Crecimiento",pros:6,off:[]},premium:{n:"Premium",pros:0,off:[]}};
-const PLAN=PLANS[PLAN_ID]||PLANS.premium;
+let PLAN=PLANS[PLAN_ID]||PLANS.premium;
+/* El admin de Araújo Tech puede cambiar el plan y activar o quitar funciones (llega por licencia.js) */
+const PLAN_F=["proLogin","commissions","reports","loyalty","promos","shop"];
+function applyLic(d){if(!d||!PLANS[d.plan])return;const b=PLANS[d.plan],fe=d.feats||{};
+  PLAN={n:b.n,pros:d.pros!=null&&!isNaN(+d.pros)?+d.pros:b.pros,off:PLAN_F.filter(f=>f in fe?!fe[f]:b.off.includes(f))};
+  try{if(typeof ui!=="undefined"&&ui.user)render()}catch(e){}}
+window.addEventListener("atlic",e=>applyLic(e.detail));if(window.ATLIC)applyLic(window.ATLIC);
 const can=f=>!PLAN.off.includes(f);
 const proLimit=()=>PLAN.pros||Infinity;
 const LOCK_VIEW={reports:"reports"};

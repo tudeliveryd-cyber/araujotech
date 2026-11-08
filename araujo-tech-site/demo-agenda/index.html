@@ -260,8 +260,8 @@ const H=()=>({0:null,1:["08:00","20:00"],2:["08:00","20:00"],3:["08:00","20:00"]
 const LOLI_LOGO="";
 let SALON={name:"Salón Aurora",logo:"",phone:"0982 086171",address:"Av. Mcal. López 1240, Santa Rita",instagram:"araujo_tech_sistemas",maps:"https://maps.google.com/?q=Santa+Rita+Alto+Parana+Paraguay",photos:[],brand:"#8a2d49",lang:"es",step:30,
   policy:"Para cancelar o cambiar su turno, avise con al menos 3 horas de anticipación por WhatsApp."};
-const PLAN_PROS=0; /* límite de profesionales del plan (0 = sin límite) */
-const PLAN_SHOP=true; /* vitrina de productos (planes Crecimiento y Premium) */
+let PLAN_PROS=0; /* límite de profesionales del plan (0 = sin límite) */
+let PLAN_SHOP=true; /* vitrina de productos (planes Crecimiento y Premium) */
 let PRODUCTS=[{id:"pr1",name:"Pomada mate 100 g",price:65000,stock:9,desc:"Fijación fuerte, acabado natural sin brillo.",photo:""},{id:"pr2",name:"Shampoo sin sal 300 ml",price:85000,stock:2,desc:"Para uso diario, cuida el color.",photo:""},{id:"pr3",name:"Aceite para barba",price:55000,stock:6,desc:"Hidrata y suaviza. Aroma a madera.",photo:""}];
 let PROS=[{id:"p1",name:"Laura Benítez",role:"Colorista",color:"#b5476b",svc:["s1","s3","s4","s5"],hours:H()},
  {id:"p2",name:"Camila Ortiz",role:"Estilista",color:"#3f7fb5",svc:["s1","s2","s5","s6"],hours:Object.assign(H(),{3:null})},
@@ -562,6 +562,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){if($("#layer").inne
 applyTheme();applyBrand();
 render();
 cloudLoad();
+/* Plan y funciones que define el admin de Araújo Tech (llega por licencia.js) */
+function applyLic(d){if(!d||!d.plan)return;const P0={esencial:2,crecimiento:6,premium:0};PLAN_PROS=d.pros!=null&&!isNaN(+d.pros)?+d.pros:(P0[d.plan]||0);PLAN_SHOP=d.feats&&"shop" in d.feats?!!d.feats.shop:d.plan!=="esencial";if(!PLAN_SHOP&&st.tab==="shop")st.tab="svc";if(!PLAN_SHOP)st.cart={};cloudLoad();render()}
+window.addEventListener("atlic",e=>applyLic(e.detail));if(window.ATLIC)applyLic(window.ATLIC);
 })();
 </script>
 </body>
