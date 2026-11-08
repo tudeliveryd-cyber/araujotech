@@ -496,23 +496,13 @@ const CONFIG = {
    pc / celular: capturas REALES de pantalla en img/ ("" mientras no haya)
    ========================================================= */
 const SISTEMAS = [
-  { nombre:"Meu Púlpito", status:"ok", link:"https://meupulpito.com", linkTexto:"meupulpito.com", instagram:"meupulpito",
-    pc:"img/sistemas/pulpito-pc.jpg", celular:"img/sistemas/pulpito-cel.jpg",
-    es:{ para:"Para pastores y predicadores",
-         desc:"Un bloc de notas para escribir el sermón y leerlo en el púlpito sin perderse, con la Biblia al lado.",
-         puntos:["Modo Predicar: cada parte del sermón con su color, en letra grande","Biblia con varias versiones en español y portugués","Proyección para la iglesia y registro de miembros"] },
-    pt:{ para:"Para pastores e pregadores",
-         desc:"Um bloco de notas para escrever o sermão e lê-lo no púlpito sem se perder, com a Bíblia ao lado.",
-         puntos:["Modo Pregar: cada parte do sermão com sua cor, em letra grande","Bíblia com várias versões em português e espanhol","Projeção para a igreja e cadastro de membros"] } },
-
-  { nombre:"Tu Delivery Catálogos", status:"ok", link:"demo/", demo:true, mas:"catalogo-digital/", pc:"img/sistemas/catalogo-pc.jpg", celular:"img/sistemas/catalogo-cel.jpg",
+  { nombre:"Catálogo digital", status:"ok", link:"demo/", demo:true, mas:"catalogo-digital/", pc:"img/sistemas/catalogo-pc.jpg", celular:"img/sistemas/catalogo-cel.jpg",
     es:{ para:"Para restaurantes, farmacias, tiendas y todo comercio",
          desc:"El menú o catálogo de cualquier negocio en internet: restaurantes, farmacias, tiendas de ropa, cosméticos, almacenes y más. El cliente arma el pedido y le llega listo a su WhatsApp.",
          puntos:["Sin comisión y sin límite de pedidos","Caja, pantalla de cocina y mesas con QR","Clientes, stock, opiniones y sitio web"] },
     pt:{ para:"Para restaurantes, farmácias, lojas e todo comércio",
          desc:"O cardápio ou catálogo de qualquer negócio na internet: restaurantes, farmácias, lojas de roupas, cosméticos, mercados e mais. O cliente monta o pedido e ele chega pronto no seu WhatsApp.",
          puntos:["Sem comissão e sem limite de pedidos","Caixa, tela da cozinha e mesas com QR","Clientes, estoque, avaliações e site"] } },
-
   { nombre:"Agenda para Salones y Barberías", status:"ok", link:"demo-agenda/", demo:true,
     mas:"demo-agenda/gestion.html", masTexto:{es:"Ver el panel del negocio",pt:"Ver o painel do negócio"},
     pedir:{es:"Quiero este sistema",pt:"Quero este sistema"},
@@ -523,7 +513,14 @@ const SISTEMAS = [
     pt:{ para:"Para salões, barbearias e centros de estética",
          desc:"As clientes reservam o horário pelo celular, com os horários livres de cada profissional. O negócio controla agenda, caixa e comissões num só lugar.",
          puntos:["Reservas online com o logo e as cores do negócio","Agenda por profissional, lembretes pelo WhatsApp e cartão fidelidade","Caixa com comissões, produtos, estoque e relatórios"] } },
-
+  { nombre:"Meu Púlpito", status:"ok", link:"https://meupulpito.com", linkTexto:"meupulpito.com", instagram:"meupulpito",
+    pc:"img/sistemas/pulpito-pc.jpg", celular:"img/sistemas/pulpito-cel.jpg",
+    es:{ para:"Para pastores y predicadores",
+         desc:"Un bloc de notas para escribir el sermón y leerlo en el púlpito sin perderse, con la Biblia al lado.",
+         puntos:["Modo Predicar: cada parte del sermón con su color, en letra grande","Biblia con varias versiones en español y portugués","Proyección para la iglesia y registro de miembros"] },
+    pt:{ para:"Para pastores e pregadores",
+         desc:"Um bloco de notas para escrever o sermão e lê-lo no púlpito sem se perder, com a Bíblia ao lado.",
+         puntos:["Modo Pregar: cada parte do sermão com sua cor, em letra grande","Bíblia com várias versões em português e espanhol","Projeção para a igreja e cadastro de membros"] } },
   { nombre:"Caja de Entregas", status:"ok", link:"", pc:"img/sistemas/caja-pc.jpg", celular:"img/sistemas/caja-cel.jpg",
     es:{ para:"Para empresas de delivery",
          desc:"Cada entrega anotada en el momento. Al cerrar el día, la caja cuadra sola y cada repartidor ve cuánto le toca.",
@@ -531,7 +528,6 @@ const SISTEMAS = [
     pt:{ para:"Para empresas de delivery",
          desc:"Cada entrega anotada na hora. No fim do dia, o caixa fecha sozinho e cada entregador vê quanto tem a receber.",
          puntos:["Abertura e fechamento de caixa","Efectivo, transferência e anotado separados por entregador","Pontos e prêmios para os entregadores"] } },
-
   { nombre:"Sistema para Iglesias", status:"dev", link:"", pc:"", celular:"",
     es:{ para:"Para iglesias", desc:"Una app para los miembros, con la agenda de cultos y los avisos, y una secretaría para el liderazgo.",
          puntos:["Registro de miembros","Diezmos y ofrendas","Agenda, eventos y asistencia"] },
@@ -714,7 +710,7 @@ render();
  const apply=c=>{if(!c)return;const K=['h1','h_p','a_p1','a_p2','a_p3','bk_p','hf_t','hf_p'];
   if(c.contacto){['whatsapp','email','instagram','ciudad','foto'].forEach(k=>{if(typeof c.contacto[k]==='string'&&c.contacto[k].trim())CONFIG[k]=c.contacto[k].trim()})}
   if(c.txt)['es','pt'].forEach(L=>{const o=c.txt[L]||{};const OLD=["Comencé Tu Delivery solo, con una moto. Cuando la empresa creció, controlar la caja y las comisiones de cada repartidor en papel ya no funcionaba, así que hice el sistema que necesitaba. Como pastor, hice lo mismo con mis sermones: así nació Meu Púlpito.","Comecei a Tu Delivery sozinho, com uma moto. Quando a empresa cresceu, controlar o caixa e as comissões de cada entregador no papel já não funcionava, então fiz o sistema de que precisava. Como pastor, fiz o mesmo com os meus sermões: assim nasceu o Meu Púlpito.","Araújo Tech forma parte del grupo de Tu Delivery, empresa de entregas de Santa Rita. Cada sistema se usa primero en un negocio real antes de ofrecerlo.","A Araújo Tech faz parte do grupo da Tu Delivery, empresa de entregas de Santa Rita. Cada sistema é usado primeiro em um negócio real antes de ser oferecido."];K.forEach(k=>{if(typeof o[k]==='string'&&o[k].trim()&&!OLD.includes(o[k].trim()))T[L][k]=o[k].trim()})});
-  if(Array.isArray(c.sis))c.sis.forEach(x=>{const s=SISTEMAS.find(z=>z.nombre===x.nombre);if(!s)return;if(x.status==='ok'||x.status==='dev')s.status=x.status;if(typeof x.link==='string')s.link=x.link.trim();
+  if(Array.isArray(c.sis))c.sis.forEach(x=>{const nm=x.nombre==='Tu Delivery Catálogos'?'Catálogo digital':x.nombre;const s=SISTEMAS.find(z=>z.nombre===nm);if(!s)return;if(x.status==='ok'||x.status==='dev')s.status=x.status;if(typeof x.link==='string')s.link=x.link.trim();
    ['es','pt'].forEach(L=>{const o=x[L]||{};if(o.para&&o.para.trim())s[L].para=o.para.trim();if(o.desc&&o.desc.trim())s[L].desc=o.desc.trim();if(Array.isArray(o.puntos)&&o.puntos.length)s[L].puntos=o.puntos})});
   if(Array.isArray(c.testi)){TESTIMONIOS.length=0;c.testi.forEach(x=>{if(x&&x.nombre&&x.texto&&(x.texto.es||x.texto.pt))TESTIMONIOS.push({nombre:x.nombre,cargo:x.cargo||'',foto:x.foto||'',texto:{es:x.texto.es||x.texto.pt,pt:x.texto.pt||x.texto.es}})})}
   if(c.faq)['es','pt'].forEach(L=>{const f=c.faq[L];if(Array.isArray(f)&&f.length)T[L].faq=f.filter(q=>Array.isArray(q)&&q[0]).map(q=>[q[0],q[1]||''])});
