@@ -212,6 +212,9 @@ render();
  fetch('https://firestore.googleapis.com/v1/'+P+':commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},
   body:JSON.stringify({writes:[{update:{name:P+'/visitas/'+id,fields:{}},updateMask:{fieldPaths:[]},updateTransforms:[{fieldPath:'n',increment:{integerValue:'1'}},{fieldPath:'u',increment:{integerValue:first?'1':'0'}}]}]})}).catch(()=>{})
 }catch(e){}})();
+
+/* abrir direto em #planes (o conteúdo é montado por script) */
+if(location.hash.length>1){const go=()=>{try{const e=document.querySelector(location.hash);if(e)e.scrollIntoView({behavior:'instant',block:'start'})}catch(x){}};setTimeout(go,60);addEventListener('load',()=>{go();setTimeout(go,400)})}
 </script>
 </body>
 </html>
