@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="es-PY">
 <head>
+<script>/* Agenda: abre direto */try{(function(){var h=location.hostname.toLowerCase();if(!/^[a-z0-9-]+\.araujotechsistemas\.com$/.test(h)||/^www\./.test(h)||/^\/agenda\//.test(location.pathname)||/^\/painel/.test(location.pathname))return;if(localStorage.getItem("tdc_ag_"+h)==="1")location.replace("/agenda/"+(/^\/gestion/i.test(location.pathname)?"gestion.html":"")+location.search+location.hash)})()}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#1A1714">
@@ -3119,7 +3120,7 @@ function editClSheet(){const n=ui.ec;openSheet(`<div class="sh-top"><h2>${t('ec_
 function agSub(s){const m=String(s.url||'').match(/^https?:\/\/([a-z0-9-]+)\.araujotechsistemas\.com\/?$/i);return m&&m[1].toLowerCase()!=='barberialoli'?m[1].toLowerCase():''}
 function agPanel(s){const u=sxUrl(s);return agSub(s)?u+'/gestion':u+'/gestion.html'}
 async function agendaRedirect(){try{const r=await fetch('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/licencias/'+encodeURIComponent(window.TDC_SHOP)+'?key='+FB_CFG.apiKey,{cache:'no-store'});if(!r.ok)return false;const j=await r.json();const f=j.fields||{};if(!f.sys||f.sys.stringValue!=='agenda')return false;
- location.replace('/agenda/'+(/^\/gestion/i.test(location.pathname)?'gestion.html':'')+location.hash);return true}catch(e){return false}}
+ try{localStorage.setItem('tdc_ag_'+location.hostname.toLowerCase(),'1')}catch(e){}location.replace('/agenda/'+(/^\/gestion/i.test(location.pathname)?'gestion.html':'')+location.search+location.hash);return true}catch(e){return false}}
 /* ===== Endereço dos outros sistemas ===== */
 const SX_KNOWN={loreni:'https://barberialoli.araujotechsistemas.com','barberia-loli':'https://barberialoli.araujotechsistemas.com'};
 function sxUrl(s){let u=String(s.url||SX_KNOWN[licKey(s)]||'').trim();if(u&&!/^https?:\/\//i.test(u))u='https://'+u;return u.replace(/\/+$/,'')}
@@ -3356,8 +3357,8 @@ function startOrders(){if(CLOUD.unsubOrders)return;startAlarm();CLOUD.firstSnap=
   try{stockApply(list)}catch(er){console.warn(er)}if(ui.view==='admin'&&['orders','resumo','cocina','caja','salon'].includes(ui.tab)&&!document.querySelector('.sheet'))render()},e=>{console.warn(e)});CLOUD.unsubOrders=true}
 const TITLE0=document.title;
 const TRACK_MAP={aguardando:'recebido',recebido:'recebido',aceito:'recebido',preparo:'preparo',entregador:'preparo',saiu:'preparo',pronto:'pronto',entregue:'entregue',retirado:'entregue',cancelado:'cancelado'};
-async function cloudBoot(){const unboot=()=>document.documentElement.classList.remove('tdc-boot');if(MODE==='catalog'&&window.TDC_SUB&&/^\/gestion/i.test(location.pathname)&&await agendaRedirect())return;try{await CLOUD.init()}catch(e){console.warn(e);CLOUD.err='net';unboot();return}
- if(MODE==='catalog'){try{const okShop=await cloudLoadShop();if(!okShop&&window.TDC_SUB){if(await agendaRedirect())return;notFoundPage();unboot();return}if(okShop){limCat(pub);render();unboot();if(pub.store.showRev!==false&&!limOff('reviews')&&CLOUD.api.listReviews)CLOUD.api.listReviews(SHOP).then(l=>{REVS=l;if(!document.querySelector('.sheet'))render()}).catch(()=>{})}}catch(e){console.warn(e)}unboot();const L=S.get(K.last,null);if(L&&L.id)watchTrackLast();return}
+async function cloudBoot(){const unboot=()=>document.documentElement.classList.remove('tdc-boot');const agP=MODE==='catalog'&&window.TDC_SUB?agendaRedirect():null;if(agP&&/^\/gestion/i.test(location.pathname)&&await agP)return;try{await CLOUD.init()}catch(e){console.warn(e);CLOUD.err='net';unboot();return}
+ if(MODE==='catalog'){try{const okShop=await cloudLoadShop();if(!okShop&&window.TDC_SUB){if(await (agP||agendaRedirect()))return;notFoundPage();unboot();return}if(okShop){limCat(pub);render();unboot();if(pub.store.showRev!==false&&!limOff('reviews')&&CLOUD.api.listReviews)CLOUD.api.listReviews(SHOP).then(l=>{REVS=l;if(!document.querySelector('.sheet'))render()}).catch(()=>{})}}catch(e){console.warn(e)}unboot();const L=S.get(K.last,null);if(L&&L.id)watchTrackLast();return}
  CLOUD.api.onAuth(async u=>{CLOUD.user=u;CLOUD.shopOk=false;CLOUD.admin=false;if(!u){CLOUD.loading=false;render();return}
   CLOUD.loading=true;render();try{CLOUD.admin=await CLOUD.api.isAdmin();
    if(MODE==='platform'){if(!CLOUD.admin){CLOUD.err='noadmin';await CLOUD.api.logout();return}await loadPlatformCloud()}

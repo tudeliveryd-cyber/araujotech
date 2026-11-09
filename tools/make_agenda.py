@@ -29,10 +29,13 @@ def build(name, out, publico):
         s = re.sub(r'const AG_ID="[a-z0-9-]*",', lambda m: 'const AG_ID=' + AGJS + ',', s, count=1)
         s = rep(s, re.search(r'<script src="https://araujotechsistemas.com/licencia.js" data-cliente="[^"]*" data-publico="1"></script>', s).group(0), lic(True), f)
         s = rep(s, '<title>Barbería Loli · Reservas</title>', '<title>Reservas</title>', f)
+        # não mostra a página genérica antes dos dados do salão
+        s = rep(s, '<head>', '<head>\n<style>html.ag-boot{background:#f4f4f5}html.ag-boot body{visibility:hidden}</style><script>if(/^[a-z0-9-]+\\.araujotechsistemas\\.com$/i.test(location.hostname)||/[?&]ag=/.test(location.search)){document.documentElement.classList.add("ag-boot");setTimeout(function(){document.documentElement.classList.remove("ag-boot")},8000)}</script>', f)
+        s = rep(s, 'AG_LOADED=true;applyBrand();render();return true}', 'AG_LOADED=true;applyBrand();render();document.documentElement.classList.remove("ag-boot");return true}', f)
         s = rep(s, '<link rel="manifest" href="manifest.json">\n', '', f)
         s = rep(s, '<meta name="apple-mobile-web-app-title" content="Barbería Loli">', '<meta name="apple-mobile-web-app-title" content="Reservas">', f)
         s = rep(s, 'let SALON={name:"Barbería Loli",logo:LOLI_LOGO,', 'let SALON={name:"",logo:"",', f)
-        s = rep(s, '  if(AG_ON){if(await agLoad())return}', '  if(AG_ON){if(await agLoad())return;document.body.innerHTML=`<div style="min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;background:#f4f4f5;color:#333;text-align:center;padding:24px"><div><h1 style="font-size:22px;margin:0 0 8px">Página en preparación</h1><p style="margin:0;color:#666">Volvé a intentar en unos minutos.</p><p style="margin:24px 0 0;font-size:13px;color:#999">Desarrollado por <b>Araújo Tech</b></p></div></div>`;return}', f)
+        s = rep(s, '  if(AG_ON){if(await agLoad())return}', '  if(AG_ON){if(await agLoad())return;try{localStorage.removeItem("tdc_ag_"+location.hostname.toLowerCase())}catch(e){}document.documentElement.classList.remove("ag-boot");document.body.innerHTML=`<div style="min-height:100vh;display:grid;place-items:center;font-family:system-ui,sans-serif;background:#f4f4f5;color:#333;text-align:center;padding:24px"><div><h1 style="font-size:22px;margin:0 0 8px">Página en preparación</h1><p style="margin:0;color:#666">Volvé a intentar en unos minutos.</p><p style="margin:24px 0 0;font-size:13px;color:#999">Desarrollado por <b>Araújo Tech</b></p></div></div>`;return}', f)
     else:
         s = re.sub(r'const AG_ID="[a-z0-9-]*";', lambda m: 'const AG_ID=' + AGJS + ';', s, count=1)
         s = rep(s, re.search(r'<script src="https://araujotechsistemas.com/licencia.js" data-cliente="[^"]*"></script>', s).group(0), lic(False), f)
