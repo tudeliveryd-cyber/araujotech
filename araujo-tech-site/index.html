@@ -321,6 +321,7 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
 .lzbox h2{font-size:clamp(32px,5vw,52px);line-height:1.05;font-weight:900;letter-spacing:-.02em;margin:16px 0 12px;color:#fff}
 .lzbox p{font-size:18px;color:#E9E2FB;margin:0 0 8px;max-width:640px}.lzbox small{font-size:14px;color:#C4B5FD}
 .lzact{display:flex;flex-direction:column;align-items:stretch;gap:12px;flex:0 0 auto}.lzbtn{background:#fff;color:#4C1D95;font-weight:800;padding:16px 26px;border-radius:14px;text-align:center;justify-content:center}.lzbtn:hover{background:#F3EDFC}
+.lzleft{display:inline-flex;align-items:center;gap:8px;margin-top:14px;font-weight:800;font-size:15px;color:#1A1222;background:#fff;border-radius:999px;padding:6px 14px}.lzleft[hidden]{display:none}.lzleft::before{content:"";width:8px;height:8px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.2)}
 .lzlink{color:#fff;text-align:center;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 @media (max-width:600px){.lzk{font-size:11px;letter-spacing:.06em;padding:5px 11px}.lzhome{padding:28px 0 4px}.lzbox{padding:26px 20px;border-radius:20px}.lzbox p{font-size:16px}.lzact{width:100%}}
 </style>
@@ -375,7 +376,7 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
     <div class="lztx"><span class="lzk" data-t="lz_k">Oferta exclusiva de lanzamiento</span>
       <h2 data-t="lz_h">¡Pagá 10 meses. Disfrutá 12!</h2>
       <p data-t="lz_p">Los primeros 20 clientes que contraten un plan anual del Catálogo Digital, con pago anticipado, reciben 2 meses gratis. Al completarse el cupo, la oferta finaliza.</p>
-      <small data-t="lz_s">La instalación se abona por separado, según el plan contratado.</small></div>
+      <small data-t="lz_s">La instalación se abona por separado, según el plan contratado.</small><span class="lzleft" data-lzleft hidden></span></div>
     <div class="lzact"><a class="btn lzbtn js-walz" href="#" data-t="lz_b">¡Quiero mis 2 meses gratis!</a><a class="lzlink" href="catalogo-digital/#planes" data-t="lz_v">Ver planes y precios</a></div>
   </div></div>
 </section>
@@ -570,7 +571,7 @@ es:{
  n1:"Sistemas",n2:"Quiénes somos",n3:"Cómo trabajamos",n4:"Preguntas",n5:"Pedir presupuesto",
  h1:"Sistemas a la medida de su negocio",
  h_p:"Hacemos aplicaciones y sistemas web para comercios, restaurantes, salones, empresas de delivery e iglesias. Funcionan en el celular y en la computadora, en español y en portugués.",
- h_b1:"Escribir por WhatsApp",h_b2:"Ver el catálogo digital",rot_pre:"Para",sh_all:"Ver todos los sistemas",lz_k:"Oferta exclusiva de lanzamiento",lz_h:"¡Pagá 10 meses. Disfrutá 12!",lz_p:"Los primeros 20 clientes que contraten un plan anual del Catálogo Digital, con pago anticipado, reciben 2 meses gratis. Al completarse el cupo, la oferta finaliza.",lz_s:"La instalación se abona por separado, según el plan contratado.",lz_b:"¡Quiero mis 2 meses gratis!",lz_v:"Ver planes y precios",lz_wa:"la promoción de lanzamiento del Catálogo Digital (pagá 10 meses, disfrutá 12).",cl_h:"Ya lo usan negocios de Santa Rita",cl_1:"Catálogo digital",cl_2:"Agenda de turnos",cl_3:"Caja de Entregas",wa_fab:"Escribinos",hf_tag:"Nuevo",hf_t:"Catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar",hf_tag:"Nuevo",hf_t:"Catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar",h_where:"Desde Santa Rita, Alto Paraná, para Paraguay y Brasil.",
+ h_b1:"Escribir por WhatsApp",h_b2:"Ver el catálogo digital",rot_pre:"Para",sh_all:"Ver todos los sistemas",lz_k:"Oferta exclusiva de lanzamiento",lz_h:"¡Pagá 10 meses. Disfrutá 12!",lz_p:"Los primeros 20 clientes que contraten un plan anual del Catálogo Digital, con pago anticipado, reciben 2 meses gratis. Al completarse el cupo, la oferta finaliza.",lz_s:"La instalación se abona por separado, según el plan contratado.",lz_b:"¡Quiero mis 2 meses gratis!",lz_v:"Ver planes y precios",lz_wa:"la promoción de lanzamiento del Catálogo Digital (pagá 10 meses, disfrutá 12).",lz_left:"Quedan {n} de {m} cupos",cl_h:"Ya lo usan negocios de Santa Rita",cl_1:"Catálogo digital",cl_2:"Agenda de turnos",cl_3:"Caja de Entregas",wa_fab:"Escribinos",hf_tag:"Nuevo",hf_t:"Catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar",hf_tag:"Nuevo",hf_t:"Catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 30 ejemplos para probar",h_where:"Desde Santa Rita, Alto Paraná, para Paraguay y Brasil.",
  s_h:"Sistemas",s_p:"Cada uno nació para resolver un problema real y se usa todos los días. Todos se pueden adaptar a su negocio.",
  ok:"Disponible",dev:"En desarrollo",open:"Abrir",demo:"Ver demostración",mas:"Ver todas las funciones",planes:"Ver planes y precios",ask:"Pedir una demostración",soon:"Quiero saber más",
  s_more:"¿Su negocio necesita algo que no está en esta lista? Cuéntenos qué le hace falta.",s_more_b:"Contar mi idea",
@@ -605,7 +606,7 @@ pt:{
  n1:"Sistemas",n2:"Quem somos",n3:"Como trabalhamos",n4:"Perguntas",n5:"Pedir orçamento",
  h1:"Sistemas sob medida para o seu negócio",
  h_p:"Fazemos aplicativos e sistemas web para comércios, restaurantes, salões, empresas de delivery e igrejas. Funcionam no celular e no computador, em português e em espanhol.",
- h_b1:"Falar no WhatsApp",h_b2:"Ver o catálogo digital",rot_pre:"Para",sh_all:"Ver todos os sistemas",lz_k:"Oferta exclusiva de lançamento",lz_h:"Pague 10 meses. Aproveite 12!",lz_p:"Os primeiros 20 clientes que contratarem um plano anual do Catálogo Digital, com pagamento adiantado, ganham 2 meses grátis. Quando as vagas acabarem, a oferta termina.",lz_s:"A instalação é paga à parte, conforme o plano contratado.",lz_b:"Quero meus 2 meses grátis!",lz_v:"Ver planos e preços",lz_wa:"a promoção de lançamento do Catálogo Digital (pague 10 meses, aproveite 12).",cl_h:"Negócios de Santa Rita que já usam",cl_1:"Catálogo digital",cl_2:"Agenda de horários",cl_3:"Caixa de Entregas",wa_fab:"Fale conosco",hf_tag:"Novo",hf_t:"Catálogo digital com pedidos pelo WhatsApp",hf_p:"Para restaurantes, lojas, farmácias e todo tipo de comércio · 30 exemplos para testar",h_where:"De Santa Rita, Alto Paraná, para o Paraguai e o Brasil.",
+ h_b1:"Falar no WhatsApp",h_b2:"Ver o catálogo digital",rot_pre:"Para",sh_all:"Ver todos os sistemas",lz_k:"Oferta exclusiva de lançamento",lz_h:"Pague 10 meses. Aproveite 12!",lz_p:"Os primeiros 20 clientes que contratarem um plano anual do Catálogo Digital, com pagamento adiantado, ganham 2 meses grátis. Quando as vagas acabarem, a oferta termina.",lz_s:"A instalação é paga à parte, conforme o plano contratado.",lz_b:"Quero meus 2 meses grátis!",lz_v:"Ver planos e preços",lz_wa:"a promoção de lançamento do Catálogo Digital (pague 10 meses, aproveite 12).",lz_left:"Restam {n} de {m} vagas",cl_h:"Negócios de Santa Rita que já usam",cl_1:"Catálogo digital",cl_2:"Agenda de horários",cl_3:"Caixa de Entregas",wa_fab:"Fale conosco",hf_tag:"Novo",hf_t:"Catálogo digital com pedidos pelo WhatsApp",hf_p:"Para restaurantes, lojas, farmácias e todo tipo de comércio · 30 exemplos para testar",h_where:"De Santa Rita, Alto Paraná, para o Paraguai e o Brasil.",
  s_h:"Sistemas",s_p:"Cada um nasceu para resolver um problema real e é usado todos os dias. Todos podem ser adaptados ao seu negócio.",
  ok:"Disponível",dev:"Em desenvolvimento",open:"Abrir",demo:"Ver demonstração",mas:"Ver todas as funções",planes:"Ver planos e preços",ask:"Pedir uma demonstração",soon:"Quero saber mais",
  s_more:"Seu negócio precisa de algo que não está nesta lista? Conte o que está faltando.",s_more_b:"Contar minha ideia",
@@ -686,7 +687,7 @@ function render(){
  if(prev>0)sel.selectedIndex=prev;
 
  // contact + footer
- $$(".js-wa").forEach(a=>{a.href=wa(t.wag);a.target="_blank";a.rel="noopener"});$$(".js-walz").forEach(a=>{a.href=wa(t.lz_wa);a.target="_blank";a.rel="noopener"});
+ $$(".js-wa").forEach(a=>{a.href=wa(t.wag);a.target="_blank";a.rel="noopener"});$$(".js-walz").forEach(a=>{a.href=wa(t.lz_wa);a.target="_blank";a.rel="noopener"});$$("[data-lzleft]").forEach(el=>{if(window.LZ){el.textContent=t.lz_left.replace("{n}",LZ.left).replace("{m}",LZ.max);el.hidden=false}});
  $$(".js-mail").forEach(a=>a.href="mailto:"+CONFIG.email);
  $$(".js-mailtxt").forEach(a=>a.textContent=CONFIG.email);
  $$(".js-ig").forEach(a=>{a.href="https://instagram.com/"+CONFIG.instagram;a.hidden=!CONFIG.instagram});
@@ -796,6 +797,10 @@ render();
  const fab=document.querySelector('.wafab');try{if(fab)fab.href=wa(T[lang].wag)}catch(e){}const fabT=()=>{if(fab)fab.classList.toggle('on',scrollY>Math.min(500,innerHeight*.6))};addEventListener('scroll',fabT,{passive:true});fabT();
  splitH1();go(0,false);auto();reveal();
 })();
+</script>
+<script>/* vagas da promoção de lançamento (admin: caixinha "Lanzamiento") */
+fetch("https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/licencias/_lz?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{const F=j&&j.fields;if(!F)return;const used=+(F.used&&(F.used.integerValue||F.used.doubleValue))||0,max=+(F.max&&(F.max.integerValue||F.max.doubleValue))||20,left=Math.max(0,max-used);
+ if(!left){document.querySelectorAll(".lzhome").forEach(e=>e.remove());return}window.LZ={left,max};const tx=(typeof T!=="undefined"&&typeof lang!=="undefined")?T[lang]:null;document.querySelectorAll("[data-lzleft]").forEach(el=>{el.textContent=(tx?tx.lz_left:"Quedan {n} de {m} cupos").replace("{n}",left).replace("{m}",max);el.hidden=false})}).catch(()=>{});
 </script>
 </body>
 </html>
