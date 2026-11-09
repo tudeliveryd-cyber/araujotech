@@ -129,6 +129,7 @@ h2{font-family:var(--display);font-weight:900;font-size:clamp(32px,4.2vw,54px);l
 .sys{display:grid;grid-template-columns:5fr 7fr;gap:24px 56px;padding:48px 0;border-bottom:1px solid var(--line)}
 .sys h3{font-family:var(--display);font-weight:900;font-size:clamp(30px,3.4vw,46px);line-height:1.02;letter-spacing:-.03em;margin-bottom:12px}
 .sys .for{font-size:17px;color:var(--muted)}
+.sys .desde{display:inline-block;margin-top:12px;font-size:15px;color:var(--ink,#17151F);background:#F3EDFC;border-radius:999px;padding:6px 14px}.sys .desde b{color:#6D28D9;font-weight:800}
 .sys .st{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-size:14px;font-weight:700}
 .sys .st::before{content:"";width:9px;height:9px;border-radius:2px;background:currentColor}
 .sys .st.ok{color:var(--ok)}.sys .st.dev{color:var(--dev)}
@@ -496,7 +497,7 @@ const CONFIG = {
    pc / celular: capturas REALES de pantalla en img/ ("" mientras no haya)
    ========================================================= */
 const SISTEMAS = [
-  { nombre:"Catálogo digital", status:"ok", link:"demo/", demo:true, mas:"catalogo-digital/", planes:"catalogo-digital/#planes", pc:"img/sistemas/catalogo-pc.jpg", celular:"img/sistemas/catalogo-cel.jpg",
+  { nombre:"Catálogo digital", status:"ok", desde:{es:"Desde <b>Gs. 99.000</b> por mes",pt:"A partir de <b>Gs. 99.000</b> por mês"}, link:"demo/", demo:true, mas:"catalogo-digital/", planes:"catalogo-digital/#planes", pc:"img/sistemas/catalogo-pc.jpg", celular:"img/sistemas/catalogo-cel.jpg",
     es:{ para:"Para restaurantes, farmacias, tiendas y todo comercio",
          desc:"El menú o catálogo de cualquier negocio en internet: restaurantes, farmacias, tiendas de ropa, cosméticos, almacenes y más. El cliente arma el pedido y le llega listo a su WhatsApp.",
          puntos:["Sin comisión y sin límite de pedidos","Caja, pantalla de cocina y mesas con QR","Clientes, stock, opiniones y sitio web"] },
@@ -513,7 +514,7 @@ const SISTEMAS = [
     pt:{ para:"Para salões, barbearias e centros de estética",
          desc:"As clientes reservam o horário pelo celular, com os horários livres de cada profissional. O negócio controla agenda, caixa e comissões num só lugar.",
          puntos:["Reservas online com o logo e as cores do negócio","Agenda por profissional, lembretes pelo WhatsApp e cartão fidelidade","Caixa com comissões, produtos, estoque e relatórios"] } },
-  { nombre:"Meu Púlpito", status:"ok", link:"https://meupulpito.com", linkTexto:"meupulpito.com", instagram:"meupulpito",
+  { nombre:"Meu Púlpito", status:"ok", desde:{es:"Plan gratis · Premium desde <b>Gs. 45.000</b> por mes",pt:"Plano grátis · Premium a partir de <b>Gs. 45.000</b> por mês"}, link:"https://meupulpito.com", linkTexto:"meupulpito.com", instagram:"meupulpito",
     pc:"img/sistemas/pulpito-pc.jpg", celular:"img/sistemas/pulpito-cel.jpg",
     es:{ para:"Para pastores y predicadores",
          desc:"Un bloc de notas para escribir el sermón y leerlo en el púlpito sin perderse, con la Biblia al lado.",
@@ -644,7 +645,7 @@ function render(){
    (s.planes?`<a class="btn btn-ghost" href="${s.planes}">${t.planes}</a>`:"")+
    (s.instagram?`<a class="btn btn-ghost" href="https://instagram.com/${s.instagram}" target="_blank" rel="noopener">${igI}@${s.instagram}</a>`:"");
   const shots=(s.pc||s.celular)?`<div class="shots"><div class="stage${s.pc?"":" solo"}">${s.pc?`<div class="laptop"><div class="lid"><div class="bezel"><div class="screen"><img src="${s.pc}" alt="${s.nombre} en la computadora" loading="lazy" width="1280" height="800"><span class="glare"></span></div></div></div><div class="base"></div></div>`:""}${s.celular?`<div class="phone"><div class="inner"><div class="scr"><img src="${s.celular}" alt="${s.nombre} en el celular" loading="lazy" width="600" height="1298"><span class="glare"></span></div></div></div>`:""}</div></div>`:"";
-  return `<article class="sys"><div><h3>${s.nombre}</h3><div class="for">${d.para}</div><div class="st ${s.status}">${t[s.status]}</div></div>
+  return `<article class="sys"><div><h3>${s.nombre}</h3><div class="for">${d.para}</div>${s.desde?`<div class="desde">${s.desde[lang]}</div>`:""}<div class="st ${s.status}">${t[s.status]}</div></div>
    <div><p class="desc">${d.desc}</p><ul>${d.puntos.map(p=>`<li><span class="px"></span><span>${p}</span></li>`).join("")}</ul><div class="acts">${acts}</div></div>${shots}</article>`;
  }).join("");
 
