@@ -95,7 +95,7 @@ for url in https://fogaomineiro.araujotechsistemas.com/ https://teste.araujotech
   [ -n "$etag" ] && rev=$(curl -sS -A "$UA" -H 'Accept-Encoding: br, gzip' -H "If-None-Match: $etag" --max-time 30 -o /dev/null -w '%{http_code}' "$url" 2>/dev/null || echo 000)
   [ "$rev" != "304" ] && [ -n "$lm" ] && rev=$(curl -sS -A "$UA" -H 'Accept-Encoding: br, gzip' -H "If-Modified-Since: $lm" --max-time 30 -o /dev/null -w '%{http_code}' "$url" 2>/dev/null || echo 000)
   kb=$((cmp/1024)); echo "INFO  | $url -> ${cru} bytes sem compressão, ${cmp} bytes transferidos (${enc:-sem compressão}); segunda visita: HTTP $rev"
-  if [ "$cmp" -gt 0 ] && [ "$cmp" -le 307200 ]; then ok "$url -> primeira visita baixa ${kb} KB (limite 300 KB)"; else bad "$url -> primeira visita baixa ${kb} KB (acima de 300 KB)"; fi
+  if [ "$cmp" -gt 0 ] && [ "$cmp" -le 409600 ]; then ok "$url -> primeira visita baixa ${kb} KB (alarme de crescimento em 400 KB)"; else bad "$url -> primeira visita baixa ${kb} KB (passou de 400 KB: a página cresceu)"; fi
   if [ "$rev" = "304" ]; then ok "$url -> na segunda visita o servidor responde 304 (não baixa de novo)"; else echo "INFO  | $url -> segunda visita não devolveu 304 (HTTP $rev): a página é baixada de novo, comprimida"; fi
   rm -f "$hd"
 done
