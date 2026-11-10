@@ -441,7 +441,7 @@ const T={
   paidOk:"Pago registrado",received:"Cobros del día",toCharge:"Por cobrar",commissions:"Comisiones",net:"Neto del negocio",expenses:"Gastos",addExpense:"Registrar gasto",sale:"Venta de productos",
   closeCash:"Cerrar caja",cashClosed:"Caja cerrada",closedBy:"cerrada por",counted:"Efectivo contado",expected:"Efectivo esperado",difference:"Diferencia",reopen:"Reabrir",inCash:"En caja (efectivo)",
   p_today:"Hoy",p_7:"Últimos 7 días",p_month:"Este mes",p_last:"Mes anterior",
-  revenue:"Facturación",attended:"Atendimientos",ticketAvg:"Ticket promedio",noshowRate:"Inasistencias",byPro:"Por profesional",topSvc:"Servicios más vendidos",perDay:"Facturación por día",
+  revenue:"Facturación",attended:"Atenciones",ticketAvg:"Ticket promedio",noshowRate:"Inasistencias",byPro:"Por profesional",topSvc:"Servicios más vendidos",perDay:"Facturación por día",
   salonName:"Nombre del negocio",salonSub:"Subtítulo",salonPhone:"WhatsApp del negocio",address:"Dirección",open:"Abre",closeT:"Cierra",step:"Intervalo de la agenda",
   langDefault:"Idioma principal del negocio",msgTpl:"Mensaje de confirmación",remTpl:"Mensaje de recordatorio",promo:"Mensaje de promoción",msgHelp:"Use {cliente}, {fecha}, {hora}, {servicio}, {profesional} y {salon}.",
   backup:"Copia de seguridad",exportB:"Descargar copia",copyB:"Copiar datos",importB:"Restaurar copia",clearSample:"Borrar datos de ejemplo",resetAll:"Borrar todo",restartSetup:"Configurar desde cero",
@@ -1583,7 +1583,8 @@ async function importBookings(rows){
     let proId=r.profesional&&r.profesional!=="any"?r.profesional:null;
     if(!proId){const d=toMin(r.hora);proId=(activePros().find(p=>!S.appts.some(a=>a.proId===p.id&&a.date===r.fecha&&live(a)&&d<toMin(a.start)+a.dur&&d+dur>toMin(a.start)))||activePros()[0]||{}).id}
     const items=(Array.isArray(r.productos)?r.productos:[]).map(i=>{const p=S.products.find(x=>x.id===i.id);return p?{id:p.id,name:p.name,price:p.price,qty:Math.max(1,+i.qty||1)}:null}).filter(Boolean);
-    S.appts.push({id:"rv_"+r.id,clientId:c.id,proId,serviceIds:svs.map(s=>s.id),date:r.fecha,start:r.hora,dur,price:svs.reduce((s,v)=>s+v.price,0)||r.precio,status:"pending",notes:"Reserva online"+(items.length?" · "+(LG()!=="pt"?"Separar: ":"Separar: ")+items.map(i=>i.qty+"× "+i.name).join(", "):""),paid:null,deposit:0,...(items.length?{items}:{})});
+    const d0=toMin(r.hora),clash=!!proId&&S.appts.some(a=>a.proId===proId&&a.date===r.fecha&&live(a)&&d0<toMin(a.start)+a.dur&&d0+dur>toMin(a.start));
+    S.appts.push({id:"rv_"+r.id,clientId:c.id,proId,serviceIds:svs.map(s=>s.id),date:r.fecha,start:r.hora,dur,price:svs.reduce((s,v)=>s+v.price,0)||r.precio,status:"pending",notes:(clash?(LG()!=="pt"?"ATENCIÓN: ese horario ya estaba ocupado. Reubicar o avisar al cliente. · ":"ATENÇÃO: esse horário já estava ocupado. Remarcar ou avisar o cliente. · "):"")+"Reserva online"+(items.length?" · "+(LG()!=="pt"?"Separar: ":"Separar: ")+items.map(i=>i.qty+"× "+i.name).join(", "):""),paid:null,deposit:0,...(items.length?{items}:{})});
     n++;try{if(FB_ON)await FA.markBooking(r.id);else await sb.from("reservas").update({procesada:true}).eq("id",r.id)}catch(e){}}
   if(n){ui.newBookings+=n;save();if(!$("#layer").innerHTML)render()}
 }

@@ -51,6 +51,10 @@ async function route(ctx) {
       }
       if (u.hostname === 'cdn.jsdelivr.net' && /zxing/.test(u.pathname) && fs.existsSync(path.join(SDK, 'zxing.min.js'))) return r.fulfill({ status: 200, contentType: MIME.js, body: fs.readFileSync(path.join(SDK, 'zxing.min.js')) });
       if (u.hostname === 'open.er-api.com') return r.fulfill({ status: 200, contentType: MIME.json, headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ result: 'success', rates: { USD: 1, PYG: 6250, BRL: 5.5 } }) });
+      if (u.hostname === 'firestore.googleapis.com') { // páginas que usam a API REST direto (reservas, licenças): mesma rota no emulador
+        const rq = r.request(); const h = {}; for (const [k, v] of Object.entries(rq.headers())) if (/^(content-type|authorization)$/i.test(k)) h[k] = v;
+        const rs = await fetch('http://' + FSH + ':' + FSP + u.pathname + u.search, { method: rq.method(), headers: h, body: ['GET', 'HEAD'].includes(rq.method()) ? undefined : rq.postData() });
+        return r.fulfill({ status: rs.status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: await rs.text() }); }
       const lf = localFile(u);
       if (!lf) return r.abort();
       if (lf.redirect) return r.fulfill({ status: 301, headers: { location: lf.redirect } });
