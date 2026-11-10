@@ -170,8 +170,9 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
       await p.goto('https://' + host + '.araujotechsistemas.com/', { waitUntil: 'load', timeout: 60000 });
       await p.waitForFunction(() => typeof pub !== 'undefined' && pub && pub.products && document.querySelector('[data-act=open]'), null, { timeout: 30000 }).catch(() => {});
       await p.waitForTimeout(4000);
-      const st = await p.evaluate(() => ({ susp: !!document.querySelector('.susp-wrap'), ready: !!document.querySelector('[data-act=open]'), url: location.href, txt: document.body.innerText.slice(0, 120).replace(/\n+/g, ' / ') }));
-      if (st.susp) { (s.status === 'suspenso' ? ok : bad)('loja ' + s.id + ' (' + (s.status || 'sem status') + '): mostra o aviso de catálogo indisponível e nenhum produto → "' + st.txt + '"'); }
+      const st = await p.evaluate(() => ({ nf: /no encontrado|não encontrado/i.test(document.title), susp: !!document.querySelector('.susp-wrap'), ready: !!document.querySelector('[data-act=open]'), url: location.href, txt: document.body.innerText.slice(0, 120).replace(/\n+/g, ' / ') }));
+      if (st.nf) { ok('endereço ' + s.id + ' (documento só de sitio web, sem catálogo): mostra "Catálogo no encontrado", nenhum produto e nenhum pedido possível'); }
+      else if (st.susp) { (s.status === 'suspenso' ? ok : bad)('loja ' + s.id + ' (' + (s.status || 'sem status') + '): mostra o aviso de catálogo indisponível e nenhum produto → "' + st.txt + '"'); }
       else if (s.status === 'suspenso') { let campos = '?'; try { const dj = await (await fetch(FS + '/shops/' + s.id + '?key=' + KEY)).json(); campos = Object.keys(dj.fields || {}).map(k => k + ':' + JSON.stringify(dj.fields[k]).length).join(', '); } catch (e) {}
         const dg = await p.evaluate(() => ({ url: location.href, title: document.title, shop: typeof SHOP !== 'undefined' ? SHOP : '', mode: typeof MODE !== 'undefined' ? MODE : '', st: typeof SHOP_STATUS !== 'undefined' ? SHOP_STATUS : '', sub: !!window.TDC_SUB, name: pub && pub.store && pub.store.name, txt: document.body.innerText.slice(0, 160).replace(/\n+/g, ' / ') }));
         bad('loja ' + s.id + ' está suspensa mas o catálogo continua aberto · diagnóstico: ' + JSON.stringify(dg) + ' · campos do documento: ' + campos + ' · erros: ' + p.errs.join(' | ')); }
