@@ -310,5 +310,34 @@ const STOP = process.env.STOP || '';
     check(/Mesa 2/.test(st), 'painel: a mesa 2 aparece com pedido/chamado no salão', st.slice(0, 400));
     await M.ctx.close();
   }, o2);
+
+  sec('L. Plano Crecimiento: venda por kg, atacado e "leve 3, pague 2"');
+  await step('vendas', async () => {
+    const psel = a.locator('select[data-f=plan][data-sid="' + SID + '"], [data-sid="' + SID + '"] select[data-f=plan], input[data-f=plan][data-sid="' + SID + '"][value=pro]');
+    if (await psel.count()) { const tg = await psel.first().evaluate(e => e.tagName); if (tg === 'SELECT') await psel.first().selectOption('pro'); else await psel.first().check(); }
+    else await a.evaluate(sid => { const e = [...document.querySelectorAll('[data-f=plan]')].find(x => (x.dataset.sid === sid || x.dataset.shop === sid || x.dataset.i === String(PL.shops.findIndex(s => s.id === sid))) && (x.tagName === 'SELECT' || x.value === 'pro')); if (e) { if (e.tagName === 'SELECT') e.value = 'pro'; else e.checked = true; e.dispatchEvent(new Event('change', { bubbles: true })); } }, SID);
+    await a.w(3500);
+    const lim = (await shopDoc()).lim || {}; check(lim.plan === 'Crecimiento' || (lim.off || []).length === 1, 'admin: mudar o plano para Crecimiento grava os limites novos na loja', JSON.stringify(lim));
+    await o2.reload(); await o2.w(4000); await tab(o2, 'products');
+    const mk = async (name, price, fn) => { await o2.act('newprod'); await o2.set('#ed_nes', name); await o2.set('#ed_pr', String(price)); await fn(); await o2.act('saveprod'); await o2.w(2500); return o2.evaluate(n => (pub.products.find(p => p.n.es === n) || {}).id || '', name); };
+    const kg = await mk('Queso E2E', 40000, async () => { await o2.selectOption('#ed_u', 'kg'); await o2.w(300); });
+    const ws = await mk('Yerba E2E', 10000, async () => { await o2.set('#ed_wq', '3'); await o2.set('#ed_wp', '9000'); });
+    const bx = await mk('Jabon E2E', 5000, async () => { await o2.set('#ed_bx', '3'); await o2.set('#ed_by', '2'); });
+    check(!!kg && !!ws && !!bx, 'painel: produtos por kg, com preço de atacado e com promoção 3×2 criados', [kg, ws, bx].join(','));
+    const X = await L.open({ w: 390 }); const x = X.p; { const t = new Date(); t.setUTCHours(15, 10, 0, 0); await x.clock.setFixedTime(t); }
+    await x.goto(HOST + '/'); await x.waitForFunction(() => typeof pub !== 'undefined' && pub.products.some(p => p.n.es === 'Jabon E2E') && document.querySelector('[data-act=open]'), null, { timeout: 20000 }).catch(() => {});
+    const add = async (pid, plus) => { await x.locator('[data-act=open][data-pid="' + pid + '"]:visible').first().click(); await x.w(500); for (let i = 0; i < plus; i++) { await x.locator('[data-act=pq][data-d="1"]:visible').last().click(); await x.w(200); } await x.act('addcart'); };
+    await add(kg, 0); await add(ws, 2); await add(bx, 2);
+    const ln = await x.evaluate(() => cart.map(l => { const p = pub.products.find(q => q.id === l.pid); return { n: p.n.es, q: l.q, u: p.u || '' }; }));
+    const qk = (ln.find(l => l.n === 'Queso E2E') || {}).q || 0, exp = Math.round(qk * 40000) + 27000 + 10000;
+    info('carrinho: ' + JSON.stringify(ln) + ' → esperado ' + Math.round(qk * 40000) + ' (queijo ' + qk + ' kg × 40.000) + 27.000 (3 × 9.000 atacado) + 10.000 (leve 3, pague 2) = ' + exp);
+    await x.act('cart'); const ct = x.locator('.sheet button:visible', { hasText: 'Continuar' }); if (await ct.count()) { await ct.first().click(); await x.w(400); } else await x.act('checkout');
+    await x.locator('[data-act=mode]:visible').nth(1).click(); await x.w(400); await x.fill('[data-ck=name]', 'Cliente Mayorista'); await x.fill('[data-ck=phone]', '0981 777 888');
+    const tm = x.locator('[data-ck=time]'); if (await tm.count()) { const ov = await tm.evaluate(e => [...e.options].map(o => o.value).filter(Boolean)); if (ov.length) await tm.selectOption(ov[0]); }
+    await x.act('send'); await x.w(3500);
+    const docs = ((await L.fsReq(P, 'GET', 'shops/' + SID + '/orders?pageSize=50', 'owner')).json.documents || []).map(L.unfields); const od = docs.find(d => d.name === 'Cliente Mayorista');
+    check(!!od && od.total === exp && qk > 0, 'pedido com kg + atacado + 3×2: total gravado = ' + exp, od ? JSON.stringify({ total: od.total, sub: od.sub }) : (await x.txt('.sheet')).slice(0, 300));
+    await X.ctx.close();
+  }, o2);
   await L.done();
 })().catch(e => { console.log('EXC', e.stack); process.exit(2); });

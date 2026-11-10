@@ -70,13 +70,19 @@ probe "agendas/loli/state" 403 "dados internos da Agenda (clientes, caixa) sem l
 probe "agendas/loli/reservas" 403 "reservas recebidas sem login"
 probe "visitas" 403 "contador de visitas sem login"
 
-echo; echo "== 4. Firebase da Tu Delivery (Meu Púlpito e Caja): dados privados fechados"
-K2="AIzaSyAIF3GBWko0C8S5xuvxG9ufPZXizAjDwCs"; B="https://firestore.googleapis.com/v1/projects/tu-delivery-1eb61/databases/(default)/documents"; K="$K2"
+echo; echo "== 4. Firebase do Meu Púlpito (projeto meu-pulpito-app): dados privados fechados"
+K="AIzaSyAuOBVdU5-bcFuaVEsGv4iK8H2krFU9Un8"; B="https://firestore.googleapis.com/v1/projects/meu-pulpito-app/databases/(default)/documents"
 probe "pulpito" 403 "sermões dos pastores sem login"
 probe "planos" 403 "planos dos usuários do Meu Púlpito sem login"
+probe "config/app" 403 "configuração do app sem login"
+probe "suporte" 403 "mensagens de suporte sem login"
+
+echo; echo "== 5. Firebase da Tu Delivery (Caja de Entregas, projeto tu-delivery-1eb61): dados privados fechados"
+K="AIzaSyAIF3GBWko0C8S5xuvxG9ufPZXizAjDwCs"; B="https://firestore.googleapis.com/v1/projects/tu-delivery-1eb61/databases/(default)/documents"
 probe "turnos" 403 "cadastro dos deliverys sem login"
 probe "empresa" 403 "dados da empresa (Caja) sem login"
 probe "config/roles" 403 "papéis de administrador sem login"
+probe "liq" 403 "liquidações dos deliverys sem login"
 
 echo; echo "== RESULTADO: $FALHAS falha(s)"
 [ "$FALHAS" = "0" ]

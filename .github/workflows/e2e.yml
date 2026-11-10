@@ -1,0 +1,71 @@
+name: Testes de ponta a ponta
+
+# Navegador real + emulador oficial do Firebase (Firestore e Auth) com as regras dos repositórios.
+# Roda os fluxos completos de cada sistema sem tocar em dados de produção.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - '404.html'
+      - 'painel/**'
+      - 'admin/**'
+      - 'agenda/**'
+      - 'firebase/**'
+      - 'tools/e2e/**'
+      - '.github/workflows/e2e.yml'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: araujotech
+      - uses: actions/checkout@v4
+        with:
+          repository: tudeliveryd-cyber/Barber-a-Loli
+          path: barber-a-loli
+      - uses: actions/checkout@v4
+        with:
+          repository: tudeliveryd-cyber/meu-pulpito
+          path: meu-pulpito
+      - uses: actions/checkout@v4
+        with:
+          repository: tudeliveryd-cyber/Caj-Entrega
+          path: caj-entrega
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Instalar ferramentas (emulador, navegador e SDK do Firebase)
+        run: |
+          mkdir -p ferramentas/sdk && cd ferramentas
+          npm init -y >/dev/null
+          npm i firebase-tools@13.29.1 playwright@1.49.1 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null
+          for f in firebase-app.js firebase-firestore.js firebase-auth.js firebase-app-compat.js firebase-firestore-compat.js firebase-auth-compat.js; do curl -sf -o sdk/$f https://www.gstatic.com/firebasejs/10.12.2/$f; done
+          curl -sf -o sdk/zxing.min.js https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js || true
+      - name: Rodar os testes
+        env:
+          FIREBASE_BIN: ${{ github.workspace }}/ferramentas/node_modules/.bin/firebase
+          NODE_PATH: ${{ github.workspace }}/ferramentas/node_modules
+          SDK_DIR: ${{ github.workspace }}/ferramentas/sdk
+          BARBER_DIR: ${{ github.workspace }}/barber-a-loli
+          PULPITO_DIR: ${{ github.workspace }}/meu-pulpito
+          CAJA_DIR: ${{ github.workspace }}/caj-entrega
+        run: |
+          cd araujotech
+          F=0
+          echo "######## CATÁLOGO · regras em produção (v10)";        tools/e2e/run.sh e2e_catalogo.js || F=1
+          echo "######## CATÁLOGO · regras novas (v11, candidatas)";   tools/e2e/run.sh e2e_catalogo.js firestore-v11.rules || F=1
+          echo "######## AGENDA";                                      tools/e2e/run.sh e2e_agenda.js || F=1
+          echo "######## AGENDA · regras novas (v11)";                 tools/e2e/run.sh e2e_agenda.js firestore-v11.rules || F=1
+          echo "######## MEU PÚLPITO";  RULES_SRC=$PULPITO_DIR/firestore.rules tools/e2e/run.sh e2e_pulpito.js x meu-pulpito-app || F=1
+          echo "######## CAJA DE ENTREGAS"; RULES_SRC=$CAJA_DIR/firestore.rules tools/e2e/run.sh e2e_caja.js x tu-delivery-1eb61 || F=1
+          exit $F
