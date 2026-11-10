@@ -172,7 +172,9 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
       await p.waitForTimeout(4000);
       const st = await p.evaluate(() => ({ susp: !!document.querySelector('.susp-wrap'), ready: !!document.querySelector('[data-act=open]'), url: location.href, txt: document.body.innerText.slice(0, 120).replace(/\n+/g, ' / ') }));
       if (st.susp) { (s.status === 'suspenso' ? ok : bad)('loja ' + s.id + ' (' + (s.status || 'sem status') + '): mostra o aviso de catálogo indisponível e nenhum produto → "' + st.txt + '"'); }
-      else if (s.status === 'suspenso') bad('loja ' + s.id + ' está suspensa mas o catálogo continua aberto');
+      else if (s.status === 'suspenso') { let campos = '?'; try { const dj = await (await fetch(FS + '/shops/' + s.id + '?key=' + KEY)).json(); campos = Object.keys(dj.fields || {}).map(k => k + ':' + JSON.stringify(dj.fields[k]).length).join(', '); } catch (e) {}
+        const dg = await p.evaluate(() => ({ url: location.href, title: document.title, shop: typeof SHOP !== 'undefined' ? SHOP : '', mode: typeof MODE !== 'undefined' ? MODE : '', st: typeof SHOP_STATUS !== 'undefined' ? SHOP_STATUS : '', sub: !!window.TDC_SUB, name: pub && pub.store && pub.store.name, txt: document.body.innerText.slice(0, 160).replace(/\n+/g, ' / ') }));
+        bad('loja ' + s.id + ' está suspensa mas o catálogo continua aberto · diagnóstico: ' + JSON.stringify(dg) + ' · campos do documento: ' + campos + ' · erros: ' + p.errs.join(' | ')); }
       else if (!st.ready) { info(s.id + ': não abriu como catálogo (' + st.url + ') → "' + st.txt + '"'); } else await conferir(p, 'loja ' + s.id, false);
     } catch (e) { bad('loja ' + s.id + ': ' + String(e.message).slice(0, 140)); }
     await ctx.close();
