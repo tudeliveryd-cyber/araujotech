@@ -33,7 +33,7 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         else if (R) { const exp = cc === 'PY' ? Math.round(usd[i] * R.PYG / 5000) * 5000 : Math.round(usd[i] * R.BRL); const got = num(x.loc);
           if (cc === 'PY' && !/Gs\./.test(x.loc)) errs.push(x.n + ' sem Gs.: "' + x.loc + '"'); if (cc === 'BR' && !/R\$/.test(x.loc)) errs.push(x.n + ' sem R$: "' + x.loc + '"');
           if (Math.abs(got - exp) > (cc === 'PY' ? 5000 : 1)) errs.push(x.n + ': mostra ' + x.loc + ', esperado ' + exp);
-          if (x.lz && Math.abs(num(x.lz.split('≈')[1] || '') - exp * 10) > (cc === 'PY' ? 50000 : 10)) errs.push(x.n + ' anual: "' + x.lz + '", esperado ' + exp * 10); }
+          if (x.lz && Math.abs(num(((x.lz.split('≈')[1] || '').split(')')[0])) - exp * 10) > (cc === 'PY' ? 50000 : 10)) errs.push(x.n + ' anual: "' + x.lz + '", esperado ' + exp * 10); }
       });
       if (errs.length) bad(pais + ' (' + tz + '): ' + errs.join('; ')); else ok(pais + ' (' + tz + '): ' + plans.map(x => x.usd + (x.loc ? ' ' + x.loc : '')).join(' | ') + (cc === 'XX' ? '  → só dólar' : ''));
       if (p.errs.length) bad(pais + ': erro de JavaScript na página: ' + p.errs[0]);
@@ -169,12 +169,16 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
       await p.clock.install({ time: new Date() }).catch(() => {});
       await p.goto('https://' + host + '.araujotechsistemas.com/', { waitUntil: 'load', timeout: 60000 });
       await p.waitForFunction(() => typeof pub !== 'undefined' && pub && pub.products && document.querySelector('[data-act=open]'), null, { timeout: 30000 }).catch(() => {});
-      const st = await p.evaluate(() => ({ ready: !!document.querySelector('[data-act=open]'), url: location.href, txt: document.body.innerText.slice(0, 120).replace(/\n+/g, ' / ') }));
-      if (!st.ready) { info(s.id + ': não abriu como catálogo (' + st.url + ') → "' + st.txt + '"'); } else await conferir(p, 'loja ' + s.id, false);
+      await p.waitForTimeout(4000);
+      const st = await p.evaluate(() => ({ susp: !!document.querySelector('.susp-wrap'), ready: !!document.querySelector('[data-act=open]'), url: location.href, txt: document.body.innerText.slice(0, 120).replace(/\n+/g, ' / ') }));
+      if (st.susp) { (s.status === 'suspenso' ? ok : bad)('loja ' + s.id + ' (' + (s.status || 'sem status') + '): mostra o aviso de catálogo indisponível e nenhum produto → "' + st.txt + '"'); }
+      else if (s.status === 'suspenso') bad('loja ' + s.id + ' está suspensa mas o catálogo continua aberto');
+      else if (!st.ready) { info(s.id + ': não abriu como catálogo (' + st.url + ') → "' + st.txt + '"'); } else await conferir(p, 'loja ' + s.id, false);
     } catch (e) { bad('loja ' + s.id + ': ' + String(e.message).slice(0, 140)); }
     await ctx.close();
   }
 
+  if (process.env.DEMOS === 'nao') { console.log('\n== RESULTADO: ' + fails + ' falha(s)'); await b.close(); process.exit(fails ? 1 : 0); }
   console.log('\n== 5. Demonstrações no ar (pedido completo com dados locais, horário simulado 11:00 de hoje)');
   let demos = [];
   try { demos = require('fs').readdirSync(require('path').join(__dirname, '..', 'araujo-tech-site')).filter(x => /^demo(-[a-z]+)?$/.test(x) && x !== 'demo-agenda').sort(); } catch (e) {}
