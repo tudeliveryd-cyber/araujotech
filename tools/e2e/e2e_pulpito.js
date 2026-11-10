@@ -113,6 +113,8 @@ const login = async p => { await p.goto('https://meupulpito.com/app/'); await p.
     await e.click('#idc'); await e.w(800);
     const got = (await e.evaluate(() => window.__cp)) || e.dialogs.join(' ');
     check(got.includes(au.localId) && /e-mail verificado: (sim|não)/.test(got) && !got.includes('@'), 'escritório: o texto copiado traz o identificador e se o e-mail está verificado, sem o e-mail', got.replace(au.localId, '<uid correto>'));
+    await e.evaluate(() => { window.__cp = ''; }); await e.locator('#idc2').scrollIntoViewIfNeeded(); await e.click('#idc2'); await e.w(600);
+    check(((await e.evaluate(() => window.__cp)) || e.dialogs.join(' ')).includes(au.localId), 'escritório: o mesmo botão existe no fim da página (para navegadores que cobrem o topo)');
     await E.ctx.close();
   }, p);
   await L.done();
