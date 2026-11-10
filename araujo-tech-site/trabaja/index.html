@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Trabajá con nosotros · Araújo Tech Sistemas</title>
+<meta name="description" content="Vendé los sistemas de Araújo Tech y ganá comisión por cada venta. Te capacitamos y te damos todo el material.">
+<link rel="icon" href="../img/simbolo.png">
+<link rel="apple-touch-icon" href="../img/simbolo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--purple:#8A12D6;--deep:#4A0A80;--night:#24093F;--lilac:#F3ECFB;--ink:#1A1222;--muted:#5F566B;--line:#E4DAF0;--white:#FFFFFF;--ok:#11845A}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:"Red Hat Text",system-ui,sans-serif;color:var(--ink);background:var(--white);line-height:1.55;font-size:17px}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+h1,h2,h3{font-family:"Red Hat Display",system-ui,sans-serif;line-height:1.1;letter-spacing:-.02em}
+header{background:var(--night);color:#fff}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0}
+.top img{height:40px;display:block}
+.lang{display:flex;border:1px solid rgba(255,255,255,.3);border-radius:999px;overflow:hidden}
+.lang button{border:0;background:none;color:#fff;font:700 14px "Red Hat Text",sans-serif;padding:7px 14px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:#fff;color:var(--deep)}
+.hero{padding:44px 0 64px;background:linear-gradient(135deg,var(--night) 0%,var(--deep) 65%,var(--purple) 100%);color:#fff}
+.kick{display:inline-block;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;background:#FBBF24;color:var(--ink);border-radius:999px;padding:6px 14px}
+.hero h1{font-size:clamp(38px,6vw,64px);font-weight:900;margin:18px 0 14px}
+.hero p{font-size:19px;color:#E9E2FB;max-width:640px}
+.hero .cta{display:inline-flex;margin-top:26px;background:#fff;color:var(--deep);font-weight:800;text-decoration:none;padding:15px 26px;border-radius:14px}
+section{padding:56px 0}
+section h2{font-size:clamp(28px,4vw,40px);margin-bottom:10px}
+.lead{color:var(--muted);max-width:680px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:26px}
+.card{border:1px solid var(--line);border-radius:18px;padding:22px}
+.card h3{font-size:20px;margin-bottom:6px;color:var(--deep)}
+.card p{color:var(--muted);font-size:16px}
+.num{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--purple);color:#fff;font-weight:800;margin-bottom:12px}
+.soft{background:var(--lilac)}
+.check{list-style:none;display:grid;gap:10px;margin-top:20px}
+.check li{display:flex;gap:10px;align-items:flex-start}
+.check svg{flex:none;margin-top:3px;color:var(--ok)}
+.note{margin-top:22px;background:#fff;border-left:5px solid var(--purple);border-radius:0 12px 12px 0;padding:14px 18px;font-size:16px}
+form{margin-top:26px;display:grid;gap:14px;max-width:640px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:15px}
+input,select,textarea{font:inherit;font-size:16px;font-weight:400;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;color:var(--ink);width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--purple);outline-offset:1px}
+textarea{min-height:96px;resize:vertical}
+.err{color:#b91c1c;font-size:14px;font-weight:700;min-height:1em}
+.send{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;background:#25D366;color:#fff;font:800 17px "Red Hat Text",sans-serif;padding:16px 26px;border-radius:14px;cursor:pointer}
+.send svg{width:22px;height:22px}
+footer{background:var(--night);color:#C4B5FD;padding:28px 0;text-align:center;font-size:14px}
+footer a{color:#fff;font-weight:700}
+@media (max-width:600px){.row{grid-template-columns:1fr}section{padding:44px 0}.hero{padding:30px 0 48px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap top">
+    <a href="../" aria-label="Araújo Tech Sistemas"><img src="../img/logo-completo-blanco.png" alt="Araújo Tech Sistemas"></a>
+    <div class="lang" role="group" aria-label="Idioma"><button data-lang="es" aria-pressed="true">ES</button><button data-lang="pt" aria-pressed="false">PT</button></div>
+  </div>
+</header>
+<div class="hero">
+  <div class="wrap">
+    <span class="kick" data-t="k">Trabajá con nosotros</span>
+    <h1 data-t="h">Vendé tecnología y ganá por cada venta</h1>
+    <p data-t="p">Buscamos vendedores para ofrecer los sistemas de Araújo Tech a comercios, salones e iglesias. Te capacitamos y te damos todo el material para vender.</p>
+    <a class="cta" href="#form" data-t="cta">Quiero postularme</a>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2 data-t="s1">Qué vas a ofrecer</h2>
+    <p class="lead" data-t="s1p">Sistemas que ya funcionan, con demostración en vivo para mostrar al cliente.</p>
+    <div class="grid">
+      <div class="card"><h3 data-t="c1">Catálogo digital</h3><p data-t="c1p">Menú o catálogo online con pedidos por WhatsApp, caja y stock. Para restaurantes, tiendas, farmacias y más.</p></div>
+      <div class="card"><h3 data-t="c2">Agenda para salones</h3><p data-t="c2p">Reservas online, agenda del equipo, caja y comisiones para peluquerías y barberías.</p></div>
+      <div class="card"><h3 data-t="c3">Meu Púlpito</h3><p data-t="c3p">Aplicación para pastores y predicadores: sermones, Biblia y administración de la iglesia.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="soft">
+  <div class="wrap">
+    <h2 data-t="s2">Cómo funciona</h2>
+    <div class="grid">
+      <div class="card" style="background:#fff"><span class="num">1</span><h3 data-t="f1">Te postulás</h3><p data-t="f1p">Completás el formulario y te contactamos por WhatsApp.</p></div>
+      <div class="card" style="background:#fff"><span class="num">2</span><h3 data-t="f2">Te capacitamos</h3><p data-t="f2p">Aprendés a mostrar los sistemas y recibís la presentación, la propuesta y los enlaces de demostración.</p></div>
+      <div class="card" style="background:#fff"><span class="num">3</span><h3 data-t="f3">Visitás clientes</h3><p data-t="f3p">Ofrecés los sistemas a comercios de tu zona, en tus horarios.</p></div>
+      <div class="card" style="background:#fff"><span class="num">4</span><h3 data-t="f4">Ganás comisión</h3><p data-t="f4p">Por cada cliente que contrata un plan, recibís tu comisión.</p></div>
+    </div>
+    <div class="note" data-t="nt"><b>Trabajo por comisión.</b> No hay sueldo fijo: ganás según tus ventas. Las condiciones se conversan en la entrevista.</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 data-t="s3">Qué buscamos</h2>
+    <ul class="check">
+      <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span data-t="q1">Ganas de vender y de hablar con dueños de negocios.</span></li>
+      <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span data-t="q2">Celular con WhatsApp e internet para mostrar las demostraciones.</span></li>
+      <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span data-t="q3">Español o portugués (los dos, mejor).</span></li>
+      <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg><span data-t="q4">No hace falta experiencia: te enseñamos.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="soft" id="form">
+  <div class="wrap">
+    <h2 data-t="s4">Postulate</h2>
+    <p class="lead" data-t="s4p">Completá tus datos. Al enviar, se abre WhatsApp con tu postulación lista.</p>
+    <form id="f" novalidate>
+      <div class="row">
+        <label><span data-t="l_n">Nombre y apellido</span><input name="n" autocomplete="name" required></label>
+        <label><span data-t="l_c">Ciudad</span><input name="c" autocomplete="address-level2" required></label>
+      </div>
+      <div class="row">
+        <label><span data-t="l_w">WhatsApp</span><input name="w" type="tel" inputmode="tel" autocomplete="tel" required></label>
+        <label><span data-t="l_d">Disponibilidad</span><select name="d"><option value="" data-t="o_sel">Elegí una opción</option><option data-t="o_d1">Medio tiempo</option><option data-t="o_d2">Tiempo completo</option><option data-t="o_d3">Solo algunos días</option></select></label>
+      </div>
+      <div class="row">
+        <label><span data-t="l_e">¿Tenés experiencia en ventas?</span><select name="e"><option value="" data-t="o_sel">Elegí una opción</option><option data-t="o_y">Sí</option><option data-t="o_l">Un poco</option><option data-t="o_no">No</option></select></label>
+        <label><span data-t="l_k">¿Conocés dueños de comercios?</span><select name="k"><option value="" data-t="o_sel">Elegí una opción</option><option data-t="o_y">Sí</option><option data-t="o_l">Algunos</option><option data-t="o_no">No</option></select></label>
+      </div>
+      <label><span data-t="l_m">Contanos algo de vos (opcional)</span><textarea name="m"></textarea></label>
+      <span class="err" id="err"></span>
+      <div><button class="send" type="submit"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.8-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg><span data-t="send">Enviar por WhatsApp</span></button></div>
+    </form>
+  </div>
+</section>
+
+<footer><div class="wrap"><a href="../">Araújo Tech Sistemas</a> · <span data-t="ft">Tecnología que transforma negocios</span></div></footer>
+
+<script>
+const WA="595982086171";
+const T={es:{},pt:{k:"Trabalhe conosco",h:"Venda tecnologia e ganhe por cada venda",p:"Buscamos vendedores para oferecer os sistemas da Araújo Tech a comércios, salões e igrejas. Nós treinamos você e damos todo o material para vender.",cta:"Quero me candidatar",
+ s1:"O que você vai oferecer",s1p:"Sistemas que já funcionam, com demonstração ao vivo para mostrar ao cliente.",c1:"Catálogo digital",c1p:"Cardápio ou catálogo online com pedidos pelo WhatsApp, caixa e estoque. Para restaurantes, lojas, farmácias e mais.",c2:"Agenda para salões",c2p:"Reservas online, agenda da equipe, caixa e comissões para salões e barbearias.",c3:"Meu Púlpito",c3p:"Aplicativo para pastores e pregadores: sermões, Bíblia e administração da igreja.",
+ s2:"Como funciona",f1:"Você se candidata",f1p:"Preenche o formulário e entramos em contato pelo WhatsApp.",f2:"Nós treinamos você",f2p:"Você aprende a mostrar os sistemas e recebe a apresentação, a proposta e os links de demonstração.",f3:"Você visita clientes",f3p:"Oferece os sistemas a comércios da sua região, nos seus horários.",f4:"Você ganha comissão",f4p:"Por cada cliente que contrata um plano, você recebe sua comissão.",
+ nt:"<b>Trabalho por comissão.</b> Não há salário fixo: você ganha conforme suas vendas. As condições são combinadas na entrevista.",s3:"O que buscamos",q1:"Vontade de vender e de conversar com donos de negócios.",q2:"Celular com WhatsApp e internet para mostrar as demonstrações.",q3:"Espanhol ou português (os dois, melhor).",q4:"Não precisa de experiência: nós ensinamos.",
+ s4:"Candidate-se",s4p:"Preencha seus dados. Ao enviar, o WhatsApp abre com a sua candidatura pronta.",l_n:"Nome e sobrenome",l_c:"Cidade",l_w:"WhatsApp",l_d:"Disponibilidade",o_sel:"Escolha uma opção",o_d1:"Meio período",o_d2:"Período integral",o_d3:"Só alguns dias",l_e:"Tem experiência em vendas?",o_y:"Sim",o_l:"Um pouco",o_no:"Não",l_k:"Conhece donos de comércios?",l_m:"Conte algo sobre você (opcional)",send:"Enviar pelo WhatsApp",ft:"Tecnologia que transforma negócios",
+ err:"Preencha nome, cidade e WhatsApp.",title:"Trabalhe conosco · Araújo Tech Sistemas"},
+ err_es:"Completá nombre, ciudad y WhatsApp."};
+document.querySelectorAll('option[data-t="o_l"]').forEach((o,i)=>{o.dataset.t=i?"o_l2":"o_l"});T.pt.o_l2="Alguns";
+document.querySelectorAll("[data-t]").forEach(e=>{T.es[e.dataset.t]=e.innerHTML});T.es.err=T.err_es;T.es.title=document.title;
+let lang="es";try{const q=new URLSearchParams(location.search).get("lang");lang=q==="pt"||(!q&&/^pt/i.test(navigator.language||""))?"pt":"es"}catch(e){}
+function setLang(l){lang=l;document.documentElement.lang=l==="pt"?"pt-BR":"es";document.querySelectorAll("[data-t]").forEach(e=>{const v=T[l][e.dataset.t];if(v!=null)e.innerHTML=v});document.title=T[l].title;document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.lang===l))}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));setLang(lang);
+document.getElementById("f").addEventListener("submit",ev=>{ev.preventDefault();const F=new FormData(ev.target);const v=k=>String(F.get(k)||"").trim();const sel=k=>{const s=ev.target.elements[k];return s.value?s.options[s.selectedIndex].text:"—"};
+ if(!v("n")||!v("c")||!v("w")){document.getElementById("err").textContent=T[lang].err;return}document.getElementById("err").textContent="";
+ const pt=lang==="pt";const L=pt?["Olá! Quero trabalhar como vendedor(a) da Araújo Tech.","Nome","Cidade","WhatsApp","Disponibilidade","Experiência em vendas","Conhece donos de comércios","Sobre mim"]:["¡Hola! Quiero trabajar como vendedor/a de Araújo Tech.","Nombre","Ciudad","WhatsApp","Disponibilidad","Experiencia en ventas","Conoce dueños de comercios","Sobre mí"];
+ let m=L[0]+"\n\n"+L[1]+": "+v("n")+"\n"+L[2]+": "+v("c")+"\n"+L[3]+": "+v("w")+"\n"+L[4]+": "+sel("d")+"\n"+L[5]+": "+sel("e")+"\n"+L[6]+": "+sel("k");if(v("m"))m+="\n"+L[7]+": "+v("m");
+ window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(m),"_blank","noopener")});
+</script>
+</body>
+</html>
