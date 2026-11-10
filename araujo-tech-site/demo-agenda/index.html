@@ -286,7 +286,7 @@ const T={es:{tag:"Reserve su turno en un minuto",tabSvc:"Servicios",tabTeam:"Equ
   noPro:"Ningún profesional hace todos esos servicios juntos. Quite uno y reserve el otro aparte.",quick:"Primer horario libre",
   morning:"Mañana",afternoon:"Tarde",noSlot:"No quedan horarios libres este día. Pruebe otro día o con otro profesional.",
   you:"Sus datos",name:"Nombre y apellido",phone:"WhatsApp",remember:"Guardamos sus datos en este celular para la próxima vez.",
-  next:"Continuar",confirm:"Confirmar reserva",reserveCta:"Reservar turno",sum0:"Elija un servicio",need:"Complete su nombre y WhatsApp.",fail:"No se pudo enviar. Intente de nuevo.",
+  next:"Continuar",confirm:"Confirmar reserva",reserveCta:"Reservar turno",sum0:"Elija un servicio",need:"Complete su nombre y WhatsApp.",badPhone:"Revise el número de WhatsApp: escriba solo números, con el código de área.",fail:"No se pudo enviar. Intente de nuevo.",
   doneT:"¡Turno reservado!",doneS:"Le confirmamos por WhatsApp en breve.",sendWa:"Avisar por WhatsApp",addCal:"Agregar a mi calendario",again:"Volver al inicio",
   service:"Servicio",pro:"Profesional",date:"Fecha",hour:"Hora",total:"Total",min:"min",closed:"Cerrado",
   wa:"Hola, quiero reservar en {salon}:\n• {svc}\n• {pro}\n• {date} a las {hour}\nNombre: {name}\nWhatsApp: {phone}",
@@ -299,7 +299,7 @@ const T={es:{tag:"Reserve su turno en un minuto",tabSvc:"Servicios",tabTeam:"Equ
   noPro:"Nenhum profissional faz todos esses serviços juntos. Tire um e reserve o outro à parte.",quick:"Primeiro horário livre",
   morning:"Manhã",afternoon:"Tarde",noSlot:"Não há horários livres neste dia. Tente outro dia ou outro profissional.",
   you:"Seus dados",name:"Nome e sobrenome",phone:"WhatsApp",remember:"Guardamos seus dados neste celular para a próxima vez.",
-  next:"Continuar",confirm:"Confirmar reserva",reserveCta:"Reservar horário",sum0:"Escolha um serviço",need:"Preencha seu nome e WhatsApp.",fail:"Não foi possível enviar. Tente de novo.",
+  next:"Continuar",confirm:"Confirmar reserva",reserveCta:"Reservar horário",sum0:"Escolha um serviço",need:"Preencha seu nome e WhatsApp.",badPhone:"Confira o número do WhatsApp: digite só números, com o DDD.",fail:"Não foi possível enviar. Tente de novo.",
   doneT:"Horário reservado!",doneS:"Confirmamos pelo WhatsApp em breve.",sendWa:"Avisar pelo WhatsApp",addCal:"Adicionar à minha agenda",again:"Voltar ao início",
   service:"Serviço",pro:"Profissional",date:"Data",hour:"Hora",total:"Total",min:"min",closed:"Fechado",
   wa:"Olá, quero reservar no {salon}:\n• {svc}\n• {pro}\n• {date} às {hour}\nNome: {name}\nWhatsApp: {phone}",
@@ -510,6 +510,7 @@ function renderOrder(el){
 function sendOrder(){
   st.name=$("#nm").value.trim();st.phone=$("#ph").value.trim();
   if(!st.name||!st.phone){$("#err").innerHTML=`<div class="warn">${t("need")}</div>`;(st.name?$("#ph"):$("#nm")).focus();return}
+  if(st.phone.replace(/\D/g,"").length<7){$("#err").innerHTML=`<div class="warn">${t("badPhone")}</div>`;$("#ph").focus();return}
   try{localStorage.setItem("reserva_me",JSON.stringify({name:st.name,phone:st.phone}))}catch(e){}
   const msg=t("waOrder").replace("{salon}",SALON.name).replace("{p}",cartItems().map(i=>"• "+i.qty+"× "+i.name+" · "+gs(i.price*i.qty)).join("\n")).replace("{t}",gs(cartTot())).replace("{name}",st.name).replace("{phone}",st.phone);
   window.open("https://wa.me/"+waNum(SALON.phone)+"?text="+encodeURIComponent(msg),"_blank","noopener");
@@ -522,6 +523,7 @@ function closeSheet(){if(st.sent){Object.assign(st,{svc:[],pro:"any",date:null,t
 function confirm(){
   st.name=$("#nm").value.trim();st.phone=$("#ph").value.trim();
   if(!st.name||!st.phone){$("#err").innerHTML=`<div class="warn">${t("need")}</div>`;(st.name?$("#ph"):$("#nm")).focus();return}
+  if(st.phone.replace(/\D/g,"").length<7){$("#err").innerHTML=`<div class="warn">${t("badPhone")}</div>`;$("#ph").focus();return}
   try{localStorage.setItem("reserva_me",JSON.stringify({name:st.name,phone:st.phone}))}catch(e){}
   if(st.pro==="any"){const p=freePro(st.date,toMin(st.time));if(p)st.pro=p.id}
   const b=$("[data-confirm]");b.disabled=true;
