@@ -1,0 +1,31 @@
+name: tmp ferramentas de teste
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  empacotar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Baixar firebase-tools, emuladores e SDK
+        run: |
+          mkdir -p pkg/ft pkg/sdk pkg/emu && cd pkg/ft
+          npm init -y >/dev/null
+          npm i firebase-tools@13.29.1 >/dev/null 2>&1
+          cd ..
+          ./ft/node_modules/.bin/firebase setup:emulators:firestore
+          cp ~/.cache/firebase/emulators/* emu/ || true
+          ls -la emu
+          for f in firebase-app.js firebase-firestore.js firebase-auth.js firebase-app-compat.js firebase-firestore-compat.js firebase-auth-compat.js firebase-messaging-compat.js firebase-storage-compat.js firebase-functions-compat.js firebase-messaging.js firebase-storage.js; do curl -sf -o sdk/$f https://www.gstatic.com/firebasejs/10.12.2/$f || echo "sem $f"; done
+          curl -sf -o sdk/zxing.min.js https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js || true
+          ls -la sdk
+          tar czf ft.tgz ft && split -b 90m ft.tgz ft.tgz.part- && rm -rf ft ft.tgz
+          du -sh *
+      - name: Enviar para branch temporário
+        run: |
+          cd pkg && git init -q -b tmp/ferramentas-teste && git config user.name ci && git config user.email ci@example.invalid
+          git add -A && git commit -q -m "ferramentas de teste (temporário)"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" tmp/ferramentas-teste
