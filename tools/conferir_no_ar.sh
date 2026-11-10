@@ -24,17 +24,17 @@ https://araujotechsistemas.com/trabaja/|
 https://araujotechsistemas.com/demo/|cleanOrder
 https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
-https://araujotechsistemas.com/admin/|tmpPass
-https://araujotechsistemas.com/painel/|cleanOrder
+https://araujotechsistemas.com/admin/|weakfix
+https://araujotechsistemas.com/painel/|forceMc
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/sitemap.xml|
-https://fogaomineiro.araujotechsistemas.com/|cleanOrder
-https://fogaomineiro.araujotechsistemas.com/painel/|tmpPass
-https://teste.araujotechsistemas.com/|cleanOrder
+https://fogaomineiro.araujotechsistemas.com/|forceMc
+https://fogaomineiro.araujotechsistemas.com/painel/|forceMc
+https://teste.araujotechsistemas.com/|forceMc
 https://teste.araujotechsistemas.com/agenda/|badPhone
-https://teste.araujotechsistemas.com/agenda/gestion.html|isTmp
+https://teste.araujotechsistemas.com/agenda/gestion.html|forceMc
 https://barberialoli.araujotechsistemas.com/reservas.html|badPhone
-https://barberialoli.araujotechsistemas.com/gestion.html|isTmp
+https://barberialoli.araujotechsistemas.com/gestion.html|forceMc
 https://meupulpito.com/|
 https://meupulpito.com/app/|
 https://tudeliveryd-cyber.github.io/Caj-Entrega/|
@@ -83,6 +83,22 @@ probe "turnos" 403 "cadastro dos deliverys sem login"
 probe "empresa" 403 "dados da empresa (Caja) sem login"
 probe "config/roles" 403 "papéis de administrador sem login"
 probe "liq" 403 "liquidações dos deliverys sem login"
+
+echo; echo "== 6. Peso real da página do catálogo (o que o celular baixa de fato)"
+for url in https://fogaomineiro.araujotechsistemas.com/ https://teste.araujotechsistemas.com/ https://araujotechsistemas.com/demo/; do
+  hd=$(mktemp)
+  cru=$(curl -sS -L -A "$UA" --max-time 40 -o /dev/null -w '%{size_download}' "$url" 2>/dev/null || echo 0)
+  cmp=$(curl -sS -L -A "$UA" -H 'Accept-Encoding: br, gzip' --max-time 40 -D "$hd" -o /dev/null -w '%{size_download}' "$url" 2>/dev/null || echo 0)
+  enc=$(tr -d '\r' < "$hd" | grep -i '^content-encoding:' | tail -1 | cut -d' ' -f2)
+  etag=$(tr -d '\r' < "$hd" | grep -i '^etag:' | tail -1 | cut -d' ' -f2-); lm=$(tr -d '\r' < "$hd" | grep -i '^last-modified:' | tail -1 | cut -d' ' -f2-)
+  rev=000
+  [ -n "$etag" ] && rev=$(curl -sS -A "$UA" -H 'Accept-Encoding: br, gzip' -H "If-None-Match: $etag" --max-time 30 -o /dev/null -w '%{http_code}' "$url" 2>/dev/null || echo 000)
+  [ "$rev" != "304" ] && [ -n "$lm" ] && rev=$(curl -sS -A "$UA" -H 'Accept-Encoding: br, gzip' -H "If-Modified-Since: $lm" --max-time 30 -o /dev/null -w '%{http_code}' "$url" 2>/dev/null || echo 000)
+  kb=$((cmp/1024)); echo "INFO  | $url -> ${cru} bytes sem compressão, ${cmp} bytes transferidos (${enc:-sem compressão}); segunda visita: HTTP $rev"
+  if [ "$cmp" -gt 0 ] && [ "$cmp" -le 307200 ]; then ok "$url -> primeira visita baixa ${kb} KB (limite 300 KB)"; else bad "$url -> primeira visita baixa ${kb} KB (acima de 300 KB)"; fi
+  if [ "$rev" = "304" ]; then ok "$url -> na segunda visita o servidor responde 304 (não baixa de novo)"; else echo "INFO  | $url -> segunda visita não devolveu 304 (HTTP $rev): a página é baixada de novo, comprimida"; fi
+  rm -f "$hd"
+done
 
 echo; echo "== RESULTADO: $FALHAS falha(s)"
 [ "$FALHAS" = "0" ]
