@@ -96,5 +96,20 @@ const dd = async (p, t) => console.log('   · ' + t + ': ' + await p.evaluate(()
     await T('dono lê as entregas do delivery', 'GET', 'turnos/' + DUID + '/entregas', ow, 200);
     await T('conta com e-mail parecido com o do dono não vira administradora', 'GET', 'turnos', fk.idToken, 403);
   }, o);
+
+  sec('F. Identificador da conta do dono (para tirar o e-mail das regras)');
+  await step('identificador', async () => {
+    const ow = await L.signIn(OWNER, OPW);
+    await o.evaluate(() => { const b = document.querySelector('[data-tema]'); b && b.click(); }); await o.w(800);
+    check(await o.locator('[data-cfgid]').count() === 1, 'dono: em "Colores y configuración" aparece "Identificador de la cuenta"', (await o.txt('.sheet')).slice(0, 300));
+    await o.evaluate(() => { window.__cp = ''; try { navigator.clipboard.writeText = t => { window.__cp = t; return Promise.resolve(); }; } catch (e) {} }); o.dialogs.length = 0;
+    await o.locator('[data-cfgid]').click(); await o.w(800);
+    const got = (await o.evaluate(() => window.__cp)) || o.dialogs.join(' ');
+    check(got.includes(ow.localId) && /verificado: sí/.test(got) && !got.includes('@'), 'dono: o texto copiado traz o identificador da conta e "correo verificado: sí", sem o e-mail', got.replace(ow.localId, '<uid correto>'));
+    const D2 = await L.open({ w: 390 }); const d2 = D2.p; await d2.goto(URL0); await d2.w(3000);
+    const em = d2.locator('input[type=email]:visible').first(); if (await em.count()) { await em.fill('delivery.e2e@example.com'); await d2.locator('input[type=password]:visible').first().fill(DPW); await d2.keyboard.press('Enter'); await d2.w(6000); }
+    await d2.evaluate(() => { const b = document.querySelector('[data-tema]'); b && b.click(); }); await d2.w(800);
+    check(await d2.locator('.sheet').count() > 0 && !(await d2.locator('[data-cfgid]').count()), 'delivery: a opção não aparece para quem não é o dono', (await d2.txt()).slice(0, 200)); await D2.ctx.close();
+  }, o);
   await L.done();
 })().catch(e => { console.log('EXC', e.stack); process.exit(2); });

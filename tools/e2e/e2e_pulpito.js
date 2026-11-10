@@ -100,5 +100,20 @@ const login = async p => { await p.goto('https://meupulpito.com/app/'); await p.
     const oob = await (await fetch('http://127.0.0.1:9099/emulator/v1/projects/' + P + '/oobCodes')).json();
     check((oob.oobCodes || []).some(c => c.email === EM && c.requestType === 'PASSWORD_RESET'), 'recuperar senha: o pedido de redefinição chega ao Firebase para o e-mail da conta', (await R.p.txt()).slice(0, 200)); await R.ctx.close();
   }, p);
+
+  sec('F. Escritório: identificador da conta do administrador');
+  await step('identificador', async () => {
+    const fs = require('fs'), path = require('path');
+    const ADM = (fs.readFileSync(path.join(L.DIRS.pulpito, 'firestore.rules'), 'utf8').match(/token\.email == '([^']+)'/) || [])[1]; if (!ADM) { info('e-mail do administrador não encontrado nas regras'); return; }
+    const au = await L.signUp(ADM, 'AdminPulpito#26');
+    const E = await L.open({ w: 1100 }); const e = E.p; await e.goto('https://meupulpito.com/escritorio/'); await e.w(3000);
+    await e.fill('#lgE', ADM); await e.fill('#lgP', 'AdminPulpito#26'); await e.press('#lgP', 'Enter'); await e.w(5000);
+    check(await e.locator('#idc').count() === 1 && !e.errs.length, 'escritório: o administrador entra e vê o botão do identificador, sem erros', (await e.txt()).split(ADM).join('<adm>').slice(0, 200) + ' | erros: ' + e.errs.join(';').split(ADM).join('<adm>'));
+    await e.evaluate(() => { window.__cp = ''; try { navigator.clipboard.writeText = t => { window.__cp = t; return Promise.resolve(); }; } catch (x) {} }); e.dialogs.length = 0;
+    await e.click('#idc'); await e.w(800);
+    const got = (await e.evaluate(() => window.__cp)) || e.dialogs.join(' ');
+    check(got.includes(au.localId) && /e-mail verificado: (sim|não)/.test(got) && !got.includes('@'), 'escritório: o texto copiado traz o identificador e se o e-mail está verificado, sem o e-mail', got.replace(au.localId, '<uid correto>'));
+    await E.ctx.close();
+  }, p);
   await L.done();
 })().catch(e => { console.log('EXC', e.stack); process.exit(2); });
