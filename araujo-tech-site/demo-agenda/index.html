@@ -567,5 +567,12 @@ function applyLic(d){if(!d||!d.plan)return;const P0={esencial:2,crecimiento:6,pr
 window.addEventListener("atlic",e=>applyLic(e.detail));if(window.ATLIC)applyLic(window.ATLIC);
 })();
 </script>
+<script>/* ícone da aba com o logo de cada negócio */
+(function(G){const SUBH=/^[a-z0-9-]+\.araujotechsistemas\.com$/i.test(location.hostname)&&!/^www\./i.test(location.hostname);const K='tdc_fav_'+location.hostname+location.pathname.split('/')[1];let last=null;
+ function put(u,big){document.querySelectorAll('link[rel~="icon"],link[rel="apple-touch-icon"]').forEach(l=>l.remove());const a=document.createElement('link');a.rel='icon';a.type='image/png';a.href=u;document.head.appendChild(a);const b=document.createElement('link');b.rel='apple-touch-icon';b.href=big||u;document.head.appendChild(b)}
+ function make(src,n,cb){const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=n;const x=c.getContext('2d');const r=n*.18;x.fillStyle='#fff';x.beginPath();x.moveTo(r,0);x.arcTo(n,0,n,n,r);x.arcTo(n,n,0,n,r);x.arcTo(0,n,0,0,r);x.arcTo(0,0,n,0,r);x.closePath();x.fill();const p=n*.06,s=Math.min((n-2*p)/im.width,(n-2*p)/im.height),w=im.width*s,h=im.height*s;x.drawImage(im,(n-w)/2,(n-h)/2,w,h);cb(c.toDataURL('image/png'))}catch(e){}};im.src=src}
+ try{const c=SUBH&&localStorage.getItem(K);if(c)put(c)}catch(e){}
+ function tick(){let v=null;try{v=G()}catch(e){}if(!v||v===last)return;last=v;make(v,64,s=>make(v,180,b=>{put(s,b);try{if(SUBH)localStorage.setItem(K,s)}catch(e){}}))}
+ setInterval(tick,1500);addEventListener('load',tick)})(()=>typeof SALON!=='undefined'&&SALON?SALON.logo:null);</script>
 </body>
 </html>
