@@ -44,6 +44,7 @@ async function route(ctx) {
     try {
       if (u.hostname === 'www.gstatic.com' && u.pathname.startsWith('/firebasejs/')) {
         const file = u.pathname.split('/').pop(); const f = path.join(SDK, file);
+        if (file === 'firebase-app-check.js') return r.fulfill({ status: 200, contentType: MIME.js, headers: { 'access-control-allow-origin': '*' }, body: 'export class ReCaptchaV3Provider{constructor(k){this.k=k}}\nexport function initializeAppCheck(app,o){globalThis.__acInit=(globalThis.__acInit||0)+1;globalThis.__acKey=o&&o.provider&&o.provider.k;return {}}\nexport async function getToken(){return {token:"TESTE"}}' }); // substituto só para provar que o gancho do App Check é chamado
         if (!fs.existsSync(f)) return r.fulfill({ status: 404, body: '' });
         let body = fs.readFileSync(f, 'utf8');
         if (u.search !== '?real') { if (file === 'firebase-firestore.js') body = emuWrap(file, 'firestore'); else if (file === 'firebase-auth.js') body = emuWrap(file, 'auth'); else if (/-compat\.js$/.test(file)) body += COMPAT_PATCH; }
@@ -66,6 +67,7 @@ async function route(ctx) {
 }
 let browser;
 async function open(opt = {}) {
+  const initJs = opt.init || null;
   if (!browser) browser = await chromium.launch({ args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--disable-web-security', '--allow-running-insecure-content', '--disable-features=PrivateNetworkAccessSendPreflights,BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessRespectPreflightResults,LocalNetworkAccessChecks'] });
   const W = opt.w || 390;
   const ctx = await browser.newContext({ viewport: { width: W, height: W < 500 ? 844 : 800 }, isMobile: W < 500, hasTouch: W < 500, timezoneId: 'America/Asuncion', locale: opt.locale || 'es-PY', serviceWorkers: 'block' });
@@ -74,6 +76,7 @@ async function open(opt = {}) {
   p.on('pageerror', e => p.errs.push(String(e.message).slice(0, 200)));
   p.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') { const t = m.text(); if (!/Failed to load resource|net::ERR|ERR_FAILED|favicon|emulator/i.test(t)) (p.cons = p.cons || []).push(t.slice(0, 220)); } });
   p.on('dialog', d => { p.dialogs.push(d.message()); if (p.autoDialog) d.accept().catch(() => {}); else d.dismiss().catch(() => {}); });
+  if (initJs) await p.addInitScript(initJs);
   await p.addInitScript(() => { window.__opened = []; const o = window.open; window.open = (u) => { window.__opened.push(String(u)); return null; }; });
   p.w = ms => p.waitForTimeout(ms || 400);
   p.act = async (a, extra, n) => { const l = p.locator('[data-act=' + a + ']' + (extra || '') + ':visible'); const c = await l.count(); if (!c) return false; await (n == null ? l.first() : l.nth(n)).click(); await p.w(); return true; };
@@ -86,6 +89,7 @@ async function open(opt = {}) {
 const FSB = proj => `http://${FSH}:${FSP}/v1/projects/${proj}/databases/(default)/documents`;
 async function signUp(email, password) { const r = await fetch(`http://${FSH}:${AUP}/identitytoolkit.googleapis.com/v1/accounts:signUp?key=x`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, password, returnSecureToken: true }) }); return r.json(); }
 async function signIn(email, password) { const r = await fetch(`http://${FSH}:${AUP}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=x`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, password, returnSecureToken: true }) }); return r.json(); }
+async function setPassword(localId, password) { const r = await fetch(`http://${FSH}:${AUP}/identitytoolkit.googleapis.com/v1/accounts:update?key=x`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer owner' }, body: JSON.stringify({ localId, password }) }); return r.json(); }
 async function verifyEmail(localId) { const r = await fetch(`http://${FSH}:${AUP}/identitytoolkit.googleapis.com/v1/accounts:update?key=x`, { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer owner' }, body: JSON.stringify({ localId, emailVerified: true }) }); return r.json(); }
 // requisição ao Firestore: token = idToken de usuário (regras valem), 'owner' (ignora regras, só para preparar/conferir) ou null (anônimo)
 async function fsReq(proj, method, docPath, token, body) { const h = { 'content-type': 'application/json' }; if (token) h.authorization = 'Bearer ' + token; const r = await fetch(FSB(proj) + '/' + docPath, { method, headers: h, body: body ? JSON.stringify(body) : undefined }); let j = null; try { j = await r.json(); } catch (e) {} return { status: r.status, json: j }; }
@@ -94,4 +98,4 @@ const fields = o => ({ fields: Object.fromEntries(Object.entries(o).map(([k, x])
 const unval = v => !v ? null : 'stringValue' in v ? v.stringValue : 'integerValue' in v ? +v.integerValue : 'doubleValue' in v ? v.doubleValue : 'booleanValue' in v ? v.booleanValue : 'arrayValue' in v ? (v.arrayValue.values || []).map(unval) : 'mapValue' in v ? Object.fromEntries(Object.entries(v.mapValue.fields || {}).map(([k, x]) => [k, unval(x)])) : 'timestampValue' in v ? v.timestampValue : null;
 const unfields = d => d && d.fields ? Object.fromEntries(Object.entries(d.fields).map(([k, x]) => [k, unval(x)])) : null;
 async function done() { if (browser) await browser.close(); console.log('\n== RESULTADO: ' + oks + ' aprovado(s), ' + fails + ' falha(s)'); if (process.env.E2E_OUT) fs.writeFileSync(process.env.E2E_OUT, JSON.stringify(log)); process.exit(fails ? 1 : 0); }
-module.exports = { open, ok, bad, info, sec, check, signUp, signIn, verifyEmail, fsReq, fields, unfields, val, done, DIRS, get fails() { return fails; } };
+module.exports = { open, ok, bad, info, sec, check, signUp, signIn, verifyEmail, setPassword, fsReq, fields, unfields, val, done, DIRS, get fails() { return fails; } };

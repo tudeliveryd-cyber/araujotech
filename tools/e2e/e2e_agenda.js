@@ -167,5 +167,31 @@ const fix10 = async p => { const t = new Date(); t.setUTCHours(13, 0, 0, 0); awa
     await T('reserva gigante é recusada', 'POST', B + '/reservas', null, 403, L.fields({ json: 'x'.repeat(7000), at: 'x', p: false }));
     await T('usuário de fora não se torna dono de uma agenda', 'PATCH', 'agendaUsers/' + out.localId, out.idToken, 403, L.fields({ ag: ag.user, role: 'owner', email: 'x', name: 'x', mc: false }));
   }, g);
+
+  sec('G. Senha antiga 123456 e licença suspensa');
+  await step('senha antiga', async () => {
+    // o profissional criado acima volta ao estado de uma conta antiga: senha 123456 e sem a marca de troca
+    const lg = await L.signIn('proe2e@araujotechsistemas.com', 'ProNovo#44'); if (!lg.localId) { info('conta do profissional não disponível para este teste'); return; }
+    await L.setPassword(lg.localId, '123456'); await L.fsReq(P, 'PATCH', 'agendaUsers/' + lg.localId + '?updateMask.fieldPaths=mc', 'owner', L.fields({ mc: false }));
+    const X = await L.open({ w: 390 }); const x = X.p; await x.goto(HOST + '/agenda/gestion.html'); await x.w(2500);
+    await x.fill('#au-email', 'proe2e'); await x.fill('#au-pass', '123456'); await x.click('[data-act=authLogin]'); await x.w(3500);
+    check(await x.locator('#np-a:visible').count() > 0, 'gestão: conta antiga que entra com 123456 é obrigada a criar outra senha (mesmo sem a marca de troca)', (await x.txt()).slice(0, 200));
+    await x.fill('#np-a', '123456'); await x.fill('#np-b', '123456'); await x.click('[data-act=setNewPass]'); await x.w(1200);
+    check(await x.locator('#np-a:visible').count() > 0, 'gestão: 123456 não é aceita como senha nova');
+    await x.fill('#np-a', 'AntigoNovo#7'); await x.fill('#np-b', 'AntigoNovo#7'); await x.click('[data-act=setNewPass]'); await x.w(3500);
+    check(!(await L.signIn('proe2e@araujotechsistemas.com', '123456')).idToken && !!(await L.signIn('proe2e@araujotechsistemas.com', 'AntigoNovo#7')).idToken, 'Firebase Auth: depois da troca, 123456 deixa de funcionar');
+    await X.ctx.close();
+  }, g);
+  await step('licença suspensa', async () => {
+    const B = 'agendas/' + ag.user, body = () => L.fields({ json: '{"n":"Teste"}', at: new Date().toISOString(), p: false });
+    const lic0 = (await L.fsReq(P, 'GET', 'licencias/' + ag.user, 'owner')).json;
+    const r0 = await L.fsReq(P, 'POST', B + '/reservas', null, body()); check(r0.status === 200, 'licença ativa: reserva pela API é aceita → HTTP ' + r0.status);
+    await L.fsReq(P, 'PATCH', 'licencias/' + ag.user + '?updateMask.fieldPaths=status', 'owner', L.fields({ status: 'suspenso' }));
+    const r1 = await L.fsReq(P, 'POST', B + '/reservas', null, body());
+    if (/v1[12]/.test(process.env.RULES || '')) check(r1.status === 403, 'regras novas: agenda com licença suspensa não recebe reserva nem pela API → HTTP ' + r1.status);
+    else info('reserva pela API com a licença suspensa → HTTP ' + r1.status + (r1.status === 200 ? ' (a regra atual aceita; fecha com as regras v11)' : ''));
+    await L.fsReq(P, 'PATCH', 'licencias/' + ag.user + '?updateMask.fieldPaths=status', 'owner', { fields: { status: lic0.fields.status } });
+    const r2 = await L.fsReq(P, 'POST', B + '/reservas', null, body()); check(r2.status === 200, 'ao reativar a licença, as reservas voltam a entrar → HTTP ' + r2.status);
+  }, g);
   await L.done();
 })().catch(e => { console.log('EXC', e.stack); process.exit(2); });

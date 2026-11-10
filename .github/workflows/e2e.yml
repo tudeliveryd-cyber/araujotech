@@ -19,7 +19,7 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,8 +64,10 @@ jobs:
           F=0
           echo "######## CATÁLOGO · regras em produção (v10)";        tools/e2e/run.sh e2e_catalogo.js || F=1
           echo "######## CATÁLOGO · regras novas (v11, candidatas)";   tools/e2e/run.sh e2e_catalogo.js firestore-v11.rules || F=1
+          echo "######## CATÁLOGO · regras v12 (etapa seguinte: limite de pedidos)"; tools/e2e/run.sh e2e_catalogo.js firestore-v12.rules || F=1
           echo "######## AGENDA";                                      tools/e2e/run.sh e2e_agenda.js || F=1
           echo "######## AGENDA · regras novas (v11)";                 tools/e2e/run.sh e2e_agenda.js firestore-v11.rules || F=1
+          echo "######## AGENDA · regras v12";                         tools/e2e/run.sh e2e_agenda.js firestore-v12.rules || F=1
           echo "######## MEU PÚLPITO";  RULES_SRC=$PULPITO_DIR/firestore.rules tools/e2e/run.sh e2e_pulpito.js x meu-pulpito-app || F=1
           echo "######## CAJA DE ENTREGAS"; RULES_SRC=$CAJA_DIR/firestore.rules tools/e2e/run.sh e2e_caja.js x tu-delivery-1eb61 || F=1
           exit $F

@@ -124,7 +124,7 @@ const STOP = process.env.STOP || '';
   const O2 = await L.open({ w: 1366 }); const o2 = O2.p;
   await step('tempo real', async () => {
     await tab(o, 'orders');
-    check((await o.txt()).includes('Cliente E2E'), 'painel (celular já aberto): o pedido chegou sozinho, sem recarregar', (await o.txt()).slice(0, 300));
+    check((await o.txt()).includes('Cliente E2E'), 'painel (celular já aberto): o pedido chegou sozinho, sem recarregar', (await o.txt()).slice(0, 80) + ' ERRS ' + o.errs.join(';') + ' CONS ' + (o.cons || []).join(';').slice(0, 600) + ' orders=' + await o.evaluate(async () => JSON.stringify({ n: orders.length, unsub: !!CLOUD.unsubOrders, role: CLOUD.role, mc: CLOUD.mc, err: CLOUD.err })));
     await o2.goto(HOST + '/painel/'); await o2.w(2500); await o2.fill('#lg_user', shop.user); await o2.fill('#lg_pass', NEWP); await o2.press('#lg_pass', 'Enter'); await o2.w(3500);
     await tab(o2, 'orders');
     check((await o2.txt()).includes('Cliente E2E'), 'segundo aparelho (computador) entra com a senha nova e vê o mesmo pedido');
@@ -203,17 +203,17 @@ const STOP = process.env.STOP || '';
     const rw = await L.fsReq(P, 'PATCH', 'shops/' + SID + '?updateMask.fieldPaths=updated', caj, L.fields({ updated: 'caixa-alterou' }));
     info('caixa gravando no documento da loja pela API → HTTP ' + rw.status + (rw.status === 200 ? ' (necessário para a baixa de estoque; na v11 a cozinha fica bloqueada)' : ''));
     global.__other = other;
-    if (/v11/.test(process.env.RULES || '')) {
+    if (/v1[12]/.test(process.env.RULES || '')) { const V12 = /v12/.test(process.env.RULES);
       const zc = (await L.signIn('cocinae2e@araujotechsistemas.com', 'CocinaE2E#9')).idToken;
-      await T('v11: cozinha não altera os dados da loja', 'PATCH', 'shops/' + SID + '?updateMask.fieldPaths=updated', zc, 403, L.fields({ updated: 'x' }));
-      await T('v11: cozinha continua lendo e atualizando pedidos', 'PATCH', O1 + '/' + OID + '?updateMask.fieldPaths=kds', zc, 200, L.fields({ kds: 'ok' }));
-      await T('v11: caixa continua gravando na loja (baixa de estoque)', 'PATCH', 'shops/' + SID + '?updateMask.fieldPaths=updated', caj, 200, L.fields({ updated: 'caja' }));
-      await T('v11: pedido com número adulterado é recusado', 'POST', O1, null, 403, L.fields({ no: '9"><img src=x>', name: 'x', total: 1 }));
-      await T('v11: pedido com total em texto é recusado', 'POST', O1, null, 403, L.fields({ no: 5, name: 'x', total: '<b>1</b>' }));
-      await T('v11: pedido com comprovante que não é imagem é recusado', 'POST', O1, null, 403, L.fields({ no: 5, name: 'x', total: 1, proof: 'x" onerror="alert(1)' }));
-      await T('v11: pedido com nome gigante é recusado', 'POST', O1, null, 403, L.fields({ no: 5, name: 'x'.repeat(500), total: 1 }));
-      await T('v11: pedido bem formado de visitante é aceito', 'POST', O1, null, 200, L.fields({ no: 9001, name: 'Teste regra', phone: '0981', total: 1000, sub: 1000, fee: null, status: 'aguardando', mode: 'pickup', lines: [], items: [], proof: 'data:image/jpeg;base64,/9j/4AAQ' }));
-      await T('v11: pedido para loja que não existe é recusado', 'POST', 'shops/nao-existe-e2e/orders', null, 403, L.fields({ no: 1, name: 'x', total: 1 }));
+      await T('regras novas: cozinha não altera os dados da loja', 'PATCH', 'shops/' + SID + '?updateMask.fieldPaths=updated', zc, 403, L.fields({ updated: 'x' }));
+      await T('regras novas: cozinha continua lendo e atualizando pedidos', 'PATCH', O1 + '/' + OID + '?updateMask.fieldPaths=kds', zc, 200, L.fields({ kds: 'ok' }));
+      await T('regras novas: caixa continua gravando na loja (baixa de estoque)', 'PATCH', 'shops/' + SID + '?updateMask.fieldPaths=updated', caj, 200, L.fields({ updated: 'caja' }));
+      await T('regras novas: pedido com número adulterado é recusado', 'POST', O1, null, 403, L.fields({ no: '9"><img src=x>', name: 'x', total: 1 }));
+      await T('regras novas: pedido com total em texto é recusado', 'POST', O1, null, 403, L.fields({ no: 5, name: 'x', total: '<b>1</b>' }));
+      await T('regras novas: pedido com comprovante que não é imagem é recusado', 'POST', O1, null, 403, L.fields({ no: 5, name: 'x', total: 1, proof: 'x" onerror="alert(1)' }));
+      await T('regras novas: pedido com nome gigante é recusado', 'POST', O1, null, 403, L.fields({ no: 5, name: 'x'.repeat(500), total: 1 }));
+      await T(V12 ? 'v12: mesmo bem formado, pedido de visitante enviado direto (sem o contador) é recusado' : 'v11: pedido bem formado de visitante é aceito', 'POST', O1, null, V12 ? 403 : 200, L.fields({ no: 9001, name: 'Teste regra', phone: '0981', total: 1000, sub: 1000, fee: null, status: 'aguardando', mode: 'pickup', lines: [], items: [], proof: 'data:image/jpeg;base64,/9j/4AAQ' }));
+      await T('regras novas: pedido para loja que não existe é recusado', 'POST', 'shops/nao-existe-e2e/orders', null, 403, L.fields({ no: 1, name: 'x', total: 1 }));
     }
   }, a);
   if (STOP === 'G') return L.done();
@@ -233,7 +233,7 @@ const STOP = process.env.STOP || '';
     const vs = await v.evaluate(() => ({ susp: !!document.querySelector('.susp-wrap'), prods: document.querySelectorAll('[data-act=open]').length, txt: document.body.innerText.slice(0, 120) }));
     check(vs.susp && vs.prods === 0, 'catálogo suspenso: cliente vê o aviso de indisponível e nenhum produto', JSON.stringify(vs));
     const ro = await L.fsReq(P, 'POST', 'shops/' + SID + '/orders', null, L.fields({ name: 'x', total: 1 }));
-    if (/v11/.test(process.env.RULES || '')) check(ro.status === 403, 'v11: loja suspensa não aceita pedido nem pela API → HTTP ' + ro.status); else info('pedido direto pela API com a loja suspensa → HTTP ' + ro.status + (ro.status === 200 ? ' (a regra atual aceita; fecha com as regras v11)' : ''));
+    if (/v1[12]/.test(process.env.RULES || '')) check(ro.status === 403, 'v11: loja suspensa não aceita pedido nem pela API → HTTP ' + ro.status); else info('pedido direto pela API com a loja suspensa → HTTP ' + ro.status + (ro.status === 200 ? ' (a regra atual aceita; fecha com as regras v11)' : ''));
     await V.ctx.close();
     await a.locator('[data-act=shopstatus][data-sid="' + SID + '"]:visible, [data-act=shoppay][data-sid="' + SID + '"].pri:visible').first().click(); await a.w(2500);
     if (await a.locator('.sheet .btn-main:visible').count()) { await a.locator('.sheet .btn-main:visible').first().click(); await a.w(2500); }
@@ -339,5 +339,100 @@ const STOP = process.env.STOP || '';
     check(!!od && od.total === exp && qk > 0, 'pedido com kg + atacado + 3×2: total gravado = ' + exp, od ? JSON.stringify({ total: od.total, sub: od.sub }) : (await x.txt('.sheet')).slice(0, 300));
     await X.ctx.close();
   }, o2);
+
+  sec('M. Senhas provisórias antigas (123456)');
+  await step('senhas antigas', async () => {
+    // conta de funcionário criada do jeito antigo: senha 123456 e sem marca de troca
+    const lg = await L.signUp('legacye2e@araujotechsistemas.com', '123456');
+    await L.fsReq(P, 'PATCH', 'shopUsers/' + lg.localId, 'owner', L.fields({ shop: SID, role: 'caja', email: 'legacye2e@araujotechsistemas.com' }));
+    const K = await L.open({ w: 390 }); const k = K.p; await k.goto(HOST + '/painel/'); await k.w(2500);
+    await k.fill('#lg_user', 'legacye2e'); await k.fill('#lg_pass', '123456'); await k.press('#lg_pass', 'Enter'); await k.w(3500);
+    check(await k.locator('#np_a').count() > 0 && !(await k.locator('[data-act=tab]').count()), 'quem entra com 123456 é obrigado a criar outra senha antes de ver o painel (mesmo conta antiga sem marca)', (await k.txt()).slice(0, 200));
+    await k.fill('#np_a', '123456'); await k.fill('#np_b', '123456'); await k.press('#np_b', 'Enter'); await k.w(1200);
+    check(await k.locator('#np_a').count() > 0, '123456 não é aceita como senha nova');
+    await k.fill('#np_a', 'Legacy#Nova1'); await k.fill('#np_b', 'Legacy#Nova1'); await k.press('#np_b', 'Enter'); await k.w(3500);
+    check(!(await L.signIn('legacye2e@araujotechsistemas.com', '123456')).idToken && !!(await L.signIn('legacye2e@araujotechsistemas.com', 'Legacy#Nova1')).idToken, 'depois da troca, 123456 deixa de funcionar nessa conta');
+    await K.ctx.close();
+    // admin: dois clientes antigos com 123456 guardada — um ainda usa 123456, o outro já criou a própria
+    const other = global.__other; const ot = await L.signIn(other.user + '@araujotechsistemas.com', other.pass); await L.setPassword(ot.localId, '123456');
+    await L.fsReq(P, 'PATCH', 'shopUsers/' + ot.localId + '?updateMask.fieldPaths=mc', 'owner', L.fields({ mc: false }));
+    await L.fsReq(P, 'PATCH', 'billing/' + other.id + '?updateMask.fieldPaths=pass', 'owner', L.fields({ pass: '123456' }));
+    const sm = await L.signUp('semilla@araujotechsistemas.com', 'JaTroquei#1'); await L.fsReq(P, 'PATCH', 'shopUsers/' + sm.localId, 'owner', L.fields({ shop: 'semilla', role: 'dono', email: 'semilla@araujotechsistemas.com' }));
+    await L.fsReq(P, 'PATCH', 'billing/semilla?updateMask.fieldPaths=pass', 'owner', L.fields({ pass: '123456' }));
+    await a.reload(); await a.w(4500);
+    const wc = await a.txt(); check(/contraseña antigua 123456/.test(wc) && /Otra E2E/.test(wc) && /Semilla/.test(wc), 'admin: cartão lista os clientes que ainda têm 123456 guardada', wc.slice(0, 200));
+    a.dialogs.length = 0; await a.locator('[data-act=weakfix]:not([data-sid]):visible').click(); await a.w(6000);
+    const st = await a.evaluate(id => PL.shops.filter(s => s.id === id || s.id === 'semilla').map(s => [s.id, s.pass]), other.id);
+    const np = (st.find(x => x[0] === other.id) || [])[1] || '';
+    check(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/.test(np), 'admin: "Cambiar todas ahora" troca 123456 por senha aleatória, mantendo o usuário', JSON.stringify(st) + ' | ' + a.dialogs.join('|').slice(0, 120));
+    check(!(await L.signIn(other.user + '@araujotechsistemas.com', '123456')).idToken && !!(await L.signIn(other.user + '@araujotechsistemas.com', np)).idToken, 'Firebase Auth: 123456 deixou de funcionar e a senha nova entra');
+    const su = L.unfields((await L.fsReq(P, 'GET', 'shopUsers/' + ot.localId, 'owner')).json) || {}; check(su.mc === true, 'Firebase: a conta trocada volta a exigir senha própria no próximo acesso', JSON.stringify(su));
+    check((st.find(x => x[0] === 'semilla') || [])[1] === '' && !!(await L.signIn('semilla@araujotechsistemas.com', 'JaTroquei#1')).idToken, 'admin: cliente que já tinha criado a própria senha não é afetado; a 123456 guardada é apagada');
+    const bd = L.unfields((await L.fsReq(P, 'GET', 'billing/' + other.id, 'owner')).json) || {}; check(bd.pass === np, 'Firebase: a senha nova fica guardada para o "Copiar datos"');
+    check(!/contraseña antigua 123456/.test(await a.txt()), 'admin: o cartão de senhas antigas some quando não sobra nenhuma');
+  }, a);
+
+  sec('N. Backup: restaurar um local a partir da cópia');
+  await step('restaurar', async () => {
+    const dlP = a.waitForEvent('download', { timeout: 20000 }); await a.act('backup'); const dl = await dlP; const fp = await dl.path();
+    const before = cfgOf(await shopDoc()); const n0 = before.products.length, pr0 = before.products.find(p => p.id === PID).price;
+    await o2.reload(); await o2.w(4000); await tab(o2, 'products'); await o2.set('#pp_' + PID, '99999'); await o2.w(2500);
+    await o2.fill('#pq', 'Jabon'); await o2.w(500); await o2.act('editprod'); o2.dialogs.length = 0; await o2.act('delprod'); await o2.w(2500);
+    const mid = cfgOf(await shopDoc()); check(mid.products.find(p => p.id === PID).price === 99999 && mid.products.length === n0 - 1, 'preparação: preço alterado e um produto apagado depois do backup');
+    const d0 = await shopDoc();
+    await a.setInputFiles('#bkFile', fp); await a.w(1500);
+    check(/Restaurar un local/.test(await a.txt('.sheet')) && /Prueba E2E/.test(await a.txt('.sheet')), 'admin: ao escolher o arquivo, lista os locais da cópia', (await a.txt('.sheet')).slice(0, 200));
+    await a.locator('[data-act=bkrestore][data-id="' + SID + '"]').click(); await a.w(5000);
+    const d1 = await shopDoc(), c1 = cfgOf(d1);
+    check(c1.products.length === n0 && c1.products.find(p => p.id === PID).price === pr0 && c1.products.some(p => p.n.es === 'Jabon E2E'), 'restauração: produtos e preços voltam ao que estavam na cópia', 'n=' + c1.products.length + ' preço=' + (c1.products.find(p => p.id === PID) || {}).price);
+    check(d1.status === d0.status && JSON.stringify(d1.lim) === JSON.stringify(d0.lim), 'restauração: plano e status da loja não são alterados');
+    const od = ((await L.fsReq(P, 'GET', 'shops/' + SID + '/orders?pageSize=50', 'owner')).json.documents || []).length; check(od >= 4, 'restauração: os pedidos continuam todos lá (' + od + ')');
+    await a.setInputFiles('#bkFile', { name: 'x.json', mimeType: 'application/json', buffer: Buffer.from('{"oi":1}') }); await a.w(800);
+    check(!(await a.locator('[data-act=bkrestore]').count()), 'restauração: arquivo que não é cópia é recusado');
+  }, a);
+
+  sec('O. Gancho do App Check (desligado por padrão)');
+  await step('app check', async () => {
+    const off = await o2.evaluate(() => ({ init: window.__acInit || 0, key: typeof APPCHECK_KEY !== 'undefined' ? APPCHECK_KEY : '?' }));
+    check(off.init === 0 && off.key === '', 'sem chave configurada o App Check não é carregado (comportamento atual não muda)', JSON.stringify(off));
+    const Q = await L.open({ w: 390, init: () => { window.TDC_APPCHECK_KEY = 'chave-de-teste'; } }); await Q.p.goto(HOST + '/'); await Q.p.waitForFunction(() => typeof pub !== 'undefined' && document.querySelector('[data-act=open]'), null, { timeout: 20000 }).catch(() => {});
+    const on = await Q.p.evaluate(async () => { await CLOUD.init(); return { init: window.__acInit || 0, key: window.__acKey, ok: !!document.querySelector('[data-act=open]') && !!CLOUD.api }; });
+    check(on.init === 1 && on.key === 'chave-de-teste' && on.ok, 'com a chave configurada, o App Check é iniciado junto com a conexão ao Firebase (antes do Firestore) e o catálogo abre normalmente', JSON.stringify(on)); await Q.ctx.close();
+  }, o2);
+
+  sec('P. Dois clientes pedindo no mesmo instante');
+  await step('simultâneo', async () => {
+    const mkC = async nm => { const X = await L.open({ w: 390 }); const x = X.p; const t = new Date(); t.setUTCHours(15, 20, 0, 0); await x.clock.setFixedTime(t); await x.goto(HOST + '/'); await x.waitForFunction(() => typeof pub !== 'undefined' && document.querySelector('[data-act=open]'), null, { timeout: 20000 }).catch(() => {});
+      await x.locator('[data-act=open][data-pid="' + PID + '"]:visible').first().click(); await x.w(500); await x.act('addcart'); await x.act('cart'); const ct = x.locator('.sheet button:visible', { hasText: 'Continuar' }); if (await ct.count()) { await ct.first().click(); await x.w(400); } else await x.act('checkout');
+      await x.locator('[data-act=mode]:visible').nth(1).click(); await x.w(400); await x.fill('[data-ck=name]', nm); await x.fill('[data-ck=phone]', '0981 999 000'); const tm = x.locator('[data-ck=time]'); if (await tm.count()) { const ov = await tm.evaluate(e => [...e.options].map(o => o.value).filter(Boolean)); if (ov.length) await tm.selectOption(ov[0]); } return X; };
+    const X1 = await mkC('Simultaneo Uno'), X2 = await mkC('Simultaneo Dos'); const t0 = Date.now();
+    await Promise.all([X1.p.locator('[data-act=send]:visible').click(), X2.p.locator('[data-act=send]:visible').click()]);
+    let got = []; for (let i = 0; i < 24 && got.length < 2; i++) { await a.w(1000); got = ((await L.fsReq(P, 'GET', 'shops/' + SID + '/orders?pageSize=80', 'owner')).json.documents || []).map(L.unfields).filter(d => /^Simultaneo/.test(d.name || '')); }
+    check(got.length === 2 && got[0].no !== got[1].no, 'os dois pedidos entram, com números diferentes (' + got.map(g => g.no).join(' e ') + ') em ' + Math.round((Date.now() - t0) / 1000) + ' s', JSON.stringify(got.map(g => [g.name, g.no])) + ' | ' + (await X2.p.txt('.sheet')).slice(0, 160));
+    await X1.ctx.close(); await X2.ctx.close();
+  }, a);
+
+  if (/v1[12]/.test(process.env.RULES || '')) {
+    sec('Q. Regras novas: funções da equipe e compatibilidade');
+    await step('regras novas', async () => {
+      const own = (await L.signIn(shop.user + '@araujotechsistemas.com', NEWP)).idToken, caj = (await L.signIn('cajae2e@araujotechsistemas.com', 'CajaE2E#55')).idToken, zc = (await L.signIn('cocinae2e@araujotechsistemas.com', 'CocinaE2E#9')).idToken;
+      const T = async (desc, method, pth, tok, exp, body) => { const r = await L.fsReq(P, method, pth, tok, body); check(Array.isArray(exp) ? exp.includes(r.status) : r.status === exp, desc + ' → HTTP ' + r.status, 'esperado ' + exp); return r; };
+      await T('cozinha não grava fotos/mídia da loja', 'PATCH', 'shops/' + SID + '/media/p99', zc, 403, L.fields({ m: {} }));
+      await T('caixa continua podendo gravar mídia (necessário ao salvar a loja)', 'PATCH', 'shops/' + SID + '/media/p99', caj, 200, L.fields({ m: {} }));
+      const jk = await L.fsReq(P, 'POST', 'shops/' + SID + '/orders', 'owner', L.fields({ no: 9100, name: 'apagar', total: 1 })); const jid = jk.json.name.split('/').pop();
+      await T('caixa não apaga pedidos', 'DELETE', 'shops/' + SID + '/orders/' + jid, caj, 403);
+      await T('cozinha não apaga pedidos', 'DELETE', 'shops/' + SID + '/orders/' + jid, zc, 403);
+      await T('dono pode apagar um pedido', 'DELETE', 'shops/' + SID + '/orders/' + jid, own, 200);
+      const rv = ((await L.fsReq(P, 'GET', 'shops/' + SID + '/reviews', 'owner')).json.documents || [])[0]; const rid = rv ? rv.name.split('/').pop() : 'x';
+      await T('caixa não apaga nem altera avaliações', 'DELETE', 'shops/' + SID + '/reviews/' + rid, caj, 403);
+      await T('dono pode ocultar/responder uma avaliação', 'PATCH', 'shops/' + SID + '/reviews/' + rid + '?updateMask.fieldPaths=hid', own, 200, L.fields({ hid: false }));
+      const cn = L.unfields((await L.fsReq(P, 'GET', 'shops/' + SID + '/meta/counter', null)).json) || {};
+      if (/v11/.test(process.env.RULES)) await T('regras novas: aparelho com a versão anterior do catálogo (sem horário no contador) continua conseguindo pedir', 'PATCH', 'shops/' + SID + '/meta/counter?updateMask.fieldPaths=n', null, 200, L.fields({ n: cn.n + 1 }));
+      else { await T('v12: avançar o contador sem horário é recusado', 'PATCH', 'shops/' + SID + '/meta/counter?updateMask.fieldPaths=n', null, 403, L.fields({ n: cn.n + 1 }));
+        await T('v12: pedido de visitante direto pela API, sem passar pelo contador, é recusado', 'POST', 'shops/' + SID + '/orders', null, 403, L.fields({ no: 1000 + cn.n, name: 'Falso', phone: '1', total: 1000, lines: [], items: [] }));
+        await T('v12: chamado de mesa (sem valor) continua aceito', 'POST', 'shops/' + SID + '/orders', null, 200, L.fields({ call: 'mozo', mesa: '3', pay: '', name: '', date: 'x', status: 'aguardando', no: 0, total: 0, lines: [], items: [] }));
+        await T('v12: "chamado" com valor ou itens é recusado', 'POST', 'shops/' + SID + '/orders', null, 403, L.fields({ call: 'mozo', mesa: '3', no: 0, total: 5000, lines: [], items: [] })); }
+    }, a);
+  }
   await L.done();
 })().catch(e => { console.log('EXC', e.stack); process.exit(2); });

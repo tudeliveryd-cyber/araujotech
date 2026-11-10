@@ -125,7 +125,9 @@ service cloud.firestore {
       match /reservas/{r} {
         allow create: if request.resource.data.keys().hasOnly(['json', 'at', 'p'])
           && request.resource.data.json is string && request.resource.data.json.size() <= 6000
-          && request.resource.data.p == false;
+          && request.resource.data.p == false
+          && (!exists(/databases/$(database)/documents/licencias/$(ag))
+              || get(/databases/$(database)/documents/licencias/$(ag)).data.get('status', 'activo') != 'suspenso');
         allow read, update, delete: if isAdmin() || agMember(ag);
       }
     }
@@ -145,21 +147,24 @@ service cloud.firestore {
       }
       match /media/{pack} {
         allow read: if true;
-        allow write: if isAdmin() || isShop(shop);
+        allow write: if isAdmin() || (isShop(shop) && shopRole() != 'cocina');
       }
       match /meta/{m} {
         allow read: if true;
         allow write: if isAdmin() || isShop(shop);
         // contador de pedidos: o catálogo só pode criar em 1 ou somar 1 (ninguém zera a numeração)
-        allow create: if m == 'counter' && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == 1;
-        allow update: if m == 'counter' && request.resource.data.keys().hasOnly(['n'])
-          && request.resource.data.n == resource.data.n + 1;
+        allow create: if m == 'counter' && request.resource.data.keys().hasOnly(['n', 't']) && request.resource.data.n == 1
+          && (!('t' in request.resource.data) || request.resource.data.t == request.time);
+        allow update: if m == 'counter' && request.resource.data.keys().hasOnly(['n', 't'])
+          && request.resource.data.n == resource.data.n + 1
+          && (!('t' in request.resource.data) || request.resource.data.t == request.time || request.resource.data.t == resource.data.get('t', null));
       }
       match /orders/{id} {
         // pedidos e chamados do catálogo: qualquer cliente cria, com tamanho limitado
         allow create: if (isAdmin() || isShop(shop) || shopLive(shop))
           && okOrder(request.resource.data);
-        allow read, update, delete: if isAdmin() || isShop(shop);
+        allow read, update: if isAdmin() || isShop(shop);
+        allow delete: if isAdmin() || isOwner(shop);
       }
       match /track/{id} {
         allow read: if true;
@@ -176,7 +181,7 @@ service cloud.firestore {
           && request.resource.data.stars >= 1 && request.resource.data.stars <= 5
           && request.resource.data.text is string && request.resource.data.text.size() <= 400
           && request.resource.data.name is string && request.resource.data.name.size() <= 40;
-        allow update, delete: if isAdmin() || isShop(shop);
+        allow update, delete: if isAdmin() || isOwner(shop);
       }
     }
   }

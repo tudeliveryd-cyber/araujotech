@@ -376,7 +376,7 @@ const SB_URL_FIXED="", SB_KEY_FIXED="";
 /* Nube Araújo Tech (Firebase). AG_ID = código del cliente (el mismo de la licencia en el admin). */
 const AG_ID=(()=>{const m=location.hostname.toLowerCase().match(/^([a-z0-9-]+)\.araujotechsistemas\.com$/);return m&&!["www","barberialoli","fogaomineiro"].includes(m[1])?m[1]:(new URLSearchParams(location.search).get("ag")||"")})();
 const FB_CFG={apiKey:"AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U",authDomain:"araujotech-catalogos.firebaseapp.com",projectId:"araujotech-catalogos",storageBucket:"araujotech-catalogos.firebasestorage.app",messagingSenderId:"501170505971",appId:"1:501170505971:web:fd3a1c1578b3e1b93bcf86"};
-const FBV="10.12.2",USER_DOMAIN="araujotechsistemas.com",PASS0="123456";
+const FBV="10.12.2",USER_DOMAIN="araujotechsistemas.com",PASS0="123456",APPCHECK_KEY=""; /* App Check apagado mientras esté vacío */
 function tmpPass(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";const r=new Uint32Array(8);crypto.getRandomValues(r);let s="";for(let i=0;i<8;i++){s+=A[r[i]%A.length];if(i===3)s+="-"}return s}
 const isTmp=p=>p===PASS0||/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/.test(String(p||""));
 const FB_ON=!!window.AG_FAKE||(!!AG_ID&&location.protocol!=="file:"&&!/demo/i.test(location.pathname));
@@ -1460,7 +1460,7 @@ function fbApi(A,F,U,app,db,auth){const {doc,getDoc,setDoc,updateDoc,collection,
  }}
 async function fbReady(){if(FA)return FA;if(window.AG_FAKE){FA=window.AG_FAKE;return FA}
  const b="https://www.gstatic.com/firebasejs/"+FBV+"/";const [A,F,U]=await Promise.all([import(b+"firebase-app.js"),import(b+"firebase-firestore.js"),import(b+"firebase-auth.js")]);
- const app=A.getApps().find(a=>a.name==="ag")||A.initializeApp(FB_CFG,"ag");FA=fbApi(A,F,U,app,F.getFirestore(app),U.getAuth(app));return FA}
+ const app=A.getApps().find(a=>a.name==="ag")||A.initializeApp(FB_CFG,"ag");const ack=window.TDC_APPCHECK_KEY||APPCHECK_KEY;if(ack){try{const C=await import("https://www.gstatic.com/firebasejs/"+FBV+"/firebase-app-check.js");C.initializeAppCheck(app,{provider:new C.ReCaptchaV3Provider(ack),isTokenAutoRefreshEnabled:true})}catch(e){console.warn("appcheck",e)}}FA=fbApi(A,F,U,app,F.getFirestore(app),U.getAuth(app));return FA}
 /* imágenes van en documentos aparte (límite de tamaño de cada documento) */
 const IMG={},IMG_UP=new Set();
 function hImg(x){let h=2166136261;for(let i=0;i<x.length;i+=7){h^=x.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)+x.length.toString(36)}
@@ -1497,7 +1497,7 @@ async function fbAfterAuth(user){
   if(acc.role==="owner")ui.user={id:"owner:"+user.uid,name:(S.users[0]&&S.users[0].name)||acc.name||"Admin",role:"owner"};
   else{const p=S.pros.find(p=>p.id===acc.proId&&p.active!==false);if(!p){ui.user=null;ui.authErr=t("noAccess");try{await FA.logout()}catch(e){}render();return}ui.user={id:"pro_"+p.id,name:p.name,role:"pro",proId:p.id}}
   let ok0=false;try{ok0=!!localStorage.getItem(KEY+"_mc_"+user.uid)}catch(e){}
-  ui.mc=!!acc.mc&&!ok0;ui.authErr="";ui.cloud="on";sb={fb:true};
+  ui.mc=(!!acc.mc&&!ok0)||!!ui.forceMc;ui.authErr="";ui.cloud="on";sb={fb:true};
   if((fresh&&!ui.wz)||replaceUp){lastRemote="";await fbPush()}
   try{localStorage.setItem(mk,"1")}catch(e){}
   if(!fbWatch){fbWatch=true;FA.watchState(async j=>{try{applyRemote(await resImgs(JSON.parse(j)))}catch(e){console.warn(e)}});FA.watchBookings(rows=>{if(rows.length)importBookings(rows)})}
@@ -1640,12 +1640,12 @@ const A={
   selUser:el=>{ui.loginSel=el.dataset.id;ui.pin="";ui.pinErr=false;renderLogin()},
   pin:el=>{const n=el.dataset.n;if(n==="del")ui.pin=ui.pin.slice(0,-1);else if(n==="ok"){tryLogin();return}else if(ui.pin.length<4)ui.pin+=n;ui.pinErr=false;if(ui.pin.length===4){tryLogin();return}renderLogin()},
   authLogin:async el=>{const email=$("#au-email").value.trim(),pass=$("#au-pass").value;ui.authEmail=email;if(!email||!pass)return;el.disabled=true;
-    if(FB_ON){try{await FA.login(userEmail(email),pass)}catch(e){console.warn(e);ui.authErr=LG()!=="pt"?"Usuario o contraseña incorrectos.":"Usuário ou senha incorretos.";renderAuth()}return}
+    if(FB_ON){ui.forceMc=isTmp(pass);try{await FA.login(userEmail(email),pass)}catch(e){ui.forceMc=false;console.warn(e);ui.authErr=LG()!=="pt"?"Usuario o contraseña incorrectos.":"Usuário ou senha incorretos.";renderAuth()}return}
     const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
     if(error){ui.authErr=t("badLogin");renderAuth();return}await afterAuth(data.user)},
   setNewPass:async el=>{const es=LG()!=="pt",a=$("#np-a").value,b=$("#np-b").value;const E=m=>{ui.authErr=m;renderNewPass()};
     if(a.length<6)return E(es?"Usá al menos 6 caracteres.":"Use pelo menos 6 caracteres.");if(a!==b)return E(es?"Las dos contraseñas no son iguales.":"As duas senhas não são iguais.");if(isTmp(a))return E(es?"Elegí una contraseña tuya, distinta de la provisoria.":"Escolha uma senha sua, diferente da provisória.");
-    el.disabled=true;try{await FA.setMyPass(a);try{localStorage.setItem(KEY+"_mc_"+(ui.user.id||"").split(":").pop(),"1")}catch(e){}ui.mc=false;ui.authErr="";render();toast(es?"Contraseña creada":"Senha criada")}catch(e){console.warn(e);el.disabled=false;
+    el.disabled=true;try{await FA.setMyPass(a);ui.forceMc=false;try{localStorage.setItem(KEY+"_mc_"+(ui.user.id||"").split(":").pop(),"1")}catch(e){}ui.mc=false;ui.authErr="";render();toast(es?"Contraseña creada":"Senha criada")}catch(e){console.warn(e);el.disabled=false;
       if(/recent-login/.test(String(e.code||e.message))){E(es?"Por seguridad, salí y entrá de nuevo con la contraseña provisoria.":"Por segurança, saia e entre de novo com a senha provisória.");setTimeout(()=>A.logout(),2500)}else E(t("cloudErr"))}},
   logout:async()=>{closeM();if(FB_ON&&FA){try{await FA.logout()}catch(e){}}else if(ui.cloudMode&&sb){try{await sb.auth.signOut()}catch(e){}}ui.user=null;ui.loginSel=null;ui.pin="";try{sessionStorage.removeItem(KEY+"_user")}catch(e){}render()},
   newAppt:el=>{const now=new Date(),step=+S.cfg.step||30;let m=Math.ceil((now.getHours()*60+now.getMinutes())/step)*step;
