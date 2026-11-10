@@ -1,0 +1,23 @@
+name: Teste de produção
+
+# Navegador de verdade nos sites oficiais: moedas por país, contador da promoção, formulário e catálogos.
+# Só leitura nas lojas reais (nenhum pedido é enviado, nada é gravado no Firebase).
+on:
+  workflow_dispatch:
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar o navegador
+        run: |
+          npm init -y >/dev/null
+          npm i playwright@1.49.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Rodar os testes
+        run: node tools/teste_producao.js
