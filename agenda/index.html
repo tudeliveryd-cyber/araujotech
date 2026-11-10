@@ -113,7 +113,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .photos img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;display:block;max-width:100%}
 .policy{display:flex;gap:10px;padding:14px;border-radius:12px;background:var(--surface2);font-size:13px}
 .policy svg{color:var(--muted);margin-top:1px}
-.credit{text-align:center;font-size:12px;color:var(--muted);padding:20px 0 6px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.credit{text-align:center;font-size:12px;color:var(--muted);padding:20px 0 6px;display:flex;flex-direction:column;gap:6px;align-items:center}
 .credit button{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px;padding:0}
 
 /* Vitrina */
@@ -437,7 +437,7 @@ function render(){
       ${SALON.policy?`<h3>${t("policyT")}</h3><div class="policy">${ic("info")}<span>${esc(SALON.policy)}</span></div>`:""}
       ${photos.length?`<h3>${t("photosT")}</h3><div class="photos">${photos.map(p=>`<img src="${esc(p)}" alt="" loading="lazy">`).join("")}</div>`:""}</div>`;
   }
-  h+=`<div class="credit"><span>Desarrollado por <b>Araújo Tech</b></span><span>·</span><button data-privacy="1">${t("privacy")}</button></div></div>`;
+  h+=`<div class="credit"><span>Desarrollado por <b>Araújo Tech</b></span><button data-privacy="1">${t("privacy")}</button></div></div>`;
   $("#page").innerHTML=h;
   const cn=cartN();
   $("#cta").innerHTML=`<div class="in"><div class="sum">${st.svc.length?`<b>${gs(total()+cartTot())}</b><small>${esc(sel().map(s=>s.name).join(" + "))} · ${dur()} ${t("min")}${cn?" · "+nItems(cn):""}</small>`:cn?`<b>${gs(cartTot())}</b><small>${nItems(cn)}</small>`:`<b>${esc(SALON.name)}</b><small>${t("tag")}</small>`}</div>${cn&&!st.svc.length?`<button class="btn sec" data-open="1" style="padding:0 16px">${t("book")}</button><button class="btn" data-order="1" style="padding:0 18px">${ic("bag")}${t("orderShort")}</button>`:`<button class="btn" data-open="1">${t("reserveCta")}</button>`}</div>`;
