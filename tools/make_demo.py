@@ -144,7 +144,7 @@ def build(seed_tpl, logo_svg, out, title, ogtitle, url, desc):
     # demo: botões para voltar aos exemplos e ao início do site
     rep('<span class="spacer"></span>',
         '<span class="spacer"></span><nav class="dnav">'
-        '<a href="/catalogo-digital/#rubros" class="dn" aria-label="Ver más ejemplos" title="Ver más ejemplos"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span class="dn-t" data-es="Ejemplos" data-pt="Exemplos"></span></a>'
+        '<a href="/vitrix/#rubros" class="dn" aria-label="Ver más ejemplos" title="Ver más ejemplos"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg><span class="dn-t" data-es="Ejemplos" data-pt="Exemplos"></span></a>'
         '<a href="/" class="dn" aria-label="Inicio" title="Inicio"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg><span class="dn-t" data-es="Inicio" data-pt="Início"></span></a></nav>')
     rep("</style>", ".dnav{display:flex;gap:6px}.dn{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);color:inherit;text-decoration:none;font-size:13.5px;font-weight:600;white-space:nowrap}.dn:hover{background:var(--line)}.dn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.dn-t::after{content:attr(data-es)}html[lang^=pt] .dn-t::after{content:attr(data-pt)}@media (max-width:520px){.dn{padding:0;width:36px;justify-content:center}.dn-t{display:none}.dnav{gap:4px}}\n</style>")
     rep("</style>", ".urlpill{display:none!important}.demo-hint{margin:6px 0 0;padding:8px 12px;border-radius:10px;background:#FFF4DE;color:#5C3A00;font-size:13px}\n</style>")
@@ -206,16 +206,16 @@ def casofarma():
         .replace("code:'SALUD10'", "code:'CASOFARMA10'"))
     assert "s.name='Casofarma'" in seed and "#2E43A0" in seed and 'cf2' in seed
     build(seed, lg, os.path.join(ROOT, 'araujo-tech-site', 'demo-casofarma', 'index.html'),
-          'Casofarma · Catálogo digital · Demostración', 'Casofarma · Catálogo digital',
-          'https://araujotechsistemas.com/demo-casofarma/', 'Demostración del catálogo digital de Casofarma: productos, pedidos por WhatsApp y delivery.')
+          'Casofarma · Demostración · Vitrix', 'Casofarma · Catálogo Vitrix',
+          'https://araujotechsistemas.com/demo-casofarma/', 'Demostración del catálogo Vitrix de Casofarma: productos, pedidos por WhatsApp y delivery.')
 
 def main():
     copiar_admin()
-    build(SEED, LOGO_SVG, OUT, 'Casa Brasa · Demostración · Araújo Tech', 'Casa Brasa · Catálogo de demostración',
-          'https://araujotechsistemas.com/demo/', 'Catálogo de demostración de Araújo Tech: así queda el menú digital de su negocio, con pedidos por WhatsApp.')
+    build(SEED, LOGO_SVG, OUT, 'Casa Brasa · Demostración · Vitrix', 'Casa Brasa · Catálogo de demostración',
+          'https://araujotechsistemas.com/demo/', 'Catálogo de demostración de Vitrix (Araújo Tech): así queda el menú digital de su negocio, con pedidos por WhatsApp.')
     build(FARM_SEED, FARM_LOGO_SVG, os.path.join(ROOT, 'araujo-tech-site', 'demo-farmacia', 'index.html'),
-          'Farmacia Vida Plena · Demostración · Araújo Tech', 'Farmacia Vida Plena · Catálogo de demostración',
-          'https://araujotechsistemas.com/demo-farmacia/', 'Catálogo de demostración de Araújo Tech para farmacias: productos, recetas y delivery por WhatsApp.')
+          'Farmacia Vida Plena · Demostración · Vitrix', 'Farmacia Vida Plena · Catálogo de demostración',
+          'https://araujotechsistemas.com/demo-farmacia/', 'Catálogo de demostración de Vitrix (Araújo Tech) para farmacias: productos, recetas y delivery por WhatsApp.')
 
 def rubros():
     import sys

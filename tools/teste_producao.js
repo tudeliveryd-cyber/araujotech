@@ -22,7 +22,7 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   for (const [pais, tz, loc, cc] of casos) {
     const { ctx, p } = await mk({ timezoneId: tz, locale: loc });
     try {
-      await p.goto(SITE + '/catalogo-digital/', { waitUntil: 'networkidle', timeout: 60000 }); await p.waitForTimeout(1500);
+      await p.goto(SITE + '/vitrix/', { waitUntil: 'networkidle', timeout: 60000 }); await p.waitForTimeout(1500);
       const plans = await p.evaluate(() => [...document.querySelectorAll('.plan')].map(e => ({ n: e.querySelector('h3').innerText, usd: e.querySelector('.price b').innerText, loc: (e.querySelector('.loc') || {}).innerText || '', inst: e.querySelector('.inst').innerText.replace(/\s+/g, ' '), lz: (e.querySelector('.lzp') || {}).innerText || '' })));
       if (plans.length !== 4) { bad(pais + ': esperava 4 planos, achei ' + plans.length); continue; }
       const usd = plans.map(x => num(x.usd));
@@ -47,7 +47,7 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     const j = await (await fetch(FS + '/licencias/_lz?key=' + KEY)).json(); const F = j.fields || {}; const v = k => F[k] ? +(F[k].integerValue || F[k].doubleValue || 0) : null;
     const used = v('used') || 0, max = v('max') || 20, left = Math.max(0, max - used), upd = F.updated ? F.updated.stringValue : '(sem data)';
     info('Firebase real: ' + used + ' vagas usadas de ' + max + ' → restam ' + left + ' · gravado pelo admin em ' + upd);
-    for (const [lang, url, re] of [['ES', SITE + '/catalogo-digital/', /Quedan (\d+) de (\d+) cupos/], ['PT', SITE + '/catalogo-digital/?lang=pt', /Restam (\d+) de (\d+) vagas/], ['Inicial', SITE + '/', /(?:Quedan|Restam) (\d+) de (\d+)/]]) {
+    for (const [lang, url, re] of [['ES', SITE + '/vitrix/', /Quedan (\d+) de (\d+) cupos/], ['PT', SITE + '/vitrix/?lang=pt', /Restam (\d+) de (\d+) vagas/], ['Inicial', SITE + '/', /(?:Quedan|Restam) (\d+) de (\d+)/]]) {
       const { ctx, p } = await mk({ timezoneId: 'America/Asuncion', locale: lang === 'PT' ? 'pt-BR' : 'es-PY' });
       await p.goto(url, { waitUntil: 'networkidle', timeout: 60000 }); await p.waitForTimeout(1200);
       if (lang === 'PT') { const bt = p.locator('button', { hasText: /^PT$/ }).first(); if (await bt.count()) { await bt.click(); await p.waitForTimeout(500); } }

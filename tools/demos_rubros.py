@@ -1,4 +1,4 @@
-"""Demos de outros ramos (ropa, cosméticos, supermercado, ferretería) para a página catalogo-digital.
+"""Demos de outros ramos (ropa, cosméticos, supermercado, ferretería) para a página vitrix.
 Lojas fictícias, fotos livres do Unsplash. Gerado por tools/make_demo.py."""
 import json
 
@@ -40,7 +40,7 @@ DEMOS = [
  # ---------------- ROPA ----------------
  dict(folder='demo-ropa', shop='lua-moda', ver='lm1', ramo='ropa', name='Lúa Moda',
   slogan=P('Roupa para o dia a dia, com entrega em casa', 'Ropa para todos los días, con envío a domicilio'),
-  title='Lúa Moda · Demostración · Araújo Tech', desc='Catálogo de demostración para tiendas de ropa: talles, colores y pedidos por WhatsApp.',
+  title='Lúa Moda · Demostración · Vitrix', desc='Catálogo de demostración para tiendas de ropa: talles, colores y pedidos por WhatsApp.',
   logo=logo('#FAF6F1', '#B45309', '#1C1917', "<path d='M126 44l-18 12 8 16 10-5v36h48V67l10 5 8-16-18-12c-3 9-12 14-24 14s-21-5-24-14z'/>", 'LÚA MODA', 'ROPA · CALZADOS', 32),
   cover='photo-1441984904996-e0b6ba687e04', coupon='LUA10',
   theme=TH('#B45309', '#1C1917', '#1C1917', '#F7F3EE', '#D97706'),
@@ -65,7 +65,7 @@ DEMOS = [
  # ---------------- COSMÉTICOS ----------------
  dict(folder='demo-cosmeticos', shop='bella-piel', ver='bp1', ramo='cosmeticos', name='Bella Piel',
   slogan=P('Maquiagem e cuidados para a pele', 'Maquillaje y cuidado de la piel'),
-  title='Bella Piel · Demostración · Araújo Tech', desc='Catálogo de demostración para tiendas de cosméticos: tonos, kits y pedidos por WhatsApp.',
+  title='Bella Piel · Demostración · Vitrix', desc='Catálogo de demostración para tiendas de cosméticos: tonos, kits y pedidos por WhatsApp.',
   logo=logo('#2A1420', '#F2A7B8', '#FFF1F4', "<path d='M150 40c-10 16-22 26-22 44a22 22 0 0 0 44 0c0-18-12-28-22-44z'/><path d='M140 86a10 10 0 0 0 10 10'/>", 'BELLA PIEL', 'COSMÉTICOS', 32),
   cover='photo-1522335789203-aabd1fc54bc9', coupon='BELLA15',
   theme=TH('#BE185D', '#2A1420', '#9D174D', '#FBF3F6', '#F472B6', promo='#BE185D'),
@@ -90,7 +90,7 @@ DEMOS = [
  # ---------------- SUPERMERCADO ----------------
  dict(folder='demo-supermercado', shop='super-familia', ver='sf1', ramo='mercado', name='Super Familia',
   slogan=P('Tudo para sua casa, sem sair dela', 'Todo para tu casa, sin salir de ella'),
-  title='Super Familia · Demostración · Araújo Tech', desc='Catálogo de demostración para supermercados y almacenes: productos por kilo, pedido mínimo y delivery.',
+  title='Super Familia · Demostración · Vitrix', desc='Catálogo de demostración para supermercados y almacenes: productos por kilo, pedido mínimo y delivery.',
   logo=logo('#14532D', '#FACC15', '#F0FDF4', "<path d='M112 50h12l10 40h40l8-28h-54'/><circle cx='138' cy='104' r='5'/><circle cx='170' cy='104' r='5'/>", 'SUPER FAMILIA', 'SUPERMERCADO', 24),
   cover='photo-1604719312566-8912e9227c6a', coupon='FAMILIA5', minOrder=50000,
   theme=TH('#15803D', '#14532D', '#15803D', '#F2F7F3', '#FACC15'),
@@ -115,7 +115,7 @@ DEMOS = [
  # ---------------- FERRETERÍA ----------------
  dict(folder='demo-ferreteria', shop='ferreteria-central', ver='fc1', ramo='ferreteria', name='Ferretería Central',
   slogan=P('Ferramentas e materiais para sua obra', 'Herramientas y materiales para tu obra'),
-  title='Ferretería Central · Demostración · Araújo Tech', desc='Catálogo de demostración para ferreterías: herramientas, presupuestos y pedidos por WhatsApp.',
+  title='Ferretería Central · Demostración · Vitrix', desc='Catálogo de demostración para ferreterías: herramientas, presupuestos y pedidos por WhatsApp.',
   logo=logo('#1F2937', '#F59E0B', '#F9FAFB', "<path d='M128 100l26-26'/><path d='M150 52a16 16 0 0 0 20 20l-6 6-20-20 6-6z'/><path d='M120 108l8-8 6 6-8 8z'/>", 'CENTRAL', 'FERRETERÍA', 36),
   cover='photo-1759200165738-6366977a73c6', coupon='OBRA10',
   theme=TH('#EA580C', '#1F2937', '#C2410C', '#F7F7F6', '#FACC15'),
@@ -169,7 +169,7 @@ DEMOS += [
  # ---------------- PIZZERÍA ----------------
  dict(folder='demo-pizzeria', shop='forno-bello', ver='fb1', ramo='pizzeria', name='Forno Bello',
   slogan=P('Pizza artesanal no forno a lenha', 'Pizza artesanal al horno de leña'),
-  title='Forno Bello · Demostración · Araújo Tech', desc='Catálogo de demostración para pizzerías: tamaños, bordes, combos y delivery por WhatsApp.',
+  title='Forno Bello · Demostración · Vitrix', desc='Catálogo de demostración para pizzerías: tamaños, bordes, combos y delivery por WhatsApp.',
   logo=logo('#1A1A1A', '#E4572E', '#FFF7ED', "<path d='M150 40l34 62h-68z'/><circle cx='146' cy='76' r='4'/><circle cx='158' cy='90' r='4'/><circle cx='140' cy='92' r='4'/>", 'FORNO BELLO', 'PIZZERÍA', 30),
   cover='photo-1716237388087-4e47595a6615', coupon='PIZZA10', cards='list', hours=['18:00', '23:30'], sun=True, prep=35,
   theme=TH('#C2410C', '#1A1A1A', '#C2410C', '#FAF6F2', '#E4572E'),
@@ -193,7 +193,7 @@ DEMOS += [
  # ---------------- HELADERÍA ----------------
  dict(folder='demo-heladeria', shop='polo-sur', ver='ps1', ramo='heladeria', name='Heladería Polo Sur',
   slogan=P('Sorvete artesanal, feito todos os dias', 'Helado artesanal, hecho todos los días'),
-  title='Heladería Polo Sur · Demostración · Araújo Tech', desc='Catálogo de demostración para heladerías: elegir sabores, potes por kilo y delivery.',
+  title='Heladería Polo Sur · Demostración · Vitrix', desc='Catálogo de demostración para heladerías: elegir sabores, potes por kilo y delivery.',
   logo=logo('#F0F9FF', '#0284C7', '#0C4A6E', "<path d='M136 74h28l-14 40z'/><path d='M134 74a16 16 0 0 1 32 0'/><path d='M140 58a12 12 0 0 1 20 0'/>", 'POLO SUR', 'HELADERÍA', 34),
   cover='photo-1648971413826-8377e3c65039', coupon='HELADO10', cards='tiles', hours=['13:00', '23:00'], sun=True, prep=20,
   theme=TH('#0284C7', '#0C4A6E', '#0369A1', '#F2F8FC', '#F472B6', promo='#DB2777'),
@@ -216,7 +216,7 @@ DEMOS += [
  # ---------------- PANADERÍA ----------------
  dict(folder='demo-panaderia', shop='trigo-dorado', ver='td1', ramo='panaderia', name='Trigo Dorado',
   slogan=P('Pães e doces saídos do forno', 'Panes y dulces recién horneados'),
-  title='Trigo Dorado · Demostración · Araújo Tech', desc='Catálogo de demostración para panaderías y confiterías: panes, tortas por encargo y delivery.',
+  title='Trigo Dorado · Demostración · Vitrix', desc='Catálogo de demostración para panaderías y confiterías: panes, tortas por encargo y delivery.',
   logo=logo('#3B2412', '#E9B872', '#FFF8EE', "<path d='M150 40v72'/><path d='M150 56c-10-2-16-8-16-16 10 2 16 8 16 16zM150 56c10-2 16-8 16-16-10 2-16 8-16 16zM150 76c-10-2-16-8-16-16 10 2 16 8 16 16zM150 76c10-2 16-8 16-16-10 2-16 8-16 16zM150 96c-10-2-16-8-16-16 10 2 16 8 16 16zM150 96c10-2 16-8 16-16-10 2-16 8-16 16z'/>", 'TRIGO DORADO', 'PANADERÍA · CONFITERÍA', 24),
   cover='photo-1568254183919-78a4f43a2877', coupon='PAN10', cards='tiles', hours=['06:00', '20:00'], sun=True, prep=20,
   theme=TH('#B45309', '#3B2412', '#92400E', '#FBF6EF', '#E9B872'),
@@ -238,7 +238,7 @@ DEMOS += [
  # ---------------- PET SHOP ----------------
  dict(folder='demo-petshop', shop='mundo-pet', ver='mp1', ramo='petshop', name='Mundo Pet',
   slogan=P('Tudo para o seu pet, com entrega em casa', 'Todo para tu mascota, con envío a domicilio'),
-  title='Mundo Pet · Demostración · Araújo Tech', desc='Catálogo de demostración para pet shops: alimentos por kilo, accesorios y delivery.',
+  title='Mundo Pet · Demostración · Vitrix', desc='Catálogo de demostración para pet shops: alimentos por kilo, accesorios y delivery.',
   logo=logo('#134E4A', '#5EEAD4', '#F0FDFA', "<circle cx='150' cy='88' r='14'/><circle cx='128' cy='66' r='7'/><circle cx='143' cy='54' r='7'/><circle cx='158' cy='54' r='7'/><circle cx='172' cy='66' r='7'/>", 'MUNDO PET', 'PET SHOP', 34),
   cover='photo-1600352712371-15fd49ca42b5', coupon='PET10', cards='tiles', hours=['08:00', '19:00'], prep=30,
   theme=TH('#0F766E', '#134E4A', '#0F766E', '#F2F8F7', '#F59E0B', promo='#EA580C'),
@@ -258,7 +258,7 @@ DEMOS += [
  # ---------------- CELULARES ----------------
  dict(folder='demo-celulares', shop='conecta-cel', ver='cc1', ramo='electronica', name='Conecta Cel',
   slogan=P('Celulares e acessórios com garantia', 'Celulares y accesorios con garantía'),
-  title='Conecta Cel · Demostración · Araújo Tech', desc='Catálogo de demostración para tiendas de celulares y electrónica: modelos, capacidad y pedidos por WhatsApp.',
+  title='Conecta Cel · Demostración · Vitrix', desc='Catálogo de demostración para tiendas de celulares y electrónica: modelos, capacidad y pedidos por WhatsApp.',
   logo=logo('#0F172A', '#38BDF8', '#F8FAFC', "<rect x='134' y='38' width='32' height='60' rx='6'/><path d='M146 88h8'/>", 'CONECTA CEL', 'CELULARES · ACCESORIOS', 30),
   cover='photo-1677145503755-5a8c581671fe', coupon='CEL5', cards='tiles', hours=['08:00', '19:00'], prep=30,
   theme=TH('#2563EB', '#0F172A', '#1D4ED8', '#F3F6FB', '#38BDF8'),
@@ -278,7 +278,7 @@ DEMOS += [
  # ---------------- BEBIDAS ----------------
  dict(folder='demo-bebidas', shop='la-heladera', ver='lh1', ramo='bebidas', name='La Heladera',
   slogan=P('Bebidas geladas na sua porta', 'Bebidas heladas en tu puerta'),
-  title='La Heladera · Demostración · Araújo Tech', desc='Catálogo de demostración para distribuidoras y despensas de bebidas: packs, combos y delivery rápido.',
+  title='La Heladera · Demostración · Vitrix', desc='Catálogo de demostración para distribuidoras y despensas de bebidas: packs, combos y delivery rápido.',
   logo=logo('#111827', '#22D3EE', '#F9FAFB', "<path d='M144 38h12v14l8 12v40h-28V64l8-12z'/><path d='M136 78h28'/>", 'LA HELADERA', 'BEBIDAS · DELIVERY', 30),
   cover='photo-1792955104479-5ddf4ef78c21', coupon='FRIO10', cards='list', hours=['10:00', '23:30'], sun=True, prep=15,
   theme=TH('#0891B2', '#111827', '#0E7490', '#F2F7F9', '#22D3EE', promo='#E11D48'),
@@ -301,7 +301,7 @@ DEMOS += [
 KG = lambda base, pt='Quantidade', es='Cantidad': G('kg', pt, es, [('1/2 kg', '1/2 kg'), ('1 kg', '1 kg', base), ('2 kg', '2 kg', base * 3)])
 TAM3 = lambda a=0, b=0: G('tm', 'Tamanho', 'Tamaño', [('P', 'S'), ('M', 'M', a), ('G', 'L', b)])
 def D(folder, shop, ver, ramo, name, slogan, desc, logo_, cover, coupon, theme, cats, prods, slides, **kw):
-    d = dict(folder=folder, shop=shop, ver=ver, ramo=ramo, name=name, slogan=slogan, title=f'{name} · Demostración · Araújo Tech',
+    d = dict(folder=folder, shop=shop, ver=ver, ramo=ramo, name=name, slogan=slogan, title=f'{name} · Demostración · Vitrix',
              desc=desc, logo=logo_, cover=cover, coupon=coupon, theme=theme, cats=cats, prods=prods, slides=slides)
     d.update(kw); return d
 

@@ -18,17 +18,19 @@ while IFS='|' read -r url marca; do
   else ok "$url -> 200, ${tam} bytes${marca:+, versão nova confirmada ($marca)}"; fi
   rm -f "$body"
 done <<'URLS'
-https://araujotechsistemas.com/|lzhome
-https://araujotechsistemas.com/catalogo-digital/|lzBan
+https://araujotechsistemas.com/|syslogo
+https://araujotechsistemas.com/vitrix/|vxlogo
+https://araujotechsistemas.com/catalogo-digital/|vitrix
+https://araujotechsistemas.com/img/vitrix/vitrix-blanco.png|
 https://araujotechsistemas.com/trabaja/|
-https://araujotechsistemas.com/demo/|cleanOrder
+https://araujotechsistemas.com/demo/|vxMark
 https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/admin/|weakfix
 https://araujotechsistemas.com/painel/|forceMc
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/sitemap.xml|
-https://fogaomineiro.araujotechsistemas.com/|forceMc
+https://fogaomineiro.araujotechsistemas.com/|vxMark
 https://fogaomineiro.araujotechsistemas.com/painel/|forceMc
 https://teste.araujotechsistemas.com/|forceMc
 https://teste.araujotechsistemas.com/agenda/|badPhone
