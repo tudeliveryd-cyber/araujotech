@@ -74,7 +74,7 @@ echo; echo "== 4. Firebase do Meu Púlpito (projeto meu-pulpito-app): dados priv
 K="AIzaSyAuOBVdU5-bcFuaVEsGv4iK8H2krFU9Un8"; B="https://firestore.googleapis.com/v1/projects/meu-pulpito-app/databases/(default)/documents"
 probe "pulpito" 403 "sermões dos pastores sem login"
 probe "planos" 403 "planos dos usuários do Meu Púlpito sem login"
-probe "config/app" 403 "configuração do app sem login"
+probe "config/app" 200 "configuração pública do app (planos e avisos), leitura sem login"
 probe "suporte" 403 "mensagens de suporte sem login"
 
 echo; echo "== 5. Firebase da Tu Delivery (Caja de Entregas, projeto tu-delivery-1eb61): dados privados fechados"
