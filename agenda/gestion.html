@@ -377,6 +377,8 @@ const SB_URL_FIXED="", SB_KEY_FIXED="";
 const AG_ID=(()=>{const m=location.hostname.toLowerCase().match(/^([a-z0-9-]+)\.araujotechsistemas\.com$/);return m&&!["www","barberialoli","fogaomineiro"].includes(m[1])?m[1]:(new URLSearchParams(location.search).get("ag")||"")})();
 const FB_CFG={apiKey:"AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U",authDomain:"araujotech-catalogos.firebaseapp.com",projectId:"araujotech-catalogos",storageBucket:"araujotech-catalogos.firebasestorage.app",messagingSenderId:"501170505971",appId:"1:501170505971:web:fd3a1c1578b3e1b93bcf86"};
 const FBV="10.12.2",USER_DOMAIN="araujotechsistemas.com",PASS0="123456";
+function tmpPass(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";const r=new Uint32Array(8);crypto.getRandomValues(r);let s="";for(let i=0;i<8;i++){s+=A[r[i]%A.length];if(i===3)s+="-"}return s}
+const isTmp=p=>p===PASS0||/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/.test(String(p||""));
 const FB_ON=!!window.AG_FAKE||(!!AG_ID&&location.protocol!=="file:"&&!/demo/i.test(location.pathname));
 const userEmail=u=>{u=String(u||"").trim().toLowerCase();return u.includes("@")?u:u+"@"+USER_DOMAIN};
 let FA=null;
@@ -1413,7 +1415,7 @@ function editPro(p){
     <div class="grid3"><div class="field"><label for="r-com">${t("commission")}</label><input class="inp num" type="number" min="0" max="100" id="r-com" value="${p.commission}"></div>
     <div class="field"><label for="r-pin">${t("pin")}</label><input class="inp num" id="r-pin" inputmode="numeric" maxlength="4" value="${esc(p.pin||"0000")}"></div>
     ${FB_ON?`<div class="field"><label for="r-login">${LG()!=="pt"?"Usuario para entrar":"Usuário para entrar"}</label><input class="inp" id="r-login" autocapitalize="off" spellcheck="false" value="${esc(p.login||"")}" ${p.login?"readonly":""} placeholder="${LG()!=="pt"?"ej.: laura":"ex.: laura"}"></div>`:`<div class="field"><label for="r-email">${t("proEmail")}</label><input class="inp" id="r-email" type="email" value="${esc(p.email||"")}"></div>`}</div>
-    ${FB_ON?`<small class="help">${p.login?(LG()!=="pt"?"Entra con este usuario y su contraseña.":"Entra com este usuário e a senha dele."):(LG()!=="pt"?"Al guardar se crea el acceso con la contraseña provisoria 123456; al entrar, el sistema le pide crear la suya.":"Ao salvar, o acesso é criado com a senha provisória 123456; ao entrar, o sistema pede para criar a dele.")}</small>`:""}
+    ${FB_ON?`<small class="help">${p.login?(LG()!=="pt"?"Entra con este usuario y su contraseña.":"Entra com este usuário e a senha dele."):(LG()!=="pt"?"Al guardar se crea el acceso y se muestra una contraseña provisoria; al entrar, el sistema le pide crear la suya.":"Ao salvar, o acesso é criado e aparece uma senha provisória; ao entrar, o sistema pede para criar a dele.")}</small>`:""}
     <div class="field"><label>${t("proHours")}</label><div class="hours-grid" id="r-hours">${[1,2,3,4,5,6,0].map(i=>{const h=p.hours[i];return `<div class="hrow ${h?"":"off"}" data-d="${i}"><label><input type="checkbox" ${h?"checked":""}>${DL[i]}</label><input class="inp" type="time" value="${h?h[0]:S.cfg.open}" aria-label="${t("open")} ${DL[i]}"><input class="inp" type="time" value="${h?h[1]:S.cfg.close}" aria-label="${t("closeT")} ${DL[i]}"></div>`}).join("")}</div></div>
     <div class="field"><label>${t("proSvcs")}</label><div class="svc-pick" id="r-svcs">${S.services.map(s=>`<label><input type="checkbox" value="${s.id}" ${has.includes(s.id)?"checked":""}><span class="grow">${esc(s.name)} <small>· ${esc(s.cat||"")}</small></span></label>`).join("")}</div><small class="help">${t("proSvcsHelp")}</small></div>
     <div class="field"><label>${t("color")}</label><div class="colors" id="r-col">${PRO_COLORS.map(c=>`<button type="button" data-c="${c}" style="--pc:${c}" class="${c===color?"on":""}" aria-label="${c}"></button>`).join("")}</div></div>
@@ -1430,7 +1432,7 @@ function editPro(p){
     Object.assign(p,{name:n,role:$("#r-role").value.trim(),commission:+$("#r-com").value||0,pin:($("#r-pin").value.replace(/\D/g,"")||"0000").slice(0,4),email:FB_ON?(p.email||""):$("#r-email").value.trim().toLowerCase(),color,active:$("#r-act").checked,hours,svc,photo});
     if(isNew){p.id=uid();S.pros.push(p)}
     const lg=FB_ON&&$("#r-login")&&!p.login?$("#r-login").value.trim().toLowerCase().replace(/[^a-z0-9._-]/g,""):"";
-    if(lg){const es=LG()!=="pt";FA.createUser(lg,PASS0,{role:"pro",proId:p.id,name:p.name}).then(()=>{p.login=lg;save();render();toast(es?`Acceso creado: ${lg} · 123456`:`Acesso criado: ${lg} · 123456`)}).catch(e=>{console.warn(e);toast(/in-use/.test(String(e.code||e.message))?(es?"Ese usuario ya existe. Elegí otro.":"Esse usuário já existe. Escolha outro."):(es?"No se pudo crear el acceso.":"Não foi possível criar o acesso."))})}
+    if(lg){const es=LG()!=="pt",np=tmpPass();FA.createUser(lg,np,{role:"pro",proId:p.id,name:p.name}).then(()=>{p.login=lg;save();render();modal(es?"Acceso creado":"Acesso criado",`<p style="margin:0 0 10px">${es?"Pasale estos datos al profesional. La contraseña provisoria se muestra una sola vez; al entrar, el sistema le pide crear la suya.":"Passe estes dados ao profissional. A senha provisória aparece uma única vez; ao entrar, o sistema pede para criar a dele."}</p><div class="panel" style="padding:12px 14px;font-size:16px;line-height:1.7;user-select:all"><div>${es?"Usuario":"Usuário"}: <b>${esc(lg)}</b></div><div>${es?"Contraseña provisoria":"Senha provisória"}: <b style="letter-spacing:.06em">${np}</b></div></div>`,`<button class="btn" data-act="closeM">${t("close")}</button>`)}).catch(e=>{console.warn(e);toast(/in-use/.test(String(e.code||e.message))?(es?"Ese usuario ya existe. Elegí otro.":"Esse usuário já existe. Escolha outro."):(es?"No se pudo crear el acceso.":"Não foi possível criar o acesso."))})}
     save();closeM();render();toast(t("saved"))};
   if(!isNew)$("#r-del").onclick=()=>{const u=snap();S.pros=S.pros.filter(x=>x.id!==p.id);save();closeM();render();undoable(t("deleted"),u)};
 }
@@ -1454,7 +1456,7 @@ function fbApi(A,F,U,app,db,auth){const {doc,getDoc,setDoc,updateDoc,collection,
   setMyPass:async np=>{const u=auth.currentUser;await U.updatePassword(u,np);try{await updateDoc(doc(db,"agendaUsers",u.uid),{mc:false})}catch(e){console.warn("mc",e)}},
   createUser:async(login,pass,extra)=>{const sec=A.getApps().find(a=>a.name==="agsec")||A.initializeApp(FB_CFG,"agsec");const sa=U.getAuth(sec);
    const uid=(await U.createUserWithEmailAndPassword(sa,userEmail(login),pass)).user.uid;try{await U.signOut(sa)}catch(e){}
-   await setDoc(doc(db,"agendaUsers",uid),Object.assign({ag:AG_ID,email:userEmail(login),mc:pass===PASS0},extra));return uid}
+   await setDoc(doc(db,"agendaUsers",uid),Object.assign({ag:AG_ID,email:userEmail(login),mc:isTmp(pass)},extra));return uid}
  }}
 async function fbReady(){if(FA)return FA;if(window.AG_FAKE){FA=window.AG_FAKE;return FA}
  const b="https://www.gstatic.com/firebasejs/"+FBV+"/";const [A,F,U]=await Promise.all([import(b+"firebase-app.js"),import(b+"firebase-firestore.js"),import(b+"firebase-auth.js")]);
@@ -1635,7 +1637,7 @@ const A={
     const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
     if(error){ui.authErr=t("badLogin");renderAuth();return}await afterAuth(data.user)},
   setNewPass:async el=>{const es=LG()!=="pt",a=$("#np-a").value,b=$("#np-b").value;const E=m=>{ui.authErr=m;renderNewPass()};
-    if(a.length<6)return E(es?"Usá al menos 6 caracteres.":"Use pelo menos 6 caracteres.");if(a!==b)return E(es?"Las dos contraseñas no son iguales.":"As duas senhas não são iguais.");if(a===PASS0)return E(es?"Elegí una contraseña distinta de 123456.":"Escolha uma senha diferente de 123456.");
+    if(a.length<6)return E(es?"Usá al menos 6 caracteres.":"Use pelo menos 6 caracteres.");if(a!==b)return E(es?"Las dos contraseñas no son iguales.":"As duas senhas não são iguais.");if(isTmp(a))return E(es?"Elegí una contraseña tuya, distinta de la provisoria.":"Escolha uma senha sua, diferente da provisória.");
     el.disabled=true;try{await FA.setMyPass(a);try{localStorage.setItem(KEY+"_mc_"+(ui.user.id||"").split(":").pop(),"1")}catch(e){}ui.mc=false;ui.authErr="";render();toast(es?"Contraseña creada":"Senha criada")}catch(e){console.warn(e);el.disabled=false;
       if(/recent-login/.test(String(e.code||e.message))){E(es?"Por seguridad, salí y entrá de nuevo con la contraseña provisoria.":"Por segurança, saia e entre de novo com a senha provisória.");setTimeout(()=>A.logout(),2500)}else E(t("cloudErr"))}},
   logout:async()=>{closeM();if(FB_ON&&FA){try{await FA.logout()}catch(e){}}else if(ui.cloudMode&&sb){try{await sb.auth.signOut()}catch(e){}}ui.user=null;ui.loginSel=null;ui.pin="";try{sessionStorage.removeItem(KEY+"_user")}catch(e){}render()},
