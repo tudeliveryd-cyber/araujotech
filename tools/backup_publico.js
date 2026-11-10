@@ -4,7 +4,7 @@
 // O arquivo tem o mesmo formato da cópia do admin, então serve em Admin → Copia de seguridad → Restaurar.
 const fs = require('fs');
 const K = 'AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U'; // chave pública do site (a mesma que está no catálogo)
-const B = 'https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/';
+const B = process.env.FS_BASE || 'https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/'; // FS_BASE: só para os testes no emulador
 const val = v => { if ('stringValue' in v) return v.stringValue; if ('integerValue' in v) return Number(v.integerValue); if ('doubleValue' in v) return v.doubleValue; if ('booleanValue' in v) return v.booleanValue; if ('nullValue' in v) return null; if ('timestampValue' in v) return v.timestampValue; if ('arrayValue' in v) return (v.arrayValue.values || []).map(val); if ('mapValue' in v) return obj(v.mapValue.fields || {}); return null; };
 const obj = f => Object.fromEntries(Object.entries(f).map(([k, v]) => [k, val(v)]));
 const plain = d => Object.assign({ _id: d.name.split('/').pop() }, obj(d.fields || {}));

@@ -2,6 +2,8 @@
 const L = require('./lib'); const P = 'araujotech-catalogos';
 const { ok, bad, info, sec, check } = L;
 const STOP = process.env.STOP || '';
+// relógio dos clientes: 22h de hoje em Asunción (local aberto e sempre depois da hora real, para o pedido do cliente ficar no topo da lista do painel)
+const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 25, min, 0)); };
 (async () => {
   // ---------- preparação ----------
   const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026'];
@@ -91,7 +93,7 @@ const STOP = process.env.STOP || '';
   sec('D. Cliente anônimo: catálogo e pedido real');
   const C = await L.open({ w: 390 }); const c = C.p; let ORD = null;
   await step('catálogo', async () => {
-    { const t = new Date(); t.setUTCHours(15, 5, 0, 0); await c.clock.setFixedTime(t); } // 12:05 em Asunción: local aberto
+    { const t = noite(5); await c.clock.setFixedTime(t); } // 22:05 em Asunción: local aberto
     await c.goto(HOST + '/'); await c.waitForFunction(() => typeof pub !== 'undefined' && document.querySelector('[data-act=open]') && pub.products.some(p => p.n.es === 'Milanesa E2E'), null, { timeout: 20000 }).catch(() => {});
     const st = await c.evaluate(() => ({ has: document.body.innerText.includes('Milanesa E2E'), img: !!([...document.images].find(i => i.closest('[data-pid]') && /Milanesa/.test(i.closest('[data-pid]').innerText) && i.naturalWidth > 0)), name: pub.store.name }));
     check(st.has && st.name === 'Prueba E2E', 'catálogo público (outro aparelho, sem login) mostra o produto novo', JSON.stringify(st));
@@ -289,7 +291,7 @@ const STOP = process.env.STOP || '';
     for (const t of ['caja', 'delivery', 'custom']) { await tab(o2, t); if (await o2.locator('#sx_tables').count()) break; }
     if (!(await o2.locator('#sx_tables').count())) { info('campo de mesas não encontrado no plano Esencial: ' + (await o2.txt()).slice(0, 200)); return; }
     await o2.set('#sx_tables', '4'); await o2.w(3000);
-    const M = await L.open({ w: 390 }); const m = M.p; { const t = new Date(); t.setUTCHours(15, 5, 0, 0); await m.clock.setFixedTime(t); }
+    const M = await L.open({ w: 390 }); const m = M.p; { const t = noite(5); await m.clock.setFixedTime(t); }
     await m.goto(HOST + '/?mesa=2'); await m.waitForFunction(() => typeof pub !== 'undefined' && document.querySelector('[data-act=open]'), null, { timeout: 20000 }).catch(() => {});
     await m.w(1500);
     check(/Mesa 2/.test(await m.txt()), 'mesa: o link do QR abre o catálogo identificado como Mesa 2');
@@ -324,7 +326,7 @@ const STOP = process.env.STOP || '';
     const ws = await mk('Yerba E2E', 10000, async () => { await o2.set('#ed_wq', '3'); await o2.set('#ed_wp', '9000'); });
     const bx = await mk('Jabon E2E', 5000, async () => { await o2.set('#ed_bx', '3'); await o2.set('#ed_by', '2'); });
     check(!!kg && !!ws && !!bx, 'painel: produtos por kg, com preço de atacado e com promoção 3×2 criados', [kg, ws, bx].join(','));
-    const X = await L.open({ w: 390 }); const x = X.p; { const t = new Date(); t.setUTCHours(15, 10, 0, 0); await x.clock.setFixedTime(t); }
+    const X = await L.open({ w: 390 }); const x = X.p; { const t = noite(10); await x.clock.setFixedTime(t); }
     await x.goto(HOST + '/'); await x.waitForFunction(() => typeof pub !== 'undefined' && pub.products.some(p => p.n.es === 'Jabon E2E') && document.querySelector('[data-act=open]'), null, { timeout: 20000 }).catch(() => {});
     const add = async (pid, plus) => { await x.locator('[data-act=open][data-pid="' + pid + '"]:visible').first().click(); await x.w(500); for (let i = 0; i < plus; i++) { await x.locator('[data-act=pq][data-d="1"]:visible').last().click(); await x.w(200); } await x.act('addcart'); };
     await add(kg, 0); await add(ws, 2); await add(bx, 2);
@@ -389,6 +391,14 @@ const STOP = process.env.STOP || '';
     const od = ((await L.fsReq(P, 'GET', 'shops/' + SID + '/orders?pageSize=50', 'owner')).json.documents || []).length; check(od >= 4, 'restauração: os pedidos continuam todos lá (' + od + ')');
     await a.setInputFiles('#bkFile', { name: 'x.json', mimeType: 'application/json', buffer: Buffer.from('{"oi":1}') }); await a.w(800);
     check(!(await a.locator('[data-act=bkrestore]').count()), 'restauração: arquivo que não é cópia é recusado');
+    // cópia automática diária (só dados públicos): o arquivo gerado pelo robô também serve para restaurar
+    await a.act('close').catch(() => {}); const os = require('os'), cp = require('child_process'), pth = require('path'); const auto = pth.join(os.tmpdir(), 'copia-auto-e2e.json');
+    const outp = cp.execFileSync('node', [pth.join(__dirname, '..', 'backup_publico.js'), auto], { env: Object.assign({}, process.env, { FS_BASE: 'http://127.0.0.1:8080/v1/projects/' + P + '/databases/(default)/documents/' }) }).toString();
+    check(/RESULTADO: [1-9]/.test(outp) && !/FALHA/.test(outp), 'cópia automática: o robô lê as lojas sem login e gera o arquivo', outp.slice(-200));
+    await o2.reload(); await o2.w(4000); await tab(o2, 'products'); await o2.set('#pp_' + PID, '77777'); await o2.w(2500);
+    check(cfgOf(await shopDoc()).products.find(p => p.id === PID).price === 77777, 'preparação: preço alterado depois da cópia automática');
+    await a.setInputFiles('#bkFile', auto); await a.w(1500); await a.locator('[data-act=bkrestore][data-id="' + SID + '"]').click(); await a.w(5000);
+    const c2 = cfgOf(await shopDoc()); check(c2.products.find(p => p.id === PID).price === pr0 && c2.products.length === n0, 'cópia automática: restaurar a partir dela devolve produtos e preços', 'preço=' + (c2.products.find(p => p.id === PID) || {}).price + ' n=' + c2.products.length);
   }, a);
 
   sec('O. Gancho do App Check (desligado por padrão)');
@@ -402,7 +412,7 @@ const STOP = process.env.STOP || '';
 
   sec('P. Dois clientes pedindo no mesmo instante');
   await step('simultâneo', async () => {
-    const mkC = async nm => { const X = await L.open({ w: 390 }); const x = X.p; const t = new Date(); t.setUTCHours(15, 20, 0, 0); await x.clock.setFixedTime(t); await x.goto(HOST + '/'); await x.waitForFunction(() => typeof pub !== 'undefined' && document.querySelector('[data-act=open]'), null, { timeout: 20000 }).catch(() => {});
+    const mkC = async nm => { const X = await L.open({ w: 390 }); const x = X.p; const t = noite(20); await x.clock.setFixedTime(t); await x.goto(HOST + '/'); await x.waitForFunction(() => typeof pub !== 'undefined' && document.querySelector('[data-act=open]'), null, { timeout: 20000 }).catch(() => {});
       await x.locator('[data-act=open][data-pid="' + PID + '"]:visible').first().click(); await x.w(500); await x.act('addcart'); await x.act('cart'); const ct = x.locator('.sheet button:visible', { hasText: 'Continuar' }); if (await ct.count()) { await ct.first().click(); await x.w(400); } else await x.act('checkout');
       await x.locator('[data-act=mode]:visible').nth(1).click(); await x.w(400); await x.fill('[data-ck=name]', nm); await x.fill('[data-ck=phone]', '0981 999 000'); const tm = x.locator('[data-ck=time]'); if (await tm.count()) { const ov = await tm.evaluate(e => [...e.options].map(o => o.value).filter(Boolean)); if (ov.length) await tm.selectOption(ov[0]); } return X; };
     const X1 = await mkC('Simultaneo Uno'), X2 = await mkC('Simultaneo Dos'); const t0 = Date.now();
