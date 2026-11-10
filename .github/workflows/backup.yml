@@ -1,0 +1,25 @@
+name: Cópia de segurança automática
+
+# Todos os dias lê a parte pública dos catálogos e das agendas (produtos, preços, bairros, fotos) e guarda por 90 dias.
+# Só leitura: não grava nem altera nada no Firebase. Pedidos, custos e clientes são privados e NÃO entram aqui
+# (para esses, usar Admin → Copia de seguridad → Descargar copia).
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '40 7 * * *'
+
+jobs:
+  copia:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Ler os dados públicos
+        run: node tools/backup_publico.js "copia-publica-$(date -u +%F).json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: copia-publica-${{ github.run_id }}
+          path: copia-publica-*.json
+          retention-days: 90
