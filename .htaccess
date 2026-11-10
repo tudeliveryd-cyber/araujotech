@@ -15,4 +15,7 @@ ErrorDocument 404 /404.html
   <FilesMatch "\.(html|json)$">
     Header set Cache-Control "no-cache"
   </FilesMatch>
+  <FilesMatch "\.(png|jpe?g|webp|svg|ico|woff2?)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
 </IfModule>

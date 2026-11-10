@@ -73,6 +73,16 @@ jobs:
           RewriteCond %{REQUEST_FILENAME} !-d
           RewriteRule ^([a-z0-9][a-z0-9-]+)/?$ /sitio/index.php [L]
           </IfModule>
+          <IfModule mod_headers.c>
+          Header always set X-Content-Type-Options "nosniff"
+          Header always set Referrer-Policy "strict-origin-when-cross-origin"
+          <FilesMatch "\.(html|json|js)$">
+          Header set Cache-Control "no-cache"
+          </FilesMatch>
+          <FilesMatch "\.(png|jpe?g|webp|svg|ico|woff2?)$">
+          Header set Cache-Control "public, max-age=604800"
+          </FilesMatch>
+          </IfModule>
           # END araujotech-sitios
           HT
           sed -i 's/^          //' ht_new

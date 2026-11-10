@@ -1570,6 +1570,12 @@ function applyRemote(data){
 }
 async function importBookings(rows){
   let n=0;for(const r of rows){if(r.procesada||S.appts.some(a=>a.id==="rv_"+r.id))continue;
+    // La reserva la escribe cualquier visitante: se valida todo antes de guardarla en la agenda.
+    const txt=(v,n)=>String(v==null?"":v).replace(/[<>]/g,"").slice(0,n).trim();
+    r.nombre=txt(r.nombre,80);r.telefono=txt(r.telefono,30).replace(/[^0-9+ ()-]/g,"");r.profesional=txt(r.profesional,40);
+    r.servicios=(Array.isArray(r.servicios)?r.servicios:[]).slice(0,20).map(x=>txt(x,40));
+    if(!/^[A-Za-z0-9_-]{1,40}$/.test(String(r.id))||!/^\d{4}-\d{2}-\d{2}$/.test(String(r.fecha))||!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(r.hora))){try{if(FB_ON)await FA.markBooking(r.id)}catch(e){}continue}
+    r.duracion=+r.duracion>=5&&+r.duracion<=720?Math.round(+r.duracion):0;r.precio=+r.precio>0&&isFinite(+r.precio)?Math.round(+r.precio):0;
     let c=S.clients.find(x=>waNumber(x.phone)&&waNumber(x.phone)===waNumber(r.telefono));
     if(!c){c={id:uid(),name:r.nombre||"—",phone:r.telefono||"",birth:"",notes:"",created:today()};S.clients.push(c)}
     const svs=(r.servicios||[]).map(id=>S.services.find(s=>s.id===id)).filter(Boolean);
@@ -1577,7 +1583,7 @@ async function importBookings(rows){
     let proId=r.profesional&&r.profesional!=="any"?r.profesional:null;
     if(!proId){const d=toMin(r.hora);proId=(activePros().find(p=>!S.appts.some(a=>a.proId===p.id&&a.date===r.fecha&&live(a)&&d<toMin(a.start)+a.dur&&d+dur>toMin(a.start)))||activePros()[0]||{}).id}
     const items=(Array.isArray(r.productos)?r.productos:[]).map(i=>{const p=S.products.find(x=>x.id===i.id);return p?{id:p.id,name:p.name,price:p.price,qty:Math.max(1,+i.qty||1)}:null}).filter(Boolean);
-    S.appts.push({id:"rv_"+r.id,clientId:c.id,proId,serviceIds:svs.map(s=>s.id),date:r.fecha,start:r.hora,dur,price:r.precio||svs.reduce((s,v)=>s+v.price,0),status:"pending",notes:"Reserva online"+(items.length?" · "+(LG()!=="pt"?"Separar: ":"Separar: ")+items.map(i=>i.qty+"× "+i.name).join(", "):""),paid:null,deposit:0,...(items.length?{items}:{})});
+    S.appts.push({id:"rv_"+r.id,clientId:c.id,proId,serviceIds:svs.map(s=>s.id),date:r.fecha,start:r.hora,dur,price:svs.reduce((s,v)=>s+v.price,0)||r.precio,status:"pending",notes:"Reserva online"+(items.length?" · "+(LG()!=="pt"?"Separar: ":"Separar: ")+items.map(i=>i.qty+"× "+i.name).join(", "):""),paid:null,deposit:0,...(items.length?{items}:{})});
     n++;try{if(FB_ON)await FA.markBooking(r.id);else await sb.from("reservas").update({procesada:true}).eq("id",r.id)}catch(e){}}
   if(n){ui.newBookings+=n;save();if(!$("#layer").innerHTML)render()}
 }

@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Reservas</title>
-<meta name="description" content="Reservá tu turno online: elegí el servicio, el profesional y el horario.">
+<meta name="description" content="Reserve su turno online: elija el servicio, el profesional y el horario.">
 <link rel="icon" href="/agenda/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/agenda/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -401,7 +401,7 @@ async function cloudSave(){
 
 /* ---------- Perfil del negocio ---------- */
 function render(){
-  document.title=SALON.name+" · Reservas";try{document.querySelector('meta[name="description"]').content=SALON.name+" · "+(LG()==="pt"?"Reserve seu horário online: escolha o serviço, o profissional e a hora.":"Reservá tu turno online: elegí el servicio, el profesional y el horario.")}catch(e){}
+  document.title=SALON.name+" · Reservas";try{document.querySelector('meta[name="description"]').content=SALON.name+" · "+(LG()==="pt"?"Reserve seu horário online: escolha o serviço, o profissional e a hora.":"Reserve su turno online: elija el servicio, el profesional y el horario.")}catch(e){}
   const os=openStatus(), wn=waNum(SALON.phone), photos=SALON.photos||[];
   const insta=(SALON.instagram||"").replace(/^@/,"");
   let h=`<div class="cover">${(SALON.cover||photos[0])?`<img src="${esc(SALON.cover||photos[0])}" alt="">`:""}
