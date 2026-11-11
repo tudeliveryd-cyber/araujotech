@@ -133,10 +133,12 @@ ini=$(echo "$pg" | head -c 60 | tr -d '\n'); tt=$(echo "$pg" | grep -o '<title>[
 if echo "$ini" | grep -qi '^<!doctype html' && [ -n "$tt" ]; then ok "agenda-loreni (sem catálogo) -> página genérica intacta ($tt)"; else bad "agenda-loreni -> página genérica alterada: início '$ini', título '$tt'"; fi
 # ícones do navegador: cada cliente com o próprio logo (sem logo: Vitrix), nunca o ícone do Fogão Mineiro
 fm=$(curl -sS --max-time 30 https://fogaomineiro.araujotechsistemas.com/apple-touch-icon.png 2>/dev/null | md5sum | cut -c1-32)
+vx=$(curl -sS --max-time 30 -H 'Host: agenda-loreni.araujotechsistemas.com' https://agenda-loreni.araujotechsistemas.com/apple-touch-icon.png 2>/dev/null | md5sum | cut -c1-32)
 for u in https://nauticabrustolin.araujotechsistemas.com/apple-touch-icon.png https://nauticabrustolin.araujotechsistemas.com/favicon.png https://agenda-loreni.araujotechsistemas.com/apple-touch-icon.png; do
   t=$(mktemp); ct=$(curl -sS -A "$UA" --max-time 30 -o "$t" -w '%{http_code} %{content_type}' "$u" 2>/dev/null || echo 000); h=$(md5sum < "$t" | cut -c1-32); rm -f "$t"
   if ! echo "$ct" | grep -q '^200 image/'; then bad "$u -> $ct (ícone não abriu)"
   elif [ "$h" = "$fm" ]; then bad "$u -> ainda é o ícone do Fogão Mineiro"
+  elif [ "$h" = "$vx" ] && echo "$u" | grep -q nauticabrustolin; then bad "$u -> mostra o símbolo da Vitrix em vez do logo da loja"
   else ok "$u -> ícone próprio ($ct)"; fi
 done
 
