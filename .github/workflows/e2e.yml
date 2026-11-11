@@ -65,6 +65,8 @@ jobs:
           echo "######## CATÁLOGO · regras em produção (v10)";        tools/e2e/run.sh e2e_catalogo.js || F=1
           echo "######## CATÁLOGO · regras novas (v11, candidatas)";   tools/e2e/run.sh e2e_catalogo.js firestore-v11.rules || F=1
           echo "######## CATÁLOGO · regras v12 (etapa seguinte: limite de pedidos)"; tools/e2e/run.sh e2e_catalogo.js firestore-v12.rules || F=1
+          echo "######## CATÁLOGO · regras v13 (v11 + contatos pelo WhatsApp)"; tools/e2e/run.sh e2e_catalogo.js firestore-v13.rules || F=1
+          echo "######## CONTATOS PELO WHATSAPP · regras v13"; tools/e2e/run.sh e2e_cliques.js firestore-v13.rules || F=1
           echo "######## AGENDA";                                      tools/e2e/run.sh e2e_agenda.js || F=1
           echo "######## AGENDA · regras novas (v11)";                 tools/e2e/run.sh e2e_agenda.js firestore-v11.rules || F=1
           echo "######## AGENDA · regras v12";                         tools/e2e/run.sh e2e_agenda.js firestore-v12.rules || F=1

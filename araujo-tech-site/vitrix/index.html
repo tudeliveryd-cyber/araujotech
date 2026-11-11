@@ -293,6 +293,9 @@ render();
 fetch("https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/licencias/_lz?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U",{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{const F=j&&j.fields;if(!F)return;const used=+(F.used&&(F.used.integerValue||F.used.doubleValue))||0,max=+(F.max&&(F.max.integerValue||F.max.doubleValue))||20,left=Math.max(0,max-used);if(!left)LZ_ON=false;else LZ={left,max};render()}).catch(()=>{});
 </script>
 <script>
+/* contatos pelo WhatsApp (só soma 1 por clique; o dono não conta). Precisa das regras v13. */
+function clk(f){try{if(navigator.webdriver&&!window.__clk)return;try{if(localStorage.getItem('at_me')==='1')return}catch(e){}const d=new Date(),id=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),P='projects/araujotech-catalogos/databases/(default)/documents';fetch('https://firestore.googleapis.com/v1/'+P+':commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({writes:[{update:{name:P+'/cliques/'+id,fields:{}},updateMask:{fieldPaths:[]},updateTransforms:[{fieldPath:f,increment:{integerValue:'1'}}]}]})}).catch(()=>{})}catch(e){}}
+document.addEventListener('click',e=>{const a=e.target&&e.target.closest&&e.target.closest('a[href*="wa.me/"]');if(a)clk('wa')},true);
 /* contador de visitas (uma por sessão; pessoas únicas por dia). Não conta o dono (admin). */
 (function(){try{if(navigator.webdriver)return;let me=false;try{me=localStorage.getItem('at_me')==='1'}catch(e){}if(me)return;
  const d=new Date(),id=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
