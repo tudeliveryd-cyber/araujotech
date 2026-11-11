@@ -3,7 +3,8 @@ const L = require('./lib'); const P = 'araujotech-catalogos';
 const { ok, bad, info, sec, check } = L;
 const STOP = process.env.STOP || '';
 // relógio dos clientes: 22h de hoje em Asunción (local aberto e sempre depois da hora real, para o pedido do cliente ficar no topo da lista do painel)
-const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 25, min, 0)); };
+// se o teste roda depois das 22h, usa a hora real + alguns minutos (o pedido precisa ser mais novo que o estoque gravado agora)
+const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 25, min, 0); return new Date(Math.max(t, Date.now() + (min + 2) * 60e3)); };
 (async () => {
   // ---------- preparação ----------
   const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026'];
