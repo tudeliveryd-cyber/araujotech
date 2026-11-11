@@ -19,7 +19,7 @@ while IFS='|' read -r url marca; do
   rm -f "$body"
 done <<'URLS'
 https://araujotechsistemas.com/|syslogo
-https://araujotechsistemas.com/vitrix/|timeUpd
+https://araujotechsistemas.com/vitrix/|pbBind
 https://araujotechsistemas.com/catalogo-digital/|vitrix
 https://araujotechsistemas.com/img/vitrix/vitrix-blanco.png|
 https://araujotechsistemas.com/trabaja/|
