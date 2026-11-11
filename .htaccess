@@ -1,12 +1,12 @@
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
 
-# Lojas pelo subdomínio (nome.araujotechsistemas.com): a página inicial usa o catálogo genérico, não o do Fogão Mineiro
+# Lojas pelo subdomínio (nome.araujotechsistemas.com): a página inicial usa o catálogo genérico (catalogo.php = 404.html + nome e logo da loja para a prévia do link), não o do Fogão Mineiro
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteCond %{HTTP_HOST} \.araujotechsistemas\.com$ [NC]
   RewriteCond %{HTTP_HOST} !^(www\.)?fogaomineiro\.araujotechsistemas\.com$ [NC]
-  RewriteRule ^(index\.html)?$ /404.html [L]
+  RewriteRule ^(index\.html)?$ /catalogo.php [L]
 </IfModule>
 
 <IfModule mod_headers.c>

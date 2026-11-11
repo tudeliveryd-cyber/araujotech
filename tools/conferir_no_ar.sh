@@ -121,7 +121,7 @@ for u in https://nauticabrustolin.araujotechsistemas.com/catalogo.php https://na
   img=$(echo "$pg" | grep -o '<meta property="og:image" content="[^"]*"' | head -1 | cut -d'"' -f4)
   tit=$(echo "$pg" | grep -o '<meta property="og:title" content="[^"]*"' | head -1 | cut -d'"' -f4)
   if [ -z "$img" ]; then
-    case "$u" in */catalogo.php) bad "$u -> sem og:image (o PHP não rodou?)";; *) echo "INFO  | $u -> ainda sem og:image (a página principal ainda não usa o catalogo.php)";; esac
+    case "$u" in */catalogo.php) bad "$u -> sem og:image (o PHP não rodou?)";; *) bad "$u -> a página principal do cliente está sem og:image (prévia sem o logo)";; esac
     continue; fi
   hd=$(curl -sS -A "$WUA" --max-time 40 -o /dev/null -D - "$img" 2>/dev/null | tr -d '\r')
   ct=$(echo "$hd" | grep -i '^content-type:' | tail -1 | cut -d' ' -f2); st=$(echo "$hd" | head -1 | cut -d' ' -f2)
