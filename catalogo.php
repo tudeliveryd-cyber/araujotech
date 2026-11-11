@@ -38,7 +38,8 @@ function cat_meta($html, $s, $host) {
       . "<meta name=\"twitter:card\" content=\"summary\">\n";
     // ícones (o iPhone usa o ícone na prévia): logo da loja no lugar do ícone genérico
     $html = preg_replace('#<link rel="(icon|shortcut icon|apple-touch-icon)"[^>]*>\s*#', '', $html);
-    $meta .= "<link rel=\"icon\" type=\"image/jpeg\" href=\"{$e($img)}\">\n<link rel=\"apple-touch-icon\" href=\"{$e($img)}\">\n";
+    $v = substr(md5($s['logo']), 0, 10);
+    $meta .= "<link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon.png?v={$v}\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"192x192\" href=\"/icon-192.png?v={$v}\">\n<link rel=\"apple-touch-icon\" href=\"/apple-touch-icon.png?v={$v}\">\n";
   }
   $html = preg_replace('#<meta name="apple-mobile-web-app-title" content="[^"]*">#', '<meta name="apple-mobile-web-app-title" content="' . $e($s['name']) . '">', $html, 1);
   return preg_replace('#<title>[^<]*</title>#', $meta, $html, 1);

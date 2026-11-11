@@ -7,6 +7,11 @@ ErrorDocument 404 /404.html
   RewriteCond %{HTTP_HOST} \.araujotechsistemas\.com$ [NC]
   RewriteCond %{HTTP_HOST} !^(www\.)?fogaomineiro\.araujotechsistemas\.com$ [NC]
   RewriteRule ^(index\.html)?$ /catalogo.php [L]
+  # ícones do navegador nos subdomínios dos clientes: o logo da própria loja (sem logo: símbolo da Vitrix), nunca o do Fogão Mineiro
+  RewriteCond %{HTTP_HOST} \.araujotechsistemas\.com$ [NC]
+  RewriteCond %{HTTP_HOST} !^(www\.)?fogaomineiro\.araujotechsistemas\.com$ [NC]
+  RewriteCond %{HTTP_HOST} !^www\. [NC]
+  RewriteRule ^(favicon\.png|favicon\.ico|icon-192\.png|icon-512\.png|apple-touch-icon(-precomposed)?\.png)$ /logo.php?s=$1 [L,QSA]
 </IfModule>
 
 <IfModule mod_headers.c>
