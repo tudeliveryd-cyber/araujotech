@@ -26,7 +26,9 @@ https://araujotechsistemas.com/trabaja/|
 https://araujotechsistemas.com/demo/|vxMark
 https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
-https://araujotechsistemas.com/admin/|weakfix
+https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
+https://araujotechsistemas.com/demo-comida/|Sabor Casero
+https://araujotechsistemas.com/admin/|nsGuess
 https://araujotechsistemas.com/painel/|forceMc
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/sitemap.xml|
@@ -110,6 +112,20 @@ for url in https://fogaomineiro.araujotechsistemas.com/ https://teste.araujotech
   if [ "$cmp" -gt 0 ] && [ "$cmp" -le 409600 ]; then ok "$url -> primeira visita baixa ${kb} KB (alarme de crescimento em 400 KB)"; else bad "$url -> primeira visita baixa ${kb} KB (passou de 400 KB: a página cresceu)"; fi
   if [ "$rev" = "304" ]; then ok "$url -> na segunda visita o servidor responde 304 (não baixa de novo)"; else echo "INFO  | $url -> segunda visita não devolveu 304 (HTTP $rev): a página é baixada de novo, comprimida"; fi
   rm -f "$hd"
+done
+
+echo; echo "== 7. Prévia do link no WhatsApp: nome e LOGO do cliente"
+WUA="WhatsApp/2.24.1 A"
+for u in https://nauticabrustolin.araujotechsistemas.com/catalogo.php https://nauticabrustolin.araujotechsistemas.com/; do
+  pg=$(curl -sS -L -A "$WUA" --max-time 40 "$u" 2>/dev/null || true)
+  img=$(echo "$pg" | grep -o '<meta property="og:image" content="[^"]*"' | head -1 | cut -d'"' -f4)
+  tit=$(echo "$pg" | grep -o '<meta property="og:title" content="[^"]*"' | head -1 | cut -d'"' -f4)
+  if [ -z "$img" ]; then
+    case "$u" in */catalogo.php) bad "$u -> sem og:image (o PHP não rodou?)";; *) echo "INFO  | $u -> ainda sem og:image (a página principal ainda não usa o catalogo.php)";; esac
+    continue; fi
+  hd=$(curl -sS -A "$WUA" --max-time 40 -o /dev/null -D - "$img" 2>/dev/null | tr -d '\r')
+  ct=$(echo "$hd" | grep -i '^content-type:' | tail -1 | cut -d' ' -f2); st=$(echo "$hd" | head -1 | cut -d' ' -f2)
+  if [ "$st" = "200" ] && echo "$ct" | grep -q '^image/'; then ok "$u -> prévia '$tit' com o logo do cliente ($img, $ct)"; else bad "$u -> og:image $img respondeu HTTP $st ${ct}"; fi
 done
 
 echo; echo "== RESULTADO: $FALHAS falha(s)"
