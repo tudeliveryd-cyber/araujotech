@@ -193,7 +193,14 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
       const t = new Date(); t.setUTCHours(14, 0, 0, 0); await p.clock.install({ time: t });
       await p.goto(SITE + '/' + dm + '/', { waitUntil: 'load', timeout: 60000 });
       await p.waitForFunction(() => typeof pub !== 'undefined' && document.querySelector('[data-act=open]'), null, { timeout: 20000 }).catch(() => {});
-      if (!(await p.locator('[data-act=open]').count())) bad(dm + ': catálogo não carregou'); else await conferir(p, dm, true);
+      if (!(await p.locator('[data-act=open]').count())) bad(dm + ': catálogo não carregou'); else {
+        // fotos: rola a página para carregar todas e confere se alguma não abriu
+        await p.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 600) { scrollTo(0, y); await new Promise(r => setTimeout(r, 120)); } scrollTo(0, 0); });
+        await p.waitForTimeout(2500);
+        const fotos = await p.evaluate(() => { const im = [...document.images].filter(i => /unsplash/.test(i.currentSrc || i.src)); return { n: im.length, ruins: im.filter(i => i.complete && !i.naturalWidth).map(i => (i.currentSrc || i.src).split('?')[0].split('/').pop()) }; });
+        if (fotos.ruins.length) bad(dm + ': ' + fotos.ruins.length + ' de ' + fotos.n + ' fotos não abriram: ' + fotos.ruins.slice(0, 5).join(', ')); else ok(dm + ': ' + fotos.n + ' fotos abriram');
+        await conferir(p, dm, true);
+      }
     } catch (e) { bad(dm + ': ' + String(e.message).slice(0, 140)); }
     await ctx.close();
   }
