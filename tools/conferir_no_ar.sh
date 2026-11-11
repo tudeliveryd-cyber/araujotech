@@ -73,6 +73,13 @@ probe "shopUsers" 403 "lista de usuários das lojas sem login"
 probe "agendaUsers" 403 "lista de usuários das agendas sem login"
 probe "agendas/loli/state" 403 "dados internos da Agenda (clientes, caixa) sem login"
 probe "agendas/loli/reservas" 403 "reservas recebidas sem login"
+probe "cliques" 403 "contatos pelo WhatsApp (só o admin lê) sem login"
+# v13 no ar: visitante consegue somar 1 no contador de contatos (dia fixo de teste, fora dos últimos 30 dias do painel)
+cc=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -X POST "${B%/documents}/documents:commit?key=$K" \
+  -d '{"writes":[{"update":{"name":"projects/araujotech-catalogos/databases/(default)/documents/cliques/2000-01-01","fields":{}},"updateMask":{"fieldPaths":[]},"updateTransforms":[{"fieldPath":"wa","increment":{"integerValue":"1"}}]}]}' 2>/dev/null || echo 000)
+if [ "$cc" = "200" ]; then ok "regras v13 no ar: contador de contatos aceita +1 -> HTTP $cc"; else bad "regras v13: contador de contatos -> HTTP $cc (esperado 200; a v13 foi publicada?)"; fi
+cx=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -X PATCH "$B/cliques/2000-01-01?key=$K" -d '{"fields":{"wa":{"integerValue":"999"}}}' 2>/dev/null || echo 000)
+if [ "$cx" = "403" ]; then ok "regras v13: ninguém troca o número do contador -> HTTP $cx (esperado)"; else bad "regras v13: trocar o contador -> HTTP $cx (esperado 403)"; fi
 probe "visitas" 403 "contador de visitas sem login"
 
 echo; echo "== 4. Firebase do Meu Púlpito (projeto meu-pulpito-app): dados privados fechados"
