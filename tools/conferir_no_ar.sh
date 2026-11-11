@@ -58,8 +58,11 @@ done
 echo; echo "== 3. Firebase real (araujotech-catalogos): o que é público abre, o que é privado fica fechado"
 K="AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U"; B="https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents"
 probe(){ # caminho | esperado | descrição
-  code=$(curl -sS -g --max-time 30 -o /dev/null -w '%{http_code}' "$B/$1?key=$K&pageSize=1" 2>/dev/null || echo 000)
-  if [ "$code" = "$2" ]; then ok "$3 -> HTTP $code (esperado)"; else bad "$3 -> HTTP $code (esperado $2)"; fi; }
+  pb=$(mktemp); code=$(curl -sS -g --max-time 30 -o "$pb" -w '%{http_code}' "$B/$1?key=$K&pageSize=1" 2>/dev/null || echo 000)
+  if [ "$code" = "$2" ]; then ok "$3 -> HTTP $code (esperado)"
+  else msg=$(tr -d '\n' < "$pb" | grep -o '"message": *"[^"]*"' | head -1 | cut -d'"' -f4 | cut -c1-160)
+    if [ "$code" = "429" ]; then bad "$3 -> HTTP 429: o Firebase recusou por limite/cota (os dados continuam fechados). Motivo: ${msg:-sem detalhe}"
+    else bad "$3 -> HTTP $code (esperado $2)${msg:+. Motivo: $msg}"; fi; fi; rm -f "$pb"; }
 probe "shops/fogao-mineiro" 200 "catálogo público do Fogão Mineiro (leitura sem login)"
 probe "licencias/_lz" 200 "contador da promoção de lançamento (público)"
 probe "shops/fogao-mineiro/orders" 403 "pedidos dos clientes sem login"
