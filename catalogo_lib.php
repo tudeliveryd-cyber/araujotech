@@ -1,10 +1,13 @@
 <?php
 // Funções comuns do catálogo pelo subdomínio (catalogo.php e logo.php).
+// Avisos do PHP nunca vão para a página (estragariam o HTML e a imagem).
+@ini_set('display_errors', '0');
+error_reporting(0);
 function cat_http($url) {
   if (function_exists('curl_init')) {
     $c = curl_init($url);
     curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 4, CURLOPT_CONNECTTIMEOUT => 3]);
-    $r = curl_exec($c); $code = curl_getinfo($c, CURLINFO_HTTP_CODE); curl_close($c);
+    $r = curl_exec($c); $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
     return ($r !== false && $code >= 200 && $code < 300) ? $r : null;
   }
   $r = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 4]]));
