@@ -127,6 +127,10 @@ for u in https://nauticabrustolin.araujotechsistemas.com/catalogo.php https://na
   ct=$(echo "$hd" | grep -i '^content-type:' | tail -1 | cut -d' ' -f2); st=$(echo "$hd" | head -1 | cut -d' ' -f2)
   if [ "$st" = "200" ] && echo "$ct" | grep -q '^image/'; then ok "$u -> prévia '$tit' com o logo do cliente ($img, $ct)"; else bad "$u -> og:image $img respondeu HTTP $st ${ct}"; fi
 done
+# endereço sem catálogo (só sitio web ou suspenso): continua recebendo a página genérica intacta
+pg=$(curl -sS -L -A "$UA" --max-time 40 https://agenda-loreni.araujotechsistemas.com/ 2>/dev/null || true)
+ini=$(echo "$pg" | head -c 60 | tr -d '\n'); tt=$(echo "$pg" | grep -o '<title>[^<]*</title>' | head -1)
+if echo "$ini" | grep -qi '^<!doctype html' && [ -n "$tt" ]; then ok "agenda-loreni (sem catálogo) -> página genérica intacta ($tt)"; else bad "agenda-loreni -> página genérica alterada: início '$ini', título '$tt'"; fi
 
 echo; echo "== RESULTADO: $FALHAS falha(s)"
 [ "$FALHAS" = "0" ]
