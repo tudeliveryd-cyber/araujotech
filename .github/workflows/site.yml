@@ -26,7 +26,17 @@ jobs:
         if: env.SITE_FTP_USERNAME != '' && env.SITE_FTP_PASSWORD != ''
       - name: Instalar lftp
         if: env.SITE_FTP_USERNAME != '' && env.SITE_FTP_PASSWORD != ''
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+        run: |
+          # Tenta normal; se o servidor de segurança do Ubuntu estiver fora, instala a versão da distribuição (espelho principal).
+          sudo apt-get update -qq || true
+          if ! sudo apt-get install -y -qq lftp; then
+            REL=$(. /etc/os-release && echo "$VERSION_CODENAME")
+            for i in 1 2 3; do
+              sudo apt-get install -y -qq -o Acquire::Retries=3 -t "$REL" lftp && break
+              echo "tentativa $i sem sucesso; aguardando"; sleep 20; sudo apt-get update -qq || true
+            done
+          fi
+          command -v lftp
       - name: Gerar a demonstração (Casa Brasa) a partir do catálogo atual
         if: env.SITE_FTP_USERNAME != '' && env.SITE_FTP_PASSWORD != ''
         run: python3 tools/make_demo.py
