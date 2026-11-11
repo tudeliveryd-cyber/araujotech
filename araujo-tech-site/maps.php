@@ -1,7 +1,7 @@
 <?php
 // Converte um link do Google Maps (inclusive o curto maps.app.goo.gl que o iPhone compartilha) em coordenadas.
 // Usado pelo painel do local para marcar a ubicación do negócio e dos barrios. Só segue endereços do Google.
-@ini_set('display_errors', '0'); error_reporting(0);
+@ini_set('display_errors', '0'); error_reporting(0); @ini_set('serialize_precision', '-1');
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if (preg_match('#^https://([a-z0-9-]+\.)?araujotechsistemas\.com$#', $origin)) { header('Access-Control-Allow-Origin: ' . $origin); header('Vary: Origin'); }
 header('Content-Type: application/json; charset=utf-8');
