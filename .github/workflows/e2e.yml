@@ -71,6 +71,7 @@ jobs:
           echo "######## RUBRO OTRO E CATEGORIAS PRÓPRIAS · regras v13"; tools/e2e/run.sh e2e_otro.js firestore-v13.rules || F=1
           echo "######## CIDADE DO CLIENTE (Santa Rita, Santa Rosa, outra) · regras v13"; tools/e2e/run.sh e2e_cidade.js firestore-v13.rules || F=1
           echo "######## FLYER DE LANZAMIENTO DO CLIENTE · regras v13"; tools/e2e/run.sh e2e_flyer.js firestore-v13.rules || F=1
+          echo "######## UBICACIÓN DO LOCAL NO MAPA · regras v13"; tools/e2e/run.sh e2e_ubicacion.js firestore-v13.rules || F=1
           echo "######## AGENDA";                                      tools/e2e/run.sh e2e_agenda.js || F=1
           echo "######## AGENDA · regras novas (v11)";                 tools/e2e/run.sh e2e_agenda.js firestore-v11.rules || F=1
           echo "######## AGENDA · regras v12";                         tools/e2e/run.sh e2e_agenda.js firestore-v12.rules || F=1

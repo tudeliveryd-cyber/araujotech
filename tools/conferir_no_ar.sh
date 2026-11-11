@@ -28,7 +28,7 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|annDraw
+https://araujotechsistemas.com/admin/|slocgps
 https://araujotechsistemas.com/painel/|forceMc
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/sitemap.xml|
@@ -141,6 +141,9 @@ for u in https://nauticabrustolin.araujotechsistemas.com/apple-touch-icon.png ht
   elif [ "$h" = "$vx" ] && echo "$u" | grep -q nauticabrustolin; then bad "$u -> mostra o símbolo da Vitrix em vez do logo da loja"
   else ok "$u -> ícone próprio ($ct)"; fi
 done
+# leitor de link do Google Maps (ubicación do local)
+mp=$(curl -sS --max-time 30 -H 'Origin: https://nauticabrustolin.araujotechsistemas.com' -D /tmp/mp_h "https://araujotechsistemas.com/maps.php?u=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FX%2F%40-25.80%2C-54.90%2C17z%2Fdata%3D%213m1%214b1%213d-25.80555%214d-54.90777" 2>/dev/null || true)
+if echo "$mp" | grep -q '"lat":-25.80555' && grep -qi '^access-control-allow-origin: https://nauticabrustolin' /tmp/mp_h; then ok "maps.php -> lê o link do Maps ($mp)"; else bad "maps.php -> resposta inesperada: $mp"; fi
 
 echo; echo "== RESULTADO: $FALHAS falha(s)"
 [ "$FALHAS" = "0" ]
