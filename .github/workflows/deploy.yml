@@ -15,16 +15,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Instalar lftp
         run: |
-          # Tenta normal; se o servidor de segurança do Ubuntu estiver fora, instala a versão da distribuição (espelho principal).
-          sudo apt-get update -qq || true
-          if ! sudo apt-get install -y -qq lftp; then
-            REL=$(. /etc/os-release && echo "$VERSION_CODENAME")
-            for i in 1 2 3; do
-              sudo apt-get install -y -qq -o Acquire::Retries=3 -t "$REL" lftp && break
-              echo "tentativa $i sem sucesso; aguardando"; sleep 20; sudo apt-get update -qq || true
-            done
+          # Ubuntu fora do ar às vezes: tenta o apt por pouco tempo; se não der, usa o lftp num contêiner Alpine.
+          timeout 120 sudo apt-get update -qq || true
+          if ! timeout 240 sudo apt-get install -y -qq -o Acquire::Retries=2 lftp; then
+            echo "apt indisponível; usando lftp via contêiner"
+            printf 'FROM alpine:3.20\nRUN apk add --no-cache lftp ca-certificates\n' | docker build -q -t at-lftp -
+            printf '#!/bin/sh\nexec docker run --rm -i --network host -e LFTP_PASSWORD -v "$PWD:$PWD" -w "$PWD" at-lftp lftp "$@"\n' | sudo tee /usr/local/bin/lftp >/dev/null
+            sudo chmod +x /usr/local/bin/lftp
           fi
-          command -v lftp
+          lftp --version | head -1
       - name: Enviar arquivos para fogaomineiro.araujotechsistemas.com
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
