@@ -18,7 +18,7 @@ jobs:
         run: |
           npm init -y >/dev/null
           npm i playwright@1.47.2 >/dev/null
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium || npx playwright install chromium
       - name: Gerar as demos atuais
         run: python3 tools/make_demo.py
       - name: Tirar as telas

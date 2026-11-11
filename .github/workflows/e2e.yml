@@ -48,7 +48,7 @@ jobs:
           mkdir -p ferramentas/sdk && cd ferramentas
           npm init -y >/dev/null
           npm i firebase-tools@13.29.1 playwright@1.49.1 >/dev/null 2>&1
-          npx playwright install --with-deps chromium >/dev/null
+          npx playwright install --with-deps chromium >/dev/null || { echo "dependências do sistema indisponíveis no momento; instalando só o navegador"; npx playwright install chromium >/dev/null; }
           for f in firebase-app.js firebase-firestore.js firebase-auth.js firebase-app-compat.js firebase-firestore-compat.js firebase-auth-compat.js; do curl -sf -o sdk/$f https://www.gstatic.com/firebasejs/10.12.2/$f; done
           curl -sf -o sdk/zxing.min.js https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js || true
       - name: Rodar os testes
@@ -68,6 +68,7 @@ jobs:
           echo "######## CATÁLOGO · regras v13 (v11 + contatos pelo WhatsApp)"; tools/e2e/run.sh e2e_catalogo.js firestore-v13.rules || F=1
           echo "######## CONTATOS PELO WHATSAPP · regras v13"; tools/e2e/run.sh e2e_cliques.js firestore-v13.rules || F=1
           echo "######## COBRANÇA COM DADOS DE PAGAMENTO · regras v13"; tools/e2e/run.sh e2e_cobro.js firestore-v13.rules || F=1
+          echo "######## RUBRO OTRO E CATEGORIAS PRÓPRIAS · regras v13"; tools/e2e/run.sh e2e_otro.js firestore-v13.rules || F=1
           echo "######## AGENDA";                                      tools/e2e/run.sh e2e_agenda.js || F=1
           echo "######## AGENDA · regras novas (v11)";                 tools/e2e/run.sh e2e_agenda.js firestore-v11.rules || F=1
           echo "######## AGENDA · regras v12";                         tools/e2e/run.sh e2e_agenda.js firestore-v12.rules || F=1
