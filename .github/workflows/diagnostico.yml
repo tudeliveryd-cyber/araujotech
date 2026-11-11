@@ -1,0 +1,28 @@
+name: Diagnóstico de loja
+
+# Só leitura: mede o tamanho dos dados de uma loja real e o tempo da tela de login do painel.
+on:
+  workflow_dispatch:
+    inputs:
+      loja:
+        description: 'Endereço da loja (ex.: nauticabrustolin)'
+        default: 'nauticabrustolin'
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar o navegador
+        run: |
+          npm init -y >/dev/null
+          npm i playwright@1.49.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null || npx playwright install chromium >/dev/null
+      - name: Diagnóstico
+        env:
+          LOJA: ${{ inputs.loja }}
+        run: node tools/diag_loja.js
