@@ -3,11 +3,11 @@
 <head>
 <script>
 /* logo: corta as sobras brancas/transparentes desiguais e centraliza com a mesma margem dos lados */
-(function(){const cache={};
- function trim(img){if(img.dataset.tr)return;img.dataset.tr='1';const src=img.getAttribute('src')||'';if(!/^data:image\//.test(src))return;if(cache[src]){if(cache[src]!==src)img.src=cache[src];return}
+(function(){const cache={},FULL={};
+ function trim(img){if(img.dataset.tr)return;img.dataset.tr='1';const src=img.getAttribute('src')||'';if(!/^data:image\//.test(src))return;if(cache[src]){if(cache[src]!==src)img.src=cache[src];if(FULL[src])img.classList.add('full');return}
   const go=()=>{try{const w=img.naturalWidth,h=img.naturalHeight;if(!w||!h||w*h>4e6)return;const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(img,0,0);const d=x.getImageData(0,0,w,h).data;
    let t=h,l=w,r=-1,b=-1;for(let y=0;y<h;y++)for(let i=0;i<w;i++){const k=(y*w+i)*4;if(d[k+3]<20)continue;if(d[k]>238&&d[k+1]>238&&d[k+2]>238)continue;if(i<l)l=i;if(i>r)r=i;if(y<t)t=y;if(y>b)b=y}
-   if(r<0){cache[src]=src;return}const cw=r-l+1,ch=b-t+1;if(cw>w*.97&&ch>h*.97){cache[src]=src;return}
+   if(r<0){cache[src]=src;return}const cw=r-l+1,ch=b-t+1;if(cw>w*.97&&ch>h*.97){cache[src]=src;const op=(i,j)=>d[(j*w+i)*4+3]>200;if(op(1,1)&&op(w-2,1)&&op(1,h-2)&&op(w-2,h-2)){FULL[src]=1;img.classList.add('full')}return}
    const o=document.createElement('canvas');o.width=cw;o.height=ch;o.getContext('2d').drawImage(c,l,t,cw,ch,0,0,cw,ch);const u=o.toDataURL('image/png');cache[src]=u;img.src=u}catch(e){cache[src]=src}};
   if(img.complete&&img.naturalWidth)go();else img.addEventListener('load',go,{once:true})}
  const scan=root=>{(root.querySelectorAll?root:document).querySelectorAll('.logo img').forEach(trim)};
@@ -126,7 +126,9 @@ a.btn{text-decoration:none}
 .pcard.off .pbadge{background:color-mix(in srgb,var(--t-text) 75%,transparent);color:var(--t-bg)}
 .fcard .ph.short{aspect-ratio:5/2}
 .logo{width:68px;height:68px;border-radius:18px;flex:none;background:var(--t-primary);color:var(--t-primary-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:24px;overflow:hidden;border:3px solid color-mix(in srgb,var(--t-header-ink) 18%,transparent)}
-.logo img{width:100%;height:100%;object-fit:contain;background:#fff;padding:3px}.chead-in .logo img{padding:9px}.chead-in .logo:has(img){width:auto!important;height:auto!important;display:block}.chead-in .logo:has(img) img{display:block;height:104px;width:auto;max-width:min(250px,76vw);object-fit:contain}@container (max-width:520px){.chead-in .logo:has(img) img{height:84px}}
+.logo img{width:100%;height:100%;object-fit:contain;background:#fff;padding:3px}.chead-in .logo img{padding:9px}
+/* logo que ocupa o quadro inteiro (fundo próprio): sem margem branca, os cantos seguem o arredondado do quadro */
+.logo img.full{padding:0!important;object-fit:cover;background:transparent}.chead-in .logo:has(img){width:auto!important;height:auto!important;display:block}.chead-in .logo:has(img) img{display:block;height:104px;width:auto;max-width:min(250px,76vw);object-fit:contain}@container (max-width:520px){.chead-in .logo:has(img) img{height:84px}}
 .logo:has(img){background:#fff}
 .chead h1{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,5cqi,32px);line-height:1.05;margin:0;letter-spacing:-.02em;text-wrap:balance}
 .chead p{margin:4px 0 8px;opacity:.82;font-size:14px}
