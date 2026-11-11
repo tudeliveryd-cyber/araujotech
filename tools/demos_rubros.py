@@ -306,6 +306,32 @@ def D(folder, shop, ver, ramo, name, slogan, desc, logo_, cover, coupon, theme, 
     d.update(kw); return d
 
 DEMOS += [
+ # ---------------- CAZA, PESCA Y NÁUTICA ----------------
+ D('demo-pesca', 'puerto-dorado', 'pd1', 'pesca', 'Puerto Dorado', P('Pesca, náutica e guarda de barcos', 'Pesca, náutica y guardería de lanchas'),
+   'Catálogo de demostración para casas de pesca y náuticas: reeles, cañas, carnadas y guardería de lanchas.',
+   logo('#0B1F2A', '#F59E0B', '#F0F9FF', "<path d='M150 40v36a14 14 0 0 1-28 0'/><path d='M150 40l-6 8M150 40l6 8'/><path d='M114 100c12 8 24 8 36 0s24-8 36 0'/>", 'PUERTO DORADO', 'PESCA · NÁUTICA', 26),
+   'photo-1651646783581-ced83b545876', 'PESCA10', TH('#0E7490', '#0B1F2A', '#0E7490', '#F2F7F8', '#F59E0B'),
+   [C('pesca', 'Pesca', 'Pesca', 'fish'), C('iscas', 'Iscas', 'Carnadas', 'star'), C('nautica', 'Náutica', 'Náutica', 'tag'), C('guarda', 'Guarda de barcos', 'Guardería de lanchas', 'box')],
+   lambda: [
+    pr('p1', 'pesca', 'Molinete', 'Reel', 'Para rio e lago, várias capacidades.', 'Para río y lago, varias capacidades.', 250000, 'photo-1537872384762-e785271d14f8', best=True, feat=True,
+       g=[G('cp', 'Tamanho', 'Tamaño', [('2000', '2000'), ('3000', '3000', 30000), ('4000', '4000', 60000)])]),
+    pr('p2', 'pesca', 'Vara com molinete', 'Caña con reel', 'Conjunto pronto para pescar.', 'Equipo listo para pescar.', 380000, 'photo-1535036997436-f088d7774803', promo=340000),
+    pr('p3', 'pesca', 'Linha de pesca 100 m', 'Tanza 100 m', 'Monofilamento resistente.', 'Monofilamento resistente.', 35000, 'photo-1787293142253-549462706621',
+       g=[G('es', 'Espessura', 'Grosor', [('0,30 mm', '0,30 mm'), ('0,40 mm', '0,40 mm'), ('0,50 mm', '0,50 mm')])]),
+    pr('p4', 'pesca', 'Anzóis (caixa)', 'Anzuelos (caja)', 'Caixa com tamanhos variados.', 'Caja con tamaños surtidos.', 25000, 'photo-1714880003292-17685b9999b6'),
+    pr('p5', 'pesca', 'Boias e chumbadas', 'Boyas y plomadas', 'Kit com boias e chumbadas.', 'Kit de boyas y plomadas.', 30000, 'photo-1783464553842-96bec1c4d8e7'),
+    pr('i1', 'iscas', 'Isca viva', 'Carnada viva', 'Lambari e tuvira. Peça com antecedência.', 'Mojarra y morenita. Pedí con anticipación.', 20000, 'photo-1585547065687-075e6b6bbd46', best=True,
+       g=[G('ti', 'Tipo', 'Tipo', [('Lambari (dúzia)', 'Mojarra (docena)'), ('Tuvira (dúzia)', 'Morenita (docena)', 10000)])]),
+    pr('i2', 'iscas', 'Isca artificial', 'Señuelo', 'Cores variadas, para dourado e pintado.', 'Colores surtidos, para dorado y surubí.', 45000, 'photo-1679426294035-b6a985d32b67', feat=True),
+    pr('n1', 'nautica', 'Colete salva-vidas', 'Chaleco salvavidas', 'Homologado, adulto e infantil.', 'Homologado, adulto y niño.', 150000, 'photo-1674088690608-bdddd5dd1b8c',
+       g=[G('tl', 'Tamanho', 'Talle', [('Infantil', 'Niño'), ('Adulto M', 'Adulto M'), ('Adulto G', 'Adulto L')])]),
+    pr('g1', 'guarda', 'Guarda de barco (mensal)', 'Guardería de lancha (mensual)', 'Lugar coberto, com retirada e devolução na água.', 'Lugar techado, con bajada y subida al agua.', 400000, 'photo-1639933571071-4af0e85efacf', feat=True,
+       g=[G('tb', 'Tamanho do barco', 'Tamaño de la lancha', [('Até 5 m', 'Hasta 5 m'), ('5 a 7 m', '5 a 7 m', 150000), ('Mais de 7 m', 'Más de 7 m', 300000)])]),
+    pr('g2', 'guarda', 'Guarda por dia', 'Guardería por día', 'Para quem vem pescar no fim de semana.', 'Para quien viene a pescar el fin de semana.', 50000, 'photo-1651646783581-ced83b545876'),
+   ],
+   [('Guarde seu barco conosco', 'Guardá tu lancha con nosotros', 'Lugar coberto, por mês ou por dia', 'Lugar techado, por mes o por día', 'g1', '#0B1F2A', 'photo-1639933571071-4af0e85efacf'),
+    ('Iscas para o fim de semana', 'Carnadas para el finde', 'Peça antes e retire ao chegar', 'Pedí antes y retirá al llegar', 'i1', '#0E7490', 'photo-1585547065687-075e6b6bbd46')],
+   cards='tiles', hours=['06:00', '19:00'], sun=True, prep=30),
  # ---------------- RESTAURANTE (comida casera / menú del día) ----------------
  D('demo-comida', 'sabor-casero', 'sc1', 'restaurante', 'Sabor Casero', P('Comida caseira, prato do dia e delivery', 'Comida casera, menú del día y delivery'),
    'Catálogo de demostración para restaurantes: menú del día, platos, pastas, bebidas y postres con delivery por WhatsApp.',
