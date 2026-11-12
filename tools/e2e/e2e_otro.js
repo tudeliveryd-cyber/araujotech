@@ -24,7 +24,7 @@ const { info, sec, check } = L;
 
   sec('C. "Otro" sem rubro parecido: cria com as categorias escritas');
   await a.locator('[data-act=nsramo][data-r=otro]').click(); await a.w(300);
-  await a.locator('#ns_segc').fill('Estudio de tatuajes'); await a.w(300);
+  await a.locator('#ns_segc').fill('Escuela de idiomas'); await a.w(300);
   const sug2 = (await a.txt('#nsSug')).replace(/\s+/g, ' ');
   check(/No hay un rubro parecido/.test(sug2), 'avisa que não há rubro parecido', sug2);
   await a.set('#ns_name', 'Tattoo Ink E2E'); await a.w(200);
@@ -35,7 +35,7 @@ const { info, sec, check } = L;
   info('criado: ' + JSON.stringify(r));
   check(r && JSON.stringify(r.cats) === '["Tatuajes","Piercing","Cuidados"]', 'catálogo criado com as 3 categorias escritas');
   check(r && r.prods === 0, 'sem produtos de outro rubro (para cadastrar os próprios)');
-  check(r && r.seg && r.seg.es === 'Estudio de tatuajes', 'o rubro escrito aparece no cliente');
+  check(r && r.seg && r.seg.es === 'Escuela de idiomas', 'o rubro escrito aparece no cliente');
 
   sec('D. "Otro" sem categorias: continua como antes');
   await a.act('newshop'); await a.w(400);
