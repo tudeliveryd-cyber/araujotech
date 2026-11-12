@@ -31,6 +31,7 @@ function cat_shop($id) {
         'slogan' => is_array($sl) ? (string)($sl['es'] ?? ($sl['pt'] ?? '')) : (string)$sl,
         'logo' => (string)($st['logo'] ?? ''),
         'n' => (int)($f['mediaCount']['integerValue'] ?? 0),
+        'cfg' => (string)($f['cfg']['stringValue'] ?? ''),   // o catálogo abre já com estes dados, sem esperar a nuvem
       ];
       if ($out['name'] === '') $out = [];
     }

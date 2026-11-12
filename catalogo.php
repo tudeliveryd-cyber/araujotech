@@ -12,7 +12,13 @@ try {
   $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
   if (preg_match('/^([a-z0-9][a-z0-9-]{1,60})\.araujotechsistemas\.com$/', $host, $m)) {
     $shop = cat_shop($m[1]);
-    if ($shop) $html = cat_meta($html, $shop, $host);
+    if ($shop) {
+      $html = cat_meta($html, $shop, $host);
+      if (!empty($shop['cfg']) && strlen($shop['cfg']) < 400000) {
+        $pre = '<script>window.TDC_PRE=' . json_encode(['id' => $shop['id'], 'cfg' => $shop['cfg']], JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+        $html = preg_replace('#</head>#i', $pre . '</head>', $html, 1);
+      }
+    }
   }
 } catch (Throwable $e) { /* segue com o html normal */ }
 echo $html;

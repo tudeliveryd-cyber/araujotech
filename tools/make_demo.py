@@ -139,8 +139,8 @@ def build(seed_tpl, logo_svg, out, title, ogtitle, url, desc):
     # login do painel da demo: usuário demo / senha demo (aparece escrito na tela)
     rep("const sh=curShop(),cu=(sh&&sh.user)||(SHOP===FM?'fogaomineiro':''),cp=(sh&&sh.pass)||'';",
         "const sh=curShop(),cu=window.TDC_DEMO?'demo':((sh&&sh.user)||(SHOP===FM?'fogaomineiro':'')),cp=window.TDC_DEMO?'demo':((sh&&sh.pass)||'');")
-    rep("<h2>${t('nav_admin')}</h2><p>${esc(st.name)} · ${t('login_sub')}</p></div>",
-        "<h2>${t('nav_admin')}</h2><p>${esc(st.name)} · ${t('login_sub')}</p>${window.TDC_DEMO?`<p class=\"demo-hint\">${lang==='pt'?'Demonstração':'Demostración'} · ${lang==='pt'?'Usuário':'Usuario'}: <b>demo</b> · ${lang==='pt'?'Senha':'Contraseña'}: <b>demo</b></p>`:''}</div>")
+    rep("<h2>${t('nav_admin')}</h2><p>${ok?esc(st.name)+' · ':''}${t('login_sub')}</p></div>",
+        "<h2>${t('nav_admin')}</h2><p>${ok?esc(st.name)+' · ':''}${t('login_sub')}</p>${window.TDC_DEMO?`<p class=\"demo-hint\">${lang==='pt'?'Demonstração':'Demostración'} · ${lang==='pt'?'Usuário':'Usuario'}: <b>demo</b> · ${lang==='pt'?'Senha':'Contraseña'}: <b>demo</b></p>`:''}</div>")
     # demo: botões para voltar aos exemplos e ao início do site
     rep('<span class="spacer"></span>',
         '<span class="spacer"></span><nav class="dnav">'
