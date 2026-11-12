@@ -7,6 +7,9 @@ on:
       loja:
         description: 'Endereço da loja (ex.: nauticabrustolin)'
         default: 'nauticabrustolin'
+      maps:
+        description: 'Link de mapa para testar a leitura da ubicación (opcional)'
+        default: ''
 
 jobs:
   diag:
@@ -14,6 +17,13 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Ler link de mapa
+        if: ${{ inputs.maps != '' }}
+        env:
+          U: ${{ inputs.maps }}
+        run: |
+          echo "redirecionamentos:"; curl -sS -o /dev/null -L --max-redirs 6 -w '%{url_effective}\n' -A 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)' "$U" || true
+          echo "maps.php:"; curl -sS --max-time 40 -G --data-urlencode "u=$U" https://araujotechsistemas.com/maps.php; echo
       - uses: actions/setup-node@v4
         with:
           node-version: 22

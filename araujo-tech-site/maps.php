@@ -1,5 +1,5 @@
 <?php
-// Converte um link do Google Maps (inclusive o curto maps.app.goo.gl que o iPhone compartilha) em coordenadas.
+// Converte um link do Google Maps ou do Apple Maps (inclusive os curtos maps.app.goo.gl e maps.apple/p/...) em coordenadas.
 // Usado pelo painel do local para marcar a ubicación do negócio e dos barrios. Só segue endereços do Google.
 @ini_set('display_errors', '0'); error_reporting(0); @ini_set('serialize_precision', '-1');
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -9,11 +9,12 @@ header('Cache-Control: no-store');
 function out($a) { echo json_encode($a); exit; }
 function coords($s) {
   $s = urldecode($s);
-  $pats = ['#!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)#', '#@(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)#', '#[?&](?:q|query|ll|center|destination)=(-?\d{1,2}\.\d+),\s*\+?(-?\d{1,3}\.\d+)#', '#/(?:search|place|dir)/(-?\d{1,2}\.\d+),\s*\+?(-?\d{1,3}\.\d+)#'];
+  $pats = ['#!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)#', '#@(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)#', '#[?&](?:q|query|ll|center|destination)=(-?\d{1,2}\.\d+),\s*\+?(-?\d{1,3}\.\d+)#', '#/(?:search|place|dir)/(-?\d{1,2}\.\d+),\s*\+?(-?\d{1,3}\.\d+)#', '#[?&](?:coordinate|sll|daddr)=(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)#',
+    '#place:location:latitude"\s+content="(-?\d{1,2}\.\d+)"[^>]*>\s*<meta[^>]+place:location:longitude"\s+content="(-?\d{1,3}\.\d+)#', '#"latitude"\s*:\s*(-?\d{1,2}\.\d+)\s*,\s*"longitude"\s*:\s*(-?\d{1,3}\.\d+)#'];
   foreach ($pats as $p) if (preg_match($p, $s, $m)) { $la = (float)$m[1]; $ln = (float)$m[2]; if (abs($la) <= 90 && abs($ln) <= 180) return ['lat' => $la, 'lng' => $ln]; }
   return null;
 }
-function google_host($u) { $h = strtolower((string)parse_url($u, PHP_URL_HOST)); return (bool)preg_match('#^(maps\.app\.goo\.gl|goo\.gl|(www\.|maps\.)?google\.[a-z.]{2,8})$#', $h) && strtolower((string)parse_url($u, PHP_URL_SCHEME)) === 'https'; }
+function google_host($u) { $h = strtolower((string)parse_url($u, PHP_URL_HOST)); return (bool)preg_match('#^(maps\.app\.goo\.gl|goo\.gl|(www\.|maps\.)?google\.[a-z.]{2,8}|maps\.apple|maps\.apple\.com|(beta\.)?maps\.apple\.com)$#', $h) && strtolower((string)parse_url($u, PHP_URL_SCHEME)) === 'https'; }
 $u = trim((string)($_GET['u'] ?? ''));
 if (preg_match('#https?://\S+#', $u, $mm)) $u = $mm[0];      // aceita o texto inteiro compartilhado ("Local X https://maps.app.goo.gl/...")
 if ($c = coords($u)) out($c);
