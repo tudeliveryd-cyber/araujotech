@@ -5,6 +5,7 @@ const KEY = 'AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U';
 const FS = 'https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents';
 const kb = n => Math.round(n / 1024) + ' KB';
 (async () => {
+  if (/^\*/.test(LOJA)) { const q = LOJA.slice(1).toLowerCase(); let tok = '', ids = []; do { const r = await (await fetch(FS + '/shops?pageSize=300&mask.fieldPaths=status' + (tok ? '&pageToken=' + tok : '') + '&key=' + KEY)).json(); (r.documents || []).forEach(d => ids.push(d.name.split('/').pop())); tok = r.nextPageToken || ''; if (r.error) { console.log('erro: ' + JSON.stringify(r.error).slice(0, 200)); break; } } while (tok); console.log('lojas (' + ids.length + '): ' + ids.filter(i => !q || i.includes(q)).join(', ')); return; }
   const t0 = Date.now(); const r = await fetch(FS + '/shops/' + LOJA + '?key=' + KEY); const txt = await r.text();
   console.log('loja ' + LOJA + ': HTTP ' + r.status + ', documento ' + kb(txt.length) + ' em ' + (Date.now() - t0) + ' ms');
   let n = 0; try { const f = JSON.parse(txt).fields || {}; n = +(f.mediaCount && f.mediaCount.integerValue || 0); console.log('campos: ' + Object.keys(f).map(k => k + ':' + kb(JSON.stringify(f[k]).length)).join(', ')); } catch (e) {}
