@@ -24,16 +24,18 @@ const OUT = process.env.FLYER_OUT || '';
   sec('B. Botão "Crear flyer" gera story e post');
   check(await a.locator('[data-act=annfly][data-sid="' + sid + '"]').count() === 1, 'botão "Crear flyer" no cartão do cliente');
   await a.locator('[data-act=annfly][data-sid="' + sid + '"]').click();
-  await a.waitForFunction(() => window.ui && ui.ann && ui.ann.out && ui.ann.out.story && document.querySelectorAll('.sheet img[alt]').length >= 2, null, { timeout: 30000 }).catch(() => {});
-  const r = await a.evaluate(() => { const o = ui.ann && ui.ann.out || {}; const dim = u => new Promise(res => { const i = new Image(); i.onload = () => res([i.width, i.height]); i.onerror = () => res(null); i.src = u; }); return Promise.all([dim(o.story || ''), dim(o.post || '')]).then(d => ({ story: d[0], post: d[1], s: o.story || '', p: o.post || '' })); });
+  await a.waitForFunction(() => window.ui && ui.ann && ui.ann.out && ui.ann.out.story && document.querySelectorAll('.sheet img[alt]').length >= 4, null, { timeout: 30000 }).catch(() => {});
+  const r = await a.evaluate(() => { const o = ui.ann && ui.ann.out || {}; const dim = u => new Promise(res => { const i = new Image(); i.onload = () => res([i.width, i.height]); i.onerror = () => res(null); i.src = u; }); return Promise.all([dim(o.story || ''), dim(o.post || ''), dim(o.door || ''), dim(o.table || '')]).then(d => ({ story: d[0], post: d[1], door: d[2], table: d[3], s: o.story || '', p: o.post || '', dr: o.door || '', tb: o.table || '' })); });
   check(r.story && r.story[0] === 1080 && r.story[1] === 1920, 'story 1080×1920', JSON.stringify(r.story));
   check(r.post && r.post[0] === 1080 && r.post[1] === 1350, 'post 1080×1350', JSON.stringify(r.post));
-  check(await a.locator('[data-act=anndl]').count() === 2, 'dois botões de baixar/compartilhar');
-  if (OUT) { fs.writeFileSync(OUT + '-story-es.png', Buffer.from(r.s.split(',')[1], 'base64')); fs.writeFileSync(OUT + '-post-es.png', Buffer.from(r.p.split(',')[1], 'base64')); }
+  check(r.door && r.door[0] === 2400 && r.door[1] === 2400, 'adesivo da porta 2400×2400 (20 cm a 300 dpi)', JSON.stringify(r.door));
+  check(r.table && r.table[0] === 1240 && r.table[1] === 1748, 'placa da mesa 1240×1748 (A6 a 300 dpi)', JSON.stringify(r.table));
+  check(await a.locator('[data-act=anndl]').count() === 4, 'quatro botões de baixar/compartilhar');
+  if (OUT) { fs.writeFileSync(OUT + '-story-es.png', Buffer.from(r.s.split(',')[1], 'base64')); fs.writeFileSync(OUT + '-post-es.png', Buffer.from(r.p.split(',')[1], 'base64')); fs.writeFileSync(OUT + '-door-es.png', Buffer.from(r.dr.split(',')[1], 'base64')); fs.writeFileSync(OUT + '-table-es.png', Buffer.from(r.tb.split(',')[1], 'base64')); }
 
   sec('C. Versão em português');
   await a.locator('[data-act=annlang][data-l=pt]').click();
-  await a.waitForFunction(() => document.querySelector('[data-act=annlang][data-l=pt][aria-pressed=true]') && document.querySelectorAll('.sheet img[alt]').length >= 2, null, { timeout: 30000 }).catch(() => {});
+  await a.waitForFunction(() => document.querySelector('[data-act=annlang][data-l=pt][aria-pressed=true]') && document.querySelectorAll('.sheet img[alt]').length >= 4, null, { timeout: 30000 }).catch(() => {});
   const pt = await a.evaluate(() => ui.ann && ui.ann.out.story || '');
   check(pt && pt !== r.s, 'arte em português gerada');
   if (OUT && pt) fs.writeFileSync(OUT + '-story-pt.png', Buffer.from(pt.split(',')[1], 'base64'));

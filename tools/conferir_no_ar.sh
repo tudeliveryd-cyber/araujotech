@@ -28,7 +28,7 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|slocgps
+https://araujotechsistemas.com/admin/|annPrint
 https://araujotechsistemas.com/painel/|forceMc
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/sitemap.xml|
