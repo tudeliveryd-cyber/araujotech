@@ -23,5 +23,22 @@ const kb = n => Math.round(n / 1024) + ' KB';
     console.log('[' + net + ' ' + path + '] página carregou em ' + tl + ' ms; botão Ingresar pronto em ' + (pronto < 0 ? 'NUNCA (90 s)' : pronto + ' ms') + (errs.length ? '; avisos: ' + errs.slice(0, 5).join(' | ') : ''));
     await ctx.close();
   }
+
+  // catálogo: tempo até o nome da loja aparecer e até as imagens carregarem; maiores downloads
+  for (const net of ['rápida', '4G lento']) {
+    const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const p = await ctx.newPage(); const reqs = [];
+    p.on('response', async x => { try { const h = await x.headerValue('content-length'); const enc = await x.headerValue('content-encoding'); reqs.push([x.url().slice(0, 90), +(h || 0), enc || '', x.status()]); } catch (e) {} });
+    if (net !== 'rápida') { const c = await ctx.newCDPSession(p); await c.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 1.5e6 / 8, uploadThroughput: 750e3 / 8 }); }
+    const t = Date.now(); await p.goto('https://' + LOJA + '.araujotechsistemas.com/', { waitUntil: 'domcontentloaded', timeout: 90000 }); const tdom = Date.now() - t;
+    let tname = -1, tprod = -1;
+    try { await p.waitForFunction(() => { const h = document.querySelector('.chead h1'); return h && h.textContent.trim().length > 0; }, null, { timeout: 60000 }); tname = Date.now() - t; } catch (e) {}
+    try { await p.waitForFunction(() => document.querySelectorAll('.pcard').length > 0, null, { timeout: 60000 }); tprod = Date.now() - t; } catch (e) {}
+    await p.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => {}); const tall = Date.now() - t;
+    console.log('[catálogo ' + net + '] html pronto ' + tdom + ' ms; nome da loja ' + tname + ' ms; produtos ' + tprod + ' ms; tudo carregado ' + tall + ' ms');
+    reqs.sort((a, b) => b[1] - a[1]); reqs.slice(0, 8).forEach(r => console.log('   ' + Math.round(r[1] / 1024) + ' KB ' + (r[2] || 'sem compressão') + ' ' + r[3] + ' ' + r[0]));
+    // segunda visita (cache)
+    const t2 = Date.now(); await p.goto('https://' + LOJA + '.araujotechsistemas.com/', { waitUntil: 'domcontentloaded' }); try { await p.waitForFunction(() => document.querySelectorAll('.pcard').length > 0, null, { timeout: 60000 }); } catch (e) {} console.log('   segunda visita: produtos em ' + (Date.now() - t2) + ' ms');
+    await ctx.close();
+  }
   await b.close();
 })();
