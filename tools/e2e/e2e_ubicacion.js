@@ -52,6 +52,18 @@ const { info, sec, check } = L;
   await o.w(3500);
   const d = L.unfields((await L.fsReq(P, 'GET', 'shops/' + shop.id, 'owner')).json) || {}; const cs = JSON.parse(d.cfg || '{}').store || {};
   check(cs.lat === -25.79 && cs.lng === -55.08 && cs.locSet === true, 'ubicación salva no catálogo da nuvem', JSON.stringify({ lat: cs.lat, lng: cs.lng, set: cs.locSet }));
+
+  sec('E. Mensagem automática do WhatsApp (texto pronto com o link)');
+  await O.ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: HOST }).catch(() => {});
+  await o.evaluate(() => { ui.tab = 'resumo'; render(); }); await o.w(600);
+  const wm = await o.evaluate(() => { const e = document.getElementById('waMsg'); return e ? e.value : ''; });
+  check(/Ubicacion E2E/.test(wm) && wm.includes(shop.id + '.araujotechsistemas.com') && /(menú|catálogo) con fotos/.test(wm), 'mensagem com o nome da loja e o link do catálogo', wm.replace(/\n/g, ' | ').slice(0, 300));
+  await o.locator('[data-act=walg][data-l=pt]').click(); await o.w(400);
+  const wp = await o.evaluate(() => document.getElementById('waMsg').value);
+  check(/Obrigado por escrever/.test(wp), 'versão em português');
+  await o.act('wacopy'); await o.w(500);
+  const clip = await o.evaluate(() => navigator.clipboard.readText().catch(() => ''));
+  check(clip === wp, 'botão copia a mensagem', clip.slice(0, 60));
   check(!o.errs.length, 'sem erros de JavaScript', o.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
