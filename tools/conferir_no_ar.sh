@@ -19,7 +19,7 @@ while IFS='|' read -r url marca; do
   rm -f "$body"
 done <<'URLS'
 https://araujotechsistemas.com/|clientes.js?v=3
-https://araujotechsistemas.com/vitrix/|vxClientes
+https://araujotechsistemas.com/vitrix/|demo-autos
 https://araujotechsistemas.com/catalogo-digital/|vitrix
 https://araujotechsistemas.com/img/vitrix/vitrix-blanco.png|
 https://araujotechsistemas.com/trabaja/|
@@ -157,6 +157,9 @@ try:
   print(" | ".join(x["mapValue"]["fields"]["name"]["stringValue"]+" ("+x["mapValue"]["fields"]["sys"]["stringValue"]+")" for x in v))
 except Exception as e: print("")' 2>/dev/null || true)
 if [ -n "$vc" ]; then ok "vitrine de clientes no site -> $vc"; else echo "AVISO | vitrine de clientes ainda vazia (abrir o Panel Araújo Tech publica a lista)"; fi
+# fotos da demo de autos (Unsplash): todas abrem
+ua=$(curl -sS --max-time 30 "https://araujotechsistemas.com/demo-autos/" 2>/dev/null | grep -o 'https://images.unsplash.com/photo-[0-9a-f-]*' | sort -u)
+if [ -z "$ua" ]; then bad "demo-autos -> nenhuma foto encontrada"; else nb=0; nt=0; for u in $ua; do nt=$((nt+1)); c=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$u?w=400" 2>/dev/null || true); [ "$c" = "200" ] || { nb=$((nb+1)); echo "   foto com problema: $u -> $c"; }; done; if [ "$nb" = 0 ]; then ok "demo-autos -> as $nt fotos abrem"; else bad "demo-autos -> $nb de $nt fotos não abrem"; fi; fi
 # vídeo do produto: o servidor responde, recusa envio sem login e aceita a origem do painel
 vp=$(curl -sS --max-time 20 "https://teste.araujotechsistemas.com/video.php?op=ping" 2>/dev/null || true)
 if echo "$vp" | grep -q '"ok":true' && echo "$vp" | grep -q '"curl":true' && echo "$vp" | grep -q '"w":true'; then ok "video.php -> no ar ($vp)"; else bad "video.php -> resposta inesperada: $vp"; fi

@@ -144,6 +144,7 @@ def seed_js(d):
         'name': d['name'], 'slogan': d['slogan'], 'ramo': d['ramo'], 'cover': U(d['cover'], 1600), 'coupon': d['coupon'],
         'minOrder': d.get('minOrder', 0), 'theme': d['theme'], 'cats': d['cats'], 'products': d['prods'](),
         'slides': [SL(*s[:4], s[4], s[5], s[6]) for s in d['slides']],
+        'mode': d.get('mode', ''), 'delivery': d.get('delivery', True),
         'cards': d.get('cards', 'tiles'), 'sched': d.get('sched', False), 'hours': d.get('hours', ['08:00', '19:00']), 'sun': d.get('sun', False), 'prep': d.get('prep', 30),
     }
     data = json.dumps(cfg, ensure_ascii=False)
@@ -154,7 +155,7 @@ def seed_js(d):
             " s.address='Santa Rita, Alto Paraná';s.whatsapp='595982086171';s.prep=D.prep;s.etaPad=20;s.minOrder=D.minOrder;s.paused=false;s.allowSched=D.sched;\n"
             " s.days=[0,1,2,3,4,5,6].map(function(i){return {on:D.sun||i!==0,a:D.hours,b:['','']}});\n"
             " s.ads=[];s.instagram='';s.facebook='';s.upsellCat='';s.loyalty={on:false,every:10};\n"
-            " s.coupons=[{code:D.coupon,type:'pct',value:10,min:0,on:true}];s.slides=D.slides;\n"
+            " s.coupons=[{code:D.coupon,type:'pct',value:10,min:0,on:true}];s.slides=D.slides;if(D.mode)s.mode=D.mode;if(D.delivery===false)s.delivery=false;\n"
             " c.theme=D.theme;c.layout=Object.assign({},c.layout,{cards:D.cards,cat:'chips',featured:true,banner:true});\n"
             " c.cats=D.cats;c.products=D.products;return c};\n"
             "</script>\n")
@@ -640,4 +641,36 @@ DEMOS += [
    ],
    [('Entrega na sua obra', 'Entrega en tu obra', 'Peça seu orçamento pelo WhatsApp', 'Pedí tu presupuesto por WhatsApp', 'l1', '#1C1917', 'photo-1629608564457-5d74829a9e14'),
     ('Tinta com desconto', 'Pintura con descuento', 'Látex 18 L em várias cores', 'Látex 18 L en varios colores', 'p1', '#92400E', 'photo-1773525912493-cdb088d19d64')], prep=120),
+]
+
+# ---------------- AUTOS Y CAMIONETAS (modo consulta: o cliente pergunta pelo WhatsApp; cores com a foto de cada uma) ----------------
+def _cor(opts):  # [(pt, es, hex, foto)]
+    return {'id': 'co', 'n': P('Cor', 'Color'), 'type': 'one', 'req': True, 'kind': 'color',
+            'o': [{'id': f'co{k}', 'n': P(o[0], o[1]), 'p': 0, 'hex': o[2], 'ph': U(o[3], 1200)} for k, o in enumerate(opts)]}
+def _autos():
+    ps = [
+     pr('c1', 'cam', 'Caminhonete 4x4 cabine dupla 2020 diesel', 'Camioneta 4x4 doble cabina 2020 diésel', 'Revisada, documentos em dia. Aceitamos troca.', 'Revisada, papeles al día. Aceptamos permuta.', 185000000, 'photo-1547269257-ee55681ca2cd', feat=True, best=True,
+        g=[_cor([('Prata', 'Plata', '#BFC5CC', 'photo-1547269257-ee55681ca2cd'), ('Branco', 'Blanco', '#FFFFFF', 'photo-1621786805936-65e5e163c1e9')])]),
+     pr('c2', 'cam', 'SUV 2021 automática', 'SUV 2021 automática', 'Único dono, 45.000 km.', 'Único dueño, 45.000 km.', 160000000, 'photo-1598248691267-4a62dfdfd8a8', feat=True,
+        g=[_cor([('Preto', 'Negro', '#1F1F1F', 'photo-1598248691267-4a62dfdfd8a8'), ('Branco', 'Blanco', '#FFFFFF', 'photo-1628132261701-7f58bfab39a7')])]),
+     pr('c3', 'cam', 'Caminhonete cabine simples 2016', 'Camioneta cabina simple 2016', 'Ideal para trabalho no campo.', 'Ideal para trabajo en el campo.', 98000000, 'photo-1512044712301-ec93bcdef698'),
+     pr('a1', 'aut', 'Sedã 2019 automático', 'Sedán 2019 automático', 'Único dono, 60.000 km.', 'Único dueño, 60.000 km.', 95000000, 'photo-1587304878428-1b533030e0e7', feat=True),
+     pr('a2', 'aut', 'Hatch 2018 manual', 'Hatch 2018 manual', 'Econômico, ideal para a cidade.', 'Económico, ideal para la ciudad.', 68000000, 'photo-1678899831049-60a808d692f0', best=True,
+        g=[_cor([('Prata', 'Plata', '#BFC5CC', 'photo-1678899831049-60a808d692f0'), ('Preto', 'Negro', '#1F1F1F', 'photo-1760688964699-756df18ed485')])]),
+     pr('f1', 'fur', 'Furgão de carga 2019', 'Furgoneta de carga 2019', 'Baú amplo, porta lateral. Revisada.', 'Caja amplia, puerta lateral. Revisada.', 120000000, 'photo-1579992822406-2092a7bd5a36', feat=True),
+     pr('u1', 'usa', 'Seu carro na troca', 'Tu auto en permuta', 'Traga seu carro e fazemos uma oferta na hora.', 'Traé tu auto y te hacemos una oferta en el momento.', 0, 'photo-1600210733081-c3b8a58a2749'),
+    ]
+    for p in ps: p['cq'] = True
+    next(p for p in ps if p['id'] == 'f1')['photos'] = [U('photo-1634966047768-0a60a6b545e6', 1200)]  # mais fotos do mesmo produto
+    return ps
+DEMOS += [
+ D('demo-autos', 'ruta-norte', 'rn1', 'autos', 'Ruta Norte Automotores', P('Carros, caminhonetes e furgões', 'Autos, camionetas y furgonetas'),
+   'Catálogo de demostración para automotoras: autos, camionetas y furgonetas con fotos, colores y consultas por WhatsApp.',
+   logo('#0F172A', '#F59E0B', '#F8FAFC', "<path d='M104 96h92M110 96l10-24h60l12 24'/><circle cx='126' cy='100' r='9'/><circle cx='176' cy='100' r='9'/>", 'RUTA NORTE', 'AUTOMOTORES', 28),
+   'photo-1685091955352-4bb8796aef12', 'RUTA5', TH('#1D4ED8', '#0F172A', '#1E40AF', '#F4F6FA', '#F59E0B'),
+   [C('cam', 'Caminhonetes', 'Camionetas', 'truck'), C('aut', 'Carros', 'Autos', 'truck'), C('fur', 'Furgões e utilitários', 'Furgonetas y utilitarios', 'box'), C('usa', 'Troca', 'Permuta', 'tag')],
+   _autos,
+   [('Financiamento em até 36 vezes', 'Financiación hasta 36 cuotas', 'Consulte pelo WhatsApp', 'Consultá por WhatsApp', 'c1', '#1E3A8A', 'photo-1685091955352-4bb8796aef12'),
+    ('Aceitamos sua troca', 'Aceptamos tu permuta', 'Traga seu carro e saia de carro novo', 'Traé tu auto y salí con otro', 'u1', '#0F172A', 'photo-1600210733081-c3b8a58a2749')],
+   mode='consulta', delivery=False, hours=['08:00', '18:00']),
 ]
