@@ -28,13 +28,13 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|vidUpload
-https://araujotechsistemas.com/painel/|vidUpload
+https://araujotechsistemas.com/admin/|kdsOn
+https://araujotechsistemas.com/painel/|kdsOn
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/sitemap.xml|
-https://fogaomineiro.araujotechsistemas.com/|vidUpload
+https://fogaomineiro.araujotechsistemas.com/|kdsOn
 https://fogaomineiro.araujotechsistemas.com/painel/|forceMc
-https://teste.araujotechsistemas.com/|vidUpload
+https://teste.araujotechsistemas.com/|kdsOn
 https://teste.araujotechsistemas.com/agenda/|badPhone
 https://teste.araujotechsistemas.com/agenda/gestion.html|forceMc
 https://barberialoli.araujotechsistemas.com/reservas.html|badPhone
