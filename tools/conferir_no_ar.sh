@@ -28,14 +28,14 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|curUSD
-https://araujotechsistemas.com/painel/|curUSD
+https://araujotechsistemas.com/admin/|cvCard
+https://araujotechsistemas.com/painel/|cvCard
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|
-https://fogaomineiro.araujotechsistemas.com/|curUSD
+https://fogaomineiro.araujotechsistemas.com/|cvCard
 https://fogaomineiro.araujotechsistemas.com/painel/|forceMc
-https://teste.araujotechsistemas.com/|curUSD
+https://teste.araujotechsistemas.com/|cvCard
 https://teste.araujotechsistemas.com/agenda/|badPhone
 https://teste.araujotechsistemas.com/agenda/gestion.html|forceMc
 https://barberialoli.araujotechsistemas.com/reservas.html|badPhone
@@ -160,6 +160,11 @@ if [ -n "$vc" ]; then ok "vitrine de clientes no site -> $vc"; else echo "AVISO 
 # fotos da demo de autos (Unsplash): todas abrem
 ua=$(curl -sS --max-time 30 "https://araujotechsistemas.com/demo-autos/" 2>/dev/null | grep -o 'https://images.unsplash.com/photo-[0-9a-f-]*' | sort -u)
 if [ -z "$ua" ]; then bad "demo-autos -> nenhuma foto encontrada"; else nb=0; nt=0; for u in $ua; do nt=$((nt+1)); c=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$u?w=400" 2>/dev/null || true); [ "$c" = "200" ] || { nb=$((nb+1)); echo "   foto com problema: $u -> $c"; }; done; if [ "$nb" = 0 ]; then ok "demo-autos -> as $nt fotos abrem"; else bad "demo-autos -> $nb de $nt fotos não abrem"; fi; fi
+# regras v14 (visitas ao catálogo): soma 1 numa visita de teste da loja "teste"; antes de publicar, o Firebase recusa
+vd=$(TZ=America/Asuncion date +%Y-%m-%d)
+vr=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents:commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data "{\"writes\":[{\"update\":{\"name\":\"projects/araujotech-catalogos/databases/(default)/documents/shops/teste/visitas/$vd\",\"fields\":{}},\"updateMask\":{\"fieldPaths\":[]},\"updateTransforms\":[{\"fieldPath\":\"n\",\"increment\":{\"integerValue\":\"1\"}}]}]}" 2>/dev/null || true)
+vx=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents:commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data "{\"writes\":[{\"update\":{\"name\":\"projects/araujotech-catalogos/databases/(default)/documents/shops/teste/visitas/$vd\",\"fields\":{}},\"updateMask\":{\"fieldPaths\":[]},\"updateTransforms\":[{\"fieldPath\":\"n\",\"increment\":{\"integerValue\":\"50\"}}]}]}" 2>/dev/null || true)
+if [ "$vr" = "200" ] && [ "$vx" != "200" ]; then ok "regras v14 no ar: visita soma 1 e não aceita +50"; elif [ "$vr" = "403" ]; then echo "AVISO | regras v14 ainda não publicadas (visitas ao catálogo ainda não contam)"; else bad "regras v14: +1 -> $vr, +50 -> $vx"; fi
 # vídeo do produto: o servidor responde, recusa envio sem login e aceita a origem do painel
 vp=$(curl -sS --max-time 20 "https://teste.araujotechsistemas.com/video.php?op=ping" 2>/dev/null || true)
 if echo "$vp" | grep -q '"ok":true' && echo "$vp" | grep -q '"curl":true' && echo "$vp" | grep -q '"w":true'; then ok "video.php -> no ar ($vp)"; else bad "video.php -> resposta inesperada: $vp"; fi
