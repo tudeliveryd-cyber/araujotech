@@ -144,6 +144,11 @@ done
 # leitor de link do Google Maps (ubicación do local)
 mp=$(curl -sS --max-time 30 -H 'Origin: https://nauticabrustolin.araujotechsistemas.com' -D /tmp/mp_h "https://araujotechsistemas.com/maps.php?u=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FX%2F%40-25.80%2C-54.90%2C17z%2Fdata%3D%213m1%214b1%213d-25.80555%214d-54.90777" 2>/dev/null || true)
 if echo "$mp" | grep -q '"lat":-25.80555' && grep -qi '^access-control-allow-origin: https://nauticabrustolin' /tmp/mp_h; then ok "maps.php -> lê o link do Maps ($mp)"; else bad "maps.php -> resposta inesperada: $mp"; fi
+# painel no subdomínio do cliente: título e atalho com o nome da loja, não "Fogão Mineiro"
+pt=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/" 2>/dev/null | grep -o '<title>[^<]*</title>' | head -1)
+if echo "$pt" | grep -q 'Status · Panel del local'; then ok "painel da Status -> $pt"; else bad "painel da Status -> título inesperado: $pt"; fi
+pm=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/manifest.json" 2>/dev/null || true)
+if echo "$pm" | grep -q '"name":"Panel Status"'; then ok "atalho do painel da Status -> Panel Status"; else bad "atalho do painel da Status -> $pm"; fi
 # vídeo do produto: o servidor responde, recusa envio sem login e aceita a origem do painel
 vp=$(curl -sS --max-time 20 "https://teste.araujotechsistemas.com/video.php?op=ping" 2>/dev/null || true)
 if echo "$vp" | grep -q '"ok":true' && echo "$vp" | grep -q '"curl":true' && echo "$vp" | grep -q '"w":true'; then ok "video.php -> no ar ($vp)"; else bad "video.php -> resposta inesperada: $vp"; fi

@@ -23,6 +23,10 @@ const FX = __dirname + '/fix/';
   await o.fill('#np_a', 'DonoNovo#77'); await o.fill('#np_b', 'DonoNovo#77'); await o.press('#np_b', 'Enter'); await o.w(4000);
   await o.evaluate(() => { ui.tab = 'products'; render(); }); await o.w(600);
 
+  sec('0. Título da aba do painel');
+  const ttl = await o.evaluate(() => document.title); info(ttl);
+  check(ttl === 'Galeria E2E · Panel del local', 'a aba do painel mostra o nome da loja (não "Fogão Mineiro")');
+
   sec('A. Painel: produto com foto principal e 2 fotos a mais');
   await o.evaluate(() => acts.newprod()); await o.w(500);
   await o.set('#ed_nes', 'Campera Galería'); await o.set('#ed_pr', '150000');

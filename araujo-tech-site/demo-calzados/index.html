@@ -3656,7 +3656,7 @@ function startOrders(){if(CLOUD.unsubOrders)return;startAlarm();CLOUD.firstSnap=
   added=added.filter(id=>{const x=list.find(o=>o.id===id);return !!x&&x.canal!=='caja'});if(!first&&added.length){beep();sysNotify(list.find(o=>o.id===added[0]));toast(t('new_order')+' Nº '+(list.find(o=>o.id===added[0])||{}).no);document.title='('+added.length+') '+t('new_order');setTimeout(()=>document.title=TITLE0,8000);
    if(pub.store.autoPrint)added.forEach(id=>{const o=list.find(x=>x.id===id);if(o)printTicket(o.no)})}
   try{stockApply(list)}catch(er){console.warn(er)}if(ui.view==='admin'&&['orders','resumo','cocina','caja','salon'].includes(ui.tab)&&!document.querySelector('.sheet'))render()},e=>{console.warn(e)});CLOUD.unsubOrders=true}
-const TITLE0=document.title;
+let TITLE0=document.title;
 const TRACK_MAP={aguardando:'recebido',recebido:'recebido',aceito:'recebido',preparo:'preparo',entregador:'preparo',saiu:'preparo',pronto:'pronto',entregue:'entregue',retirado:'entregue',cancelado:'cancelado'};
 async function cloudBoot(){const unboot=()=>{const H=document.documentElement;if(H.classList.contains('tdc-boot')){H.classList.remove('tdc-boot');try{const c=getComputedStyle(document.body).backgroundColor;if(c&&!/rgba\(0, 0, 0, 0\)/.test(c))localStorage.setItem('tdc_bg_'+location.hostname,c)}catch(e){}}H.style.background=''};if(MODE!=='catalog')setTimeout(()=>{if(CLOUD.boot){CLOUD.boot=false;render()}},12000);const agP=MODE==='catalog'&&window.TDC_SUB?agendaRedirect():null;if(agP&&/^\/gestion/i.test(location.pathname)&&await agP)return;if(MODE==='catalog'){/* abrir na hora: a cópia guardada neste celular ou os dados que o servidor já mandou na página; a versão da nuvem chega logo depois */
   try{const had=!!S.get(K.pub,null)&&!!S.get(K.pub+'@c',null);let pre=null;if(!had&&window.TDC_PRE&&TDC_PRE.id===SHOP&&TDC_PRE.cfg)pre=preCfg(JSON.parse(TDC_PRE.cfg));if(had||pre){if(pre){pub=pre;draft=clone(pre)}SHOP_READY=true;render();unboot()}}catch(e){console.warn(e)}}
@@ -4122,7 +4122,7 @@ const panelAuthed=()=>CLOUD_ON?CLOUD.shopOk:S.get(K.auth,false);
 const plAuthed=()=>CLOUD_ON?CLOUD.admin&&!CLOUD.loading:S.get(K.authPl,false);
 const shopSuspended=()=>CLOUD_ON&&MODE==='catalog'?(SHOP_STATUS||S.get(K.status,null))==='suspenso':!!(curShop()&&curShop().status==='suspenso');
 function cloudNote(){if(!CLOUD_ON)return '';if(CLOUD.loading)return `<div class="info" style="margin-bottom:12px">${ic('clock',18)}<span>${t('loading')}</span></div>`;const e=CLOUD.err;return e?`<div class="info bad" style="margin-bottom:12px">${ic('x',18)}<span>${t('cerr_'+e)}</span></div>`:''}
-function render(){try{document.body.classList.toggle('es1',lang!=='pt');document.body.classList.toggle('qon',!!(ui.view==='catalog'&&ui.q&&ui.q.trim()))}catch(e){}
+function render(){try{if(MODE==='panel'&&SHOP_READY&&pub&&pub.store&&pub.store.name){const tt=pub.store.name+' · '+(lang==='pt'?'Painel do local':'Panel del local');TITLE0=tt;if(!/^\(\d+\) /.test(document.title)&&document.title!==tt)document.title=tt}}catch(e){}try{document.body.classList.toggle('es1',lang!=='pt');document.body.classList.toggle('qon',!!(ui.view==='catalog'&&ui.q&&ui.q.trim()))}catch(e){}
  document.documentElement.lang=lang==='pt'?'pt-BR':'es-PY';
  document.getElementById('bm').innerHTML='<img src="'+DEV_MARK+'" alt="">';
  document.getElementById('vCat').innerHTML=ic('store',15)+'<span>'+t('nav_catalog')+'</span>';document.getElementById('vAdm').innerHTML=ic('grid',15)+'<span>'+t('nav_admin')+'</span>';

@@ -7,6 +7,15 @@ ErrorDocument 404 /404.html
   RewriteCond %{HTTP_HOST} \.araujotechsistemas\.com$ [NC]
   RewriteCond %{HTTP_HOST} !^(www\.)?fogaomineiro\.araujotechsistemas\.com$ [NC]
   RewriteRule ^(index\.html)?$ /catalogo.php [L]
+  # painel do local no subdomínio: nome e logo da própria loja no título, no histórico e no atalho da tela de início
+  RewriteCond %{HTTP_HOST} \.araujotechsistemas\.com$ [NC]
+  RewriteCond %{HTTP_HOST} !^(www\.)?fogaomineiro\.araujotechsistemas\.com$ [NC]
+  RewriteCond %{HTTP_HOST} !^www\. [NC]
+  RewriteRule ^painel/(index\.html)?$ /painel.php [L]
+  RewriteCond %{HTTP_HOST} \.araujotechsistemas\.com$ [NC]
+  RewriteCond %{HTTP_HOST} !^(www\.)?fogaomineiro\.araujotechsistemas\.com$ [NC]
+  RewriteCond %{HTTP_HOST} !^www\. [NC]
+  RewriteRule ^painel/manifest\.json$ /painel_manifest.php [L]
   # ícones do navegador nos subdomínios dos clientes: o logo da própria loja (sem logo: símbolo da Vitrix), nunca o do Fogão Mineiro
   RewriteCond %{HTTP_HOST} \.araujotechsistemas\.com$ [NC]
   RewriteCond %{HTTP_HOST} !^(www\.)?fogaomineiro\.araujotechsistemas\.com$ [NC]
