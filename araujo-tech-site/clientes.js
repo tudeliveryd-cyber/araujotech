@@ -9,6 +9,7 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const ini = n => String(n).split(/\s+/).filter(w => /[\p{L}\p{N}]/u.test(w)).slice(0, 2).map(w => w.match(/[\p{L}\p{N}]/u)[0]).join('').toUpperCase();
   const safeUrl = u => /^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(String(u || '')) ? u : '';
+  const logoUrl = u => { u = safeUrl(u); return /\/logo\.php$/.test(u) ? u + '?v=2' : u; }; // v=2: logo de cor ocupa o quadro todo
   let LIST = null; const waiting = [];
   function load(cb) {
     if (LIST) return cb(LIST); waiting.push(cb); if (waiting.length > 1) return;
@@ -28,7 +29,7 @@
   }
   function card(c, L) {
     const s = SYSN[c.sys] || SYSN.otro, seg = L === 'pt' ? (c.segPt || c.segEs) : (c.segEs || c.segPt);
-    const meta = [s[L], seg, c.city].filter(Boolean).join(' · '), url = safeUrl(c.url), logo = safeUrl(c.logo);
+    const meta = [s[L], seg, c.city].filter(Boolean).join(' · '), url = safeUrl(c.url), logo = logoUrl(c.logo);
     const go = url ? `<a class="atc-go" href="${esc(url)}" target="_blank" rel="noopener">${c.sys === 'catalogo' ? TX[L].cat : c.sys === 'agenda' ? TX[L].ag : TX[L].see} →</a>` : '';
     return `<article class="atc-card" data-sys="${esc(c.sys)}"><span class="atc-lg">${logo ? `<img src="${esc(logo)}" alt="" loading="lazy" width="64" height="64" data-ini="${esc(ini(c.name))}">` : `<b>${esc(ini(c.name))}</b>`}</span><div class="atc-tx"><h3>${esc(c.name)}</h3><p>${esc(meta)}</p>${go}</div></article>`;
   }
@@ -48,7 +49,7 @@
   function strip(list, lang) {
     const L = lang === 'pt' ? 'pt' : 'es';
     return (list || []).map(c => {
-      const seg = L === 'pt' ? (c.segPt || c.segEs) : (c.segEs || c.segPt), url = safeUrl(c.url), logo = safeUrl(c.logo), i = ini(c.name);
+      const seg = L === 'pt' ? (c.segPt || c.segEs) : (c.segEs || c.segPt), url = safeUrl(c.url), logo = logoUrl(c.logo), i = ini(c.name);
       const sub = c.sys === 'catalogo' ? 'Vitrix · ' + (seg || SMALL.catalogo[L]) : c.sys === 'agenda' ? SMALL.agenda[L] : (SYSN[c.sys] || SYSN.otro)[L];
       const img = logo ? `<img src="${esc(logo)}" alt="${esc(c.name)}" width="64" height="64" loading="lazy" data-ini="${esc(i)}" onerror="this.outerHTML='<span class=&quot;cl-in&quot;>'+this.dataset.ini+'</span>'">` : `<span class="cl-in">${esc(i)}</span>`;
       const inner = `${img}<span><b>${esc(c.name)}</b><small>${esc(sub)}</small></span>`;

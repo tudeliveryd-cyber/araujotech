@@ -17,7 +17,7 @@ if (!$s || $s['logo'] === '') {
   http_response_code(404); exit;
 }
 $id = $s['id'];
-$cache = sys_get_temp_dir() . '/at_logo_' . md5($id . '|' . md5($s['logo']) . '|' . $N) . ($N ? '.png' : '.jpg');
+$cache = sys_get_temp_dir() . '/at_logo2_' . md5($id . '|' . md5($s['logo']) . '|' . $N) . ($N ? '.png' : '.jpg');
 if (is_file($cache) && time() - filemtime($cache) < 86400) lg_out(@file_get_contents($cache), $N ? 'image/png' : 'image/jpeg', $N ? 3600 : 86400);
 $src = $s['logo'];
 if (strpos($src, 'm:') === 0) {                       // logo guardado nos pacotes de imagens da loja
@@ -38,10 +38,17 @@ if (!preg_match('#^data:(image/[a-z+.-]+);base64,(.+)$#s', $src, $mm)) {
 $bin = base64_decode($mm[2]); $type = $mm[1];
 if (function_exists('imagecreatefromstring') && ($im = @imagecreatefromstring($bin))) {
   $w = imagesx($im); $h = imagesy($im);
-  $S = $N ?: 600; $pad = $N ? (int)round($N * 0.06) : 48;   // ícone: margem pequena, como o ícone que o catálogo monta
+  // logo que já é um quadro de cor (cantos opacos e não brancos): ocupa tudo, sem margem branca, fundo da cor do próprio logo
+  $full = false; $cr = 255; $cg = 255; $cb = 255;
+  if ($w > 8 && $h > 8) {
+    $pts = [[2, 2], [$w - 3, 2], [2, $h - 3], [$w - 3, $h - 3]]; $ok = true; $sum = [0, 0, 0];
+    foreach ($pts as [$x, $y]) { $c = imagecolorsforindex($im, imagecolorat($im, $x, $y)); if ($c['alpha'] > 10 || ($c['red'] > 235 && $c['green'] > 235 && $c['blue'] > 235)) { $ok = false; break; } $sum[0] += $c['red']; $sum[1] += $c['green']; $sum[2] += $c['blue']; }
+    if ($ok) { $full = true; $cr = (int)($sum[0] / 4); $cg = (int)($sum[1] / 4); $cb = (int)($sum[2] / 4); }
+  }
+  $S = $N ?: 600; $pad = $full ? 0 : ($N ? (int)round($N * 0.06) : 48);   // ícone: margem pequena, como o ícone que o catálogo monta
   $sc = min(($S - 2 * $pad) / $w, ($S - 2 * $pad) / $h);
   $nw = max(1, (int)round($w * $sc)); $nh = max(1, (int)round($h * $sc));
-  $dst = imagecreatetruecolor($S, $S); imagefill($dst, 0, 0, imagecolorallocate($dst, 255, 255, 255));
+  $dst = imagecreatetruecolor($S, $S); imagefill($dst, 0, 0, imagecolorallocate($dst, $cr, $cg, $cb));
   imagealphablending($dst, true);
   imagecopyresampled($dst, $im, (int)(($S - $nw) / 2), (int)(($S - $nh) / 2), 0, 0, $nw, $nh, $w, $h);
   ob_start(); if ($N) imagepng($dst, null, 6); else imagejpeg($dst, null, 86); $bin = ob_get_clean(); $type = $N ? 'image/png' : 'image/jpeg';
