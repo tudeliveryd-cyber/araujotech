@@ -312,7 +312,8 @@ html.anim .rv.in{opacity:1;transform:none}
 .cl{display:flex;align-items:center;gap:12px;padding:10px 18px 10px 10px;border:1px solid var(--line);border-radius:16px;text-decoration:none;color:var(--ink);background:#fff;transition:transform .15s,box-shadow .15s}
 a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)}
 .cl img{width:52px;height:52px;border-radius:12px;object-fit:cover;flex:none}
-.cl b{display:block;font-size:15px}.cl small{font-size:13px;color:var(--muted)}
+.cl b{display:block;font-size:15px}
+.cl .cl-in{width:52px;height:52px;border-radius:12px;flex:none;display:grid;place-items:center;background:var(--lilac,#efe6ff);color:var(--purple,#7b2ff2);font-weight:800;font-size:18px}.cl small{font-size:13px;color:var(--muted)}
 .wafab{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:8px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px 12px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.2);transform:translateY(140px);transition:transform .35s cubic-bezier(.2,.7,.2,1);-webkit-tap-highlight-color:transparent}
 .wafab.on{transform:none}.wafab,.wafab.on{opacity:1}
 .wafab:hover{background:#1FB959}
@@ -384,14 +385,10 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
   </div></div>
 </section>
 
-<section class="clients" aria-label="Clientes">
+<section class="clients" aria-label="Clientes" hidden>
   <div class="wrap">
-    <p class="cl-h" data-t="cl_h">Ya lo usan negocios de Santa Rita</p>
-    <div class="cl-row">
-      <a class="cl" href="https://fogaomineiro.araujotechsistemas.com" target="_blank" rel="noopener"><img src="img/clientes/fogao-mineiro.png" alt="Restaurante Fogão Mineiro" width="64" height="64" loading="lazy"><span><b>Fogão Mineiro</b><small data-t="cl_1">Vitrix · catálogo digital</small></span></a>
-      <a class="cl" href="https://barberialoli.araujotechsistemas.com" target="_blank" rel="noopener"><img src="img/clientes/barberia-loli.png" alt="Barbería Loli" width="64" height="64" loading="lazy"><span><b>Barbería Loli</b><small data-t="cl_2">Agenda de turnos</small></span></a>
-      <div class="cl"><img src="img/tu-delivery.png" alt="Tu Delivery" width="64" height="64" loading="lazy" style="object-fit:contain;background:#fff"><span><b>Tu Delivery</b><small data-t="cl_3">Caja de Entregas</small></span></div>
-    </div>
+    <p class="cl-h" data-t="cl_h">Negocios que ya usan nuestros sistemas</p>
+    <div class="cl-row"></div>
   </div>
 </section>
 
@@ -434,13 +431,6 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
       <div class="step"><h3 data-t="c3">Desarrollamos por etapas</h3><p data-t="c3p">Va probando cada parte con sus datos reales.</p></div>
       <div class="step"><h3 data-t="c4">Publicamos y acompañamos</h3><p data-t="c4p">Le enseñamos a usarlo a usted y a su equipo, y seguimos mejorando.</p></div>
     </div>
-  </div>
-</section>
-
-<section id="clientes" hidden>
-  <div class="wrap">
-    <div class="sec-head"><h2 data-t="cl_h">Negocios que ya usan nuestros sistemas</h2><p data-t="cl_p">Clientes reales que ya trabajan con los sistemas de Araújo Tech. Entrá y mirá cómo funcionan.</p></div>
-    <div id="clList"></div>
   </div>
 </section>
 
@@ -508,7 +498,7 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
   </div>
 </footer>
 
-<script src="/clientes.js?v=1"></script>
+<script src="/clientes.js?v=2"></script>
 <script>
 /* =========================================================
    1) CONTACTO
@@ -585,7 +575,7 @@ es:{
  n1:"Sistemas",n2:"Quiénes somos",n3:"Cómo trabajamos",n4:"Preguntas",n5:"Pedir presupuesto",
  h1:"Sistemas a la medida de su negocio",
  h_p:"Hacemos aplicaciones y sistemas web para comercios, restaurantes, salones, empresas de delivery e iglesias. Funcionan en el celular y en la computadora, en español y en portugués.",
- h_b1:"Escribir por WhatsApp",h_b2:"Conocer Vitrix",rot_pre:"Para",sh_all:"Ver todos los sistemas",ft_job:"Trabajá con nosotros",lz_k:"Oferta exclusiva de lanzamiento",lz_h:"¡Pagá 10 meses. Disfrutá 12!",lz_p:"Los primeros 20 clientes que contraten un plan anual de Vitrix, con pago anticipado, reciben 2 meses gratis. Al completarse el cupo, la oferta finaliza.",lz_s:"La instalación se abona por separado, según el plan contratado.",lz_b:"¡Quiero mis 2 meses gratis!",lz_v:"Ver planes y precios",lz_wa:"la promoción de lanzamiento de Vitrix (pagá 10 meses, disfrutá 12).",lz_left:"Quedan {n} de {m} cupos",cl_h:"Ya lo usan negocios de Santa Rita",cl_1:"Vitrix · catálogo digital",cl_2:"Agenda de turnos",cl_3:"Caja de Entregas",wa_fab:"Escribinos",hf_tag:"Nuevo",hf_t:"Vitrix: catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 32 ejemplos para probar",hf_tag:"Nuevo",hf_t:"Vitrix: catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 32 ejemplos para probar",h_where:"Desde Santa Rita, Alto Paraná, para Paraguay y Brasil.",
+ h_b1:"Escribir por WhatsApp",h_b2:"Conocer Vitrix",rot_pre:"Para",sh_all:"Ver todos los sistemas",ft_job:"Trabajá con nosotros",lz_k:"Oferta exclusiva de lanzamiento",lz_h:"¡Pagá 10 meses. Disfrutá 12!",lz_p:"Los primeros 20 clientes que contraten un plan anual de Vitrix, con pago anticipado, reciben 2 meses gratis. Al completarse el cupo, la oferta finaliza.",lz_s:"La instalación se abona por separado, según el plan contratado.",lz_b:"¡Quiero mis 2 meses gratis!",lz_v:"Ver planes y precios",lz_wa:"la promoción de lanzamiento de Vitrix (pagá 10 meses, disfrutá 12).",lz_left:"Quedan {n} de {m} cupos",cl_h:"Negocios que ya usan nuestros sistemas",cl_1:"Vitrix · catálogo digital",cl_2:"Agenda de turnos",cl_3:"Caja de Entregas",wa_fab:"Escribinos",hf_tag:"Nuevo",hf_t:"Vitrix: catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 32 ejemplos para probar",hf_tag:"Nuevo",hf_t:"Vitrix: catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 32 ejemplos para probar",h_where:"Desde Santa Rita, Alto Paraná, para Paraguay y Brasil.",
  s_h:"Sistemas",s_p:"Cada uno nació para resolver un problema real y se usa todos los días. Todos se pueden adaptar a su negocio.",
  ok:"Disponible",dev:"En desarrollo",open:"Abrir",demo:"Ver demostración",mas:"Ver todas las funciones",planes:"Ver planes y precios",ask:"Pedir una demostración",soon:"Quiero saber más",
  s_more:"¿Su negocio necesita algo que no está en esta lista? Cuéntenos qué le hace falta.",s_more_b:"Contar mi idea",
@@ -599,7 +589,7 @@ es:{
  c2:"Le mostramos las pantallas",c2p:"Antes de programar, aprueba cómo se va a ver cada pantalla.",
  c3:"Desarrollamos por etapas",c3p:"Va probando cada parte con sus datos reales.",
  c4:"Publicamos y acompañamos",c4p:"Le enseñamos a usarlo a usted y a su equipo, y seguimos mejorando.",
- t_h:"Lo que dicen nuestros clientes",cl_h:"Negocios que ya usan nuestros sistemas",cl_p:"Clientes reales que ya trabajan con los sistemas de Araújo Tech. Entrá y mirá cómo funcionan.",
+ t_h:"Lo que dicen nuestros clientes",
  q_h:"Preguntas frecuentes",
  faq:[["¿Cuánto cuesta un sistema?","Depende de lo que necesite. Después de conversar le enviamos un presupuesto claro, sin compromiso. Algunos sistemas se pagan por mes."],
       ["¿Hay que instalar algo?","No. Se abren desde el navegador del celular, la tablet o la computadora."],
@@ -620,7 +610,7 @@ pt:{
  n1:"Sistemas",n2:"Quem somos",n3:"Como trabalhamos",n4:"Perguntas",n5:"Pedir orçamento",
  h1:"Sistemas sob medida para o seu negócio",
  h_p:"Fazemos aplicativos e sistemas web para comércios, restaurantes, salões, empresas de delivery e igrejas. Funcionam no celular e no computador, em português e em espanhol.",
- h_b1:"Falar no WhatsApp",h_b2:"Conhecer o Vitrix",rot_pre:"Para",sh_all:"Ver todos os sistemas",ft_job:"Trabalhe conosco",lz_k:"Oferta exclusiva de lançamento",lz_h:"Pague 10 meses. Aproveite 12!",lz_p:"Os primeiros 20 clientes que contratarem um plano anual do Vitrix, com pagamento adiantado, ganham 2 meses grátis. Quando as vagas acabarem, a oferta termina.",lz_s:"A instalação é paga à parte, conforme o plano contratado.",lz_b:"Quero meus 2 meses grátis!",lz_v:"Ver planos e preços",lz_wa:"a promoção de lançamento do Vitrix (pague 10 meses, aproveite 12).",lz_left:"Restam {n} de {m} vagas",cl_h:"Negócios de Santa Rita que já usam",cl_1:"Vitrix · catálogo digital",cl_2:"Agenda de horários",cl_3:"Caixa de Entregas",wa_fab:"Fale conosco",hf_tag:"Novo",hf_t:"Vitrix: catálogo digital com pedidos pelo WhatsApp",hf_p:"Para restaurantes, lojas, farmácias e todo tipo de comércio · 32 exemplos para testar",h_where:"De Santa Rita, Alto Paraná, para o Paraguai e o Brasil.",
+ h_b1:"Falar no WhatsApp",h_b2:"Conhecer o Vitrix",rot_pre:"Para",sh_all:"Ver todos os sistemas",ft_job:"Trabalhe conosco",lz_k:"Oferta exclusiva de lançamento",lz_h:"Pague 10 meses. Aproveite 12!",lz_p:"Os primeiros 20 clientes que contratarem um plano anual do Vitrix, com pagamento adiantado, ganham 2 meses grátis. Quando as vagas acabarem, a oferta termina.",lz_s:"A instalação é paga à parte, conforme o plano contratado.",lz_b:"Quero meus 2 meses grátis!",lz_v:"Ver planos e preços",lz_wa:"a promoção de lançamento do Vitrix (pague 10 meses, aproveite 12).",lz_left:"Restam {n} de {m} vagas",cl_h:"Negócios que já usam nossos sistemas",cl_1:"Vitrix · catálogo digital",cl_2:"Agenda de horários",cl_3:"Caixa de Entregas",wa_fab:"Fale conosco",hf_tag:"Novo",hf_t:"Vitrix: catálogo digital com pedidos pelo WhatsApp",hf_p:"Para restaurantes, lojas, farmácias e todo tipo de comércio · 32 exemplos para testar",h_where:"De Santa Rita, Alto Paraná, para o Paraguai e o Brasil.",
  s_h:"Sistemas",s_p:"Cada um nasceu para resolver um problema real e é usado todos os dias. Todos podem ser adaptados ao seu negócio.",
  ok:"Disponível",dev:"Em desenvolvimento",open:"Abrir",demo:"Ver demonstração",mas:"Ver todas as funções",planes:"Ver planos e preços",ask:"Pedir uma demonstração",soon:"Quero saber mais",
  s_more:"Seu negócio precisa de algo que não está nesta lista? Conte o que está faltando.",s_more_b:"Contar minha ideia",
@@ -634,7 +624,7 @@ pt:{
  c2:"Mostramos as telas",c2p:"Antes de programar, você aprova como cada tela vai ficar.",
  c3:"Desenvolvemos por etapas",c3p:"Você vai testando cada parte com os seus dados reais.",
  c4:"Publicamos e acompanhamos",c4p:"Ensinamos você e sua equipe a usar, e seguimos melhorando.",
- t_h:"O que dizem nossos clientes",cl_h:"Negócios que já usam nossos sistemas",cl_p:"Clientes reais que já trabalham com os sistemas da Araújo Tech. Entre e veja como funcionam.",
+ t_h:"O que dizem nossos clientes",
  q_h:"Perguntas frequentes",
  faq:[["Quanto custa um sistema?","Depende do que você precisa. Depois de conversar, enviamos um orçamento claro, sem compromisso. Alguns sistemas são pagos por mês."],
       ["Precisa instalar alguma coisa?","Não. Eles abrem no navegador do celular, do tablet ou do computador."],
@@ -682,8 +672,8 @@ function render(){
    <div><p class="desc">${d.desc}</p><ul>${d.puntos.map(p=>`<li><span class="px"></span><span>${p}</span></li>`).join("")}</ul><div class="acts">${acts}</div></div>${shots}</article>`;
  }).join("");
 
- // clientes reais (publicados pelo Panel Araújo Tech)
- if(window.AT_CLIENTES)AT_CLIENTES.load(()=>{const n=AT_CLIENTES.render($("#clList"),lang,{});$("#clientes").hidden=!n});
+ // clientes: exatamente os cadastrados no Panel Araújo Tech (sem lista fixa)
+ if(window.AT_CLIENTES)AT_CLIENTES.load(l=>{const sec=document.querySelector(".clients"),row=sec&&sec.querySelector(".cl-row");if(!row)return;row.innerHTML=AT_CLIENTES.strip(l,lang);sec.hidden=!l.length});
 
  // about photo (only if provided)
  const ph=$("#aboutPhoto");

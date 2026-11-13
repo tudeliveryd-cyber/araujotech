@@ -43,5 +43,17 @@
     if (!el.dataset.atb) { el.dataset.atb = '1'; el.addEventListener('click', e => { const b = e.target.closest('[data-atf]'); if (!b) return; el.dataset.f = b.dataset.atf; render(el, el.dataset.lang || L, opt); }); }
     el.dataset.lang = L; return base.length;
   }
-  window.AT_CLIENTES = { load, render };
+  // faixa compacta da página inicial (classe .cl do site): logo, nome e o sistema que usa
+  const SMALL = { catalogo: { es: 'catálogo digital', pt: 'catálogo digital' }, agenda: { es: 'Agenda de turnos', pt: 'Agenda de horários' } };
+  function strip(list, lang) {
+    const L = lang === 'pt' ? 'pt' : 'es';
+    return (list || []).map(c => {
+      const seg = L === 'pt' ? (c.segPt || c.segEs) : (c.segEs || c.segPt), url = safeUrl(c.url), logo = safeUrl(c.logo), i = ini(c.name);
+      const sub = c.sys === 'catalogo' ? 'Vitrix · ' + (seg || SMALL.catalogo[L]) : c.sys === 'agenda' ? SMALL.agenda[L] : (SYSN[c.sys] || SYSN.otro)[L];
+      const img = logo ? `<img src="${esc(logo)}" alt="${esc(c.name)}" width="64" height="64" loading="lazy" data-ini="${esc(i)}" onerror="this.outerHTML='<span class=&quot;cl-in&quot;>'+this.dataset.ini+'</span>'">` : `<span class="cl-in">${esc(i)}</span>`;
+      const inner = `${img}<span><b>${esc(c.name)}</b><small>${esc(sub)}</small></span>`;
+      return url ? `<a class="cl" href="${esc(url)}" target="_blank" rel="noopener">${inner}</a>` : `<div class="cl">${inner}</div>`;
+    }).join('');
+  }
+  window.AT_CLIENTES = { load, render, strip };
 })();

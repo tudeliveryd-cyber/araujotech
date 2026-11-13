@@ -150,6 +150,13 @@ pt=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/" 
 if echo "$pt" | grep -q 'Status · Panel del local'; then ok "painel da Status -> $pt"; else bad "painel da Status -> título inesperado: $pt"; fi
 pm=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/manifest.json" 2>/dev/null || true)
 if echo "$pm" | grep -q '"name":"Panel Status"'; then ok "atalho do painel da Status -> Panel Status"; else bad "atalho do painel da Status -> $pm"; fi
+# vitrine de clientes do site: lista publicada pelo Panel Araújo Tech (só leitura)
+vc=$(curl -sS --max-time 30 "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U&mask.fieldPaths=clientes" 2>/dev/null | python3 -c 'import sys,json
+try:
+  d=json.load(sys.stdin);v=d.get("fields",{}).get("clientes",{}).get("arrayValue",{}).get("values",[])
+  print(" | ".join(x["mapValue"]["fields"]["name"]["stringValue"]+" ("+x["mapValue"]["fields"]["sys"]["stringValue"]+")" for x in v))
+except Exception as e: print("")' 2>/dev/null || true)
+if [ -n "$vc" ]; then ok "vitrine de clientes no site -> $vc"; else echo "AVISO | vitrine de clientes ainda vazia (abrir o Panel Araújo Tech publica a lista)"; fi
 # vídeo do produto: o servidor responde, recusa envio sem login e aceita a origem do painel
 vp=$(curl -sS --max-time 20 "https://teste.araujotechsistemas.com/video.php?op=ping" 2>/dev/null || true)
 if echo "$vp" | grep -q '"ok":true' && echo "$vp" | grep -q '"curl":true' && echo "$vp" | grep -q '"w":true'; then ok "video.php -> no ar ($vp)"; else bad "video.php -> resposta inesperada: $vp"; fi
