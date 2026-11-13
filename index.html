@@ -559,6 +559,7 @@ textarea.inp{resize:vertical;min-height:64px}
 .cvprev>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 18%}
 .lgprev{position:absolute;left:12px;bottom:12px;width:72px;height:72px;border-radius:14px;background:#fff;overflow:hidden;box-shadow:0 4px 14px rgb(0 0 0 / .3);display:grid;place-items:center;font-weight:800;color:#222}
 .lgprev img{width:100%;height:100%;object-fit:contain;padding:3px}.lgprev img.full{padding:0;object-fit:cover;border:3px solid #fff;border-radius:14px}.lgprev img.full.fit,.logo img.full.fit{object-fit:contain}
+/* logo que já é um quadro completo (ex.: fundo preto): ocupa todo o espaço, sem moldura branca */.logo img.full,.lgprev img.full{border:0!important;box-shadow:0 0 0 1px rgb(255 255 255 / .14),0 6px 18px rgb(0 0 0 / .35)}.chead-in .logo img.full{border-radius:26px}.logo:has(img.full){background:transparent!important;border-color:transparent!important;box-shadow:none!important}
 .filebtn{position:relative;overflow:hidden;cursor:pointer}.filebtn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
 .filebtn .ic{transform:rotate(180deg)}
 .two-mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
