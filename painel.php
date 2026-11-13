@@ -1,4 +1,5 @@
 <?php
+@ini_set('display_errors', '0'); // avisos do PHP nunca aparecem na página do cliente
 // Painel do local pelo subdomínio (nome.araujotechsistemas.com/painel/): o mesmo painel/index.html,
 // mas com o nome e o logo da própria loja no título da aba, no histórico e no ícone da tela de início.
 // Qualquer falha aqui só faz cair no painel normal, sem mudar nada.

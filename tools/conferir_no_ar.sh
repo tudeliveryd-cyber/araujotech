@@ -150,6 +150,11 @@ pt=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/" 
 if echo "$pt" | grep -q 'Status · Panel del local'; then ok "painel da Status -> $pt"; else bad "painel da Status -> título inesperado: $pt"; fi
 pm=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/manifest.json" 2>/dev/null || true)
 if echo "$pm" | grep -q '"name":"Panel Status"'; then ok "atalho do painel da Status -> Panel Status"; else bad "atalho do painel da Status -> $pm"; fi
+# sites padrão e catálogos: nenhum aviso do PHP (Deprecated/Warning/Notice) pode aparecer na página
+for u in https://araujotechsistemas.com/status https://araujotechsistemas.com/fogaomineiro https://lojastatus.araujotechsistemas.com/ https://nauticabrustolin.araujotechsistemas.com/ "https://lojastatus.araujotechsistemas.com/painel/"; do
+  pg=$(curl -sS --max-time 30 "$u" 2>/dev/null | head -c 4000 || true)
+  if echo "$pg" | grep -qiE "<b>(deprecated|warning|notice|fatal error)</b>|^(deprecated|warning|notice): "; then bad "$u -> aviso do PHP aparece na página"; else ok "$u -> sem avisos do PHP"; fi
+done
 # vitrine de clientes do site: lista publicada pelo Panel Araújo Tech (só leitura)
 vc=$(curl -sS --max-time 30 "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U&mask.fieldPaths=clientes" 2>/dev/null | python3 -c 'import sys,json
 try:

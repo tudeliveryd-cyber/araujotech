@@ -1,4 +1,5 @@
 <?php
+@ini_set('display_errors', '0'); // avisos do PHP nunca aparecem na página do cliente
 // Catálogo do cliente pelo subdomínio (nome.araujotechsistemas.com).
 // Entrega o mesmo 404.html (o catálogo genérico), mas já com o nome, a descrição e o LOGO da loja
 // nas etiquetas que o WhatsApp, o Facebook e o Google leem para montar a prévia do link.

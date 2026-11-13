@@ -1,4 +1,5 @@
 <?php
+@ini_set('display_errors', '0'); // avisos do PHP nunca aparecem na página do cliente
 // Logo da loja do subdomínio como imagem, para a prévia do link (WhatsApp/Facebook) e para os ícones do navegador.
 // A loja vem do endereço (nome.araujotechsistemas.com/logo.php).
 //  - sem ?s: quadrado 600x600 JPEG, fundo branco (prévia do link)

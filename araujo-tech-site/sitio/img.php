@@ -1,4 +1,5 @@
 <?php
+@ini_set('display_errors', '0'); // avisos do PHP nunca aparecem na página do cliente
 // Serve as fotos do site do cliente como arquivo de imagem (para a prévia do WhatsApp/Facebook).
 // img.php?id=<loja>&k=sh  (sh = foto principal, sl = logo, sg0..sg7 = galeria)
 $id = $_GET['id'] ?? ''; $k = $_GET['k'] ?? '';
@@ -7,7 +8,7 @@ $cache = sys_get_temp_dir() . '/at_img_' . md5($id . '|' . $k . '|' . ($_GET['v'
 if (is_file($cache) && time() - filemtime($cache) < 86400) { at_out(@file_get_contents($cache), 'image/jpeg'); }
 $url = 'https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/shops/' . rawurlencode($id) . '/media/' . $k . '?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U';
 $r = null;
-if (function_exists('curl_init')) { $c = curl_init($url); curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8]); $r = curl_exec($c); if (curl_getinfo($c, CURLINFO_HTTP_CODE) != 200) $r = null; curl_close($c); }
+if (function_exists('curl_init')) { $c = curl_init($url); curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8]); $r = curl_exec($c); if (curl_getinfo($c, CURLINFO_HTTP_CODE) != 200) $r = null; }
 else { $r = @file_get_contents($url); if ($r === false) $r = null; }
 if (!$r) { http_response_code(404); exit; }
 $j = json_decode($r, true); $m = $j['fields']['m']['stringValue'] ?? '';

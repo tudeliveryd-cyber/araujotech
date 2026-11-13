@@ -1,4 +1,5 @@
 <?php
+@ini_set('display_errors', '0'); // avisos do PHP nunca aparecem na página do cliente
 // Manifesto do painel no subdomínio da loja: o atalho na tela de início leva o nome e o logo da loja (não "Painel Fogão").
 require __DIR__ . '/catalogo_lib.php';
 header('Content-Type: application/manifest+json; charset=utf-8');

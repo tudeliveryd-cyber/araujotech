@@ -1,4 +1,5 @@
 <?php
+@ini_set('display_errors', '0'); // avisos do PHP nunca aparecem na página do cliente
 // Site do cliente (araujotechsistemas.com/<nome>).
 // Entrega o mesmo index.html, mas já com título, descrição e foto do negócio nas etiquetas
 // que o WhatsApp, o Facebook e o Google leem (eles não rodam JavaScript).
@@ -26,7 +27,7 @@ function at_http($url, $post = null) {
     $c = curl_init($url);
     curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 6, CURLOPT_CONNECTTIMEOUT => 4]);
     if ($post !== null) { curl_setopt($c, CURLOPT_POST, true); curl_setopt($c, CURLOPT_POSTFIELDS, $post); curl_setopt($c, CURLOPT_HTTPHEADER, ['Content-Type: application/json']); }
-    $r = curl_exec($c); $code = curl_getinfo($c, CURLINFO_HTTP_CODE); curl_close($c);
+    $r = curl_exec($c); $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
     return ($r !== false && $code >= 200 && $code < 300) ? $r : null;
   }
   $opt = ['http' => ['timeout' => 6, 'ignore_errors' => true]];
