@@ -78,6 +78,7 @@ jobs:
           echo "######## GARÇOM LANÇA PEDIDO NA MESA · regras v13"; tools/e2e/run.sh e2e_mozo.js firestore-v13.rules || F=1
           echo "######## FOTOS GRANDES E LOGO LARGO · regras v13"; CAPA=$PWD/tools/e2e/fix/capa-grande.jpg LOGO=$PWD/tools/e2e/fix/logo-largo.png tools/e2e/run.sh e2e_fotos.js firestore-v13.rules || F=1
           echo "######## GALERIA DE FOTOS DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_galeria.js firestore-v13.rules || F=1
+          echo "######## CORES DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_cores.js firestore-v13.rules || F=1
           echo "######## AGENDA";                                      tools/e2e/run.sh e2e_agenda.js || F=1
           echo "######## AGENDA · regras novas (v11)";                 tools/e2e/run.sh e2e_agenda.js firestore-v11.rules || F=1
           echo "######## AGENDA · regras v12";                         tools/e2e/run.sh e2e_agenda.js firestore-v12.rules || F=1
