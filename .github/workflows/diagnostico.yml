@@ -10,6 +10,9 @@ on:
       maps:
         description: 'Link de mapa para testar a leitura da ubicación (opcional)'
         default: ''
+      topo:
+        description: 'Só salvar a foto do topo e o logo original da loja (sim/não)'
+        default: 'não'
 
 jobs:
   diag:
@@ -32,7 +35,18 @@ jobs:
           npm init -y >/dev/null
           npm i playwright@1.49.1 >/dev/null
           npx playwright install --with-deps chromium >/dev/null || npx playwright install chromium >/dev/null
+      - name: Foto do topo e logo original
+        if: ${{ inputs.topo == 'sim' }}
+        env:
+          LOJA: ${{ inputs.loja }}
+        run: node tools/foto_topo.js
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.topo == 'sim' }}
+        with:
+          name: topo
+          path: topo/
       - name: Diagnóstico
+        if: ${{ inputs.topo != 'sim' }}
         env:
           LOJA: ${{ inputs.loja }}
         run: node tools/diag_loja.js
