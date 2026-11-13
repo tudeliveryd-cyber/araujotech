@@ -18,7 +18,7 @@ while IFS='|' read -r url marca; do
   else ok "$url -> 200, ${tam} bytes${marca:+, versão nova confirmada ($marca)}"; fi
   rm -f "$body"
 done <<'URLS'
-https://araujotechsistemas.com/|clientes.js?v=1
+https://araujotechsistemas.com/|clientes.js?v=2
 https://araujotechsistemas.com/vitrix/|vxClientes
 https://araujotechsistemas.com/catalogo-digital/|vitrix
 https://araujotechsistemas.com/img/vitrix/vitrix-blanco.png|
