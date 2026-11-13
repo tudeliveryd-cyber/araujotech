@@ -178,6 +178,8 @@ h2{font-family:var(--display);font-weight:900;font-size:clamp(32px,4.2vw,54px);l
 .step h3{font-family:var(--display);font-weight:700;font-size:21px;margin-bottom:8px}
 .step p{color:var(--muted);font-size:16px}
 
+/* ---------- clientes reais (do Panel Araújo Tech) ---------- */
+#clientes .sec-head{margin-bottom:28px}#clientes .sec-head p{color:var(--muted);font-size:17px;max-width:640px;margin:10px 0 0}
 /* ---------- testimonials (only real ones) ---------- */
 .tlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px}
 .tq blockquote{font-family:var(--display);font-weight:700;font-size:23px;line-height:1.35;letter-spacing:-.01em;margin-bottom:20px}
@@ -435,6 +437,13 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
   </div>
 </section>
 
+<section id="clientes" hidden>
+  <div class="wrap">
+    <div class="sec-head"><h2 data-t="cl_h">Negocios que ya usan nuestros sistemas</h2><p data-t="cl_p">Clientes reales que ya trabajan con los sistemas de Araújo Tech. Entrá y mirá cómo funcionan.</p></div>
+    <div id="clList"></div>
+  </div>
+</section>
+
 <section id="testimonios" hidden>
   <div class="wrap">
     <div class="sec-head"><h2 data-t="t_h">Lo que dicen nuestros clientes</h2></div>
@@ -499,6 +508,7 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
   </div>
 </footer>
 
+<script src="/clientes.js?v=1"></script>
 <script>
 /* =========================================================
    1) CONTACTO
@@ -589,7 +599,7 @@ es:{
  c2:"Le mostramos las pantallas",c2p:"Antes de programar, aprueba cómo se va a ver cada pantalla.",
  c3:"Desarrollamos por etapas",c3p:"Va probando cada parte con sus datos reales.",
  c4:"Publicamos y acompañamos",c4p:"Le enseñamos a usarlo a usted y a su equipo, y seguimos mejorando.",
- t_h:"Lo que dicen nuestros clientes",
+ t_h:"Lo que dicen nuestros clientes",cl_h:"Negocios que ya usan nuestros sistemas",cl_p:"Clientes reales que ya trabajan con los sistemas de Araújo Tech. Entrá y mirá cómo funcionan.",
  q_h:"Preguntas frecuentes",
  faq:[["¿Cuánto cuesta un sistema?","Depende de lo que necesite. Después de conversar le enviamos un presupuesto claro, sin compromiso. Algunos sistemas se pagan por mes."],
       ["¿Hay que instalar algo?","No. Se abren desde el navegador del celular, la tablet o la computadora."],
@@ -624,7 +634,7 @@ pt:{
  c2:"Mostramos as telas",c2p:"Antes de programar, você aprova como cada tela vai ficar.",
  c3:"Desenvolvemos por etapas",c3p:"Você vai testando cada parte com os seus dados reais.",
  c4:"Publicamos e acompanhamos",c4p:"Ensinamos você e sua equipe a usar, e seguimos melhorando.",
- t_h:"O que dizem nossos clientes",
+ t_h:"O que dizem nossos clientes",cl_h:"Negócios que já usam nossos sistemas",cl_p:"Clientes reais que já trabalham com os sistemas da Araújo Tech. Entre e veja como funcionam.",
  q_h:"Perguntas frequentes",
  faq:[["Quanto custa um sistema?","Depende do que você precisa. Depois de conversar, enviamos um orçamento claro, sem compromisso. Alguns sistemas são pagos por mês."],
       ["Precisa instalar alguma coisa?","Não. Eles abrem no navegador do celular, do tablet ou do computador."],
@@ -671,6 +681,9 @@ function render(){
   return `<article class="sys"><div><h3>${s.logo?`<img class="syslogo" src="${s.logo}" alt="${s.nombre}" width="1218" height="384" loading="lazy">`:s.nombre}</h3>${s.sub?`<div class="syssub">${s.sub[lang]}</div>`:""}<div class="for">${d.para}</div>${s.desde?`<div class="desde">${s.desde[lang]}</div>`:""}<div class="st ${s.status}">${t[s.status]}</div></div>
    <div><p class="desc">${d.desc}</p><ul>${d.puntos.map(p=>`<li><span class="px"></span><span>${p}</span></li>`).join("")}</ul><div class="acts">${acts}</div></div>${shots}</article>`;
  }).join("");
+
+ // clientes reais (publicados pelo Panel Araújo Tech)
+ if(window.AT_CLIENTES)AT_CLIENTES.load(()=>{const n=AT_CLIENTES.render($("#clList"),lang,{});$("#clientes").hidden=!n});
 
  // about photo (only if provided)
  const ph=$("#aboutPhoto");
