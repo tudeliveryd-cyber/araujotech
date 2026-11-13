@@ -28,13 +28,13 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|border-width:3px!important;border-radius:26px
-https://araujotechsistemas.com/painel/|border-width:3px!important;border-radius:26px
+https://araujotechsistemas.com/admin/|vidUpload
+https://araujotechsistemas.com/painel/|vidUpload
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/sitemap.xml|
-https://fogaomineiro.araujotechsistemas.com/|border-width:3px!important;border-radius:26px
+https://fogaomineiro.araujotechsistemas.com/|vidUpload
 https://fogaomineiro.araujotechsistemas.com/painel/|forceMc
-https://teste.araujotechsistemas.com/|border-width:3px!important;border-radius:26px
+https://teste.araujotechsistemas.com/|vidUpload
 https://teste.araujotechsistemas.com/agenda/|badPhone
 https://teste.araujotechsistemas.com/agenda/gestion.html|forceMc
 https://barberialoli.araujotechsistemas.com/reservas.html|badPhone
@@ -144,6 +144,13 @@ done
 # leitor de link do Google Maps (ubicación do local)
 mp=$(curl -sS --max-time 30 -H 'Origin: https://nauticabrustolin.araujotechsistemas.com' -D /tmp/mp_h "https://araujotechsistemas.com/maps.php?u=https%3A%2F%2Fwww.google.com%2Fmaps%2Fplace%2FX%2F%40-25.80%2C-54.90%2C17z%2Fdata%3D%213m1%214b1%213d-25.80555%214d-54.90777" 2>/dev/null || true)
 if echo "$mp" | grep -q '"lat":-25.80555' && grep -qi '^access-control-allow-origin: https://nauticabrustolin' /tmp/mp_h; then ok "maps.php -> lê o link do Maps ($mp)"; else bad "maps.php -> resposta inesperada: $mp"; fi
+# vídeo do produto: o servidor responde, recusa envio sem login e aceita a origem do painel
+vp=$(curl -sS --max-time 20 "https://teste.araujotechsistemas.com/video.php?op=ping" 2>/dev/null || true)
+if echo "$vp" | grep -q '"ok":true' && echo "$vp" | grep -q '"curl":true' && echo "$vp" | grep -q '"w":true'; then ok "video.php -> no ar ($vp)"; else bad "video.php -> resposta inesperada: $vp"; fi
+va=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST --data-binary 'x' "https://teste.araujotechsistemas.com/video.php?op=up&shop=teste&up=aaaaaaaaaaaaaaaa&i=0&n=1&off=0" 2>/dev/null || true)
+if [ "$va" = "401" ]; then ok "video.php -> sem login é recusado (401)"; else bad "video.php -> sem login devolveu $va (esperado 401)"; fi
+vo=$(curl -sS --max-time 20 -o /dev/null -D - -X OPTIONS -H 'Origin: https://araujotechsistemas.com' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: authorization,x-at-token' "https://teste.araujotechsistemas.com/video.php" 2>/dev/null || true)
+if echo "$vo" | grep -qi '^access-control-allow-origin: https://araujotechsistemas.com' && echo "$vo" | grep -qi 'x-at-token'; then ok "video.php -> painel em araujotechsistemas.com pode enviar (CORS)"; else bad "video.php -> CORS: $(echo "$vo" | head -3 | tr '\r\n' ' ')"; fi
 
 echo; echo "== RESULTADO: $FALHAS falha(s)"
 [ "$FALHAS" = "0" ]
