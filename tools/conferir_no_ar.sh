@@ -28,14 +28,14 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|syncPubClients
-https://araujotechsistemas.com/painel/|syncPubClients
+https://araujotechsistemas.com/admin/|curUSD
+https://araujotechsistemas.com/painel/|curUSD
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|
-https://fogaomineiro.araujotechsistemas.com/|syncPubClients
+https://fogaomineiro.araujotechsistemas.com/|curUSD
 https://fogaomineiro.araujotechsistemas.com/painel/|forceMc
-https://teste.araujotechsistemas.com/|syncPubClients
+https://teste.araujotechsistemas.com/|curUSD
 https://teste.araujotechsistemas.com/agenda/|badPhone
 https://teste.araujotechsistemas.com/agenda/gestion.html|forceMc
 https://barberialoli.araujotechsistemas.com/reservas.html|badPhone
