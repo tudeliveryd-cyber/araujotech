@@ -153,6 +153,8 @@ if echo "$pm" | grep -q '"name":"Panel Status"'; then ok "atalho do painel da St
 # site padrão no endereço próprio da empresa (status.araujotechsistemas.com)
 sb=$(curl -sS --max-time 30 "https://status.araujotechsistemas.com/" 2>/dev/null | head -c 20000 || true)
 if echo "$sb" | grep -q 'AT_SITE_SLUG="status"' && echo "$sb" | grep -q '<link rel="canonical" href="https://status.araujotechsistemas.com/">'; then ok "site da Status em status.araujotechsistemas.com"; else bad "status.araujotechsistemas.com não mostra o site ($(echo "$sb" | grep -o '<title>[^<]*' | head -1))"; fi
+rd=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code} %{redirect_url}' "https://araujotechsistemas.com/status" 2>/dev/null || true)
+if [ "$rd" = "301 https://status.araujotechsistemas.com/" ]; then ok "araujotechsistemas.com/status leva para status.araujotechsistemas.com"; else bad "araujotechsistemas.com/status -> $rd"; fi
 # site padrão: produtos em destaque vindos do catálogo (prods.php) e a foto do primeiro produto (pimg.php)
 pj=$(curl -sS --max-time 30 "https://araujotechsistemas.com/sitio/prods.php?id=lojastatus" 2>/dev/null || true)
 if echo "$pj" | grep -q '"items":\['; then

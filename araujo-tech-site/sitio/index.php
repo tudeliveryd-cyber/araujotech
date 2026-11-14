@@ -17,6 +17,11 @@ try {
   $slug = strtolower(trim($slug));
   if ($slug !== '' && $slug !== 'sitio' && preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $slug)) {
     $rec = at_site($slug);
+    // araujotechsistemas.com/nome → nome.araujotechsistemas.com (o nome da empresa na frente). Só quando nenhuma loja tem esse nome.
+    if ($rec && !isset($_GET['s']) && ($rec['id'] ?? '') !== $slug && $slug !== 'www' && preg_match('/^(www\.)?araujotechsistemas\.com$/i', $_SERVER['HTTP_HOST'] ?? '')) {
+      $site = $rec['site'] ?? [];
+      if (($site['on'] ?? true) !== false && ($rec['status'] ?? '') !== 'suspenso') { header('Location: https://' . $slug . '.araujotechsistemas.com/', true, 301); exit; }
+    }
     if ($rec) $html = at_meta($html, $rec, $slug);
   }
 } catch (Throwable $e) { /* segue com o html normal */ }
@@ -79,7 +84,7 @@ function at_meta($html, $rec, $slug) {
   elseif (!empty($ph['l'])) $img = 'https://araujotechsistemas.com/sitio/img.php?id=' . rawurlencode($rec['id']) . '&k=sl&v=' . rawurlencode((string)($ph['v'] ?? '1'));
   else $img = 'https://images.unsplash.com/' . ($tplImg[$s['tpl'] ?? ''] ?? $tplImg['comercio']) . '?auto=format&fit=crop&w=1200&h=630&q=70';
   $title = $name . ($tag ? ' — ' . $tag : '');
-  $url = 'https://araujotechsistemas.com/' . $slug;
+  $url = ($rec['id'] ?? '') !== $slug ? 'https://' . $slug . '.araujotechsistemas.com/' : 'https://araujotechsistemas.com/' . $slug;
   $meta = "<title>{$e($title)}</title>\n"
     . "<meta property=\"og:type\" content=\"website\">\n"
     . "<meta property=\"og:site_name\" content=\"{$e($name)}\">\n"
