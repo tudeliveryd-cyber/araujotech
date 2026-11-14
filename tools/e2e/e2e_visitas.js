@@ -34,8 +34,7 @@ const VT = () => { window.TDC_VTEST = true; };
   sec('B. Dono e equipe não contam');
   const O = await L.open({ w: 1280, init: VT }); const o = O.p;
   await o.goto(HOST + '/painel/'); await o.waitForFunction(() => { const b = document.querySelector('#loginForm button[type=submit]'); return b && !b.disabled; }, null, { timeout: 20000 }).catch(() => {});
-  await o.fill('#lg_user', shop.user); await o.fill('#lg_pass', shop.pass); await o.press('#lg_pass', 'Enter');
-  await o.waitForSelector('#np_a', { timeout: 30000 }).catch(() => {});
+  for (let k = 0; k < 3 && !(await o.locator('#np_a').count()); k++) { if (await o.locator('#lg_user').count()) { await o.fill('#lg_user', shop.user); await o.fill('#lg_pass', shop.pass); await o.press('#lg_pass', 'Enter'); } await o.waitForSelector('#np_a', { timeout: 15000 }).catch(() => {}); } // no CI o primeiro login às vezes demora: tenta de novo
   await o.fill('#np_a', 'DonoNovo#77'); await o.fill('#np_b', 'DonoNovo#77'); await o.press('#np_b', 'Enter'); await o.w(4000);
   const O2 = await o.context().newPage(); await O2.addInitScript(VT); await O2.goto(HOST + '/'); await O2.waitForTimeout(3500); await O2.close();
   check(await nVis() === 2, 'o dono abrindo o próprio catálogo no celular do painel não conta');

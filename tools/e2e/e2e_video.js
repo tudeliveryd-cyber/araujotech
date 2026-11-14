@@ -37,8 +37,7 @@ async function phpRoute(ctx) { // os endereços oficiais do servidor de vídeos 
   const HOST = 'https://' + shop.id + '.araujotechsistemas.com';
   const O = await L.open({ w: 390 }); const o = O.p; await phpRoute(O.ctx);
   await o.goto(HOST + '/painel/'); await o.waitForFunction(() => { const b = document.querySelector('#loginForm button[type=submit]'); return b && !b.disabled; }, null, { timeout: 20000 }).catch(() => {});
-  await o.fill('#lg_user', shop.user); await o.fill('#lg_pass', shop.pass); await o.press('#lg_pass', 'Enter');
-  await o.waitForSelector('#np_a', { timeout: 30000 }).catch(() => {});
+  for (let k = 0; k < 3 && !(await o.locator('#np_a').count()); k++) { if (await o.locator('#lg_user').count()) { await o.fill('#lg_user', shop.user); await o.fill('#lg_pass', shop.pass); await o.press('#lg_pass', 'Enter'); } await o.waitForSelector('#np_a', { timeout: 15000 }).catch(() => {}); } // no CI o primeiro login às vezes demora: tenta de novo
   await o.fill('#np_a', 'DonoNovo#77'); await o.fill('#np_b', 'DonoNovo#77'); await o.press('#np_b', 'Enter'); await o.w(4000);
   await o.evaluate(() => { window.TDC_VCH = 131072; ui.tab = 'products'; render(); }); await o.w(600); // partes pequenas no teste: o envio em várias partes é exercitado com um vídeo leve
   const dir = path.join(ROOT, 'v', shop.id); const files = () => fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => /\.mp4$/.test(f)) : [];
