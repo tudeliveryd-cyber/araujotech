@@ -95,6 +95,17 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check((d.gev || [])[0] && d.gev[0].t === 'Feria Teste' && d.gev[0].d === '2026-12-05', 'evento salvo com data e lugar');
   check((d.gbus || []).length === 3 && (d.gpro || []).length === 1, 'ônibus e profissionais continuam');
   check(await a.locator('.sheet .card h3', { hasText: /Números de la Guía|Números da Guia/ }).count() === 1, 'o painel mostra o cartão de números da Guía');
+  sec('J. Notícias do parceiro');
+  await a.act('close'); await a.act('gusite'); await a.w(2000);
+  await a.fill('[data-gu="news.n"]', 'Diario Teste'); await a.fill('[data-gu="news.feed"]', 'http://inseguro/feed'); await a.locator('[data-gu="news.on"]').check(); await a.w(300);
+  await a.act('gusave'); await a.w(1500);
+  check(!((await doc()).gnews || {}).feed, 'feed sem https não deixa salvar');
+  await a.fill('[data-gu="news.feed"]', 'https://diario.test/feed'); await a.fill('[data-gu="news.site"]', 'https://diario.test'); await a.act('gusave'); await a.w(2500);
+  d = await doc(); info(JSON.stringify(d.gnews));
+  check(d.gnews && d.gnews.n === 'Diario Teste' && d.gnews.feed === 'https://diario.test/feed' && d.gnews.on === true, 'notícias salvas com nome, feed e ligado');
+  check((d.gev || []).length === 1 && (d.gbus || []).length === 3, 'eventos e ônibus continuam');
+  const rep = await a.evaluate(() => { PL.shops.push({ id: 'rep-t', name: 'Loja Rel', contact: '0981 222 333' }); const h = gnRep('rep-t', { c: { 'rep-t': 7 }, s: { 'c-rep-t': 3 } }); PL.shops.pop(); return decodeURIComponent(h); });
+  check(/wa\.me\/595981222333/.test(rep) && /7 veces/.test(rep) && /3 veces en el slider/.test(rep), 'resumo do mês por WhatsApp com os números do cliente');
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });

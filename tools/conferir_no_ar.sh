@@ -28,8 +28,8 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|data-sgu
-https://araujotechsistemas.com/painel/|data-sgu
+https://araujotechsistemas.com/admin/|gnCard
+https://araujotechsistemas.com/painel/|gnCard
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|
@@ -174,6 +174,7 @@ case "$go" in \[*) ok "guia.php?ofs -> ofertas de hoje ($(echo "$go" | grep -o '
 gh1=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' -A 'Mozilla/5.0 (conferir)' -H 'Origin: https://araujotechsistemas.com' "https://araujotechsistemas.com/sitio/guia_hit.php?t=x" 2>/dev/null || true); [ "$gh1" = "204" ] && ok "guia_hit.php responde (contador da Guía)" || bad "guia_hit.php -> $gh1"
 gd=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/sitio/datos/" 2>/dev/null || true); [ "$gd" = "403" ] && ok "pasta de números da Guía fechada ao público (403)" || bad "sitio/datos/ -> $gd (devia ser 403)"
 gst=$(curl -sS --max-time 30 -X POST -d '{"t":"x"}' "https://araujotechsistemas.com/sitio/guia_stats.php" 2>/dev/null || true); [ "$gst" = '{"ok":false}' ] && ok "guia_stats.php recusa quem não é admin" || bad "guia_stats.php -> $gst"
+gn=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?news=1" 2>/dev/null | head -c 300 || true); echo "$gn" | grep -q '"items":\[' && ok "guia.php?news -> notícias do parceiro (desligadas até configurar)" || bad "guia.php?news -> $(echo "$gn" | head -c 120)"
 gm=$(curl -sS --max-time 30 "https://araujotechsistemas.com/guia/manifest.webmanifest" 2>/dev/null || true); echo "$gm" | grep -q '"start_url":"/guia/' && ok "Guía instalável (manifest)" || bad "manifest da Guía não abriu"
 if echo "$gs" | grep -q 'id="sl"' && echo "$gs" | grep -q 'Recomendado por Vitrix'; then ok "Guía com o slider do topo (Publicidad / Recomendado por Vitrix)"; else bad "Guía sem o slider do topo"; fi
 if echo "$gs" | grep -q 'tu-delivery.jpg' && echo "$gs" | grep -q "td_h:'Delivery'" && echo "$gs" | grep -q 'araujo-tech.jpg' && echo "$gs" | grep -q "pro_h:'Profesionales'"; then ok "Guía com os banners (Tu Delivery, Vitrix, Araújo Tech), categoria Delivery e Profesionales"; else bad "Guía sem os banners da casa ou sem a categoria Delivery"; fi

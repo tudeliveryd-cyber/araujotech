@@ -4,7 +4,7 @@ const AT_FS = 'https://firestore.googleapis.com/v1/projects/araujotech-catalogos
 const AT_KEY = 'AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U';
 function at_get($url) {
   if (function_exists('curl_init')) {
-    $c = curl_init($url); curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10, CURLOPT_CONNECTTIMEOUT => 4]);
+    $c = curl_init($url); curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10, CURLOPT_CONNECTTIMEOUT => 4, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 3, CURLOPT_USERAGENT => 'Mozilla/5.0 (GuiaVitrix; +https://araujotechsistemas.com/guia/)']);
     $r = curl_exec($c); $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
     return ($r !== false && $code === 200) ? $r : null;
   }

@@ -2,9 +2,9 @@
 // Guía Vitrix: banners pagos (platform/sitio.gads) e lugares públicos (platform/sitio.gutil), cadastrados no Panel Araújo Tech.
 // Os banners só saem entre as datas escolhidas (hora do Paraguai). A imagem vai por gimg.php (o JSON fica leve).
 function guia_doc() {
-  $cache = sys_get_temp_dir() . '/at_guia4.json';
+  $cache = sys_get_temp_dir() . '/at_guia5.json';
   if (is_file($cache) && time() - filemtime($cache) < 180) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gadsAt');
+  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -16,7 +16,7 @@ function guia_doc() {
     if (isset($v['arrayValue'])) return array_map($val, $v['arrayValue']['values'] ?? []);
     return null;
   };
-  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
+  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
@@ -72,4 +72,38 @@ function guia_pub() {
   }
   usort($ev, function ($a, $b) { return strcmp($a['d'] . $a['h'], $b['d'] . $b['h']); });
   return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 8), 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
+}
+
+// Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
+function guia_news() {
+  $cfg = guia_doc()['gnews'] ?? null;
+  if (!is_array($cfg) || empty($cfg['on']) || !preg_match('#^https://[^\s"\'<>]+$#i', (string)($cfg['feed'] ?? ''))) return ['items' => []];
+  $name = (string)($cfg['n'] ?? ''); $site = preg_match('#^https://[^\s"\'<>]+$#i', (string)($cfg['site'] ?? '')) ? (string)$cfg['site'] : '';
+  $cache = sys_get_temp_dir() . '/at_news_' . md5($cfg['feed']) . '.json';
+  if (is_file($cache) && time() - filemtime($cache) < 1800) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return ['n' => $name, 'site' => $site, 'items' => $d]; }
+  $r = at_get($cfg['feed']); $items = [];
+  if ($r && function_exists('simplexml_load_string')) {
+    $x = @simplexml_load_string($r, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NONET);
+    if ($x) {
+      $list = isset($x->channel->item) ? $x->channel->item : (isset($x->entry) ? $x->entry : []);
+      foreach ($list as $it) {
+        if (count($items) >= 6) break;
+        $t = trim(html_entity_decode(strip_tags((string)$it->title), ENT_QUOTES, 'UTF-8'));
+        $l = (string)$it->link; if ($l === '' && isset($it->link['href'])) $l = (string)$it->link['href'];
+        if ($t === '' || !preg_match('#^https?://#i', $l)) continue;
+        $img = '';
+        $media = $it->children('media', true);
+        if (isset($media->content) && $media->content->attributes()->url) $img = (string)$media->content->attributes()->url;
+        elseif (isset($media->thumbnail) && $media->thumbnail->attributes()->url) $img = (string)$media->thumbnail->attributes()->url;
+        elseif (isset($it->enclosure) && preg_match('#^image/#', (string)$it->enclosure['type'])) $img = (string)$it->enclosure['url'];
+        else { $html = (string)$it->children('content', true)->encoded . (string)$it->description; if (preg_match('#<img[^>]+src="(https://[^"]+)"#i', $html, $m)) $img = $m[1]; }
+        if (!preg_match('#^https://#i', $img)) $img = '';
+        $date = (string)($it->pubDate ?? $it->published ?? $it->updated ?? ''); $ts = $date ? strtotime($date) : 0;
+        $items[] = ['t' => mb_substr($t, 0, 140), 'u' => preg_replace('#^http://#i', 'https://', $l), 'img' => $img, 'd' => $ts ? date('Y-m-d', $ts) : ''];
+      }
+    }
+  }
+  if ($items || !is_file($cache)) @file_put_contents($cache, json_encode($items));
+  elseif (is_file($cache)) { $items = json_decode((string)@file_get_contents($cache), true) ?: []; }
+  return ['n' => $name, 'site' => $site, 'items' => $items];
 }
