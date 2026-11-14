@@ -31,6 +31,8 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stro
 .logo{display:flex;align-items:center;gap:12px;min-width:0}
 .logo img{height:46px;width:auto;max-width:150px;object-fit:contain;border-radius:6px}
 .logo img.wm{height:38px;max-width:210px;border-radius:0}
+.h1wm img{height:clamp(64px,9vw,118px);width:auto;max-width:100%;object-fit:contain;object-position:left center}
+.hd.wmh .logo{opacity:0;transform:translateY(-6px);transition:opacity .25s,transform .25s;pointer-events:none}.hd.wmh.lg .logo{opacity:1;transform:none;pointer-events:auto}
 .logo b{font-family:var(--hf);font-weight:var(--hw);font-size:20px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nav{display:flex;gap:26px;margin-left:auto;font-size:15px;color:var(--mute)}
 .nav a:hover{color:var(--ink)}
@@ -125,7 +127,7 @@ footer .bot a{color:var(--ft-ink);font-weight:500}
 .state div{max-width:440px;display:flex;flex-direction:column;gap:12px;align-items:center}
 .state h1{font-size:30px}.state p{color:var(--mute)}.state small{margin-top:24px;color:var(--mute)}.state small a{color:var(--ink);font-weight:600}
 .sk{min-height:100vh}
-@media (max-width:960px){.prods{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pc .pb{padding:12px}.pc b{font-size:15px}.hd .btn{margin-left:auto}.nav{display:none}.hero{padding:20px 0 56px}.hero .w{grid-template-columns:1fr;gap:28px}.photo{order:-1;aspect-ratio:4/3}.split,.visit{grid-template-columns:1fr;gap:28px}.split>div:last-child{padding-top:0}.list{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr;grid-auto-rows:170px}footer .cols{grid-template-columns:1fr 1fr}footer .cols>div:first-child{grid-column:1/-1}.sec{padding:68px 0}}
+@media (max-width:960px){.hd.wmh .logo{opacity:1;transform:none;pointer-events:auto}.h1wm{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);margin:0}.wmhero .tag{font-family:var(--hf);font-weight:var(--hw);font-size:26px;line-height:1.2;color:var(--ink);margin-top:12px}.prods{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pc .pb{padding:12px}.pc b{font-size:15px}.hd .btn{margin-left:auto}.nav{display:none}.hero{padding:20px 0 56px}.hero .w{grid-template-columns:1fr;gap:28px}.photo{order:-1;aspect-ratio:4/3}.split,.visit{grid-template-columns:1fr;gap:28px}.split>div:last-child{padding-top:0}.list{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr;grid-auto-rows:170px}footer .cols{grid-template-columns:1fr 1fr}footer .cols>div:first-child{grid-column:1/-1}.sec{padding:68px 0}}
 @media (max-width:560px){.w{padding:0 18px}.hd .w{height:66px}.logo img{height:38px}.logo img.wm{height:30px;max-width:170px}.hero h1{margin:12px 0}.hero .cta .btn{flex:1 1 100%}.facts{grid-template-columns:1fr;gap:10px}.contact .btn{width:100%}footer .cols{grid-template-columns:1fr}.hd .btn span{display:none}.hd .btn{width:42px;padding:0}}
 
 /* rodapé centralizado (computador e celular) */
@@ -241,13 +243,14 @@ async function main(){
  const tdy=todayRow(hr,l);let tdyHTML='';if(tdy){const on=tdy[0]===l.hoy?openNow(tdy[1]):null;const isCl=tdy[0]===l.hoy&&closedTxt(tdy[1]);
   tdyHTML=`<b>${isCl?esc(l.closed):shiftsHTML(tdy[1])}</b>${on?`<span class="st ${on.on?'on':'off'}"><i></i>${on.on?`${l.onw} · ${l.until} ${on.until}`:`${l.offw}${on.next?` · ${l.opens} ${on.next}`:''}`}</span>`:isCl?`<span class="st off"><i></i>${l.offw}</span>`:''}`}
  const facts=[tdy?['clock',tdy[0],tdyHTML,'','hoy']:null,s.addr?['pin',l.addr,`<b>${esc(s.addr)}</b>`,ml]:null,s.wa?['chat',l.wa,`<b class="nw">${esc(waShow(s.wa))}</b>`,waL]:null].filter(Boolean);
+ const WM=!!(pal&&pal.wide&&pal.crop);/* logo escrito: aparece grande no topo no lugar do nome, e o do cabeçalho só aparece ao rolar */
  const nav=[prods.length>=2?['productos',lang==='pt'?'Produtos':'Productos']:null,s.about?['nosotros',l.nav[0]]:null,svc.length?['servicios',l.nav[1]]:null,(hr.length||s.addr)?['horarios',l.nav[2]]:null,['contacto',l.nav[3]]].filter(Boolean);
  const ig=igUser(s.ig);const fb=s.fb?(/^https?:/.test(s.fb)?s.fb:'https://facebook.com/'+String(s.fb).replace(/^@/,'')):'';
  app.innerHTML=`
- <header class="hd" id="hd"><div class="w"><a class="logo" href="#">${pal&&pal.wide&&pal.crop?`<img class="wm" src="${pal.crop}" alt="${esc(name)}">`:`${logo?`<img src="${logo}" alt="${esc(name)}">`:''}<b>${esc(name)}</b>`}</a>
+ <header class="hd${WM?' wmh':''}" id="hd"><div class="w"><a class="logo" href="#">${pal&&pal.wide&&pal.crop?`<img class="wm" src="${pal.crop}" alt="${esc(name)}">`:`${logo?`<img src="${logo}" alt="${esc(name)}">`:''}<b>${esc(name)}</b>`}</a>
   <nav class="nav">${nav.map(([h,t])=>`<a href="#${h}">${esc(t)}</a>`).join('')}</nav>${waL?`<a class="btn pri sm" href="${waL}" target="_blank" rel="noopener" aria-label="WhatsApp" style="${nav.length?'':'margin-left:auto'}">${ic('chat')}<span>${l.write}</span></a>`:''}</div></header>
- <section class="hero"><div class="w">
-  <div><p class="where"><i></i>${esc(where)}</p><h1>${esc(name)}</h1>${s.tag?`<p class="tag">${esc(s.tag)}</p>`:''}
+ <section class="hero${WM?' wmhero':''}"><div class="w">
+  <div><p class="where"><i></i>${esc(where)}</p>${WM?`<h1 class="h1wm"><img src="${pal.crop}" alt="${esc(name)}"></h1>`:`<h1>${esc(name)}</h1>`}${s.tag?`<p class="tag">${esc(s.tag)}</p>`:''}
    <div class="cta">${s.cat?`<a class="btn pri" href="${esc(s.cat)}" target="_blank" rel="noopener">${esc(tx.cat)}${ic('arrow')}</a>`:''}${waL?`<a class="btn ${s.cat?'out':'pri'}" href="${waL}" target="_blank" rel="noopener">${ic('chat')}${esc(tx.call)}</a>`:''}${!s.cat&&ml?`<a class="btn out" href="${ml}" target="_blank" rel="noopener">${ic('pin')}${l.how}</a>`:''}</div>
    ${facts.length?`<div class="facts">${facts.map(([i,a,h,u,c])=>`<${u?`a href="${esc(u)}" target="_blank" rel="noopener"`:'div'} class="fc${c?' '+c:''}"><span class="fi">${ic(i)}</span><span class="ft"><small>${esc(a)}</small>${h}</span></${u?'a':'div'}>`).join('')}</div>`:''}</div>
   ${heroUrl?`<div class="photo"><img src="${heroUrl}" alt="${esc(name)}" fetchpriority="high"></div>`:`<div class="photo brand">${pal&&pal.crop?`<img src="${pal.crop}" alt="${esc(name)}">`:logo?`<img src="${logo}" alt="${esc(name)}">`:`<b>${esc(name.slice(0,1).toUpperCase())}</b>`}</div>`}
@@ -270,7 +273,7 @@ async function main(){
  <div class="lb" id="lb"><img alt=""></div>`;
  document.querySelectorAll('.sec .split>div,.sec>.w>h2,.visit,.contact,.gal').forEach(x=>x.classList.add('rv'));
  if('IntersectionObserver'in window){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{rootMargin:'0px 0px -8% 0px'});document.querySelectorAll('.rv').forEach(x=>io.observe(x))}else document.querySelectorAll('.rv').forEach(x=>x.classList.add('in'));
- const hd=document.getElementById('hd');const onS=()=>hd.classList.toggle('b',scrollY>8);addEventListener('scroll',onS,{passive:true});onS();
+ const hd=document.getElementById('hd');const h1w=document.querySelector('.h1wm');const onS=()=>{hd.classList.toggle('b',scrollY>8);if(h1w)hd.classList.toggle('lg',h1w.getBoundingClientRect().bottom<hd.offsetHeight)};addEventListener('scroll',onS,{passive:true});onS();
  const lb=document.getElementById('lb');document.querySelectorAll('.gal img').forEach(im=>im.addEventListener('click',()=>{lb.querySelector('img').src=im.src;lb.classList.add('on')}));lb.addEventListener('click',()=>lb.classList.remove('on'));
 }
 main();
