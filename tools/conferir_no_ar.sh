@@ -18,7 +18,7 @@ while IFS='|' read -r url marca; do
   else ok "$url -> 200, ${tam} bytes${marca:+, versão nova confirmada ($marca)}"; fi
   rm -f "$body"
 done <<'URLS'
-https://araujotechsistemas.com/|clientes.js?v=3
+https://araujotechsistemas.com/|gv_b1
 https://araujotechsistemas.com/vitrix/|demo-autos
 https://araujotechsistemas.com/catalogo-digital/|vitrix
 https://araujotechsistemas.com/img/vitrix/vitrix-blanco.png|
@@ -28,8 +28,8 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|gxCards
-https://araujotechsistemas.com/painel/|gxCards
+https://araujotechsistemas.com/admin/|data-sgu
+https://araujotechsistemas.com/painel/|data-sgu
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|

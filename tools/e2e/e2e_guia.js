@@ -79,8 +79,9 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(d.gbus[0].d === 'asu' && d.gbus[1].h === '05:40' && d.gbus[1].e === 'Empresa Teste' && d.gbus[2].h === '06:15', 'duplicar copia a empresa; fica ordenado por destino e hora');
   check(((d.gpro || []).length === 1) && (d.gutil || []).length === n0 + 1, 'profissionais e lugares continuam');
   sec('H. Premium recomendado, VIP com anúncio');
-  const tiers = await a.evaluate(() => { PL.plans.push({ id: 't-vip', n: 'VIP', price: 1 }, { id: 't-prem', n: 'Premium', price: 1 }, { id: 't-bas', n: 'Básico', price: 1 }); const r = ['t-vip', 't-prem', 't-bas'].map(id => guTier({ plan: id, sys: 'catalogo' })); PL.plans.splice(-3, 3); return r; });
+  const tiers = await a.evaluate(() => { PL.plans.push({ id: 't-vip', n: 'VIP', price: 1 }, { id: 't-prem', n: 'Premium', price: 1 }, { id: 't-bas', n: 'Básico', price: 1 }); const r = ['t-vip', 't-prem', 't-bas'].map(id => guTier({ plan: id, sys: 'catalogo' })).concat([guTier({ plan: 't-bas', gu: 'vip' }), guTier({ plan: 't-bas', gu: 'rec' }), guTier({ plan: 't-vip', gu: 'none' })]); PL.plans.splice(-3, 3); return r; });
   info(JSON.stringify(tiers)); check(tiers[0] === 2 && tiers[1] === 1 && tiers[2] === 0, 'VIP = recomendado + slider, Premium = só recomendado, Básico = nada');
+  check(tiers[3] === 2 && tiers[4] === 1 && tiers[5] === 0, 'a escolha manual no cliente vale mais que o plano (recomendar, slider ou tirar o destaque)');
   sec('I. Farmácia de turno e agenda de eventos');
   await a.act('close'); await a.act('gusite'); await a.w(2000);
   await a.act('guadd', '[data-k="turno"]'); await a.w(300);
