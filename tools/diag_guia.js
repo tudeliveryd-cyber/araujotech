@@ -36,7 +36,7 @@ const sh = c => { try { return execSync(c, { encoding: 'utf8', timeout: 60000 })
     for (const [n, o] of [['pc', { viewport: { width: 1440, height: 980 }, deviceScaleFactor: 2 }], ['cel', { ...devices['iPhone 13'] }]]) {
       const ctx = await b.newContext(o); const p = await ctx.newPage(); await p.goto(U + '/guia/', { waitUntil: 'networkidle' }).catch(() => {}); await p.waitForTimeout(4000);
       await p.evaluate(() => { try { SL.hold = true; slGo(0); } catch (e) {} }); await p.waitForTimeout(800);
-      await p.screenshot({ path: 'guia-telas/guia-' + n + '.png' }); await ctx.close(); }
+      const f = 'guia-telas/guia-' + n + '.jpg'; await p.screenshot({ path: f, type: 'jpeg', quality: 88 }); const b64 = fs.readFileSync(f).toString('base64'); for (let i = 0; i < b64.length; i += 4000) console.log('IMG64 ' + n + ' ' + b64.slice(i, i + 4000)); await ctx.close(); }
     console.log('telas salvas'); }
   await b.close();
 })();
