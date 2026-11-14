@@ -148,7 +148,7 @@ function readHr(){site.hours=[...document.querySelectorAll('#hrRows .r')].map(r=
 function resize(file,max,keepPng){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{const sc=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);const x=c.getContext('2d');if(!keepPng){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(im,0,0,c.width,c.height);
   if(keepPng){const u=c.toDataURL('image/png');if(u.length<700000){res(u);return}}let q=.84,u;do{u=c.toDataURL('image/jpeg',q);q-=.1}while(u.length>850000&&q>.4);res(u)};im.src=fr.result};fr.readAsDataURL(file)})}
 const syncRows=()=>{if(document.getElementById('svcRows')){readSvc();readHr()}};
-async function upload(k,file){syncRows();try{const isLogo=k==='sl';const u=await resize(file,isLogo?500:k==='sh'?1800:1400,isLogo&&/png|svg|webp/.test(file.type));if(u.length>950000){toast(t('big'),true);return}
+async function upload(k,file){syncRows();try{const isLogo=k==='sl';const u=await resize(file,isLogo?800:k==='sh'?1800:1400,isLogo&&/png|svg|webp/.test(file.type));if(u.length>950000){toast(t('big'),true);return}
  const ph=site.ph;let key=k;if(k==='sg'){if((+ph.g||0)>=8)return;key='sg'+(+ph.g||0)}
  toast(t('saving'));await API.putImg(SHOP,key,u);imgs[key]=u;if(k==='sh'){ph.h=1;ph.hc=1}else if(k==='sl'){ph.l=1;ph.lc=1}else ph.g=(+ph.g||0)+1;ph.v=Date.now();
  await API.putSite(SHOP,{ph});render();toast(t('photo_ok'))}catch(e){console.warn(e);toast(t('err'),true)}}

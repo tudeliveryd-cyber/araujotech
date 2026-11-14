@@ -4163,8 +4163,8 @@ function toast(msg,bad){const r=document.getElementById('toastRoot');r.innerHTML
 function savePub(){let adm=false;try{adm=!CLOUD_ON||CLOUD.admin}catch(e){adm=!CLOUD_ON}if(adm&&pub&&pub.store){const a=feeSnap(pub);pub.store.feeApproved=a;if(draft&&draft.store)draft.store.feeApproved=JSON.parse(JSON.stringify(a))}S.set(K.pub,pub);S.set(K.draft,draft);queueCloudSave()}
 function applyBoth(fn){fn(pub);fn(draft);savePub()}
 function dirty(){ui.state='dirty';ui.confirmPub=false;refreshPreview();const b=document.querySelector('[data-act="publish"]');if(b){b.className='btn pri';b.textContent=t('publish')}}
-function resizeImg(file,max,cb){/* foto do celular (até 48 MP): lê direto do arquivo, reduz e só então vira texto — não trava nem fecha a página */
- const done=(src,w,h,fin)=>{try{const s=Math.min(1,max/Math.max(w,h));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*s));c.height=Math.max(1,Math.round(h*s));const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(src,0,0,c.width,c.height);fin&&fin();const u=c.toDataURL('image/jpeg',.82);c.width=c.height=0;cb(u)}catch(e){fin&&fin();console.warn(e);toast(t('img_err'),true)}};
+function resizeImg(file,max,cb,o){o=o||{};/* foto do celular (até 48 MP): lê direto do arquivo, reduz e só então vira texto — não trava nem fecha a página */
+ const done=(src,w,h,fin)=>{try{const s=Math.min(1,max/Math.max(w,h));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*s));c.height=Math.max(1,Math.round(h*s));const x=c.getContext('2d');if(!o.png){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(src,0,0,c.width,c.height);fin&&fin();const u=c.toDataURL(o.png?'image/png':'image/jpeg',o.q||.82);c.width=c.height=0;cb(u)}catch(e){fin&&fin();console.warn(e);toast(t('img_err'),true)}};
  const viaImg=()=>{const url=URL.createObjectURL(file);const im=new Image();im.decoding='async';im.onload=()=>done(im,im.naturalWidth,im.naturalHeight,()=>URL.revokeObjectURL(url));im.onerror=()=>{URL.revokeObjectURL(url);toast(t('img_err'),true)};im.src=url};
  if(window.createImageBitmap){createImageBitmap(file).then(b=>done(b,b.width,b.height,()=>{try{b.close()}catch(e){}})).catch(viaImg)}else viaImg()}
 function setPath(obj,path,v){const ks=path.split('.');let o=obj;ks.slice(0,-1).forEach(k=>o=o[k]);o[ks[ks.length-1]]=v}
@@ -4451,8 +4451,8 @@ document.addEventListener('change',e=>{const el=e.target;
  if(el.dataset.adfile!=null&&el.files&&el.files[0]){const i=+el.dataset.adfile;resizeImg(el.files[0],1400,u=>{applyBoth(c=>{if(c.store.ads[i])c.store.ads[i].img=u});render()});return}
  if(el.dataset.slfile!=null&&el.files&&el.files[0]){const i=+el.dataset.slfile;resizeImg(el.files[0],1400,u=>{draft.store.slides[i].img=u;ui.state='dirty';render()});return}
  if(el.id==='coverFile'&&el.files[0]){resizeImg(el.files[0],1400,u=>{draft.store.cover=u;ui.state='dirty';render()});return}
- if(el.id==='nsLogoFile'&&el.files[0]){resizeImg(el.files[0],256,u=>{ui.ns.logo=u;themeFromLogo(u,null,th=>{ui.ns.th=th;ui.ns.uselc=true;newShopSheet()})});return}
-  if(el.id==='logoFile'&&el.files[0]){resizeImg(el.files[0],256,u=>{draft.store.logo=u;ui.state='dirty';render()});return}
+ if(el.id==='nsLogoFile'&&el.files[0]){resizeImg(el.files[0],512,u=>{ui.ns.logo=u;themeFromLogo(u,null,th=>{ui.ns.th=th;ui.ns.uselc=true;newShopSheet()})},{png:/png|webp|svg/.test(el.files[0].type),q:.92});return}
+  if(el.id==='logoFile'&&el.files[0]){resizeImg(el.files[0],512,u=>{draft.store.logo=u;ui.state='dirty';render()},{png:/png|webp|svg/.test(el.files[0].type),q:.92});return}
  if(el.id==='ckProof'&&el.files[0]){resizeImg(el.files[0],1000,u=>{ck.proof=u;checkoutSheet()});return}
  if(el.id==='prodFile'&&el.files[0]){const f=el.files[0];resizeImg(f,720,u=>{ui.edit.photo=u;ui.edit.hq=null;delete ui.edit.hqk;editorSheet();hqImg(f,h=>{if(ui.edit&&ui.edit.photo===u){ui.edit.hq=h;ui.edit.hqk=hashStr(u)}})});return}
  if(el.dataset&&el.dataset.ecolph!=null&&el.files&&el.files[0]){const g=colG(ui.edit),o=g&&g.o[+el.dataset.ecolph];if(!o)return;hqImg(el.files[0],u=>{o.ph=u;editorSheet()});return}
