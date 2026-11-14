@@ -67,6 +67,17 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check((d.gutil || []).length === n0 + 1, 'os lugares continuam');
   await a.act('close'); await a.act('atsite'); await a.w(2500); await a.act('atsave'); await a.w(2500);
   check(((await doc()).gpro || []).length === 1, 'salvar o site não apaga os profissionais');
+  sec('G. Horários de ônibus');
+  await a.act('close'); await a.act('gusite'); await a.w(2000);
+  await a.act('guadd', '[data-k="bus"]'); await a.w(300);
+  await a.fill('[data-gu="bus.0.h"]', '06:15'); await a.fill('[data-gu="bus.0.e"]', 'Empresa Teste'); await a.fill('[data-gu="bus.0.dias"]', 'Lun a sáb');
+  await a.act('gubusdup', '[data-i="0"]'); await a.w(300); await a.fill('[data-gu="bus.1.h"]', '05:40');
+  await a.act('guadd', '[data-k="bus"]'); await a.w(300); await a.locator('select[data-gu="bus.2.d"]').selectOption('asu'); await a.w(300); await a.fill('[data-gu="bus.2.h"]', '21:00');
+  await a.act('guadd', '[data-k="bus"]'); await a.w(300);
+  await a.act('gusave'); await a.w(2500); d = await doc(); info(JSON.stringify(d.gbus));
+  check((d.gbus || []).length === 3, 'salva os 3 horários com hora (o vazio fica de fora)');
+  check(d.gbus[0].d === 'asu' && d.gbus[1].h === '05:40' && d.gbus[1].e === 'Empresa Teste' && d.gbus[2].h === '06:15', 'duplicar copia a empresa; fica ordenado por destino e hora');
+  check(((d.gpro || []).length === 1) && (d.gutil || []).length === n0 + 1, 'profissionais e lugares continuam');
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });

@@ -28,8 +28,8 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|gpCard
-https://araujotechsistemas.com/painel/|gpCard
+https://araujotechsistemas.com/admin/|gbCard
+https://araujotechsistemas.com/painel/|gbCard
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|
@@ -167,7 +167,7 @@ if echo "$gu" | grep -q 'Guía Vitrix'; then ok "Guía Vitrix no ar (araujotechs
 gp=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?ids=lojastatus" 2>/dev/null | head -c 2000 || true)
 if echo "$gp" | grep -q '"lojastatus":{"days":\['; then ok "guia.php -> horários da Status para o 'Abierto ahora'"; else bad "guia.php -> resposta inesperada: $(echo "$gp" | head -c 160)"; fi
 gg=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?g=1" 2>/dev/null | head -c 3000 || true)
-if echo "$gg" | grep -q '^{"ads":\[' && echo "$gg" | grep -q '"pros":\['; then ok "guia.php?g=1 -> banners pagos e lugares públicos ($(echo "$gg" | grep -o '"img"' | wc -l) banner(s) no ar)"; else bad "guia.php?g=1 -> resposta inesperada: $(echo "$gg" | head -c 160)"; fi
+if echo "$gg" | grep -q '^{"ads":\[' && echo "$gg" | grep -q '"bus":\['; then ok "guia.php?g=1 -> banners pagos e lugares públicos ($(echo "$gg" | grep -o '"img"' | wc -l) banner(s) no ar)"; else bad "guia.php?g=1 -> resposta inesperada: $(echo "$gg" | head -c 160)"; fi
 gs=$(curl -sS --max-time 30 "https://araujotechsistemas.com/guia/" 2>/dev/null || true)
 if echo "$gs" | grep -q 'id="sl"' && echo "$gs" | grep -q 'Recomendado por Vitrix'; then ok "Guía com o slider do topo (Publicidad / Recomendado por Vitrix)"; else bad "Guía sem o slider do topo"; fi
 if echo "$gs" | grep -q 'tu-delivery.jpg' && echo "$gs" | grep -q "td_h:'Delivery'" && echo "$gs" | grep -q 'araujo-tech.jpg' && echo "$gs" | grep -q "pro_h:'Profesionales'"; then ok "Guía com os banners (Tu Delivery, Vitrix, Araújo Tech), categoria Delivery e Profesionales"; else bad "Guía sem os banners da casa ou sem a categoria Delivery"; fi

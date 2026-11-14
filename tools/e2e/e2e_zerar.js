@@ -39,7 +39,7 @@ const { info, sec, check } = L;
   sec('B. Araújo Tech (admin) no painel do local');
   const B = await L.open({ w: 1280 }); const b = B.p;
   await b.goto(HOST + '/painel/'); await b.waitForFunction(() => { const x = document.querySelector('#loginForm button[type=submit]'); return x && !x.disabled; }, null, { timeout: 20000 }).catch(() => {});
-  await b.fill('#lg_user', 'admin'); await b.fill('#lg_pass', ADM[1]); await b.press('#lg_pass', 'Enter'); await b.w(8000);
+  for (let k = 0; k < 3 && (await b.locator('#lg_user').count()); k++) { await b.fill('#lg_user', 'admin'); await b.fill('#lg_pass', ADM[1]); await b.press('#lg_pass', 'Enter'); await b.waitForSelector('#lg_user', { state: 'detached', timeout: 20000 }).catch(() => {}); } await b.w(3000); // no CI o login demora mais
   await b.evaluate(() => { ui.tab = 'orders'; render(); }); await b.w(800);
   check(await b.locator('[data-act=wipeord]').count() === 1, 'o admin vê "Empezar de cero (solo Araújo Tech)"');
   await b.locator('[data-act=wipeord]').click(); await b.w(1500);
