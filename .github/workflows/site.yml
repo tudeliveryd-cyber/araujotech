@@ -79,6 +79,7 @@ jobs:
           RewriteEngine On
           # Guía Vitrix: aceita /Guia, /GUIA, /guía, /guia (com ou sem barra)
           RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
+          RewriteCond %{REQUEST_URI} !^/guia/$
           RewriteRule ^gu(i|í|%C3%AD)a/?$ /guia/ [R=301,NC,L]
           # endereço com letras maiúsculas (ex.: /Status) vira minúsculo
           RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
