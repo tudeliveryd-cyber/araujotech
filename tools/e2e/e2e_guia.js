@@ -13,7 +13,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
 
   await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(500);
   sec('A. Abrir a Guía no painel');
-  check(await a.locator('[data-act="gusite"]').count() > 0, 'o painel tem o botão Guía ao lado do site da Araújo Tech');
+  check(await a.locator('[data-act="gusite"]').count() > 0, 'o painel tem o cartão Guía Vitrix com Administrar');
   await a.act('gusite'); await a.w(2000);
   check(await a.evaluate(() => !!ui.gu && ui.gu.ads.length === 0 && ui.gu.util.length === 0), 'abre vazio (sem banners e sem lugares)');
 
@@ -78,6 +78,9 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check((d.gbus || []).length === 3, 'salva os 3 horários com hora (o vazio fica de fora)');
   check(d.gbus[0].d === 'asu' && d.gbus[1].h === '05:40' && d.gbus[1].e === 'Empresa Teste' && d.gbus[2].h === '06:15', 'duplicar copia a empresa; fica ordenado por destino e hora');
   check(((d.gpro || []).length === 1) && (d.gutil || []).length === n0 + 1, 'profissionais e lugares continuam');
+  sec('H. Premium recomendado, VIP com anúncio');
+  const tiers = await a.evaluate(() => { PL.plans.push({ id: 't-vip', n: 'VIP', price: 1 }, { id: 't-prem', n: 'Premium', price: 1 }, { id: 't-bas', n: 'Básico', price: 1 }); const r = ['t-vip', 't-prem', 't-bas'].map(id => guTier({ plan: id, sys: 'catalogo' })); PL.plans.splice(-3, 3); return r; });
+  info(JSON.stringify(tiers)); check(tiers[0] === 2 && tiers[1] === 1 && tiers[2] === 0, 'VIP = recomendado + slider, Premium = só recomendado, Básico = nada');
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });

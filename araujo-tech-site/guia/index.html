@@ -21,7 +21,7 @@ a{color:inherit}
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
 .hdr{color:#fff;background:var(--night)}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px}
-.brand img{height:34px;width:auto;display:block}
+.brand img{height:34px;width:auto;display:block}.nav>a.bk{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:14px;font-weight:700;padding:7px 12px 7px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.35)}.nav>a.bk svg{width:18px;height:18px}.nav>a.bk+.brand{margin-right:auto;margin-left:14px}
 .right{display:flex;align-items:center;gap:10px}
 .back{font-size:15px;font-weight:500;text-decoration:none;opacity:.85}.back:hover{opacity:1}
 .lang{display:flex;padding:2px;border-radius:999px;border:1px solid rgba(255,255,255,.4);font-size:12px;font-weight:700}
@@ -119,12 +119,13 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
 .bus-nx{display:flex;gap:8px;align-items:center;margin:12px 0 8px;font-size:15px}.bus-nx svg{width:18px;height:18px;color:#11845A}.bus-l{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}.bus-r{display:flex;gap:12px;align-items:center;padding:9px 12px;border-radius:12px;background:#FBF8FE;border:1px solid var(--line)}.bus-r b{font-family:var(--display);font-size:19px;color:var(--deep);min-width:56px}.bus-r span{font-size:14px;line-height:1.25}.bus-r small{display:block;color:var(--muted);font-size:12px}.bus-r.nx{background:#E7F7EE;border-color:#A7E3C2}
 .pjoin{font-size:13.5px;color:var(--muted);margin-top:12px}.pjoin a{color:var(--deep);font-weight:700}
 @media (prefers-reduced-motion:reduce){.sl-tr{transition:none}}
+@media (min-width:900px){.hero .wrap{text-align:center}.hero .vx{margin:0 auto 22px}.hero h1,.hero p{margin-left:auto;margin-right:auto}.sl,.sl-dt,.srch{margin-left:auto;margin-right:auto}.sl{text-align:left}.sl-dt{max-width:900px}.sl{max-width:900px}.srch{max-width:900px}.srch input{text-align:left}.chips{justify-content:center}}
 @media (max-width:640px){.sl{border-radius:16px}.sd .in{max-width:94%;padding:0 16px;gap:6px}.sd p{display:none}.sd h3{font-size:18px}.sd .tg{font-size:10.5px;padding:3px 8px}.sd .bt{font-size:12.5px;padding:6px 12px;margin-top:2px}.sl{margin-top:20px}.sl-dt{margin-top:10px}.sd.cl::after{background:linear-gradient(0deg,rgba(20,4,36,.92) 0%,rgba(20,4,36,.5) 55%,rgba(20,4,36,.1) 100%)}.sd .sl-lg{width:38px;height:38px;border-radius:10px}.sl-nv{display:none}}
-@media (max-width:640px){.wrap{padding:0 16px}.back{display:none}.hero{padding:30px 0 84px}.hero .vx{height:32px}.chips{flex-wrap:nowrap;overflow-x:auto;margin-right:-16px;padding-right:16px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap}.cta{padding:24px}}
+@media (max-width:640px){.wrap{padding:0 16px}.back{display:none}.nav>a.bk span{display:none}.nav>a.bk{padding:7px;margin-right:0}.nav>a.bk+.brand{margin-left:10px}.hero{padding:30px 0 84px}.hero .vx{height:32px}.chips{flex-wrap:nowrap;overflow-x:auto;margin-right:-16px;padding-right:16px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap}.cta{padding:24px}}
 </style></head>
 <body>
 <header class="hdr"><div class="wrap nav">
- <a class="brand" href="../" aria-label="Araújo Tech Sistemas"><img src="../img/logo-blanco.png" alt="Araújo Tech Sistemas"></a>
+ <a class="bk" href="../" id="bk" aria-label="Volver al sitio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span data-t="bk">Volver</span></a><a class="brand" href="../" aria-label="Araújo Tech Sistemas"><img src="../img/logo-blanco.png" alt="Araújo Tech Sistemas"></a>
  <div class="right"><a class="back" href="../vitrix/" data-t="what">¿Qué es Vitrix?</a><div class="lang" role="group" aria-label="Idioma"><button data-lang="es">ES</button><button data-lang="pt">PT</button></div></div>
 </div></header>
 <section class="hero"><div class="wrap">
@@ -159,8 +160,8 @@ const ini=n=>String(n).split(/\s+/).filter(w=>/[\p{L}\p{N}]/u.test(w)).slice(0,2
 const safe=u=>/^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(String(u||''))?u:'';
 const logoU=u=>{u=safe(u);return /\/logo\.php$/.test(u)?u+'?v=2':u};
 const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
-Object.assign(TX.es,{bus_h:'Horarios de ómnibus · salidas de Santa Rita',bus_nx:'Próxima salida hoy:',bus_none:'No hay más salidas hoy para este destino.',bus_vf:'Horarios informados por la terminal y las empresas; pueden cambiar. Confirmá antes de viajar.',bus_at:'Actualizado el',pro_h:'Profesionales',pro_web:'Sitio',pro_join:'¿Sos profesional y querés aparecer acá?',pro_join_b:'Escribinos',td_h:'Delivery',td_p:'Delivery en Santa Rita · De confianza',td_go:'Pedir por WhatsApp',ad:'Publicidad',dvx:'Recomendado por Vitrix',sl_lab:'Recomendados y publicidad',sl_prev:'Anterior',sl_next:'Siguiente',u_route:'Cómo llegar'});
-Object.assign(TX.pt,{bus_h:'Horários de ônibus · saídas de Santa Rita',bus_nx:'Próxima saída hoje:',bus_none:'Não há mais saídas hoje para este destino.',bus_vf:'Horários informados pela terminal e pelas empresas; podem mudar. Confirme antes de viajar.',bus_at:'Atualizado em',pro_h:'Profissionais',pro_web:'Site',pro_join:'É profissional e quer aparecer aqui?',pro_join_b:'Fale com a gente',td_h:'Delivery',td_p:'Delivery em Santa Rita · De confianza',td_go:'Pedir pelo WhatsApp',ad:'Publicidade',dvx:'Recomendado pela Vitrix',sl_lab:'Recomendados e publicidade',sl_prev:'Anterior',sl_next:'Próximo',u_route:'Como chegar'});
+Object.assign(TX.es,{bk:'Volver',bus_h:'Horarios de ómnibus · salidas de Santa Rita',bus_nx:'Próxima salida hoy:',bus_none:'No hay más salidas hoy para este destino.',bus_vf:'Horarios informados por la terminal y las empresas; pueden cambiar. Confirmá antes de viajar.',bus_at:'Actualizado el',pro_h:'Profesionales',pro_web:'Sitio',pro_join:'¿Sos profesional y querés aparecer acá?',pro_join_b:'Escribinos',td_h:'Delivery',td_p:'Delivery en Santa Rita · De confianza',td_go:'Pedir por WhatsApp',ad:'Publicidad',dvx:'Recomendado por Vitrix',sl_lab:'Recomendados y publicidad',sl_prev:'Anterior',sl_next:'Siguiente',u_route:'Cómo llegar'});
+Object.assign(TX.pt,{bk:'Voltar',bus_h:'Horários de ônibus · saídas de Santa Rita',bus_nx:'Próxima saída hoje:',bus_none:'Não há mais saídas hoje para este destino.',bus_vf:'Horários informados pela terminal e pelas empresas; podem mudar. Confirme antes de viajar.',bus_at:'Atualizado em',pro_h:'Profissionais',pro_web:'Site',pro_join:'É profissional e quer aparecer aqui?',pro_join_b:'Fale com a gente',td_h:'Delivery',td_p:'Delivery em Santa Rita · De confianza',td_go:'Pedir pelo WhatsApp',ad:'Publicidade',dvx:'Recomendado pela Vitrix',sl_lab:'Recomendados e publicidade',sl_prev:'Anterior',sl_next:'Próximo',u_route:'Como chegar'});
 let L=(()=>{try{const v=localStorage.getItem('at_lang');if(v==='es'||v==='pt')return v}catch(e){}return /^pt/i.test(navigator.language||'')?'pt':'es'})();
 let LIST=null,CAT='all',F_OPEN=false,F_DEL=false;
 /* palavras do dia a dia que levam à categoria certa (quem busca 'almuerzo' acha os restaurantes) */
@@ -209,7 +210,7 @@ let SL={items:[],i:0,tm:null,sig:'',ord:null};
 const TD_WA='https://wa.me/595982086171?text='+encodeURIComponent('Hola Tu Delivery, quiero pedir un delivery');
 const HOUSE=[{id:'h-td',t:'Tu Delivery · 0982 086 171',u:TD_WA,img:'/img/guia/tu-delivery.jpg?v=5'},{id:'h-vx',t:'Planes Vitrix',u:'https://araujotechsistemas.com/vitrix/#planes',img:'/img/guia/vitrix-planes.jpg?v=5'},{id:'h-at',t:'Araújo Tech Sistemas · 0982 086 171',u:'https://wa.me/595982086171?text='+encodeURIComponent('Hola Araújo Tech, quiero información sobre sistemas y sitios web para mi negocio'),img:'/img/guia/araujo-tech.jpg?v=2'}];
 function slItems(){const ads=(G.ads||[]).filter(a=>a&&a.img).map(a=>({k:'ad',a}));
- const dest=(LIST||[]).filter(c=>c.dest).map(c=>({k:'cl',c}));
+ const dest=(LIST||[]).filter(c=>c.vip).map(c=>({k:'cl',c}));/* slider: só plano VIP; Premium fica com o selo Recomendado na lista */
  if(!SL.ord)SL.ord={};const o=x=>{const id=x.k==='ad'?'a'+x.a.id:'c'+x.c.id;if(SL.ord[id]==null)SL.ord[id]=Math.random();return SL.ord[id]};
  return ads.sort((x,y)=>o(x)-o(y)).concat(dest.sort((x,y)=>o(x)-o(y)),HOUSE.map(a=>({k:'own',a})))}
 function slideHTML(x){const t=TX[L];if(x.k==='ad'||x.k==='own'){const a=x.a,u=safe(a.u),tag=u?'a':'div',pd=x.k==='ad';return `<${tag} class="sd ad-s"${u?` href="${esc(u)}" target="_blank" rel="noopener${pd?' sponsored':''}"`:''} aria-label="${esc(pd?t.ad+(a.t?': '+a.t:''):a.t)}"><img class="bgi" src="${esc(a.img)}" alt="" aria-hidden="true">${a.imgm?`<picture><source media="(max-width:640px)" srcset="${esc(a.imgm)}">`:''}<img class="fg" src="${esc(a.img)}" alt="${esc(a.t||t.ad)}">${a.imgm?'</picture>':''}${pd?`<span class="ad">${t.ad}</span>`:''}</${tag}>`}
@@ -267,6 +268,7 @@ try{const c=JSON.parse(localStorage.getItem(CK)||'null');if(c&&Date.now()-c.t<7*
 if(LIST)render();else slRender();
 AT_CLIENTES.load(l=>{if(!l.length&&LIST)return;setList(l);render();ckSave();
  const ids=LIST.map(c=>c.id).filter(Boolean);if(ids.length)fetch('/sitio/guia.php?ids='+encodeURIComponent(ids.join(','))).then(r=>r.ok?r.json():{}).then(j=>{INFO=j||{};render();ckSave()}).catch(()=>{})});
+document.getElementById('bk').addEventListener('click',e=>{try{const r=document.referrer;if(r&&new URL(r).host===location.host&&!/\/guia\/?/.test(new URL(r).pathname)&&history.length>1){e.preventDefault();history.back()}}catch(er){}});/* veio do site: volta para onde estava */
 window.addEventListener('pageshow',e=>{if(e.persisted)location.reload()});/* voltar para a aba: mostra sempre a versão nova */
 fetch('/sitio/guia.php?g=1').then(r=>r.ok?r.json():null).then(j=>{if(j&&typeof j==='object'){G={ads:Array.isArray(j.ads)?j.ads:[],util:Array.isArray(j.util)?j.util:null,pros:Array.isArray(j.pros)?j.pros:[],bus:Array.isArray(j.bus)?j.bus:[],at:typeof j.at==='string'?j.at:''};if(LIST)render();else slRender();ckSave()}}).catch(()=>{});
 setInterval(()=>{if(LIST)render()},60000);/* 'Abierto ahora' se atualiza sozinho */
