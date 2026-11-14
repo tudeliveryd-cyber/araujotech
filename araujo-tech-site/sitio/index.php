@@ -15,6 +15,7 @@ try {
     $slug = explode('/', $path)[0] ?? '';
   }
   $slug = strtolower(trim($slug));
+  if (isset($_GET['low']) && !isset($_GET['s']) && preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $slug)) { header('Location: /' . $slug, true, 301); exit; } // /Status → /status
   if ($slug !== '' && $slug !== 'sitio' && preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $slug)) {
     $rec = at_site($slug);
     // araujotechsistemas.com/nome → nome.araujotechsistemas.com (o nome da empresa na frente). Só quando nenhuma loja tem esse nome.

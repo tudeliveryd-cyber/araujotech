@@ -159,6 +159,9 @@ rf=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code} %{redirect_url}' "http
 if [ "$rf" = "301 https://fogao-mineiro.araujotechsistemas.com/" ]; then ok "araujotechsistemas.com/fogao-mineiro leva para fogao-mineiro.araujotechsistemas.com"; else bad "araujotechsistemas.com/fogao-mineiro -> $rf"; fi
 sf=$(curl -sS --max-time 30 "https://fogao-mineiro.araujotechsistemas.com/" 2>/dev/null | head -c 20000 || true)
 if echo "$sf" | grep -q 'AT_SITE_SLUG="fogao-mineiro"'; then ok "site do Fogão em fogao-mineiro.araujotechsistemas.com"; else bad "fogao-mineiro.araujotechsistemas.com não mostra o site ($(echo "$sf" | grep -o '<title>[^<]*' | head -1))"; fi
+for gv in Guia GUIA guia; do gr=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code} %{redirect_url}' "https://araujotechsistemas.com/$gv" 2>/dev/null || true); case "$gr" in 301\ https://araujotechsistemas.com/guia/) ok "/$gv leva para a Guía";; *) bad "/$gv -> $gr";; esac; done
+nf=$(curl -sS --max-time 30 "https://araujotechsistemas.com/nao-existe-xyz/a.html" 2>/dev/null | head -c 3000 || true)
+if echo "$nf" | grep -q 'No encontramos esta página'; then ok "página de 'não encontrado' amigável"; else bad "endereço errado não mostra a página amigável"; fi
 gu=$(curl -sS --max-time 30 "https://araujotechsistemas.com/guia/" 2>/dev/null | head -c 6000 || true)
 if echo "$gu" | grep -q 'Guía Vitrix'; then ok "Guía Vitrix no ar (araujotechsistemas.com/guia/)"; else bad "araujotechsistemas.com/guia/ não abriu a Guía Vitrix"; fi
 gp=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?ids=lojastatus" 2>/dev/null | head -c 2000 || true)

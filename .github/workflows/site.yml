@@ -77,6 +77,15 @@ jobs:
           # BEGIN araujotech-sitios
           <IfModule mod_rewrite.c>
           RewriteEngine On
+          # Guía Vitrix: aceita /Guia, /GUIA, /guía, /guia (com ou sem barra)
+          RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
+          RewriteRule ^gu(i|í|%C3%AD)a/?$ /guia/ [R=301,NC,L]
+          # endereço com letras maiúsculas (ex.: /Status) vira minúsculo
+          RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteCond %{REQUEST_URI} ^/[A-Za-z0-9-]*[A-Z][A-Za-z0-9-]*/?$
+          RewriteRule ^([A-Za-z0-9-]+)/?$ /sitio/index.php?low=1 [L]
           RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
           RewriteCond %{REQUEST_FILENAME} !-f
           RewriteCond %{REQUEST_FILENAME} !-d
@@ -92,6 +101,7 @@ jobs:
           Header set Cache-Control "public, max-age=604800"
           </FilesMatch>
           </IfModule>
+          ErrorDocument 404 /nao-encontrado.html
           # END araujotech-sitios
           HT
           sed -i 's/^          //' ht_new
