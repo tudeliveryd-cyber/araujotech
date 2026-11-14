@@ -26,6 +26,8 @@ const FX = __dirname + '/fix/';
   sec('0. Título da aba do painel');
   const ttl = await o.evaluate(() => document.title); info(ttl);
   check(ttl === 'Galeria E2E · Panel del local', 'a aba do painel mostra o nome da loja (não "Fogão Mineiro")');
+  const cl = await o.evaluate(() => [...document.querySelectorAll('a.btn')].filter(a => /Catálogo|Catalogo/i.test(a.textContent)).map(a => a.getAttribute('href'))); info(JSON.stringify(cl));
+  check(cl.length && cl.every(h => h === HOST + '/'), 'o botão Catálogo do painel abre o endereço próprio da loja (não fogaomineiro.../loja/)');
 
   sec('A. Painel: produto com foto principal e 2 fotos a mais');
   await o.evaluate(() => acts.newprod()); await o.w(500);
