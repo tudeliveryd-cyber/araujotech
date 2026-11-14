@@ -11,7 +11,13 @@ echo "== 1. Páginas no ar (status e versão publicada)"
 # url | texto que precisa existir na página (prova de que a versão nova está no ar)
 while IFS='|' read -r url marca; do
   [ -z "$url" ] && continue
-  body=$(mktemp); code=$(curl -sS -L -A "$UA" --compressed --max-time 40 -o "$body" -w '%{http_code}' "$url" 2>/dev/null || echo 000)
+  body=$(mktemp); code=000
+  # até 3 tentativas: logo depois de publicar, o envio dos arquivos ainda pode estar no meio (página antiga ou pela metade)
+  for tent in 1 2 3; do
+    code=$(curl -sS -L -A "$UA" --compressed --max-time 40 -o "$body" -w '%{http_code}' "$url" 2>/dev/null || echo 000)
+    if [ "$code" = "200" ] && { [ -z "$marca" ] || grep -q -- "$marca" "$body"; }; then break; fi
+    [ "$tent" != 3 ] && sleep 25
+  done
   tam=$(wc -c < "$body")
   if [ "$code" != "200" ]; then bad "$url -> HTTP $code"
   elif [ -n "$marca" ] && ! grep -q -- "$marca" "$body"; then bad "$url -> 200, mas SEM a versão nova (falta '$marca')"

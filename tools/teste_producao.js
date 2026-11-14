@@ -96,10 +96,10 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     const d = await p.evaluate(() => {
       const S = pub.store, L = x => (x && typeof x === 'object') ? (x.es || x.pt || '') : String(x || '');
       const pr = pub.products || [], cats = (pub.cats || []).map(c => c.id);
-      const pe = []; pr.forEach(q => { const n = L(q.n); if (!n.trim()) pe.push('produto sem nome (' + q.id + ')'); if (!(+q.price > 0) || !isFinite(+q.price)) pe.push(n + ': preço inválido (' + q.price + ')'); if (q.promo && !(+q.promo > 0 && +q.promo < +q.price)) pe.push(n + ': promoção ' + q.promo + ' não é menor que o preço ' + q.price); if (!cats.includes(q.cat)) pe.push(n + ': categoria inexistente'); (q.g || []).forEach(g => (g.o || []).forEach(o => { if (!(+o.p >= 0)) pe.push(n + ': adicional com preço inválido'); })); });
+      const pe = []; pr.forEach(q => { const n = L(q.n); if (!n.trim()) pe.push('produto sem nome (' + q.id + ')'); if (!isFinite(+q.price) || +q.price < 0 || (!(+q.price > 0) && S.mode !== 'consulta')) pe.push(n + ': preço inválido (' + q.price + ')'); /* em modo consulta, preço 0 = "Consultar precio" */ if (q.promo && !(+q.promo > 0 && +q.promo < +q.price)) pe.push(n + ': promoção ' + q.promo + ' não é menor que o preço ' + q.price); if (!cats.includes(q.cat)) pe.push(n + ': categoria inexistente'); (q.g || []).forEach(g => (g.o || []).forEach(o => { if (!(+o.p >= 0)) pe.push(n + ': adicional com preço inválido'); })); });
       const br = (S.bairros || []); const be = []; const seen = {}; br.forEach(x => { const n = String(x.name || x.n || '').trim(); if (!n) be.push('bairro sem nome'); if (seen[n.toLowerCase()]) be.push('bairro repetido: ' + n); seen[n.toLowerCase()] = 1; const f = x.fee; if (f !== '' && f != null && !(+f >= 0 && isFinite(+f))) be.push(n + ': taxa inválida (' + f + ')'); });
       const cp = (S.coupons || []); const ce = []; cp.forEach(c => { if (!/^[A-Z0-9]{2,20}$/.test(String(c.code || ''))) ce.push('cupom com código inválido: ' + c.code); if (c.type === 'pct' && !(+c.value > 0 && +c.value <= 100)) ce.push(c.code + ': porcentagem inválida ' + c.value); if (c.type !== 'pct' && c.type !== 'frete' && !(+c.value > 0)) ce.push(c.code + ': valor inválido ' + c.value); });
-      return { name: S.name, np: pr.length, on: pr.filter(q => q.on).length, nb: br.length, nbFee: br.filter(x => x.fee !== '' && x.fee != null && +x.fee >= 0).length, nc: cp.filter(c => c.on).length, feeMode: S.feeMode || '', delivery: S.delivery !== false, pe, be, ce, simple: (pr.find(q => q.on && !(q.g || []).length && !q.u) || pr.find(q => q.on) || {}).id || '', wa: String(S.whatsapp || '').replace(/\D/g, ''), coupons: cp.filter(c => c.on).map(c => ({ code: c.code, type: c.type, value: +c.value, min: +c.min || 0 })), paused: !!S.paused };
+      return { name: S.name, np: pr.length, on: pr.filter(q => q.on).length, nb: br.length, nbFee: br.filter(x => x.fee !== '' && x.fee != null && +x.fee >= 0).length, nc: cp.filter(c => c.on).length, feeMode: S.feeMode || '', delivery: S.delivery !== false, pe, be, ce, simple: (pr.find(q => q.on && !(q.g || []).length && !q.u) || pr.find(q => q.on) || {}).id || '', wa: String(S.whatsapp || '').replace(/\D/g, ''), coupons: cp.filter(c => c.on).map(c => ({ code: c.code, type: c.type, value: +c.value, min: +c.min || 0 })), paused: !!S.paused, consulta: S.mode === 'consulta' };
     });
     d.pe.concat(d.be, d.ce).forEach(E);
     if (!d.np) E('nenhum produto cadastrado'); if (d.wa.length < 9) E('WhatsApp do local inválido (' + d.wa + ')');
@@ -110,9 +110,11 @@ const gsTxt = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
       if (!(await card.count())) { E('produto ' + d.simple + ' não aparece no catálogo'); }
       else {
         await card.click(); await p.waitForTimeout(500);
-        const add = p.locator('[data-act=addcart]:visible'); if (await add.count()) { await add.first().click(); await p.waitForTimeout(500); }
+        const add = p.locator('[data-act=addcart]:visible'); const cq = await p.locator('[data-act=cqsend]:visible').count(); if (await add.count()) { await add.first().click(); await p.waitForTimeout(500); }
         const st0 = await p.evaluate(() => ({ n: cart.length, sub: cart.length ? subtotal() : 0 }));
-        if (!st0.n) { conta = 'não foi possível adicionar ao carrinho (loja fechada/pausada ou opção obrigatória)'; }
+        if (!st0.n && d.consulta && cq) { conta = 'modo consulta: o produto abre com "Consultar por WhatsApp" (sem carrinho), como esperado'; }
+        else if (!st0.n && d.consulta) { E('modo consulta sem o botão de consultar por WhatsApp'); }
+        else if (!st0.n) { conta = 'não foi possível adicionar ao carrinho (loja fechada/pausada ou opção obrigatória)'; }
         else {
           await p.evaluate(() => { checkoutSheet(); }); await p.waitForTimeout(500);
           const rows = async () => p.evaluate(() => { const s = document.querySelector('.sheet'); if (!s) return null; const t = s.innerText.split('\n').map(x => x.trim()).filter(Boolean); const after = k => { const i = t.findIndex(x => k.test(x)); return i < 0 ? '' : t[i + 1] || ''; }; return { sub: after(/^Subtotal$/i), fee: after(/^(Costo de envío|Taxa de entrega|Envío|Entrega)$/i), disc: (t.find(x => /^-\s?Gs\./.test(x)) || ''), total: after(/^Total$/i) }; });
