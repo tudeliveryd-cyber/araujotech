@@ -12,15 +12,15 @@ function at_get($url) {
   return $r === false ? null : $r;
 }
 function at_shop_cfg($id) {
-  $cache = sys_get_temp_dir() . '/at_pcfg2_' . md5($id) . '.json';
+  $cache = sys_get_temp_dir() . '/at_pcfg3_' . md5($id) . '.json';
   if (is_file($cache) && time() - filemtime($cache) < 600) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d ?: null; }
-  $r = at_get(AT_FS . rawurlencode($id) . '?key=' . AT_KEY . '&mask.fieldPaths=cfg&mask.fieldPaths=status&mask.fieldPaths=mediaCount&mask.fieldPaths=site.maps&mask.fieldPaths=site.lat&mask.fieldPaths=site.lng');
+  $r = at_get(AT_FS . rawurlencode($id) . '?key=' . AT_KEY . '&mask.fieldPaths=cfg&mask.fieldPaths=status&mask.fieldPaths=mediaCount&mask.fieldPaths=site.maps&mask.fieldPaths=site.lat&mask.fieldPaths=site.lng&mask.fieldPaths=site.ph&mask.fieldPaths=lim');
   $out = [];
   if ($r) {
     $f = (json_decode($r, true)['fields'] ?? []);
     $cfg = json_decode((string)($f['cfg']['stringValue'] ?? ''), true);
     $sf = $f['site']['mapValue']['fields'] ?? []; $num = function ($v) { return isset($v['doubleValue']) ? (float)$v['doubleValue'] : (isset($v['integerValue']) ? (float)$v['integerValue'] : null); };
-    if (is_array($cfg)) $out = ['cfg' => $cfg, 'status' => (string)($f['status']['stringValue'] ?? ''), 'mc' => (int)($f['mediaCount']['integerValue'] ?? 0), 'site' => ['maps' => (string)($sf['maps']['stringValue'] ?? ''), 'lat' => $num($sf['lat'] ?? null), 'lng' => $num($sf['lng'] ?? null)]];
+    if (is_array($cfg)) $out = ['cfg' => $cfg, 'status' => (string)($f['status']['stringValue'] ?? ''), 'mc' => (int)($f['mediaCount']['integerValue'] ?? 0), 'site' => ['maps' => (string)($sf['maps']['stringValue'] ?? ''), 'lat' => $num($sf['lat'] ?? null), 'lng' => $num($sf['lng'] ?? null), 'g' => (int)($sf['ph']['mapValue']['fields']['g']['integerValue'] ?? 0), 'pv' => (string)($sf['ph']['mapValue']['fields']['v']['integerValue'] ?? ($sf['ph']['mapValue']['fields']['v']['doubleValue'] ?? ''))], 'off' => array_map(function ($v) { return (string)($v['stringValue'] ?? ''); }, $f['lim']['mapValue']['fields']['off']['arrayValue']['values'] ?? [])];
   }
   @file_put_contents($cache, json_encode($out));
   return $out ?: null;

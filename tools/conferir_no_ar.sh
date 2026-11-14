@@ -34,8 +34,8 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|kErr
-https://araujotechsistemas.com/painel/|kErr
+https://araujotechsistemas.com/admin/|gdCard
+https://araujotechsistemas.com/painel/|gdCard
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|
@@ -182,6 +182,9 @@ gd=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' "https://araujotechsi
 gst=$(curl -sS --max-time 30 -X POST -d '{"t":"x"}' "https://araujotechsistemas.com/sitio/guia_stats.php" 2>/dev/null || true); [ "$gst" = '{"ok":false}' ] && ok "guia_stats.php recusa quem não é admin" || bad "guia_stats.php -> $gst"
 gn=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?news=1" 2>/dev/null | head -c 300 || true); echo "$gn" | grep -q '"items":\[' && ok "guia.php?news -> notícias do parceiro (desligadas até configurar)" || bad "guia.php?news -> $(echo "$gn" | head -c 120)"
 gt=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?top=1" 2>/dev/null | head -c 300 || true); echo "$gt" | grep -q '"q":\[' && ok "guia.php?top -> 'Lo más buscado'" || bad "guia.php?top -> $(echo "$gt" | head -c 120)"
+gg=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?g=1" 2>/dev/null | head -c 200000 || true); echo "$gg" | grep -q '"dir":\[' && ok "guia.php?g -> traz as fichas de negócios sem catálogo" || bad "guia.php?g sem 'dir': $(echo "$gg" | head -c 120)"
+gi=$(curl -sS --max-time 60 "https://araujotechsistemas.com/sitio/guia.php?ids=fogao-mineiro,lojastatus,nauticabrustolin" 2>/dev/null | head -c 3000 || true); echo "$gi" | grep -q '"days":' && ok "guia.php?ids -> horários (e nota, quando há 3 ou mais opiniões): $(echo "$gi" | grep -o '"r[tn]":[0-9.]*' | tr '\n' ' ')" || bad "guia.php?ids -> $(echo "$gi" | head -c 120)"
+gb=$(curl -sS --max-time 40 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/guia/fogao-mineiro" 2>/dev/null || true); [ "$gb" = "200" ] && ok "página do negócio na Guía responde 200" || bad "página do negócio na Guía -> HTTP $gb"
 ga=$(curl -sS --max-time 40 "https://araujotechsistemas.com/guia/aparecer/" 2>/dev/null || true); echo "$ga" | grep -q 'Enviar por WhatsApp' && ok "/guia/aparecer/ -> página para negócios entrarem na Guía" || bad "/guia/aparecer/ sem o formulário"
 gc=$(curl -sS --max-time 40 "https://araujotechsistemas.com/guia/" 2>/dev/null || true); echo "$gc" | grep -q 'href="/guia/aparecer/"' && echo "$gc" | grep -q 'data-tq' && ok "Guía aponta para /guia/aparecer/ e tem 'Lo más buscado'" || bad "Guía sem link para /guia/aparecer/ ou sem 'Lo más buscado'"
 gq=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 -A "Mozilla/5.0 (iPhone)" "https://araujotechsistemas.com/sitio/guia_hit.php?t=q&id=0981123456" 2>/dev/null || true); [ "$gq" = "204" ] && ok "guia_hit t=q recusa número de telefone" || bad "guia_hit t=q -> $gq"

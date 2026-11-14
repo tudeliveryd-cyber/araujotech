@@ -63,6 +63,8 @@ foreach ($ids as $id) {
     $days[] = ['on' => ($d['on'] ?? true) !== false, 'a' => array_slice((array)($d['a'] ?? []), 0, 2), 'b' => array_slice((array)($d['b'] ?? []), 0, 2)];
   }
   $o = ['days' => $days, 'del' => !empty($st['delivery']), 'pick' => !empty($st['pickup']), 'paused' => !empty($st['paused'])];
+  if (!function_exists('guia_reviews')) require_once __DIR__ . '/guia_lib.php';
+  $rv = guia_reviews($id, $s); if ($rv) { $o['rt'] = $rv['avg']; $o['rn'] = $rv['n']; }
   // capa e slogan do catálogo (slider da Guía para os clientes Premium e VIP)
   if (preg_match('/^m:([a-z0-9]{2,24})$/', (string)($st['cover'] ?? ''), $m)) $o['cv'] = '/sitio/pimg.php?s=' . rawurlencode($id) . '&k=' . $m[1];
   else { $best = null; foreach ((array)($s['cfg']['products'] ?? []) as $p) { if (!is_array($p) || ($p['on'] ?? true) === false || !preg_match('/^m:([a-z0-9]{2,24})$/', (string)($p['photo'] ?? ''), $m)) continue; if (!empty($p['feat'])) { $best = $m[1]; break; } if ($best === null) $best = $m[1]; }

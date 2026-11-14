@@ -2,9 +2,9 @@
 // Guía Vitrix: banners pagos (platform/sitio.gads) e lugares públicos (platform/sitio.gutil), cadastrados no Panel Araújo Tech.
 // Os banners só saem entre as datas escolhidas (hora do Paraguai). A imagem vai por gimg.php (o JSON fica leve).
 function guia_doc() {
-  $cache = sys_get_temp_dir() . '/at_guia5.json';
+  $cache = sys_get_temp_dir() . '/at_guia6.json';
   if (is_file($cache) && time() - filemtime($cache) < 180) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gadsAt');
+  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -16,7 +16,7 @@ function guia_doc() {
     if (isset($v['arrayValue'])) return array_map($val, $v['arrayValue']['values'] ?? []);
     return null;
   };
-  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
+  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
@@ -71,7 +71,17 @@ function guia_pub() {
     $ev[] = ['t' => (string)$x['t'], 'd' => (string)$x['d'], 'h' => (string)($x['h'] ?? ''), 'l' => (string)($x['l'] ?? ''), 'u' => $u];
   }
   usort($ev, function ($a, $b) { return strcmp($a['d'] . $a['h'], $b['d'] . $b['h']); });
-  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 8), 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
+  // negócios sem catálogo (ficha simples cadastrada no Panel Araújo Tech)
+  $dir = [];
+  foreach ((array)($d['gdir'] ?? []) as $x) {
+    if (!is_array($x) || ($x['on'] ?? true) === false || trim((string)($x['n'] ?? '')) === '') continue;
+    $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
+    $m = (string)($x['map'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $m)) $m = '';
+    $g = (string)($x['g'] ?? 'serv'); if (!in_array($g, ['food', 'shop', 'health', 'home', 'car', 'serv'], true)) $g = 'serv';
+    $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80)];
+    if (count($dir) >= 300) break;
+  }
+  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 8), 'dir' => $dir, 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
@@ -140,4 +150,26 @@ function guia_loc($id, $sh) {
     if (is_array($c) && isset($c['lat'], $c['lng']) && !$dflt($c['lat'], $c['lng'])) return ['lat' => round((float)$c['lat'], 6), 'lng' => round((float)$c['lng'], 6), 'src' => 'site'];
   }
   return null;
+}
+
+// Opiniões dos clientes de um catálogo (as mesmas regras do catálogo: só as não ocultas; a nota aparece com 3 ou mais;
+// o texto, só de 4 e 5 estrelas). Respeita "mostrar opiniones" desligado e o plano sem opiniões. 30 minutos em cache.
+function guia_reviews($id, $sh) {
+  if (!$sh || (($sh['cfg']['store']['showRev'] ?? true) === false) || in_array('reviews', (array)($sh['off'] ?? []), true)) return null;
+  $cache = sys_get_temp_dir() . '/at_grev_' . md5($id) . '.json';
+  if (is_file($cache) && time() - filemtime($cache) < 1800) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d ?: null; }
+  $r = at_get(AT_FS . rawurlencode($id) . '/reviews?pageSize=100&key=' . AT_KEY);
+  if ($r === null) return null;
+  $n = 0; $sum = 0; $top = [];
+  foreach ((json_decode($r, true)['documents'] ?? []) as $doc) {
+    $f = $doc['fields'] ?? []; if (!empty($f['hidden']['booleanValue'])) continue;
+    $st = (int)($f['stars']['integerValue'] ?? 0); if ($st < 1 || $st > 5) continue;
+    $n++; $sum += $st;
+    $tx = trim((string)($f['text']['stringValue'] ?? ''));
+    if ($st >= 4 && $tx !== '') $top[] = ['s' => $st, 't' => mb_substr($tx, 0, 400), 'n' => mb_substr(explode(' ', trim((string)($f['name']['stringValue'] ?? '')))[0], 0, 30), 'd' => substr((string)($f['date']['stringValue'] ?? ($f['date']['timestampValue'] ?? '')), 0, 10)];
+  }
+  usort($top, function ($a, $b) { return strcmp($b['d'], $a['d']); });
+  $out = $n >= 3 ? ['n' => $n, 'avg' => round($sum / $n, 1), 'top' => array_slice($top, 0, 4)] : [];
+  @file_put_contents($cache, json_encode($out));
+  return $out ?: null;
 }
