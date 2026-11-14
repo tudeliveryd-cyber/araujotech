@@ -70,7 +70,10 @@ async function phpRoute(ctx) { // os endereços oficiais do servidor de vídeos 
   const q = (s, up) => `?op=up&shop=${s}&up=${up}&i=0&n=1&off=0`;
   check((await php(q(shop.id, 'aaaaaaaaaaaaaaaa'), { body: chunk })).s === 401, 'sem login: recusado');
   check((await php(q(shop.id, 'aaaaaaaaaaaaaaaa'), { body: chunk, headers: { authorization: 'Bearer ' + 'x'.repeat(40) } })).s === 401, 'login falso: recusado');
-  check((await php(q('outraloja', 'aaaaaaaaaaaaaaaa'), { body: chunk, headers: { authorization: 'Bearer ' + tk.idToken } })).s === 403, 'login de uma loja não envia vídeo para outra');
+  for (let i = 0; i < 10 && !tk.idToken; i++) { await new Promise(r => setTimeout(r, 1500)); tk = await L.signIn(shop.user + '@araujotechsistemas.com', 'DonoNovo#77'); } // no CI a troca de senha às vezes ainda está terminando
+  const r3 = await php(q('outraloja', 'aaaaaaaaaaaaaaaa'), { body: chunk, headers: { authorization: 'Bearer ' + tk.idToken } });
+  info('login do dono: ' + (tk.idToken ? 'ok' : 'SEM TOKEN ' + JSON.stringify(tk).slice(0, 160)) + ' | outra loja -> ' + JSON.stringify(r3).slice(0, 160));
+  check(r3.s === 403, 'login de uma loja não envia vídeo para outra');
   check((await php(q(shop.id, 'bbbbbbbbbbbbbbbb'), { body: Buffer.from('<?php echo 1; ?>' + 'x'.repeat(100)), headers: { authorization: 'Bearer ' + tk.idToken } })).s === 415, 'arquivo que não é vídeo: recusado');
   check((await php(`?op=del&shop=${shop.id}&f=../video.php`, { headers: { authorization: 'Bearer ' + tk.idToken } })).s === 400 && fs.existsSync(path.join(ROOT, 'video.php')), 'não dá para apagar nada fora da pasta de vídeos');
   check(fs.existsSync(path.join(ROOT, 'v', '.htaccess')) && /Require all denied/.test(fs.readFileSync(path.join(ROOT, 'v', '.htaccess'), 'utf8')), 'a pasta de vídeos não executa PHP');
