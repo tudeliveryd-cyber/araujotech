@@ -134,6 +134,19 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
 .tiles{margin:4px 0 34px}.tiles h2{font-family:var(--display);font-weight:900;font-size:22px;display:flex;align-items:center;gap:10px;margin-bottom:12px}.tiles h2 svg{width:22px;height:22px;color:var(--purple)}.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.tile{font:inherit;text-align:left;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--ink);transition:transform .15s,border-color .15s,box-shadow .15s}.tile:hover{transform:translateY(-2px);border-color:#CDB6EC;box-shadow:0 14px 28px -20px rgba(74,10,128,.5)}.ti{width:46px;height:46px;border-radius:14px;background:var(--lilac);color:var(--purple);display:grid;place-items:center;margin-bottom:6px}.ti svg{width:24px;height:24px}.tile b{font-size:16px;line-height:1.25}.tile small{color:var(--muted);font-size:13px}
 .bkh{margin:4px 0 34px}.bkh button{font:inherit;font-weight:700;font-size:14.5px;color:var(--deep);background:var(--lilac);border:0;border-radius:999px;padding:10px 16px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}.bkh button svg{width:16px;height:16px;transform:rotate(180deg)}
 @media (max-width:640px){.tg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* computador: tudo centralizado no meio da página */
+@media (min-width:900px){
+ .tiles h2,.grp h2,.util h2,.evs h2,.nws h2,.ofs h2{justify-content:center}
+ .util>p,.uh,.vf,.nws-by,.pjoin,.bkh{text-align:center}
+ .tg,.grid,.ugrid,.nws-g,.bus-g{display:flex;flex-wrap:wrap;justify-content:center}
+ .tg>*{flex:0 1 206px}.grid>*{flex:0 1 350px}.ugrid>*{flex:0 1 268px}.nws-g>*{flex:0 1 350px}.bus-g>*{flex:0 0 74px}
+ .bus{max-width:1112px;margin-left:auto;margin-right:auto}.bus-tabs{justify-content:center}.bus-nx{justify-content:center}
+ .ofs-r{justify-content:safe center}
+ .tu{max-width:720px;margin-left:auto;margin-right:auto}
+ .sub2{justify-content:center}
+}
+/* celular: o último quadro sozinho ocupa a linha inteira */
+@media (max-width:640px){.tg>.tile:last-child:nth-child(odd){grid-column:1/-1}}
 .pjoin{font-size:13.5px;color:var(--muted);margin-top:12px}.pjoin a{color:var(--deep);font-weight:700}
 @media (prefers-reduced-motion:reduce){.sl-tr{transition:none}}
 @media (min-width:900px){.hero .wrap{text-align:center}.hero .vx{margin:0 auto 22px}.hero .wrap>h1,.hero .wrap>p{margin-left:auto;margin-right:auto}.sl,.sl-dt,.srch{margin-left:auto;margin-right:auto}.sl{text-align:left}.sl-dt{max-width:900px}.sl{max-width:900px}.srch{max-width:900px}.srch input{text-align:left}.chips{justify-content:safe center}.filt{justify-content:center}}
