@@ -151,7 +151,7 @@ if echo "$pt" | grep -q 'Status · Panel del local'; then ok "painel da Status -
 pm=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/manifest.json" 2>/dev/null || true)
 if echo "$pm" | grep -q '"name":"Panel Status"'; then ok "atalho do painel da Status -> Panel Status"; else bad "atalho do painel da Status -> $pm"; fi
 # site padrão: produtos em destaque vindos do catálogo (prods.php) e a foto do primeiro produto (pimg.php)
-pj=$(curl -sS --max-time 30 "https://araujotechsistemas.com/sitio/prods.php?id=fogaomineiro" 2>/dev/null || true)
+pj=$(curl -sS --max-time 30 "https://araujotechsistemas.com/sitio/prods.php?id=lojastatus" 2>/dev/null || true)
 if echo "$pj" | grep -q '"items":\['; then
   pu=$(echo "$pj" | grep -o '"img":"[^"]*"' | head -1 | sed 's/"img":"//;s/"$//;s#\\/#/#g')
   if [ -n "$pu" ]; then pt=$(curl -sS --max-time 40 -o /dev/null -w '%{http_code} %{content_type} %{size_download}' "https://araujotechsistemas.com$pu" 2>/dev/null || true); case "$pt" in "200 image/jpeg"*) ok "produtos do site padrão -> $(echo "$pj" | grep -o '"id"' | wc -l) produtos; foto: $pt";; *) bad "foto de produto do site padrão -> $pt ($pu)";; esac; else ok "produtos do site padrão -> responde, sem produtos com foto"; fi
