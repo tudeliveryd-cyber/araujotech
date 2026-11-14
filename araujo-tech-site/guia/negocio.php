@@ -47,7 +47,8 @@ if ($days && empty($st['paused'])) {
 }
 $DN = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; $SCH = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 $addr = trim(preg_replace('/^[\s—-]+/u', '', (string)($st['address'] ?? ''))); $loc = guia_loc($id, $sh); $lat = $loc['lat'] ?? null; $lng = $loc['lng'] ?? null; $hasGeo = (bool)$loc;
-$mapQ = $hasGeo ? $lat . ',' . $lng : trim($name . ', ' . ($addr ?: ($city ?: 'Santa Rita')) . (stripos($addr, 'Santa Rita') === false && stripos($addr, $city ?: 'zz') === false ? ', ' . ($city ?: 'Santa Rita') : ''));
+$mapQ = $hasGeo ? $lat . ',' . $lng : trim($name . ', ' . ($addr ?: ($city ?: 'Santa Rita')) . (stripos($addr, 'Santa Rita') === false && stripos($addr, $city ?: 'zz') === false ? ', ' . ($city ?: 'Santa Rita') : '')) . (stripos($addr, 'Alto Paran') === false ? ', Alto Paraná' : '') . ', Paraguay';
+// sempre com o país: sem ele, 'Fogão Mineiro, Centro' caía num restaurante de Juiz de Fora (Brasil)
 $mapUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($mapQ);
 $wa = preg_replace('/\D/', '', (string)($st['whatsapp'] ?? '')); if ($wa && $wa[0] === '0') $wa = '595' . substr($wa, 1); elseif ($wa && strpos($wa, '595') !== 0 && strlen($wa) <= 10) $wa = '595' . $wa;
 $waUrl = $wa ? 'https://wa.me/' . $wa . '?text=' . rawurlencode('Hola ' . $name . ', te encontré en la Guía Vitrix') : '';
