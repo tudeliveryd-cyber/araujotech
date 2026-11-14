@@ -17,7 +17,8 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);bac
 img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 .w{max-width:1180px;margin:0 auto;padding:0 24px}
-h1,h2,h3{font-family:var(--hf);font-weight:var(--hw);line-height:1.08;letter-spacing:-.02em}
+h1,h2,h3{font-family:var(--hf);font-weight:var(--hw);line-height:1.12;letter-spacing:-.01em}
+h1{letter-spacing:-.02em}h3{letter-spacing:0}
 svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:50px;padding:0 24px;border-radius:var(--r);font-weight:600;font-size:15px;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,color .15s}
 .btn.pri{background:var(--ac);color:var(--ac-ink)}.btn.pri:hover{filter:brightness(.92)}
@@ -61,6 +62,7 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stro
 .sec{padding:96px 0;border-top:1px solid var(--line)}
 .sec.alt{background:var(--paper);border-top:0}
 .split{display:grid;grid-template-columns:.8fr 1.2fr;gap:64px}
+.split>div:last-child{padding-top:21px}/* começa na altura do título (o traço colorido fica acima dele) */
 .sec h2{font-size:clamp(32px,3.8vw,48px)}
 .sec h2::before{content:'';display:block;width:36px;height:3px;border-radius:3px;background:var(--ac);margin-bottom:18px}
 .contact h2::before{display:none}
@@ -84,7 +86,7 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stro
 .item{padding:24px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:44px 1fr;gap:4px 10px}
 .sec.alt .item{border-color:color-mix(in srgb,var(--ink) 12%,transparent)}
 .item span{font-size:13px;color:var(--ac-tx);font-weight:600;padding-top:4px;font-variant-numeric:tabular-nums}
-.item b{font-size:19px;font-weight:600;font-family:var(--hf);letter-spacing:-.01em}
+.item b{font-size:18px;font-weight:600;font-family:var(--hf);letter-spacing:0;line-height:1.35}
 .item p{grid-column:2;color:var(--mute)}
 .gal{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:220px;gap:12px;margin-top:44px}
 .gal img{width:100%;height:100%;object-fit:cover;border-radius:var(--r);cursor:zoom-in}
@@ -123,7 +125,7 @@ footer .bot a{color:var(--ft-ink);font-weight:500}
 .state div{max-width:440px;display:flex;flex-direction:column;gap:12px;align-items:center}
 .state h1{font-size:30px}.state p{color:var(--mute)}.state small{margin-top:24px;color:var(--mute)}.state small a{color:var(--ink);font-weight:600}
 .sk{min-height:100vh}
-@media (max-width:960px){.prods{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pc .pb{padding:12px}.pc b{font-size:15px}.hd .btn{margin-left:auto}.nav{display:none}.hero{padding:20px 0 56px}.hero .w{grid-template-columns:1fr;gap:28px}.photo{order:-1;aspect-ratio:4/3}.split,.visit{grid-template-columns:1fr;gap:28px}.list{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr;grid-auto-rows:170px}footer .cols{grid-template-columns:1fr 1fr}footer .cols>div:first-child{grid-column:1/-1}.sec{padding:68px 0}}
+@media (max-width:960px){.prods{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.pc .pb{padding:12px}.pc b{font-size:15px}.hd .btn{margin-left:auto}.nav{display:none}.hero{padding:20px 0 56px}.hero .w{grid-template-columns:1fr;gap:28px}.photo{order:-1;aspect-ratio:4/3}.split,.visit{grid-template-columns:1fr;gap:28px}.split>div:last-child{padding-top:0}.list{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr;grid-auto-rows:170px}footer .cols{grid-template-columns:1fr 1fr}footer .cols>div:first-child{grid-column:1/-1}.sec{padding:68px 0}}
 @media (max-width:560px){.w{padding:0 18px}.hd .w{height:66px}.logo img{height:38px}.logo img.wm{height:30px;max-width:170px}.hero h1{margin:12px 0}.hero .cta .btn{flex:1 1 100%}.facts{grid-template-columns:1fr;gap:10px}.contact .btn{width:100%}footer .cols{grid-template-columns:1fr}.hd .btn span{display:none}.hd .btn{width:42px;padding:0}}
 
 /* rodapé centralizado (computador e celular) */
