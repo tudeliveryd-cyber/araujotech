@@ -2766,7 +2766,8 @@ function cartSheet(){
  ${cart.length?`<div class="sh-foot">${blockedNow(pub.store)?`<button class="btn-main" disabled>${esc(openLabel(pub.store))}</button>`:`<button class="btn-main" data-act="checkout" ${bad?'disabled':''}>${t('continue')}</button>`}</div>`:''}`)}
 let ckErr={};
 function checkoutSheet(){
- const st=pub.store;if(MESA&&!limOff('mesas'))ck.mode='mesa';{const av=['delivery','pickup','envio'].filter(k=>k==='envio'?!!st.ship:!!st[k]);if(ck.mode&&ck.mode!=='mesa'&&!av.includes(ck.mode))ck.mode='';if(!ck.mode&&av.length===1)ck.mode=av[0]}
+ const st=pub.store;if(MESA&&!limOff('mesas'))ck.mode='mesa';
+ if(MODE==='demo'&&!ck._demo){ck._demo=1;if(!ck.name)ck.name=lang==='pt'?'Cliente teste':'Cliente de prueba';if(!ck.phone)ck.phone='0981 123 456';if(!ck.mode&&st.delivery&&!(MESA&&!limOff('mesas')))ck.mode='delivery'}/* demonstração: dados já preenchidos; só tocar em Usar mi ubicación e enviar */{const av=['delivery','pickup','envio'].filter(k=>k==='envio'?!!st.ship:!!st[k]);if(ck.mode&&ck.mode!=='mesa'&&!av.includes(ck.mode))ck.mode='';if(!ck.mode&&av.length===1)ck.mode=av[0]}
  const pays=Object.keys(st.pay).filter(k=>st.pay[k]);if(!pays.includes(ck.pay))ck.pay=pays[0]||'';
  if(st.feeMode==='bairro'&&ck.bairro&&ck.bairro!=='__out'&&!bairroFee())ck.bairro='';
  if(ck.coupon&&!activeCoupon(subtotal())){const c=pub.store.coupons.find(x=>x.on&&x.code===ck.coupon);ckErr.coupon=c?`${t('err_coupon_min')} ${gs(c.min)}`:t('err_coupon');ck.couponIn=ck.coupon;ck.coupon=''}
@@ -4270,7 +4271,7 @@ const acts={
  checkout(){if(blockedNow(pub.store)){closeSheet();render();toast(openLabel(pub.store),true);return}ckErr={};checkoutSheet()},
  mode(el){ck.mode=el.dataset.m;delete ckErr.mode;checkoutSheet()},
  gps(){if(!navigator.geolocation){ck.gps='fail';checkoutSheet();return}ck.gps='wait';checkoutSheet();
-  try{navigator.geolocation.getCurrentPosition(p=>{ck.lat=p.coords.latitude;ck.lng=p.coords.longitude;ck.gps='ok';ck.zone=zoneByKm(dist(pub.store.lat,pub.store.lng,ck.lat,ck.lng));ck.bairroAuto='';if(pub.store.feeMode==='bairro'){const nb=nearestBairro(ck.lat,ck.lng);if(nb){ck.bairro=nb.name;ck.bairroAuto=nb.name;delete ckErr.bairro}}checkoutSheet()},()=>{ck.gps='fail';checkoutSheet()},{timeout:8000,enableHighAccuracy:true})}catch(e){ck.gps='fail';checkoutSheet()}},
+  try{navigator.geolocation.getCurrentPosition(p=>{ck.lat=p.coords.latitude;ck.lng=p.coords.longitude;ck.gps='ok';ck.zone=zoneByKm(dist(pub.store.lat,pub.store.lng,ck.lat,ck.lng));ck.bairroAuto='';if(pub.store.feeMode==='bairro'){let nb=nearestBairro(ck.lat,ck.lng);if(!nb&&MODE==='demo'&&!ck.bairro){const L=pub.store.bairros||[];nb=L.find(x=>/^centro$/i.test(x.name))||L[0]}/* demonstração: o pedido de teste sai só com o GPS */if(nb){ck.bairro=nb.name;ck.bairroAuto=nb.name;delete ckErr.bairro}}checkoutSheet()},()=>{ck.gps='fail';checkoutSheet()},{timeout:8000,enableHighAccuracy:true})}catch(e){ck.gps='fail';checkoutSheet()}},
  send(){sendOrder()},
  copymsg(){const txt=document.getElementById('msgText').textContent;const ok=()=>toast(t('copied'));try{navigator.clipboard.writeText(txt).then(ok,()=>selectMsg())}catch(e){selectMsg()}},
  tab(el){ui.tab=el.dataset.t;ui.confirmPub=false;closeSheet();render();scrollTo(0,0)},
