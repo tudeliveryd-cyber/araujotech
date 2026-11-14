@@ -57,6 +57,11 @@ jobs:
       - name: Velocidade da Guía
         if: ${{ inputs.guia == 'sim' }}
         run: node tools/diag_guia.js
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.guia == 'sim' }}
+        with:
+          name: guia-telas
+          path: guia-telas/
       - name: Diagnóstico
         if: ${{ inputs.topo != 'sim' && inputs.capturas != 'sim' && inputs.guia != 'sim' }}
         env:

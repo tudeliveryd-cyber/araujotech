@@ -32,5 +32,11 @@ const sh = c => { try { return execSync(c, { encoding: 'utf8', timeout: 60000 })
     reqs.sort((a, b) => (typeof b[0] === 'number' ? b[0] : 1e9) - (typeof a[0] === 'number' ? a[0] : 1e9)).slice(0, 14).forEach(r => console.log('  ', r[0], r[1]));
     await ctx.close();
   }
+  { const fs = require('fs'); fs.mkdirSync('guia-telas', { recursive: true });
+    for (const [n, o] of [['pc', { viewport: { width: 1440, height: 980 }, deviceScaleFactor: 2 }], ['cel', { ...devices['iPhone 13'] }]]) {
+      const ctx = await b.newContext(o); const p = await ctx.newPage(); await p.goto(U + '/guia/', { waitUntil: 'networkidle' }).catch(() => {}); await p.waitForTimeout(4000);
+      await p.evaluate(() => { try { SL.hold = true; slGo(0); } catch (e) {} }); await p.waitForTimeout(800);
+      await p.screenshot({ path: 'guia-telas/guia-' + n + '.png' }); await ctx.close(); }
+    console.log('telas salvas'); }
   await b.close();
 })();
