@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Guía Vitrix · Negocios de Santa Rita con catálogo y pedidos por WhatsApp</title>
+<meta name="description" content="Guía Vitrix: restaurantes, tiendas, farmacias y más negocios de Santa Rita con catálogo online y pedidos por WhatsApp. Todo en la palma de tu mano. Una iniciativa de Araújo Tech Sistemas y Tu Delivery.">
+<meta property="og:title" content="Guía Vitrix · Todo Santa Rita en la palma de tu mano">
+<meta property="og:description" content="Restaurantes, tiendas y más negocios con catálogo y pedidos por WhatsApp.">
+<meta property="og:image" content="https://araujotechsistemas.com/img/vitrix/og.jpg">
+<meta property="og:url" content="https://araujotechsistemas.com/guia/">
+<link rel="canonical" href="https://araujotechsistemas.com/guia/">
+<link rel="icon" href="../img/vitrix/vitrix-icono.png?v=4">
+<meta name="theme-color" content="#24093F">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--purple:#8A12D6;--deep:#4A0A80;--night:#24093F;--lilac:#F3ECFB;--ink:#1A1222;--muted:#5F566B;--line:#E4DAF0;--yellow:#FFC21A;--display:"Red Hat Display",system-ui,sans-serif;--text:"Red Hat Text",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--text);color:var(--ink);background:#FBF8FE;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+.hdr{color:#fff;background:var(--night)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px}
+.brand img{height:34px;width:auto;display:block}
+.right{display:flex;align-items:center;gap:10px}
+.back{font-size:15px;font-weight:500;text-decoration:none;opacity:.85}.back:hover{opacity:1}
+.lang{display:flex;padding:2px;border-radius:999px;border:1px solid rgba(255,255,255,.4);font-size:12px;font-weight:700}
+.lang button{border:0;background:none;padding:5px 10px;border-radius:999px;cursor:pointer;color:inherit;opacity:.75;line-height:1;font:inherit}
+.lang button.on{opacity:1;background:#fff;color:var(--deep)}
+.hero{color:#fff;background:radial-gradient(900px 420px at 80% -10%,#5B1AA8 0%,transparent 60%),radial-gradient(700px 380px at 0% 110%,#3B0E70 0%,transparent 60%),var(--night);padding:46px 0 92px}
+.hero .vx{height:40px;width:auto;display:block;margin-bottom:22px}
+.hero h1{font-family:var(--display);font-weight:900;font-size:clamp(34px,5.4vw,58px);line-height:1.05;letter-spacing:-.01em;max-width:780px}
+.hero h1 b{color:var(--yellow)}
+.hero p{margin-top:14px;font-size:clamp(16px,1.7vw,19px);color:#E3D3FA;max-width:640px}
+.srch{position:relative;max-width:620px;margin-top:28px}
+.srch input{width:100%;font:inherit;font-size:17px;padding:16px 18px 16px 50px;border-radius:16px;border:0;outline:none;color:var(--ink);background:#fff;box-shadow:0 18px 40px -18px rgba(0,0,0,.6)}
+.srch input:focus{box-shadow:0 0 0 3px var(--yellow),0 18px 40px -18px rgba(0,0,0,.6)}
+.srch svg{position:absolute;left:17px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:-40px 0 26px;position:relative}
+.chip{font:inherit;font-size:14px;font-weight:700;padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 20px -14px rgba(36,9,63,.5)}
+.chip svg{width:16px;height:16px;color:var(--purple)}
+.chip small{font-weight:700;color:var(--muted)}
+.chip[aria-pressed=true]{background:var(--deep);border-color:var(--deep);color:#fff}.chip[aria-pressed=true] svg,.chip[aria-pressed=true] small{color:#fff}
+.grp{margin:8px 0 34px}
+.grp h2{font-family:var(--display);font-weight:900;font-size:22px;display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.grp h2 svg{width:22px;height:22px;color:var(--purple)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{display:flex;gap:14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;text-decoration:none;transition:transform .15s,box-shadow .15s,border-color .15s;min-width:0}
+.card:hover{transform:translateY(-2px);border-color:#CDB6EC;box-shadow:0 16px 32px -20px rgba(74,10,128,.45)}
+.lg{width:66px;height:66px;border-radius:16px;flex:none;overflow:hidden;display:grid;place-items:center;background:var(--lilac);border:1px solid var(--line)}
+.lg img{width:100%;height:100%;object-fit:cover;display:block}.lg b{font-family:var(--display);font-size:22px;color:var(--purple)}
+.tx{min-width:0;display:flex;flex-direction:column;gap:2px;flex:1}
+.tx h3{font-size:17px;line-height:1.25;overflow-wrap:anywhere}
+.tx p{font-size:13.5px;color:var(--muted);line-height:1.35}
+.go{margin-top:6px;font-size:13.5px;font-weight:700;color:var(--purple);display:inline-flex;align-items:center;gap:6px}
+.go svg{width:14px;height:14px}
+.empty{padding:40px 0 30px;color:var(--muted);text-align:center;font-size:16px}
+.cta{margin:20px 0 56px;border-radius:24px;padding:30px;background:linear-gradient(120deg,var(--deep),var(--purple));color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.cta h2{font-family:var(--display);font-weight:900;font-size:clamp(22px,2.6vw,30px);line-height:1.15}
+.cta p{color:#EBDDFB;margin-top:6px;max-width:560px}
+.cta a{background:var(--yellow);color:var(--night);text-decoration:none;font-weight:700;padding:14px 22px;border-radius:14px;white-space:nowrap}
+.allies{display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;padding:6px 0 30px;color:var(--muted);font-size:14px}
+.allies img{height:32px;width:auto;display:block}.allies img+img{height:42px}
+footer{padding:26px 0 40px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);text-align:center}
+footer a{color:var(--deep);font-weight:700;text-decoration:none}
+@media (max-width:640px){.wrap{padding:0 16px}.back{display:none}.hero{padding:30px 0 84px}.hero .vx{height:32px}.chips{flex-wrap:nowrap;overflow-x:auto;margin-right:-16px;padding-right:16px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chip{white-space:nowrap}.cta{padding:24px}}
+</style></head>
+<body>
+<header class="hdr"><div class="wrap nav">
+ <a class="brand" href="../" aria-label="Araújo Tech Sistemas"><img src="../img/logo-blanco.png" alt="Araújo Tech Sistemas"></a>
+ <div class="right"><a class="back" href="../vitrix/" data-t="what">¿Qué es Vitrix?</a><div class="lang" role="group" aria-label="Idioma"><button data-lang="es">ES</button><button data-lang="pt">PT</button></div></div>
+</div></header>
+<section class="hero"><div class="wrap">
+ <img class="vx" src="../img/vitrix/vitrix-blanco-nombre.png" alt="Vitrix">
+ <h1 data-th="h1"></h1>
+ <p data-t="sub"></p>
+ <label class="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" autocomplete="off" aria-label="Buscar"></label>
+</div></section>
+<main class="wrap">
+ <div class="chips" id="chips" role="group"></div>
+ <div id="list"><p class="empty" data-t="loading"></p></div>
+ <section class="cta"><div><h2 data-t="cta_h"></h2><p data-t="cta_p"></p></div><a href="../vitrix/" data-t="cta_b"></a></section>
+ <div class="allies"><span data-t="by"></span><img src="../img/logo-completo.png" alt="Araújo Tech Sistemas"><img src="../img/tu-delivery.png" alt="Tu Delivery"></div>
+</main>
+<footer><div class="wrap">© 2026 <a href="../">Araújo Tech Sistemas</a> · Santa Rita, Alto Paraná, Paraguay</div></footer>
+<script src="/clientes.js?v=3"></script>
+<script>
+/* Guía Vitrix: os negócios com catálogo Vitrix, publicados sozinhos pelo Panel Araújo Tech (só ativos, sem os de teste e com "Mostrar en el sitio") */
+const TX={es:{h1:'Todo Santa Rita<br>en la <b>palma de tu mano</b>',sub:'Restaurantes, tiendas, farmacias y más negocios con catálogo online. Elegí, mirá precios y fotos, y pedí por WhatsApp.',ph:'¿Qué buscás? Ej.: almuerzo, sofá, suplementos…',all:'Todos',loading:'Cargando negocios…',none:'Todavía no hay negocios en esta categoría.',nores:'No encontramos negocios con esa búsqueda.',go:'Ver catálogo',what:'¿Qué es Vitrix?',cta_h:'¿Tenés un negocio? Aparecé en la Guía Vitrix',cta_p:'Con tu catálogo Vitrix tu negocio aparece acá, destacado por Araújo Tech y Tu Delivery, para que más clientes te encuentren.',cta_b:'Quiero mi catálogo',by:'Una iniciativa de'},
+ pt:{h1:'Toda Santa Rita<br>na <b>palma da sua mão</b>',sub:'Restaurantes, lojas, farmácias e mais negócios com catálogo online. Escolha, veja preços e fotos, e peça pelo WhatsApp.',ph:'O que você procura? Ex.: almoço, sofá, suplementos…',all:'Todos',loading:'Carregando negócios…',none:'Ainda não há negócios nesta categoria.',nores:'Não encontramos negócios com essa busca.',go:'Ver catálogo',what:'O que é o Vitrix?',cta_h:'Tem um negócio? Apareça no Guia Vitrix',cta_p:'Com o seu catálogo Vitrix o seu negócio aparece aqui, em destaque pela Araújo Tech e pela Tu Delivery, para mais clientes te encontrarem.',cta_b:'Quero meu catálogo',by:'Uma iniciativa de'}};
+const IC={food:'<path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v5M9 3v5M17 3c-1.7 0-3 2.2-3 5s1.3 4 3 4v9"/>',shop:'<path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/>',health:'<path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z"/>',home:'<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/>',car:'<path d="M5 16l1.5-5h11L19 16"/><rect x="3" y="16" width="18" height="3" rx="1"/><circle cx="7.5" cy="19.5" r="1.3"/><circle cx="16.5" cy="19.5" r="1.3"/>',serv:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>',grid:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>'};
+const ic=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
+const GR=[['food',/restaur|pizz|comid|caf[eé]|sushi|helad|sorvet|panad|padar|bebid|carnic|açoug|verdul|hortif|super|burg|lomit|almuer|cocina|parrill/i,{es:'Comida y bebidas',pt:'Comida e bebidas'}],
+ ['shop',/ropa|roupa|moda|calzad|calçad|accesor|acessór|joy|relog|deport|esport|celul|jugue|brinq|libr|papel|tienda|loja|suplement|regal|presente/i,{es:'Tiendas y moda',pt:'Lojas e moda'}],
+ ['health',/farm|cosm|ópti|optic|ótic|pelu|barb|sal[oó]n|salud|saúde|pet|veter|estét/i,{es:'Salud y belleza',pt:'Saúde e beleza'}],
+ ['home',/mueb|móve|hogar|casa|ferret|ferrag|constru|flor|decor|tapic|colch/i,{es:'Hogar y construcción',pt:'Casa e construção'}],
+ ['car',/auto|carro|moto|repuest|peça|náut|naut|lancha|barco|pesca|agro|tractor|trator|camion|caminh/i,{es:'Autos, motos y náutica',pt:'Carros, motos e náutica'}],
+ ['serv',/./,{es:'Servicios y otros',pt:'Serviços e outros'}]];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+const ini=n=>String(n).split(/\s+/).filter(w=>/[\p{L}\p{N}]/u.test(w)).slice(0,2).map(w=>w.match(/[\p{L}\p{N}]/u)[0]).join('').toUpperCase();
+const safe=u=>/^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(String(u||''))?u:'';
+const logoU=u=>{u=safe(u);return /\/logo\.php$/.test(u)?u+'?v=2':u};
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+let L=(()=>{try{const v=localStorage.getItem('at_lang');if(v==='es'||v==='pt')return v}catch(e){}return /^pt/i.test(navigator.language||'')?'pt':'es'})();
+let LIST=null,CAT='all';
+/* palavras do dia a dia que levam à categoria certa (quem busca 'almuerzo' acha os restaurantes) */
+const SYN={food:/almuer|almoc|cena|janta|comer|comida|hambre|fome|lanche|pizza|burg|asado|churras|postre|torta|cafe|cerveza|bebida/,shop:/ropa|roupa|zapat|sapat|tenis|remera|camis|vestid|regalo|presente|suplement|prote|celular|juguete/,health:/remedi|farmac|medic|corte|pelo|cabelo|unas|unha|perfum|maquill|mascota|perro|cachorro|gato/,home:/sofa|mueble|movel|moveis|cama|colchon|colchao|mesa|silla|cadeira|decor|pintura|cemento|herramienta|ferrament|flor/,car:/auto|carro|camioneta|caminhonete|moto|repuesto|peca|lancha|barco|pesca|tractor|trator|neumat|pneu/};
+const grpOf=c=>{const t=(c.segEs||'')+' '+(c.segPt||'')+' '+(c.name||'');return (GR.find(g=>g[1].test(t))||GR[GR.length-1])[0]};
+function texts(){const t=TX[L];document.documentElement.lang=L;document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t[e.dataset.t]);document.querySelectorAll('[data-th]').forEach(e=>e.innerHTML=t[e.dataset.th]);document.getElementById('q').placeholder=t.ph;document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.lang===L))}
+function card(c){const seg=L==='pt'?(c.segPt||c.segEs):(c.segEs||c.segPt);const u=safe(c.url),lg=logoU(c.logo);
+ return `<a class="card" href="${esc(u)}" target="_blank" rel="noopener"><span class="lg">${lg?`<img src="${esc(lg)}" alt="" loading="lazy" width="66" height="66" data-ini="${esc(ini(c.name))}">`:`<b>${esc(ini(c.name))}</b>`}</span><span class="tx"><h3>${esc(c.name)}</h3><p>${esc([seg,c.city].filter(Boolean).join(' · '))}</p><span class="go">${TX[L].go}${ic('arrow')}</span></span></a>`}
+function render(){texts();const el=document.getElementById('list'),ch=document.getElementById('chips');if(!LIST)return;
+ const q=norm(document.getElementById('q').value.trim());const syn=q?Object.keys(SYN).filter(k=>q.split(/\s+/).some(w=>w.length>2&&SYN[k].test(w))):[];const base=LIST.filter(c=>!q||norm([c.name,c.segEs,c.segPt,c.city].join(' ')).includes(q)||syn.includes(c._g));
+ const present=GR.filter(g=>LIST.some(c=>c._g===g[0]));
+ ch.innerHTML=[['all',ic('grid'),TX[L].all,base.length]].concat(present.map(g=>[g[0],ic(g[0]),g[2][L],base.filter(c=>c._g===g[0]).length])).map(([k,i,n,cnt])=>`<button class="chip" data-c="${k}" aria-pressed="${CAT===k}">${i}${esc(n)}<small>${cnt}</small></button>`).join('');
+ const show=GR.filter(g=>(CAT==='all'||CAT===g[0])).map(g=>[g,base.filter(c=>c._g===g[0])]).filter(([,l])=>l.length);
+ el.innerHTML=show.length?show.map(([g,l])=>`<section class="grp"><h2>${ic(g[0])}${esc(g[2][L])}</h2><div class="grid">${l.map(card).join('')}</div></section>`).join(''):`<p class="empty">${q?TX[L].nores:TX[L].none}</p>`;
+ el.querySelectorAll('.lg img').forEach(i=>{i.onerror=()=>{const b=document.createElement('b');b.textContent=i.dataset.ini;i.replaceWith(b)}})}
+document.getElementById('chips').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(!b)return;CAT=b.dataset.c;render()});
+document.getElementById('q').addEventListener('input',()=>{CAT='all';render()});
+document.querySelector('.lang').addEventListener('click',e=>{const b=e.target.closest('[data-lang]');if(!b)return;L=b.dataset.lang;try{localStorage.setItem('at_lang',L)}catch(er){}render()});
+texts();
+const qs=new URLSearchParams(location.search);if(qs.get('q'))document.getElementById('q').value=qs.get('q');
+AT_CLIENTES.load(l=>{LIST=l.filter(c=>c.sys==='catalogo'&&safe(c.url)).map(c=>Object.assign({},c,{_g:grpOf(c)})).sort((a,b)=>a.name.localeCompare(b.name,'es'));render()});
+</script>
+</body></html>

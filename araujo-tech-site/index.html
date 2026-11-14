@@ -307,7 +307,7 @@ html.anim .rv.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.hero h1 .w,.hrot,.hero .hgrid p,.hero .hgrid .ctas,.show{opacity:1!important;animation:none!important;filter:none!important;transform:none!important}.sh-phone,.show .glow,.hrot .rw::after{animation:none!important}html.anim .rv{opacity:1;transform:none}}
 
 .clients{padding:34px 0 10px;background:#fff;border-bottom:1px solid var(--line)}
-.cl-h{text-align:center;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 18px}
+.cl-h{text-align:center;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 18px}.cl-g{text-align:center;margin:18px 0 0;font-weight:700;color:var(--purple,#7b2ff2)}.cl-g a{color:inherit;text-decoration:none}.cl-g a:hover{text-decoration:underline}
 .cl-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;padding-bottom:24px}
 .cl{display:flex;align-items:center;gap:12px;padding:10px 18px 10px 10px;border:1px solid var(--line);border-radius:16px;text-decoration:none;color:var(--ink);background:#fff;transition:transform .15s,box-shadow .15s}
 a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)}
@@ -340,6 +340,7 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
     </a>
     <nav class="menu" id="menu">
       <a href="#sistemas" data-t="n1">Sistemas</a>
+      <a href="guia/" data-t="n_g">Guía Vitrix</a>
       <a href="#quienes" data-t="n2">Quiénes somos</a>
       <a href="#como" data-t="n3">Cómo trabajamos</a>
       <a href="#preguntas" data-t="n4">Preguntas</a>
@@ -389,6 +390,7 @@ a.cl:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(76,29,149,.12)
   <div class="wrap">
     <p class="cl-h" data-t="cl_h">Negocios que ya usan nuestros sistemas</p>
     <div class="cl-row"></div>
+    <p class="cl-g"><a href="guia/" data-t="cl_g">Ver todos en la Guía Vitrix</a> →</p>
   </div>
 </section>
 
@@ -572,7 +574,7 @@ const TESTIMONIOS = [
 const T = {
 es:{
  title:"Araújo Tech Sistemas — Sistemas a medida en Santa Rita, Paraguay",
- n1:"Sistemas",n2:"Quiénes somos",n3:"Cómo trabajamos",n4:"Preguntas",n5:"Pedir presupuesto",
+ n_g:"Guía Vitrix",cl_g:"Ver todos en la Guía Vitrix",n1:"Sistemas",n2:"Quiénes somos",n3:"Cómo trabajamos",n4:"Preguntas",n5:"Pedir presupuesto",
  h1:"Sistemas a la medida de su negocio",
  h_p:"Hacemos aplicaciones y sistemas web para comercios, restaurantes, salones, empresas de delivery e iglesias. Funcionan en el celular y en la computadora, en español y en portugués.",
  h_b1:"Escribir por WhatsApp",h_b2:"Conocer Vitrix",rot_pre:"Para",sh_all:"Ver todos los sistemas",ft_job:"Trabajá con nosotros",lz_k:"Oferta exclusiva de lanzamiento",lz_h:"¡Pagá 10 meses. Disfrutá 12!",lz_p:"Los primeros 20 clientes que contraten un plan anual de Vitrix, con pago anticipado, reciben 2 meses gratis. Al completarse el cupo, la oferta finaliza.",lz_s:"La instalación se abona por separado, según el plan contratado.",lz_b:"¡Quiero mis 2 meses gratis!",lz_v:"Ver planes y precios",lz_wa:"la promoción de lanzamiento de Vitrix (pagá 10 meses, disfrutá 12).",lz_left:"Quedan {n} de {m} cupos",cl_h:"Negocios que ya usan nuestros sistemas",cl_1:"Vitrix · catálogo digital",cl_2:"Agenda de turnos",cl_3:"Caja de Entregas",wa_fab:"Escribinos",hf_tag:"Nuevo",hf_t:"Vitrix: catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 33 ejemplos para probar",hf_tag:"Nuevo",hf_t:"Vitrix: catálogo digital con pedidos por WhatsApp",hf_p:"Para restaurantes, tiendas, farmacias y todo tipo de comercio · 33 ejemplos para probar",h_where:"Desde Santa Rita, Alto Paraná, para Paraguay y Brasil.",
@@ -607,7 +609,7 @@ es:{
 },
 pt:{
  title:"Araújo Tech Sistemas — Sistemas sob medida em Santa Rita, Paraguai",
- n1:"Sistemas",n2:"Quem somos",n3:"Como trabalhamos",n4:"Perguntas",n5:"Pedir orçamento",
+ n_g:"Guia Vitrix",cl_g:"Ver todos no Guia Vitrix",n1:"Sistemas",n2:"Quem somos",n3:"Como trabalhamos",n4:"Perguntas",n5:"Pedir orçamento",
  h1:"Sistemas sob medida para o seu negócio",
  h_p:"Fazemos aplicativos e sistemas web para comércios, restaurantes, salões, empresas de delivery e igrejas. Funcionam no celular e no computador, em português e em espanhol.",
  h_b1:"Falar no WhatsApp",h_b2:"Conhecer o Vitrix",rot_pre:"Para",sh_all:"Ver todos os sistemas",ft_job:"Trabalhe conosco",lz_k:"Oferta exclusiva de lançamento",lz_h:"Pague 10 meses. Aproveite 12!",lz_p:"Os primeiros 20 clientes que contratarem um plano anual do Vitrix, com pagamento adiantado, ganham 2 meses grátis. Quando as vagas acabarem, a oferta termina.",lz_s:"A instalação é paga à parte, conforme o plano contratado.",lz_b:"Quero meus 2 meses grátis!",lz_v:"Ver planos e preços",lz_wa:"a promoção de lançamento do Vitrix (pague 10 meses, aproveite 12).",lz_left:"Restam {n} de {m} vagas",cl_h:"Negócios que já usam nossos sistemas",cl_1:"Vitrix · catálogo digital",cl_2:"Agenda de horários",cl_3:"Caixa de Entregas",wa_fab:"Fale conosco",hf_tag:"Novo",hf_t:"Vitrix: catálogo digital com pedidos pelo WhatsApp",hf_p:"Para restaurantes, lojas, farmácias e todo tipo de comércio · 33 exemplos para testar",h_where:"De Santa Rita, Alto Paraná, para o Paraguai e o Brasil.",
