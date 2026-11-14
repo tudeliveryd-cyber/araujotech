@@ -2,9 +2,9 @@
 // Guía Vitrix: banners pagos (platform/sitio.gads) e lugares públicos (platform/sitio.gutil), cadastrados no Panel Araújo Tech.
 // Os banners só saem entre as datas escolhidas (hora do Paraguai). A imagem vai por gimg.php (o JSON fica leve).
 function guia_doc() {
-  $cache = sys_get_temp_dir() . '/at_guia1.json';
+  $cache = sys_get_temp_dir() . '/at_guia2.json';
   if (is_file($cache) && time() - filemtime($cache) < 180) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gadsAt');
+  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -16,7 +16,7 @@ function guia_doc() {
     if (isset($v['arrayValue'])) return array_map($val, $v['arrayValue']['values'] ?? []);
     return null;
   };
-  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
+  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
@@ -41,5 +41,16 @@ function guia_pub() {
       $util[] = ['c' => (string)($x['c'] ?? 'gob'), 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'h' => (string)($x['h'] ?? ''), 'map' => $m];
     }
   }
-  return ['ads' => $ads, 'util' => $util];
+  $pros = [];
+  foreach ((array)($d['gpro'] ?? []) as $x) {
+    if (!is_array($x) || trim((string)($x['n'] ?? '')) === '' || ($x['on'] ?? true) === false) continue;
+    if (!empty($x['from']) && $x['from'] > $day) continue;
+    if (!empty($x['to']) && $x['to'] < $day) continue;
+    $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
+    $w = (string)($x['web'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $w)) $w = '';
+    $pros[] = ['id' => $id, 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? 'otro'), 'e' => (string)($x['e'] ?? ''), 'd' => (string)($x['d'] ?? ''),
+      'wa' => preg_replace('/[^\d]/', '', (string)($x['wa'] ?? '')), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'web' => $w,
+      'ph' => !empty($x['ph']) ? '/sitio/gimg.php?p=' . $id . '&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
+  }
+  return ['ads' => $ads, 'util' => $util, 'pros' => $pros];
 }

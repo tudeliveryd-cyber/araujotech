@@ -2,7 +2,7 @@
 @ini_set('display_errors', '0'); error_reporting(0); // avisos do PHP nunca aparecem na página
 // Guía Vitrix: horários e entrega de cada catálogo (para "Abierto ahora" e "Con delivery"). Só leitura do catálogo público.
 // guia.php?ids=loja1,loja2  →  {"loja1":{"days":[...],"del":true,"pick":true,"cv":capa,"sl":slogan}}
-// guia.php?g=1  →  {"ads":[banners pagos no ar hoje],"util":[lugares públicos] ou null}
+// guia.php?g=1  →  {"ads":[banners pagos no ar hoje],"util":[lugares públicos] ou null,"pros":[profissionais em destaque]}
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=300');
 require __DIR__ . '/prods_lib.php';

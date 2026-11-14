@@ -28,8 +28,8 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|gusite
-https://araujotechsistemas.com/painel/|gusite
+https://araujotechsistemas.com/admin/|gpCard
+https://araujotechsistemas.com/painel/|gpCard
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|
@@ -167,11 +167,11 @@ if echo "$gu" | grep -q 'Guía Vitrix'; then ok "Guía Vitrix no ar (araujotechs
 gp=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?ids=lojastatus" 2>/dev/null | head -c 2000 || true)
 if echo "$gp" | grep -q '"lojastatus":{"days":\['; then ok "guia.php -> horários da Status para o 'Abierto ahora'"; else bad "guia.php -> resposta inesperada: $(echo "$gp" | head -c 160)"; fi
 gg=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?g=1" 2>/dev/null | head -c 3000 || true)
-if echo "$gg" | grep -q '^{"ads":\['; then ok "guia.php?g=1 -> banners pagos e lugares públicos ($(echo "$gg" | grep -o '"img"' | wc -l) banner(s) no ar)"; else bad "guia.php?g=1 -> resposta inesperada: $(echo "$gg" | head -c 160)"; fi
+if echo "$gg" | grep -q '^{"ads":\[' && echo "$gg" | grep -q '"pros":\['; then ok "guia.php?g=1 -> banners pagos e lugares públicos ($(echo "$gg" | grep -o '"img"' | wc -l) banner(s) no ar)"; else bad "guia.php?g=1 -> resposta inesperada: $(echo "$gg" | head -c 160)"; fi
 gs=$(curl -sS --max-time 30 "https://araujotechsistemas.com/guia/" 2>/dev/null || true)
 if echo "$gs" | grep -q 'id="sl"' && echo "$gs" | grep -q 'Recomendado por Vitrix'; then ok "Guía com o slider do topo (Publicidad / Recomendado por Vitrix)"; else bad "Guía sem o slider do topo"; fi
-if echo "$gs" | grep -q 'tu-delivery.jpg' && echo "$gs" | grep -q "td_h:'Delivery'"; then ok "Guía com os banners da Tu Delivery e dos planos Vitrix, e a categoria Delivery"; else bad "Guía sem os banners da casa ou sem a categoria Delivery"; fi
-for gi in tu-delivery.jpg tu-delivery-m.jpg vitrix-planes.jpg td-icono.png; do gc=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/img/guia/$gi" 2>/dev/null || true); [ "$gc" = "200" ] && ok "img/guia/$gi no ar" || bad "img/guia/$gi -> $gc"; done
+if echo "$gs" | grep -q 'tu-delivery.jpg' && echo "$gs" | grep -q "td_h:'Delivery'" && echo "$gs" | grep -q 'araujo-tech.jpg' && echo "$gs" | grep -q "pro_h:'Profesionales'"; then ok "Guía com os banners (Tu Delivery, Vitrix, Araújo Tech), categoria Delivery e Profesionales"; else bad "Guía sem os banners da casa ou sem a categoria Delivery"; fi
+for gi in tu-delivery.jpg tu-delivery-m.jpg vitrix-planes.jpg araujo-tech.jpg araujo-tech-m.jpg td-icono.png; do gc=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/img/guia/$gi" 2>/dev/null || true); [ "$gc" = "200" ] && ok "img/guia/$gi no ar" || bad "img/guia/$gi -> $gc"; done
 # site padrão: produtos em destaque vindos do catálogo (prods.php) e a foto do primeiro produto (pimg.php)
 pj=$(curl -sS --max-time 30 "https://araujotechsistemas.com/sitio/prods.php?id=lojastatus" 2>/dev/null || true)
 if echo "$pj" | grep -q '"items":\['; then
