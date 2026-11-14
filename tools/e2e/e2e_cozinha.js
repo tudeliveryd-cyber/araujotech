@@ -21,7 +21,10 @@ const { info, sec, check } = L;
   // a tela se redesenha quando chega um dado da nuvem: o que a pessoa já digitou não pode sumir
   const kept = await o.evaluate(() => { document.getElementById('np_b').focus(); render(); render(); return [document.getElementById('np_a').value, document.getElementById('np_b').value, document.activeElement && document.activeElement.id].join('|'); });
   check(kept === 'DonoNovo#77|DonoNovo#77|np_b', 'redesenhar a tela não apaga a senha nova que está sendo digitada (nem tira o foco)', kept);
+  const kept2 = await o.evaluate(() => { document.getElementById('np_b').focus(); const b0 = CLOUD.boot; CLOUD.boot = true; render(); const mid = !!document.querySelector('.bootld') && !document.getElementById('np_a'); CLOUD.boot = b0; render(); return mid + '|' + document.getElementById('np_a').value + '|' + document.getElementById('np_b').value; });
+  check(kept2 === 'true|DonoNovo#77|DonoNovo#77', 'a senha digitada sobrevive também à tela de "carregando" no meio', kept2);
   await o.press('#np_b', 'Enter'); await o.waitForSelector('#np_a', { state: 'detached', timeout: 45000 }).catch(() => {}); await o.w(2500);
+  check(await o.evaluate(() => Object.keys(window.__kp || {}).length === 0), 'depois de entrar, nada do que foi digitado fica guardado na memória');
   const tabs = () => o.evaluate(() => admTabs().map(x => x[0] + ':' + x[1] + ':' + t('a_' + x[0])).filter(x => /^cocina/.test(x)).join(''));
   const deliv = async () => { await o.evaluate(() => { ui.tab = 'delivery'; render(); }); await o.waitForSelector('#m_kds', { timeout: 15000 }).catch(() => {}); await o.w(300); return o.evaluate(() => { const i = document.getElementById('m_kds'); return i && { on: i.checked, txt: i.closest('label').innerText.replace(/\s+/g, ' ') }; }); };
 
