@@ -18,7 +18,7 @@ try {
   if ($slug !== '' && $slug !== 'sitio' && preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $slug)) {
     $rec = at_site($slug);
     // araujotechsistemas.com/nome → nome.araujotechsistemas.com (o nome da empresa na frente). Só quando nenhuma loja tem esse nome.
-    if ($rec && !isset($_GET['s']) && ($rec['id'] ?? '') !== $slug && $slug !== 'www' && preg_match('/^(www\.)?araujotechsistemas\.com$/i', $_SERVER['HTTP_HOST'] ?? '')) {
+    if ($rec && !isset($_GET['s']) && at_own_sub($rec, $slug) && $slug !== 'www' && preg_match('/^(www\.)?araujotechsistemas\.com$/i', $_SERVER['HTTP_HOST'] ?? '')) {
       $site = $rec['site'] ?? [];
       if (($site['on'] ?? true) !== false && ($rec['status'] ?? '') !== 'suspenso') { header('Location: https://' . $slug . '.araujotechsistemas.com/', true, 301); exit; }
     }
@@ -51,10 +51,10 @@ function at_val($v) {
   return null;
 }
 function at_site($slug) {
-  $cache = sys_get_temp_dir() . '/at_site2_' . md5($slug) . '.json';
+  $cache = sys_get_temp_dir() . '/at_site3_' . md5($slug) . '.json';
   if (is_file($cache) && time() - filemtime($cache) < 300) { $d = json_decode(@file_get_contents($cache), true); if (is_array($d)) return $d ?: null; }
   $q = json_encode(['structuredQuery' => [
-    'select' => ['fields' => [['fieldPath' => 'site.name'], ['fieldPath' => 'site.tag'], ['fieldPath' => 'site.about'], ['fieldPath' => 'site.tpl'], ['fieldPath' => 'site.ph'], ['fieldPath' => 'site.on'], ['fieldPath' => 'site.city'], ['fieldPath' => 'site.addr'], ['fieldPath' => 'site.wa'], ['fieldPath' => 'site.lat'], ['fieldPath' => 'site.lng'], ['fieldPath' => 'site.email'], ['fieldPath' => 'status']]],
+    'select' => ['fields' => [['fieldPath' => 'site.name'], ['fieldPath' => 'site.tag'], ['fieldPath' => 'site.about'], ['fieldPath' => 'site.tpl'], ['fieldPath' => 'site.ph'], ['fieldPath' => 'site.on'], ['fieldPath' => 'site.city'], ['fieldPath' => 'site.addr'], ['fieldPath' => 'site.wa'], ['fieldPath' => 'site.lat'], ['fieldPath' => 'site.lng'], ['fieldPath' => 'site.email'], ['fieldPath' => 'site.cat'], ['fieldPath' => 'status']]],
     'from' => [['collectionId' => 'shops']],
     'where' => ['fieldFilter' => ['field' => ['fieldPath' => 'site.slug'], 'op' => 'EQUAL', 'value' => ['stringValue' => $slug]]],
     'limit' => 1]]);
@@ -84,7 +84,7 @@ function at_meta($html, $rec, $slug) {
   elseif (!empty($ph['l'])) $img = 'https://araujotechsistemas.com/sitio/img.php?id=' . rawurlencode($rec['id']) . '&k=sl&v=' . rawurlencode((string)($ph['v'] ?? '1'));
   else $img = 'https://images.unsplash.com/' . ($tplImg[$s['tpl'] ?? ''] ?? $tplImg['comercio']) . '?auto=format&fit=crop&w=1200&h=630&q=70';
   $title = $name . ($tag ? ' — ' . $tag : '');
-  $url = ($rec['id'] ?? '') !== $slug ? 'https://' . $slug . '.araujotechsistemas.com/' : 'https://araujotechsistemas.com/' . $slug;
+  $url = at_own_sub($rec, $slug) ? 'https://' . $slug . '.araujotechsistemas.com/' : 'https://araujotechsistemas.com/' . $slug;
   $meta = "<title>{$e($title)}</title>\n"
     . "<meta property=\"og:type\" content=\"website\">\n"
     . "<meta property=\"og:site_name\" content=\"{$e($name)}\">\n"
@@ -105,4 +105,10 @@ function at_meta($html, $rec, $slug) {
   $html = preg_replace('#<title>[^<]*</title>#', $meta, $html, 1);
   $html = preg_replace('#<meta name="description" content="[^"]*">#', '<meta name="description" content="' . $e($desc) . '">', $html, 1);
   return $html;
+}
+// o site pode ficar em nome.araujotechsistemas.com? Sim, se nenhuma loja tem esse nome, ou se é a própria loja e o catálogo dela mora em outro endereço.
+function at_own_sub($rec, $slug) {
+  if (($rec['id'] ?? '') !== $slug) return true;
+  $ch = strtolower((string)parse_url((string)($rec['site']['cat'] ?? ''), PHP_URL_HOST));
+  return $ch !== '' && $ch !== $slug . '.araujotechsistemas.com';
 }

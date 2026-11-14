@@ -15,7 +15,7 @@ function cat_http($url) {
 }
 // Lê a loja (documento público shops/<id>) e guarda por 5 minutos
 function cat_shop($id) {
-  $cache = sys_get_temp_dir() . '/at_cat_' . md5($id) . '.json';
+  $cache = sys_get_temp_dir() . '/at_cat2_' . md5($id) . '.json';
   if (is_file($cache) && time() - filemtime($cache) < 300) { $d = json_decode(@file_get_contents($cache), true); if (is_array($d)) return $d ?: null; }
   $r = cat_http('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/shops/' . rawurlencode($id) . '?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U');
   $out = [];
@@ -32,6 +32,8 @@ function cat_shop($id) {
         'logo' => (string)($st['logo'] ?? ''),
         'n' => (int)($f['mediaCount']['integerValue'] ?? 0),
         'cfg' => (string)($f['cfg']['stringValue'] ?? ''),   // o catálogo abre já com estes dados, sem esperar a nuvem
+        'site_slug' => (string)($f['site']['mapValue']['fields']['slug']['stringValue'] ?? ''),
+        'site_cat' => (string)($f['site']['mapValue']['fields']['cat']['stringValue'] ?? ''),
       ];
       if ($out['name'] === '') $out = [];
     }

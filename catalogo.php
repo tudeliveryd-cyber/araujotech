@@ -13,7 +13,9 @@ try {
   $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
   if (preg_match('/^([a-z0-9][a-z0-9-]{1,60})\.araujotechsistemas\.com$/', $host, $m)) {
     $shop = cat_shop($m[1]);
-    if (!$shop && ($site = cat_site_html($m[1])) !== '') { echo $site; exit; } // sem loja com esse nome: é o site padrão da empresa (nome.araujotechsistemas.com)
+    // a loja tem site com este mesmo nome e o catálogo dela mora em outro endereço (ex.: Fogão Mineiro, catálogo em fogaomineiro.): aqui fica o site
+    $own = $shop && ($shop['site_slug'] ?? '') === $m[1] && ($ch = strtolower((string)parse_url($shop['site_cat'] ?? '', PHP_URL_HOST))) !== '' && $ch !== $host;
+    if ((!$shop || $own) && ($site = cat_site_html($m[1])) !== '') { echo $site; exit; } // sem loja com esse nome: é o site padrão da empresa (nome.araujotechsistemas.com)
     if ($shop) {
       $html = cat_meta($html, $shop, $host);
       if (!empty($shop['cfg']) && strlen($shop['cfg']) < 400000) {
