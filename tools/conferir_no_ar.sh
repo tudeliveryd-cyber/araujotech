@@ -161,6 +161,8 @@ sf=$(curl -sS --max-time 30 "https://fogao-mineiro.araujotechsistemas.com/" 2>/d
 if echo "$sf" | grep -q 'AT_SITE_SLUG="fogao-mineiro"'; then ok "site do Fogão em fogao-mineiro.araujotechsistemas.com"; else bad "fogao-mineiro.araujotechsistemas.com não mostra o site ($(echo "$sf" | grep -o '<title>[^<]*' | head -1))"; fi
 gu=$(curl -sS --max-time 30 "https://araujotechsistemas.com/guia/" 2>/dev/null | head -c 6000 || true)
 if echo "$gu" | grep -q 'Guía Vitrix'; then ok "Guía Vitrix no ar (araujotechsistemas.com/guia/)"; else bad "araujotechsistemas.com/guia/ não abriu a Guía Vitrix"; fi
+gp=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?ids=lojastatus" 2>/dev/null | head -c 2000 || true)
+if echo "$gp" | grep -q '"lojastatus":{"days":\['; then ok "guia.php -> horários da Status para o 'Abierto ahora'"; else bad "guia.php -> resposta inesperada: $(echo "$gp" | head -c 160)"; fi
 # site padrão: produtos em destaque vindos do catálogo (prods.php) e a foto do primeiro produto (pimg.php)
 pj=$(curl -sS --max-time 30 "https://araujotechsistemas.com/sitio/prods.php?id=lojastatus" 2>/dev/null || true)
 if echo "$pj" | grep -q '"items":\['; then
