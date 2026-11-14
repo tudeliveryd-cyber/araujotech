@@ -20,7 +20,7 @@ const { info, sec, check } = L;
   const O = await L.open({ w: 390 }); const o = O.p;
   await o.goto('https://' + shop.id + '.araujotechsistemas.com/painel/'); await o.waitForFunction(() => { const b = document.querySelector('#loginForm button[type=submit]'); return b && !b.disabled; }, null, { timeout: 20000 }).catch(() => {});
   for (let k = 0; k < 3 && !(await o.locator('#np_a').count()); k++) { if (await o.locator('#lg_user').count()) { await o.fill('#lg_user', shop.user); await o.fill('#lg_pass', shop.pass); await o.press('#lg_pass', 'Enter'); } await o.waitForSelector('#np_a', { timeout: 15000 }).catch(() => {}); }
-  await o.fill('#np_a', 'DonoNovo#77'); await o.fill('#np_b', 'DonoNovo#77'); await o.press('#np_b', 'Enter'); await o.w(5000);
+  await o.fill('#np_a', 'DonoNovo#77'); await o.fill('#np_b', 'DonoNovo#77'); await o.press('#np_b', 'Enter'); await o.waitForSelector('#np_a', { state: 'detached', timeout: 45000 }).catch(() => {}); await o.w(2500);
 
   await a.evaluate(() => { const s = PL.shops.find(x => x.name === 'Tienda Sync E2E'); s.siteExtra = true; if (!hasSite(s)) planOf(s).site = true; ensureSite(s, true); savePL(); }); await a.w(4000);
   let s0 = {}; for (let i = 0; i < 10 && !s0.slug; i++) { await a.w(1000); s0 = await site(); }

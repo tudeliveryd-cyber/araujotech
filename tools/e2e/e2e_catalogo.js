@@ -55,7 +55,7 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
   await o.fill('#np_a', '123'); await o.fill('#np_b', '123'); await o.press('#np_b', 'Enter'); await o.w(1500);
   check(await o.locator('#np_a').count() > 0, 'painel: senha curta é recusada');
   const NEWP = 'DonoNovo#77';
-  await o.fill('#np_a', NEWP); await o.fill('#np_b', NEWP); await o.press('#np_b', 'Enter'); await o.w(4000);
+  await o.fill('#np_a', NEWP); await o.fill('#np_b', NEWP); await o.press('#np_b', 'Enter'); await o.waitForSelector('#np_a', { state: 'detached', timeout: 45000 }).catch(() => {}); await o.w(2500);
   check(await o.locator('[data-act=tab]').count() > 0, 'painel: senha própria criada e painel aberto', (await o.txt()).slice(0, 300) + '|' + o.errs.join('|'));
   const tOld = await L.signIn(shop.user + '@araujotechsistemas.com', shop.pass), tNew = await L.signIn(shop.user + '@araujotechsistemas.com', NEWP);
   check(!tOld.idToken && !!tNew.idToken, 'Firebase Auth: a senha provisória deixou de funcionar e a nova funciona');
@@ -163,7 +163,7 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
     const Z = await L.open({ w: 390 }); const z = Z.p; await z.goto(HOST + '/painel/'); await z.w(2500);
     await z.fill('#lg_user', 'cocinae2e'); await z.fill('#lg_pass', cocPass); await z.press('#lg_pass', 'Enter'); await z.w(3500);
     check(await z.locator('#np_a').count() > 0, 'cozinha: com senha provisória, é obrigada a criar a própria no primeiro acesso', (await z.txt()).slice(0, 200));
-    await z.fill('#np_a', 'CocinaE2E#9'); await z.fill('#np_b', 'CocinaE2E#9'); await z.press('#np_b', 'Enter'); await z.w(4000);
+    await z.fill('#np_a', 'CocinaE2E#9'); await z.fill('#np_b', 'CocinaE2E#9'); await z.press('#np_b', 'Enter'); await z.waitForSelector('#np_a', { state: 'detached', timeout: 45000 }).catch(() => {}); await z.w(2500);
     const zt = await z.evaluate(() => ({ tabs: [...new Set([...document.querySelectorAll('[data-act=tab]')].map(e => e.dataset.tab || e.dataset.t || e.innerText.trim()))], txt: document.body.innerText.slice(0, 200) }));
     check(zt.tabs.length <= 1 && !/product|caja|pedidos/i.test(JSON.stringify(zt.tabs)) && /Milanesa E2E|Cocina/i.test(await z.txt()), 'cozinha: vê só a tela da cozinha, com o pedido em preparo', JSON.stringify(zt));
     await Z.ctx.close();
@@ -354,7 +354,7 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
     check(await k.locator('#np_a').count() > 0 && !(await k.locator('[data-act=tab]').count()), 'quem entra com 123456 é obrigado a criar outra senha antes de ver o painel (mesmo conta antiga sem marca)', (await k.txt()).slice(0, 200));
     await k.fill('#np_a', '123456'); await k.fill('#np_b', '123456'); await k.press('#np_b', 'Enter'); await k.w(1200);
     check(await k.locator('#np_a').count() > 0, '123456 não é aceita como senha nova');
-    await k.fill('#np_a', 'Legacy#Nova1'); await k.fill('#np_b', 'Legacy#Nova1'); await k.press('#np_b', 'Enter'); await k.w(3500);
+    await k.fill('#np_a', 'Legacy#Nova1'); await k.fill('#np_b', 'Legacy#Nova1'); await k.press('#np_b', 'Enter'); await k.waitForSelector('#np_a', { state: 'detached', timeout: 45000 }).catch(() => {}); await k.w(2500);
     check(!(await L.signIn('legacye2e@araujotechsistemas.com', '123456')).idToken && !!(await L.signIn('legacye2e@araujotechsistemas.com', 'Legacy#Nova1')).idToken, 'depois da troca, 123456 deixa de funcionar nessa conta');
     await K.ctx.close();
     // admin: dois clientes antigos com 123456 guardada — um ainda usa 123456, o outro já criou a própria

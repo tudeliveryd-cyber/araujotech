@@ -110,6 +110,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 .acts{justify-content:center}.sec{max-width:760px;margin-left:auto;margin-right:auto}.sec h2{justify-content:center}
 .sec .hrs{max-width:520px;margin:0 auto}.sec .box>p{text-align:center}.pg{justify-content:center;grid-template-columns:repeat(auto-fit,minmax(150px,180px))}
 .cta{max-width:760px;margin-left:auto;margin-right:auto}}
+@media (max-width:420px){.hrs div{font-size:13.5px;padding:7px 8px}.hrs span:last-child{white-space:nowrap}}
 @media (max-width:600px){.lg{width:82px;height:82px;border-radius:20px}.btn{flex:1 1 auto;justify-content:center}.bk span{display:none}.bk{padding:7px}}
 </style></head>
 <body>
