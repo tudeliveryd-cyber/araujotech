@@ -6,6 +6,22 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=300');
 require __DIR__ . '/prods_lib.php';
+if (isset($_GET['ofs'])) { // ofertas de hoje: produtos em promoção (com foto) dos catálogos da Guía
+  $o = []; foreach (array_slice(array_unique(array_filter(explode(',', (string)$_GET['ofs']))), 0, 40) as $id) {
+    if (!preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $id)) continue; $sh = at_shop_cfg($id);
+    if (!$sh || ($sh['status'] ?? '') === 'suspenso' || !empty($sh['cfg']['store']['paused'])) continue;
+    $hid = []; foreach (($sh['cfg']['cats'] ?? []) as $c) if (!empty($c['hide'])) $hid[$c['id'] ?? ''] = 1;
+    $n = 0; foreach (($sh['cfg']['products'] ?? []) as $p) {
+      if ($n >= 2 || !is_array($p) || ($p['on'] ?? true) === false || isset($hid[$p['cat'] ?? ''])) continue;
+      $pr = +($p['price'] ?? 0); $pm = +($p['promo'] ?? 0); if ($pm <= 0 || ($pr > 0 && $pm >= $pr)) continue;
+      if (!preg_match('/^m:([a-z0-9]{2,24})$/', (string)($p['photo'] ?? ''), $m)) continue;
+      $nm = $p['n'] ?? ''; if (!is_array($nm)) $nm = ['es' => (string)$nm, 'pt' => (string)$nm];
+      $o[] = ['s' => $id, 'p' => (string)($p['id'] ?? ''), 'n' => ['es' => (string)($nm['es'] ?? $nm['pt'] ?? ''), 'pt' => (string)($nm['pt'] ?? $nm['es'] ?? '')], 'price' => $pr, 'promo' => $pm, 'cur' => (($sh['cfg']['store']['cur'] ?? '') === 'USD') ? 'USD' : 'PYG', 'img' => '/sitio/pimg.php?s=' . rawurlencode($id) . '&k=' . $m[1]];
+      $n++;
+    }
+  }
+  echo json_encode(array_slice($o, 0, 16), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit;
+}
 if (isset($_GET['g'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_pub(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; } // banners pagos e lugares públicos
 $out = [];
 $ids = array_slice(array_unique(array_filter(explode(',', (string)($_GET['ids'] ?? '')))), 0, 60);

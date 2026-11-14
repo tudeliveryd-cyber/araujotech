@@ -28,8 +28,8 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|gbCard
-https://araujotechsistemas.com/painel/|gbCard
+https://araujotechsistemas.com/admin/|gxCards
+https://araujotechsistemas.com/painel/|gxCards
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|
@@ -169,6 +169,12 @@ if echo "$gp" | grep -q '"lojastatus":{"days":\['; then ok "guia.php -> horário
 gg=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?g=1" 2>/dev/null | head -c 3000 || true)
 if echo "$gg" | grep -q '^{"ads":\[' && echo "$gg" | grep -q '"bus":\['; then ok "guia.php?g=1 -> banners pagos e lugares públicos ($(echo "$gg" | grep -o '"img"' | wc -l) banner(s) no ar)"; else bad "guia.php?g=1 -> resposta inesperada: $(echo "$gg" | head -c 160)"; fi
 gs=$(curl -sS --max-time 30 "https://araujotechsistemas.com/guia/" 2>/dev/null || true)
+go=$(curl -sS --max-time 60 "https://araujotechsistemas.com/sitio/guia.php?ofs=lojastatus,fogao-mineiro" 2>/dev/null | head -c 400 || true)
+case "$go" in \[*) ok "guia.php?ofs -> ofertas de hoje ($(echo "$go" | grep -o '"promo"' | wc -l) na amostra)";; *) bad "guia.php?ofs -> $(echo "$go" | head -c 120)";; esac
+gh1=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' -A 'Mozilla/5.0 (conferir)' -H 'Origin: https://araujotechsistemas.com' "https://araujotechsistemas.com/sitio/guia_hit.php?t=x" 2>/dev/null || true); [ "$gh1" = "204" ] && ok "guia_hit.php responde (contador da Guía)" || bad "guia_hit.php -> $gh1"
+gd=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/sitio/datos/" 2>/dev/null || true); [ "$gd" = "403" ] && ok "pasta de números da Guía fechada ao público (403)" || bad "sitio/datos/ -> $gd (devia ser 403)"
+gst=$(curl -sS --max-time 30 -X POST -d '{"t":"x"}' "https://araujotechsistemas.com/sitio/guia_stats.php" 2>/dev/null || true); [ "$gst" = '{"ok":false}' ] && ok "guia_stats.php recusa quem não é admin" || bad "guia_stats.php -> $gst"
+gm=$(curl -sS --max-time 30 "https://araujotechsistemas.com/guia/manifest.webmanifest" 2>/dev/null || true); echo "$gm" | grep -q '"start_url":"/guia/' && ok "Guía instalável (manifest)" || bad "manifest da Guía não abriu"
 if echo "$gs" | grep -q 'id="sl"' && echo "$gs" | grep -q 'Recomendado por Vitrix'; then ok "Guía com o slider do topo (Publicidad / Recomendado por Vitrix)"; else bad "Guía sem o slider do topo"; fi
 if echo "$gs" | grep -q 'tu-delivery.jpg' && echo "$gs" | grep -q "td_h:'Delivery'" && echo "$gs" | grep -q 'araujo-tech.jpg' && echo "$gs" | grep -q "pro_h:'Profesionales'"; then ok "Guía com os banners (Tu Delivery, Vitrix, Araújo Tech), categoria Delivery e Profesionales"; else bad "Guía sem os banners da casa ou sem a categoria Delivery"; fi
 for gi in tu-delivery.jpg vitrix-planes.jpg araujo-tech.jpg td-icono.png; do gc=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/img/guia/$gi" 2>/dev/null || true); [ "$gc" = "200" ] && ok "img/guia/$gi no ar" || bad "img/guia/$gi -> $gc"; done
