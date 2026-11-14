@@ -150,6 +150,9 @@ pt=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/" 
 if echo "$pt" | grep -q 'Status · Panel del local'; then ok "painel da Status -> $pt"; else bad "painel da Status -> título inesperado: $pt"; fi
 pm=$(curl -sS --max-time 30 "https://lojastatus.araujotechsistemas.com/painel/manifest.json" 2>/dev/null || true)
 if echo "$pm" | grep -q '"name":"Panel Status"'; then ok "atalho do painel da Status -> Panel Status"; else bad "atalho do painel da Status -> $pm"; fi
+# site padrão no endereço próprio da empresa (status.araujotechsistemas.com)
+sb=$(curl -sS --max-time 30 "https://status.araujotechsistemas.com/" 2>/dev/null | head -c 20000 || true)
+if echo "$sb" | grep -q 'AT_SITE_SLUG="status"' && echo "$sb" | grep -q '<link rel="canonical" href="https://status.araujotechsistemas.com/">'; then ok "site da Status em status.araujotechsistemas.com"; else bad "status.araujotechsistemas.com não mostra o site ($(echo "$sb" | grep -o '<title>[^<]*' | head -1))"; fi
 # site padrão: produtos em destaque vindos do catálogo (prods.php) e a foto do primeiro produto (pimg.php)
 pj=$(curl -sS --max-time 30 "https://araujotechsistemas.com/sitio/prods.php?id=lojastatus" 2>/dev/null || true)
 if echo "$pj" | grep -q '"items":\['; then

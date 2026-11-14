@@ -120,7 +120,7 @@ const fld=(k,lbl,o={})=>`<div class="fld"><label for="f_${k}">${lbl}</label>${o.
 const hrsRows=()=>String(site.hours||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^([^:]{2,40}):\s*(.+)$/);return m?[m[1],m[2]]:[x,'']});
 function photo(k,cls){const u=imgs[k];return u?`<div class="ph ${cls||''}"><img src="${u}" alt=""><button data-act="rmimg" data-k="${k}" aria-label="${t('del')}">${ic('x')}</button></div>`:''}
 function upBtn(k,lbl){return `<label class="add">${ic('plus')}${lbl}<input type="file" accept="image/*" data-up="${k}" hidden></label>`}
-function render(){const ph=site.ph;const url=SITE+site.slug;const hr=hrsRows();if(!hr.length||addHr)hr.push(['','']);addHr=false;const sv=site.svc.length?site.svc.map(x=>String(x).split('|').map(y=>y.trim())):[['','']];
+function render(){const ph=site.ph;const url=site.slug&&site.slug!==SHOP?'https://'+site.slug+'.araujotechsistemas.com':SITE+site.slug;const hr=hrsRows();if(!hr.length||addHr)hr.push(['','']);addHr=false;const sv=site.svc.length?site.svc.map(x=>String(x).split('|').map(y=>y.trim())):[['','']];
  app.innerHTML=`${topBar(true)}<div class="wrap">
  <div class="card"><div class="url">${ic('globe')}<span>${t('your_url')}</span><a href="${url}" target="_blank" rel="noopener">${url.replace('https://','')}</a></div></div>
  <div class="card"><h2>${ic('edit')}${t('main')}</h2>

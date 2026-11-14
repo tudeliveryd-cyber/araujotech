@@ -3813,7 +3813,7 @@ const extraOf=s=>!s?0:exclOn(s)?(+s.siteX.mes||0):s.siteExtra&&siteMode(planOf(s
 const LZ_MAX=20,lzUsed=()=>PL.shops.filter(z=>z.lanz).length;
 const chargeOf=s=>{const p=planOf(s);if(s.lanz&&sysOf(s)==='catalogo')return ((+p.price||0)+extraOf(s))*10;return (+p.price||0)+extraOf(s)*(p.per==='ano'?12:1)};
 const monthOf=s=>s.lanz&&sysOf(s)==='catalogo'?Math.round((perMonth(planOf(s))+extraOf(s))*10/12):perMonth(planOf(s))+extraOf(s);
-const siteUrl=s=>'https://araujotechsistemas.com/'+((s.site&&s.site.slug)||s.id);
+const siteUrl=s=>{const sl=(s.site&&s.site.slug)||s.id;return PL.shops.some(x=>x.id===sl)||sl==='www'?'https://araujotechsistemas.com/'+sl:'https://'+sl+'.araujotechsistemas.com';};/* site no endereço próprio (nome.araujotechsistemas.com) quando o nome não é o de uma loja */
 function tplFor(s){const sy=sysOf(s);if(sy==='pulpito'||sy==='iglesia')return'iglesia';let r0=s.ramo;if(!r0&&sysOf(s)==='catalogo'){try{const c=s.live&&SHOP===FM?pub:S.get(mkK(s.id).pub,null);r0=c&&c.store&&c.store.ramo}catch(e){}if(!r0&&s.id===FM)r0='restaurante'}const r=String(r0||'');if(/farm|cosmet|optic|otica|salud|saude|clinic|vet/.test(r))return'farmacia';if(/rest|pizz|helad|sorvet|acai|pan|cafe|bar|hamb|comid|lanch|sushi|parrill|churr|confit|doce|dulc|food|bebid/.test(r))return'restaurante';return'comercio'}
 const SITE_DEF={
  restaurante:{tag:'Almuerzos, cenas y delivery',about:'Cocinamos todos los días con productos frescos. Podés venir a comer al local, retirar tu pedido o pedirlo por delivery.',svc:['Almuerzo|Menú del día de lunes a sábado','Cena|Platos a la carta','Delivery|Pedí por WhatsApp y te lo llevamos','Para llevar|Pedí y retirá en el local'],hours:'Lun a Sáb: 11:00 - 14:30\nLun a Sáb: 18:30 - 23:00\nDomingo: 11:00 - 15:00'},
@@ -3827,7 +3827,7 @@ function genSite(s){const o=genSite0(s);return applyCfgToSite(o,shopCfg(s))}
 function genSite0(s){const tpl=tplFor(s);const D=SITE_DEF[tpl];let base=slugify(s.name)||s.id;if(!slugFree(base,s.id))base=s.id;let sl=base,k=2;while(!slugFree(sl,s.id))sl=base+'-'+(k++);
  const cat=sysOf(s)==='catalogo'?(s.live?'https://fogaomineiro.araujotechsistemas.com/':'https://'+s.id+'.araujotechsistemas.com/'):'';
  return {tpl,slug:sl,name:s.name,tag:D.tag,about:D.about,svc:D.svc.slice(),wa:shopWa(s),addr:shopAddr(s),city:'',maps:'',hours:D.hours,cat,ig:'',fb:'',email:'',color:'',lang:'es',ph:{h:0,l:0,g:0},created:new Date().toISOString()}}
-function ensureSite(s,quiet){if(!s||!hasSite(s)||s.site)return false;s.site=genSite(s);ensureAccess(s);sitePush(s,true);setTimeout(()=>siteFromCatalog(s),50);if(!quiet)toast(t('site_created')+': araujotechsistemas.com/'+s.site.slug);return true}
+function ensureSite(s,quiet){if(!s||!hasSite(s)||s.site)return false;s.site=genSite(s);ensureAccess(s);sitePush(s,true);setTimeout(()=>siteFromCatalog(s),50);if(!quiet)toast(t('site_created')+': '+siteUrl(s).replace('https://',''));return true}
 function pubSite(s){const o=JSON.parse(JSON.stringify(s.site||{}));delete o.loc;o.on=hasSite(s)&&s.status!=='suspenso'&&!o.hide;return o}
 function daysText(days){if(!Array.isArray(days)||days.length!==7)return'';const N=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],A=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
  const val=d=>d&&d.on?shifts(d).map(([a,b])=>hhmm(a)+' - '+hhmm(b)).join(' / '):'';const ord=[1,2,3,4,5,6,0],out=[];let i=0;

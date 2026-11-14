@@ -13,6 +13,7 @@ try {
   $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
   if (preg_match('/^([a-z0-9][a-z0-9-]{1,60})\.araujotechsistemas\.com$/', $host, $m)) {
     $shop = cat_shop($m[1]);
+    if (!$shop && ($site = cat_site_html($m[1])) !== '') { echo $site; exit; } // sem loja com esse nome: é o site padrão da empresa (nome.araujotechsistemas.com)
     if ($shop) {
       $html = cat_meta($html, $shop, $host);
       if (!empty($shop['cfg']) && strlen($shop['cfg']) < 400000) {
@@ -50,4 +51,20 @@ function cat_meta($html, $s, $host) {
   }
   $html = preg_replace('#<meta name="apple-mobile-web-app-title" content="[^"]*">#', '<meta name="apple-mobile-web-app-title" content="' . $e($s['name']) . '">', $html, 1);
   return preg_replace('#<title>[^<]*</title>#', $meta, $html, 1);
+}
+
+// Site padrão da empresa pelo subdomínio: pega a página do site no domínio principal e entrega aqui, com o endereço próprio.
+function cat_site_html($slug) {
+  $cache = sys_get_temp_dir() . '/at_subsite_' . md5($slug) . '.html';
+  if (is_file($cache) && time() - filemtime($cache) < 300) return (string)@file_get_contents($cache);
+  $html = (string)cat_http('https://araujotechsistemas.com/sitio/index.php?s=' . rawurlencode($slug));
+  if (strpos($html, 'property="og:title"') === false) $html = '';            // não existe site com esse nome
+  else {
+    $url = 'https://' . $slug . '.araujotechsistemas.com/';
+    $html = preg_replace('#<link rel="canonical" href="[^"]*">#', '<link rel="canonical" href="' . $url . '">', $html, 1);
+    $html = preg_replace('#<meta property="og:url" content="[^"]*">#', '<meta property="og:url" content="' . $url . '">', $html, 1);
+    $html = preg_replace('#</head>#i', '<script>window.AT_SITE_SLUG=' . json_encode($slug) . ';window.AT_BASE="https://araujotechsistemas.com"</script></head>', $html, 1);
+  }
+  @file_put_contents($cache, $html);
+  return $html;
 }

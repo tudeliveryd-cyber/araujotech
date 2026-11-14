@@ -3,6 +3,7 @@
 // Produtos em destaque do catálogo Vitrix para o site padrão da empresa (araujotechsistemas.com/<nome>).
 // prods.php?id=<loja>  →  {"cur":"USD","items":[{"id","n":{"es","pt"},"price","promo","img"}]}
 // Só leitura do catálogo público. Fica 10 minutos em cache no servidor.
+$o = $_SERVER['HTTP_ORIGIN'] ?? ''; if (preg_match('#^https://([a-z0-9-]+\.)?araujotechsistemas\.com$#', $o)) { header('Access-Control-Allow-Origin: ' . $o); header('Vary: Origin'); } // site no subdomínio da empresa
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=300');
 $id = (string)($_GET['id'] ?? '');
