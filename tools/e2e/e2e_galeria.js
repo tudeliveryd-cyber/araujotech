@@ -101,6 +101,9 @@ const FX = __dirname + '/fix/';
   const old = await c.evaluate(id => { const p = pub.products.find(x => x.id === id); delete p.hq; delete p.hqk; delete p.photos; /* só nesta página: simula um produto antigo */ productSheet(p.id); const s = document.querySelectorAll('.sheet .pgal .gs').length; const i = document.querySelector('.sheet .pgal img'); return { s, fit: i && getComputedStyle(i).objectFit, dots: document.querySelectorAll('.sheet .pgal .dots i').length }; }, pid);
   info(JSON.stringify(old));
   check(old.s === 1 && old.fit === 'contain' && old.dots === 0, 'produto com 1 foto: aparece inteira, sem indicador de várias');
+  sec('G. Link direto para o produto (usado pelo site padrão)');
+  await c.goto(HOST + '/?p=' + encodeURIComponent(pid)); await c.w(5000);
+  check(await c.evaluate(id => !!document.querySelector('.sheet') && typeof pick !== 'undefined' && pick && pick.pid === id, pid), 'abrir o catálogo com ?p= já mostra o produto');
   check(!o.errs.length && !c.errs.length, 'sem erros de JavaScript', o.errs.concat(c.errs).join(' | '));
   if (process.env.SHOT) { await c.evaluate(id => productSheet(id), pid); await c.w(2000); await c.screenshot({ path: process.env.SHOT }); }
   L.done();

@@ -46,10 +46,10 @@ function at_val($v) {
   return null;
 }
 function at_site($slug) {
-  $cache = sys_get_temp_dir() . '/at_site_' . md5($slug) . '.json';
+  $cache = sys_get_temp_dir() . '/at_site2_' . md5($slug) . '.json';
   if (is_file($cache) && time() - filemtime($cache) < 300) { $d = json_decode(@file_get_contents($cache), true); if (is_array($d)) return $d ?: null; }
   $q = json_encode(['structuredQuery' => [
-    'select' => ['fields' => [['fieldPath' => 'site.name'], ['fieldPath' => 'site.tag'], ['fieldPath' => 'site.about'], ['fieldPath' => 'site.tpl'], ['fieldPath' => 'site.ph'], ['fieldPath' => 'site.on'], ['fieldPath' => 'site.city'], ['fieldPath' => 'status']]],
+    'select' => ['fields' => [['fieldPath' => 'site.name'], ['fieldPath' => 'site.tag'], ['fieldPath' => 'site.about'], ['fieldPath' => 'site.tpl'], ['fieldPath' => 'site.ph'], ['fieldPath' => 'site.on'], ['fieldPath' => 'site.city'], ['fieldPath' => 'site.addr'], ['fieldPath' => 'site.wa'], ['fieldPath' => 'site.lat'], ['fieldPath' => 'site.lng'], ['fieldPath' => 'site.email'], ['fieldPath' => 'status']]],
     'from' => [['collectionId' => 'shops']],
     'where' => ['fieldFilter' => ['field' => ['fieldPath' => 'site.slug'], 'op' => 'EQUAL', 'value' => ['stringValue' => $slug]]],
     'limit' => 1]]);
@@ -76,6 +76,7 @@ function at_meta($html, $rec, $slug) {
   $tplImg = ['restaurante' => 'photo-1644447381290-85358ae625cb', 'farmacia' => 'photo-1580281657529-557a6abb6387', 'iglesia' => 'photo-1709482590897-1e647801cb2d', 'comercio' => 'photo-1672777368915-609039407e1c'];
   $ph = $s['ph'] ?? [];
   if (!empty($ph['h'])) $img = 'https://araujotechsistemas.com/sitio/img.php?id=' . rawurlencode($rec['id']) . '&k=sh&v=' . rawurlencode((string)($ph['v'] ?? '1'));
+  elseif (!empty($ph['l'])) $img = 'https://araujotechsistemas.com/sitio/img.php?id=' . rawurlencode($rec['id']) . '&k=sl&v=' . rawurlencode((string)($ph['v'] ?? '1'));
   else $img = 'https://images.unsplash.com/' . ($tplImg[$s['tpl'] ?? ''] ?? $tplImg['comercio']) . '?auto=format&fit=crop&w=1200&h=630&q=70';
   $title = $name . ($tag ? ' — ' . $tag : '');
   $url = 'https://araujotechsistemas.com/' . $slug;
@@ -88,6 +89,14 @@ function at_meta($html, $rec, $slug) {
     . "<meta property=\"og:image\" content=\"{$e($img)}\">\n"
     . "<meta name=\"twitter:card\" content=\"summary_large_image\">\n"
     . "<link rel=\"canonical\" href=\"{$e($url)}\">";
+  // dados de "negócio local" para o Google (nome, endereço, telefone, mapa)
+  $ld = ['@context' => 'https://schema.org', '@type' => ($s['tpl'] ?? '') === 'restaurante' ? 'Restaurant' : (($s['tpl'] ?? '') === 'farmacia' ? 'Pharmacy' : 'LocalBusiness'), 'name' => $name, 'url' => $url, 'image' => $img];
+  if ($desc) $ld['description'] = $desc;
+  $wa = preg_replace('/\D/', '', (string)($s['wa'] ?? '')); if ($wa) $ld['telephone'] = '+' . (strpos($wa, '595') === 0 || strlen($wa) >= 12 ? $wa : '595' . ltrim($wa, '0'));
+  if (!empty($s['addr']) || !empty($s['city'])) $ld['address'] = array_filter(['@type' => 'PostalAddress', 'streetAddress' => (string)($s['addr'] ?? ''), 'addressLocality' => (string)($s['city'] ?? ''), 'addressCountry' => 'PY']);
+  if (!empty($s['lat']) && !empty($s['lng'])) $ld['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => $s['lat'], 'longitude' => $s['lng']];
+  if (!empty($s['email'])) $ld['email'] = (string)$s['email'];
+  $meta .= "\n<script type=\"application/ld+json\">" . str_replace('</', '<\/', json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) . "</script>";
   $html = preg_replace('#<title>[^<]*</title>#', $meta, $html, 1);
   $html = preg_replace('#<meta name="description" content="[^"]*">#', '<meta name="description" content="' . $e($desc) . '">', $html, 1);
   return $html;
