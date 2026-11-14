@@ -33,7 +33,20 @@ if (isset($_GET['ofs'])) { // ofertas de hoje: produtos em promoção (com foto)
 if (isset($_GET['top'])) { // 'Lo más buscado': as buscas da Guía com resultado, deste mês e do anterior (só as que se repetem)
   $tz = new DateTimeZone('America/Asuncion'); $now = new DateTime('now', $tz); $q = [];
   foreach ([(clone $now)->modify('first day of last month')->format('Y-m'), $now->format('Y-m')] as $m) { $d = json_decode((string)@file_get_contents(__DIR__ . '/datos/hits-' . $m . '.json'), true); foreach ((array)($d['q'] ?? []) as $k => $n) $q[$k] = ($q[$k] ?? 0) + (int)$n; }
-  arsort($q); $o = []; foreach ($q as $k => $n) { if ($n < 2) break; $o[] = str_replace('-', ' ', $k); if (count($o) >= 8) break; }
+  // Só aparece em público o que bate com um negócio da Guía ou com um rubro conhecido: o contador é aberto,
+  // então sem este filtro qualquer pessoa poderia fazer uma palavra ofensiva aparecer na página.
+  require_once __DIR__ . '/guia_lib.php';
+  $nrm = function ($x) { return strtr(mb_strtolower((string)$x), ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ü' => 'u', 'ã' => 'a', 'õ' => 'o', 'â' => 'a', 'ê' => 'e', 'ô' => 'o', 'ç' => 'c']); };
+  $hay = ' comida restaurante almuerzo cena desayuno pizza pizzeria hamburguesa lomito empanada asado parrilla sushi helado heladeria cafe cafeteria panaderia confiteria bebidas cerveza supermercado despensa carniceria verduleria farmacia remedios salud clinica dentista medico optica ropa moda tienda calzados zapatos accesorios joyas cosmeticos perfumes belleza peluqueria barberia salon unas muebles sofa hogar colchones electrodomesticos celulares informatica ferreteria construccion pinturas materiales autos motos repuestos taller nautica pesca agro veterinaria mascotas petshop flores floreria libreria juguetes deportes gimnasio suplementos lavanderia grafica imprenta delivery abogado escribano contador arquitecto ingeniero influencer profesor clases hotel omnibus taxi regalos ofertas promociones turno guardia ';
+  foreach (guia_clients() as $c) $hay .= $nrm($c['name'] . ' ' . $c['segEs'] . ' ' . $c['segPt']) . ' ';
+  arsort($q); $o = [];
+  foreach ($q as $k => $n) {
+    if ($n < 2) break;
+    $t = str_replace('-', ' ', $k); $okw = 0; $bad = false;
+    foreach (explode(' ', $nrm($t)) as $w) { if (strlen($w) < 3) continue; if (strpos($hay, $w) === false) { $bad = true; break; } $okw++; }
+    if ($bad || !$okw) continue;
+    $o[] = $t; if (count($o) >= 8) break;
+  }
   header('Cache-Control: public, max-age=900'); echo json_encode(['q' => $o], JSON_UNESCAPED_UNICODE); exit;
 }
 if (isset($_GET['news'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_news(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }

@@ -6,7 +6,7 @@ $s = (string)($_GET['s'] ?? ''); $k = (string)($_GET['k'] ?? '');
 if (!preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $s) || !preg_match('/^[a-z0-9]{2,24}$/', $k)) { http_response_code(404); exit; }
 require __DIR__ . '/prods_lib.php';
 function pimg_file($s, $k) { return sys_get_temp_dir() . '/at_pimg_' . md5($s) . '_' . $k . '.jpg'; }
-function pimg_out($f) { header('Content-Type: image/jpeg'); header('Cache-Control: public, max-age=604800'); header('Content-Length: ' . filesize($f)); readfile($f); exit; }
+function pimg_out($f) { header('X-Content-Type-Options: nosniff'); header('Content-Type: image/jpeg'); header('Cache-Control: public, max-age=604800'); header('Content-Length: ' . filesize($f)); readfile($f); exit; }
 function pimg_save($s, $k, $data) {
   if (!preg_match('#^data:image/[a-z+]+;base64,(.+)$#s', $data, $m)) return;
   $bin = base64_decode($m[1]); if (!$bin) return;

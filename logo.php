@@ -31,12 +31,13 @@ if (strpos($src, 'm:') === 0) {                       // logo guardado nos pacot
   }
   $src = $found;
 }
-if (preg_match('#^https?://#', $src)) { header('Location: ' . $src, true, 302); exit; }
+if (preg_match('#^https://[^\s"<>]+$#', $src)) { header('Location: ' . $src, true, 302); exit; }
 if (!preg_match('#^data:(image/[a-z+.-]+);base64,(.+)$#s', $src, $mm)) {
   if ($N) lg_out(@file_get_contents(__DIR__ . '/vitrix-icon.png'), 'image/png', 3600);
   http_response_code(404); exit;
 }
 $bin = base64_decode($mm[2]); $type = $mm[1];
+if (!in_array($type, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true)) { if ($N) lg_out(@file_get_contents(__DIR__ . '/vitrix-icon.png'), 'image/png', 3600); http_response_code(404); exit; } // nunca SVG: poderia trazer script
 if (function_exists('imagecreatefromstring') && ($im = @imagecreatefromstring($bin))) {
   $w = imagesx($im); $h = imagesy($im);
   // logo que já é um quadro de cor (cantos opacos e não brancos): ocupa tudo, sem margem branca, fundo da cor do próprio logo
@@ -56,4 +57,4 @@ if (function_exists('imagecreatefromstring') && ($im = @imagecreatefromstring($b
   @file_put_contents($cache, $bin);
 }
 lg_out($bin, $type, $N ? 3600 : 86400);
-function lg_out($bin, $type, $age) { if ($bin === false || $bin === '') { http_response_code(404); exit; } header('Content-Type: ' . $type); header('Cache-Control: public, max-age=' . $age); header('Content-Length: ' . strlen($bin)); echo $bin; exit; }
+function lg_out($bin, $type, $age) { if ($bin === false || $bin === '') { http_response_code(404); exit; } header('X-Content-Type-Options: nosniff'); header('Content-Type: ' . $type); header('Cache-Control: public, max-age=' . $age); header('Content-Length: ' . strlen($bin)); echo $bin; exit; }
