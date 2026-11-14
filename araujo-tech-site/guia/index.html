@@ -87,7 +87,7 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
 .sl-tr{display:flex;height:100%;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
 .sd{flex:0 0 100%;height:100%;position:relative;display:block;text-decoration:none;color:#fff;overflow:hidden}
 .sd>img.bgi{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.sd.ad-s>img.bgi{filter:blur(18px) brightness(.7);transform:scale(1.15)}.sd.ad-s>img.fg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.sd.ad-s>img.bgi{filter:blur(18px) brightness(.7);transform:scale(1.15)}.sd.ad-s img.fg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
 .sd.cl{background:radial-gradient(500px 260px at 85% 20%,#6A22C0 0%,transparent 70%),linear-gradient(120deg,#3B0E70,#24093F)}
 .sd.cl>img.bgi{opacity:.92}
 .sd.cl::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,4,36,.88) 0%,rgba(20,4,36,.55) 48%,rgba(20,4,36,.05) 100%)}
@@ -151,8 +151,8 @@ const ini=n=>String(n).split(/\s+/).filter(w=>/[\p{L}\p{N}]/u.test(w)).slice(0,2
 const safe=u=>/^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(String(u||''))?u:'';
 const logoU=u=>{u=safe(u);return /\/logo\.php$/.test(u)?u+'?v=2':u};
 const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
-Object.assign(TX.es,{ad:'Publicidad',dvx:'Destacado Vitrix',sl_lab:'Destacados y publicidad',sl_prev:'Anterior',sl_next:'Siguiente',u_route:'Cómo llegar'});
-Object.assign(TX.pt,{ad:'Publicidade',dvx:'Destaque Vitrix',sl_lab:'Destaques e publicidade',sl_prev:'Anterior',sl_next:'Próximo',u_route:'Como chegar'});
+Object.assign(TX.es,{td_h:'Delivery',td_p:'Delivery en Santa Rita · De confianza',td_go:'Pedir por WhatsApp',ad:'Publicidad',dvx:'Destacado Vitrix',sl_lab:'Destacados y publicidad',sl_prev:'Anterior',sl_next:'Siguiente',u_route:'Cómo llegar'});
+Object.assign(TX.pt,{td_h:'Delivery',td_p:'Delivery em Santa Rita · De confianza',td_go:'Pedir pelo WhatsApp',ad:'Publicidade',dvx:'Destaque Vitrix',sl_lab:'Destaques e publicidade',sl_prev:'Anterior',sl_next:'Próximo',u_route:'Como chegar'});
 let L=(()=>{try{const v=localStorage.getItem('at_lang');if(v==='es'||v==='pt')return v}catch(e){}return /^pt/i.test(navigator.language||'')?'pt':'es'})();
 let LIST=null,CAT='all',F_OPEN=false,F_DEL=false;
 /* palavras do dia a dia que levam à categoria certa (quem busca 'almuerzo' acha os restaurantes) */
@@ -163,6 +163,8 @@ const EMER=[['911',{es:'Policía · Sistema 911',pt:'Polícia · Sistema 911'},'
 const PCAT={gob:['gov',{es:'Gobierno y trámites',pt:'Governo e trâmites'}],doc:['id',{es:'Documentos',pt:'Documentos'}],salud:['hosp',{es:'Salud',pt:'Saúde'}],seg:['shield',{es:'Seguridad',pt:'Segurança'}],ocio:['tree',{es:'Plazas y recreación',pt:'Praças e lazer'}],trans:['bus',{es:'Transporte',pt:'Transporte'}],serv:['bolt',{es:'Servicios públicos',pt:'Serviços públicos'}],edu:['book',{es:'Educación',pt:'Educação'}]};
 const PDEF=[['gob','Municipalidad de Santa Rita'],['doc','Registro Civil'],['doc','Identificaciones (cédula y pasaporte) · Policía Nacional'],['doc','Migraciones · oficina más cercana'],['gob','Juzgado de Paz de Santa Rita'],['salud','Hospital Distrital de Santa Rita'],['salud','IPS · Unidad Sanitaria Santa Rita'],['salud','Farmacias'],['seg','Comisaría · Policía Nacional'],['seg','Bomberos Voluntarios de Santa Rita'],['ocio','Plazas de Santa Rita'],['ocio','Polideportivo municipal'],['ocio','Balnearios y piscinas'],['trans','Terminal de ómnibus de Santa Rita'],['serv','ANDE · oficina de atención']].map(([c,n])=>({c,n,a:'',tel:'',h:'',map:''}));
 let G={ads:[],util:null};
+const TDQ=/deliv|entreg|envio|envi|moto|mandad|pedido|tu ?delivery/;
+function tdCard(){const t=TX[L];return `<a class="card dest" href="${esc(TD_WA)}" target="_blank" rel="noopener"><span class="lg"><img src="../img/guia/td-icono.png" alt="" width="66" height="66" style="object-fit:contain;background:#301C57;padding:6px"></span><span class="tx"><h3>Tu Delivery</h3><p>${esc(t.td_p)}</p><span class="bdg"><span class="bd dl">${ic('bike')}0982 086 171</span></span><span class="go">${t.td_go}${ic('arrow')}</span></span></a>`}
 const PSYN={doc:/cedul|pasaport|document|identif|migrac|residen|registro|partida|certific/,gob:/munic|prefeit|intend|tramit|juzg|justic|impuest/,salud:/hospit|medic|doctor|salud|saude|ips|clinic|urgenc|vacun|farmac/,seg:/polic|comisar|delegac|bomber|denunc/,ocio:/plaza|praca|parque|balnear|piscin|pileta|rio|playa|deport|futbol|cancha|paseo/,trans:/termin|omnibus|onibus|colectiv|rodoviar|pasaje|bus/,serv:/ande|luz|agua|correo|junta|saneam/,edu:/escuel|escola|colegio|universid|faculd|bibliotec/};
 const mapU=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
 const telU=t=>{let d=String(t||'').replace(/[^\d+]/g,'');return d?'tel:'+d:''};
@@ -177,18 +179,21 @@ function utilHTML(q){const t=TX[L];const all=(G.util&&G.util.length?G.util:PDEF)
 /* slider do topo: banners pagos (Publicidad) e clientes Premium/VIP (Destacado Vitrix) */
 const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 let SL={items:[],i:0,tm:null,sig:'',ord:null};
+/* banners da casa (Tu Delivery e planos Vitrix): sempre no slider, depois dos pagos e dos Premium/VIP */
+const TD_WA='https://wa.me/595982086171?text='+encodeURIComponent('Hola Tu Delivery, quiero pedir un delivery');
+const HOUSE=[{id:'h-td',t:'Tu Delivery · 0982 086 171',u:TD_WA,img:'/img/guia/tu-delivery.jpg?v=1',imgm:'/img/guia/tu-delivery-m.jpg?v=1'},{id:'h-vx',t:'Planes Vitrix',u:'https://araujotechsistemas.com/vitrix/#planes',img:'/img/guia/vitrix-planes.jpg?v=1',imgm:'/img/guia/vitrix-planes-m.jpg?v=1'}];
 function slItems(){const ads=(G.ads||[]).filter(a=>a&&a.img).map(a=>({k:'ad',a}));
  const dest=(LIST||[]).filter(c=>c.dest).map(c=>({k:'cl',c}));
  if(!SL.ord)SL.ord={};const o=x=>{const id=x.k==='ad'?'a'+x.a.id:'c'+x.c.id;if(SL.ord[id]==null)SL.ord[id]=Math.random();return SL.ord[id]};
- return ads.sort((x,y)=>o(x)-o(y)).concat(dest.sort((x,y)=>o(x)-o(y)))}
-function slideHTML(x){const t=TX[L];if(x.k==='ad'){const a=x.a,u=safe(a.u),tag=u?'a':'div';return `<${tag} class="sd ad-s"${u?` href="${esc(u)}" target="_blank" rel="noopener sponsored"`:''} aria-label="${esc(t.ad+(a.t?': '+a.t:''))}"><img class="bgi" src="${esc(a.img)}" alt="" aria-hidden="true"><img class="fg" src="${esc(a.img)}" alt="${esc(a.t||t.ad)}"><span class="ad">${t.ad}</span></${tag}>`}
+ return ads.sort((x,y)=>o(x)-o(y)).concat(dest.sort((x,y)=>o(x)-o(y)),HOUSE.map(a=>({k:'own',a})))}
+function slideHTML(x){const t=TX[L];if(x.k==='ad'||x.k==='own'){const a=x.a,u=safe(a.u),tag=u?'a':'div',pd=x.k==='ad';return `<${tag} class="sd ad-s"${u?` href="${esc(u)}" target="_blank" rel="noopener${pd?' sponsored':''}"`:''} aria-label="${esc(pd?t.ad+(a.t?': '+a.t:''):a.t)}"><img class="bgi" src="${esc(a.img)}" alt="" aria-hidden="true">${a.imgm?`<picture><source media="(max-width:640px)" srcset="${esc(a.imgm)}">`:''}<img class="fg" src="${esc(a.img)}" alt="${esc(a.t||t.ad)}">${a.imgm?'</picture>':''}${pd?`<span class="ad">${t.ad}</span>`:''}</${tag}>`}
  const c=x.c,i=INFO[c.id]||{},u=safe(c.url),lg=logoU(c.logo),seg=L==='pt'?(c.segPt||c.segEs):(c.segEs||c.segPt),sl=i.sl?(i.sl[L]||i.sl.es||''):'';
  return `<a class="sd cl" href="${esc(u)}" target="_blank" rel="noopener">${i.cv?`<img class="bgi" src="${esc(i.cv)}" alt="" loading="lazy">`:''}<span class="in"><span class="tg">${ic('star')}${t.dvx}</span><span style="display:flex;gap:12px;align-items:center"><span class="sl-lg">${lg?`<img src="${esc(lg)}" alt="">`:`<b>${esc(ini(c.name))}</b>`}</span><h3>${esc(c.name)}</h3></span><p>${esc(sl||[seg,c.city].filter(Boolean).join(' · '))}</p><span class="bt">${t.go}${ic('arrow')}</span></span></a>`}
 const RM=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 function slGo(n,user){const el=document.getElementById('sl'),N=SL.items.length;if(!N)return;SL.i=(n+N)%N;const tr=el.querySelector('.sl-tr');if(tr)tr.style.transform=`translateX(${-100*SL.i}%)`;
  el.querySelectorAll('.sd').forEach((d,k)=>{d.setAttribute('aria-hidden',k===SL.i?'false':'true');d.tabIndex=k===SL.i?0:-1});el.querySelectorAll('.sl-dt button').forEach((b,k)=>b.setAttribute('aria-current',k===SL.i?'true':'false'));if(user)slPlay()}
 function slPlay(){clearInterval(SL.tm);SL.tm=null;if(SL.items.length>1&&!RM()&&!SL.hold)SL.tm=setInterval(()=>slGo(SL.i+1),6000)}
-function slRender(){const el=document.getElementById('sl');const items=slItems();const sig=L+'|'+JSON.stringify(items.map(x=>x.k==='ad'?x.a.id+x.a.img:x.c.id+(INFO[x.c.id]||{}).cv+JSON.stringify((INFO[x.c.id]||{}).sl||'')));if(sig===SL.sig)return;SL.sig=sig;SL.items=items;
+function slRender(){const el=document.getElementById('sl');const items=slItems();const sig=L+'|'+JSON.stringify(items.map(x=>x.k!=='cl'?x.a.id+x.a.img:x.c.id+(INFO[x.c.id]||{}).cv+JSON.stringify((INFO[x.c.id]||{}).sl||'')));if(sig===SL.sig)return;SL.sig=sig;SL.items=items;
  if(!items.length){el.hidden=true;el.innerHTML='';clearInterval(SL.tm);return}
  const t=TX[L];el.hidden=false;el.setAttribute('aria-label',t.sl_lab);if(SL.i>=items.length)SL.i=0;
  el.innerHTML=`<div class="sl-tr">${items.map(slideHTML).join('')}</div>${items.length>1?`<button class="sl-nv p" data-sl="-1" aria-label="${t.sl_prev}">${ic('arrow')}</button><button class="sl-nv n" data-sl="1" aria-label="${t.sl_next}">${ic('arrow')}</button><div class="sl-dt">${items.map((_,k)=>`<button data-sk="${k}" aria-label="${k+1} / ${items.length}"></button>`).join('')}</div>`:''}`;
@@ -216,9 +221,10 @@ function badges(c){const t=TX[L],i=INFO[c.id]||{},o=i.days&&!i.paused?openNow(i.
 function render(){texts();const el=document.getElementById('list'),ch=document.getElementById('chips');if(!LIST)return;
  const q=norm(document.getElementById('q').value.trim());const syn=q?Object.keys(SYN).filter(k=>q.split(/\s+/).some(w=>w.length>2&&SYN[k].test(w))):[];const base=LIST.filter(c=>(!q||norm([c.name,c.segEs,c.segPt,c.city].join(' ')).includes(q)||syn.includes(c._g))&&(!F_DEL||(INFO[c.id]||{}).del)&&(!F_OPEN||((INFO[c.id]||{}).days&&(openNow(INFO[c.id].days)||{}).on)));
  const present=GR.filter(g=>LIST.some(c=>c._g===g[0]));
- ch.innerHTML=[['all',ic('grid'),TX[L].all,base.length]].concat(present.map(g=>[g[0],ic(g[0]),g[2][L],base.filter(c=>c._g===g[0]).length])).map(([k,i,n,cnt])=>`<button class="chip" data-c="${k}" aria-pressed="${CAT===k}">${i}${esc(n)}<small>${cnt}</small></button>`).join('')+`<button class="chip" data-f="open" aria-pressed="${F_OPEN}">${ic('clock')}${TX[L].f_open}</button><button class="chip" data-f="del" aria-pressed="${F_DEL}">${ic('bike')}${TX[L].f_del}</button><a class="chip" href="#util">${ic('pin')}${TX[L].f_util}</a>`;
+ ch.innerHTML=[['all',ic('grid'),TX[L].all,base.length]].concat(present.map(g=>[g[0],ic(g[0]),g[2][L],base.filter(c=>c._g===g[0]).length])).map(([k,i,n,cnt])=>`<button class="chip" data-c="${k}" aria-pressed="${CAT===k}">${i}${esc(n)}<small>${cnt}</small></button>`).join('')+`<button class="chip" data-c="deliv" aria-pressed="${CAT==='deliv'}">${ic('bike')}${esc(TX[L].td_h)}<small>1</small></button>`+`<button class="chip" data-f="open" aria-pressed="${F_OPEN}">${ic('clock')}${TX[L].f_open}</button><button class="chip" data-f="del" aria-pressed="${F_DEL}">${ic('bike')}${TX[L].f_del}</button><a class="chip" href="#util">${ic('pin')}${TX[L].f_util}</a>`;
  const show=GR.filter(g=>(CAT==='all'||CAT===g[0])).map(g=>[g,base.filter(c=>c._g===g[0])]).filter(([,l])=>l.length);
- el.innerHTML=(show.length?show.map(([g,l])=>`<section class="grp"><h2>${ic(g[0])}${esc(g[2][L])}</h2><div class="grid">${l.slice().sort((a,b)=>(b.dest?1:0)-(a.dest?1:0)).map(card).join('')}</div></section>`).join(''):`<p class="empty">${q?TX[L].nores:TX[L].none}</p>`)+utilHTML(q);slRender();
+ const tdOn=(CAT==='all'||CAT==='deliv')&&!F_OPEN&&(!q||TDQ.test(q)),tdHTML=tdOn?`<section class="grp" id="delivery"><h2>${ic('bike')}${esc(TX[L].td_h)}</h2><div class="grid">${tdCard()}</div></section>`:'';
+ el.innerHTML=(show.length||tdHTML?show.map(([g,l])=>`<section class="grp"><h2>${ic(g[0])}${esc(g[2][L])}</h2><div class="grid">${l.slice().sort((a,b)=>(b.dest?1:0)-(a.dest?1:0)).map(card).join('')}</div></section>`).join('')+tdHTML:`<p class="empty">${q?TX[L].nores:TX[L].none}</p>`)+utilHTML(q);slRender();
  el.querySelectorAll('.lg img').forEach(i=>{i.onerror=()=>{const b=document.createElement('b');b.textContent=i.dataset.ini;i.replaceWith(b)}})}
 document.getElementById('chips').addEventListener('click',e=>{const f=e.target.closest('[data-f]');if(f){if(f.dataset.f==='open')F_OPEN=!F_OPEN;else F_DEL=!F_DEL;render();return}const b=e.target.closest('[data-c]');if(!b)return;CAT=b.dataset.c;render()});
 document.getElementById('q').addEventListener('input',()=>{CAT='all';render()});
