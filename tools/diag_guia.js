@@ -33,6 +33,12 @@ const sh = c => { try { return execSync(c, { encoding: 'utf8', timeout: 60000 })
     await ctx.close();
   }
   { const fs = require('fs'); fs.mkdirSync('guia-telas', { recursive: true });
+    { const ctx = await b.newContext({ ...devices['iPhone 13'], geolocation: { latitude: -25.795, longitude: -55.088 }, permissions: ['geolocation'] }); const p = await ctx.newPage();
+      await p.goto(U + '/guia/', { waitUntil: 'networkidle' }).catch(() => {}); await p.waitForTimeout(3000);
+      await p.click('.fl[data-f="near"]').catch(() => {}); await p.waitForTimeout(1500); await p.click('.fl[data-f="map"]').catch(() => {}); await p.waitForTimeout(5000);
+      console.log('MAPA', JSON.stringify(await p.evaluate(() => ({ leaflet: !!(window.L && window.L.map), tiles: document.querySelectorAll('#gmap .leaflet-tile-loaded').length, pins: document.querySelectorAll('#gmap .mpin').length, cerca: [...document.querySelectorAll('#cerca .card h3')].map(x => x.textContent) }))));
+      await p.evaluate(() => document.getElementById('gmw').scrollIntoView()); await p.waitForTimeout(500);
+      const f = 'guia-telas/guia-mapa.jpg'; await p.screenshot({ path: f, type: 'jpeg', quality: 80 }); const b64 = fs.readFileSync(f).toString('base64'); for (let i = 0; i < b64.length; i += 4000) console.log('IMG64 mapa ' + b64.slice(i, i + 4000)); await ctx.close(); }
     for (const [n, o] of [['pc', { viewport: { width: 1440, height: 980 }, deviceScaleFactor: 2 }], ['cel', { ...devices['iPhone 13'] }]]) {
       const ctx = await b.newContext(o); const p = await ctx.newPage(); await p.goto(U + '/guia/', { waitUntil: 'networkidle' }).catch(() => {}); await p.waitForTimeout(4000);
       await p.evaluate(() => { try { SL.hold = true; slGo(0); } catch (e) {} }); await p.waitForTimeout(800);
