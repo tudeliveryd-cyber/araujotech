@@ -9,6 +9,7 @@ $id = (string)($_GET['id'] ?? '');
 if (!preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $id)) { echo '{"items":[]}'; exit; }
 require __DIR__ . '/prods_lib.php';
 $shop = at_shop_cfg($id);
+if (isset($_GET['dbg'])) { $pp = $shop['cfg']['products'] ?? []; echo json_encode(['ok' => (bool)$shop, 'status' => $shop['status'] ?? null, 'mc' => $shop['mc'] ?? null, 'n' => count($pp), 'ph' => array_slice(array_map(function ($p) { return substr((string)($p['photo'] ?? ''), 0, 12); }, $pp), 0, 6)]); exit; } // conferência (sem dados privados)
 if (!$shop || ($shop['status'] ?? '') === 'suspenso' || empty($shop['cfg']['products'])) { echo '{"items":[]}'; exit; }
 $cfg = $shop['cfg'];
 $hid = [];
