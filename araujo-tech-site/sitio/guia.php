@@ -51,6 +51,7 @@ foreach ($ids as $id) {
   $sl = $st['slogan'] ?? '';
   if (is_array($sl)) $sl = ['es' => trim((string)($sl['es'] ?? $sl['pt'] ?? '')), 'pt' => trim((string)($sl['pt'] ?? $sl['es'] ?? ''))]; else $sl = trim((string)$sl) === '' ? null : ['es' => trim((string)$sl), 'pt' => trim((string)$sl)];
   if ($sl && ($sl['es'] . $sl['pt']) !== '') $o['sl'] = $sl;
+  if (is_numeric($st['lat'] ?? null) && is_numeric($st['lng'] ?? null) && abs($st['lat']) > 0.01) { $o['lat'] = round($st['lat'], 5); $o['lng'] = round($st['lng'], 5); } // para 'Cerca de mí' e o mapa
   $out[$id] = $o;
 }
 echo json_encode($out ?: new stdClass(), JSON_UNESCAPED_UNICODE);

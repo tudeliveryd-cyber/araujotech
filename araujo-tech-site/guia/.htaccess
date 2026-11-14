@@ -1,0 +1,9 @@
+# Guía Vitrix: a página principal passa pelo index.php (lista pronta para o Google) e cada negócio tem a sua página: /guia/<negocio>
+DirectoryIndex index.php index.html
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /guia/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-z0-9][a-z0-9-]{1,60})/?$ negocio.php?id=$1 [L,QSA]
+</IfModule>

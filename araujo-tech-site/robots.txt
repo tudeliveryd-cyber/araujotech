@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /sitio/datos/
 Sitemap: https://araujotechsistemas.com/sitemap.xml
+Sitemap: https://araujotechsistemas.com/guia/sitemap.php

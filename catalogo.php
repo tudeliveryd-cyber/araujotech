@@ -11,6 +11,7 @@ $html = @file_get_contents(__DIR__ . '/404.html');
 if ($html === false) { http_response_code(500); exit('Error'); }
 try {
   $host = strtolower($_SERVER['HTTP_HOST'] ?? '');
+  if ($host === 'guia.araujotechsistemas.com') { header('Location: https://araujotechsistemas.com/guia/', true, 301); exit; } // endereço curto da Guía Vitrix
   if (preg_match('/^([a-z0-9][a-z0-9-]{1,60})\.araujotechsistemas\.com$/', $host, $m)) {
     $shop = cat_shop($m[1]);
     // a loja tem site com este mesmo nome e o catálogo dela mora em outro endereço (ex.: Fogão Mineiro, catálogo em fogaomineiro.): aqui fica o site

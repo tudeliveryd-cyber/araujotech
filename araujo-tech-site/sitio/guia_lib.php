@@ -107,3 +107,21 @@ function guia_news() {
   elseif (is_file($cache)) { $items = json_decode((string)@file_get_contents($cache), true) ?: []; }
   return ['n' => $name, 'site' => $site, 'items' => $items];
 }
+
+// Clientes publicados pelo Panel Araújo Tech (platform/sitio → clientes), só catálogos. Cache de 10 minutos.
+function guia_clients() {
+  $cache = sys_get_temp_dir() . '/at_gcl1.json';
+  if (is_file($cache) && time() - filemtime($cache) < 600) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
+  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=clientes');
+  if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
+  $f = json_decode($r, true)['fields']['clientes']['arrayValue']['values'] ?? [];
+  $out = [];
+  foreach ($f as $v) {
+    $m = $v['mapValue']['fields'] ?? []; $g = function ($k) use ($m) { $x = $m[$k] ?? null; if (!$x) return null; return $x['stringValue'] ?? ($x['booleanValue'] ?? null); };
+    if ($g('sys') !== 'catalogo' || !preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', (string)$g('id'))) continue;
+    $out[] = ['id' => $g('id'), 'name' => (string)$g('name'), 'segEs' => (string)$g('segEs'), 'segPt' => (string)$g('segPt'), 'city' => (string)$g('city'), 'url' => (string)$g('url'), 'logo' => (string)$g('logo'), 'dest' => (bool)$g('dest'), 'vip' => (bool)$g('vip')];
+  }
+  usort($out, function ($a, $b) { return strcasecmp($a['name'], $b['name']); });
+  @file_put_contents($cache, json_encode($out));
+  return $out;
+}
