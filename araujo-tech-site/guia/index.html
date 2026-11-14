@@ -181,7 +181,7 @@ const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math
 let SL={items:[],i:0,tm:null,sig:'',ord:null};
 /* banners da casa (Tu Delivery e planos Vitrix): sempre no slider, depois dos pagos e dos Premium/VIP */
 const TD_WA='https://wa.me/595982086171?text='+encodeURIComponent('Hola Tu Delivery, quiero pedir un delivery');
-const HOUSE=[{id:'h-td',t:'Tu Delivery · 0982 086 171',u:TD_WA,img:'/img/guia/tu-delivery.jpg?v=3',imgm:'/img/guia/tu-delivery-m.jpg?v=3'},{id:'h-vx',t:'Planes Vitrix',u:'https://araujotechsistemas.com/vitrix/#planes',img:'/img/guia/vitrix-planes.jpg?v=3',imgm:'/img/guia/vitrix-planes-m.jpg?v=3'}];
+const HOUSE=[{id:'h-td',t:'Tu Delivery · 0982 086 171',u:TD_WA,img:'/img/guia/tu-delivery.jpg?v=4',imgm:'/img/guia/tu-delivery-m.jpg?v=4'},{id:'h-vx',t:'Planes Vitrix',u:'https://araujotechsistemas.com/vitrix/#planes',img:'/img/guia/vitrix-planes.jpg?v=4'}];
 function slItems(){const ads=(G.ads||[]).filter(a=>a&&a.img).map(a=>({k:'ad',a}));
  const dest=(LIST||[]).filter(c=>c.dest).map(c=>({k:'cl',c}));
  if(!SL.ord)SL.ord={};const o=x=>{const id=x.k==='ad'?'a'+x.a.id:'c'+x.c.id;if(SL.ord[id]==null)SL.ord[id]=Math.random();return SL.ord[id]};
