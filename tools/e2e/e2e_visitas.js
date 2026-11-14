@@ -40,7 +40,7 @@ const VT = () => { window.TDC_VTEST = true; };
   check(await nVis() === 2, 'o dono abrindo o próprio catálogo no celular do painel não conta');
 
   sec('C. Painel do local: "Personas que vieron tu catálogo"');
-  await o.evaluate(() => { ui.cvs = null; ui.tab = 'resumo'; render(); }); await o.w(2000);
+  await o.evaluate(() => { ui.cvs = null; ui.cvsAt = 0; ui.tab = 'resumo'; render(); }); await o.waitForFunction(() => { const h = [...document.querySelectorAll('.card h3')].find(x => /Personas que vieron/.test(x.textContent)); return h && h.closest('.card').querySelectorAll('.stat').length >= 2; }, null, { timeout: 20000 }).catch(() => {}); await o.w(500);
   const card = await o.evaluate(() => { const h = [...document.querySelectorAll('.card h3')].find(x => /Personas que vieron/.test(x.textContent)); if (!h) return null; const c = h.closest('.card'); return { st: [...c.querySelectorAll('.stat')].map(x => x.innerText.replace(/\s+/g, ' ')), bars: c.querySelectorAll('.cvb i').length }; });
   info(JSON.stringify(card));
   check(card && card.st[0].toLowerCase() === 'hoy 2' && card.st[1].toLowerCase() === 'últimos 7 días 2' && card.bars === 14, 'mostra hoje 2, 7 dias 2 e o gráfico de 14 dias');
