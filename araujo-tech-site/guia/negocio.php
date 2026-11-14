@@ -45,7 +45,7 @@ if ($days && empty($st['paused'])) {
   foreach ($ivs($days[$wd]) as $v) if ($nm >= $v[0] && $nm < $v[1]) $open = ['on' => true, 'until' => $v[3]];
   if (!$open['on']) foreach ($ivs($days[($wd + 6) % 7]) as $v) if ($v[1] > 1440 && $nm < $v[1] - 1440) $open = ['on' => true, 'until' => $v[3]];
 }
-$DN = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; $SCH = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+$DN = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; $DP = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']; $SCH = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 $addr = trim(preg_replace('/^[\s—-]+/u', '', (string)($st['address'] ?? ''))); $loc = guia_loc($id, $sh); $lat = $loc['lat'] ?? null; $lng = $loc['lng'] ?? null; $hasGeo = (bool)$loc;
 $mapQ = $hasGeo ? $lat . ',' . $lng : trim($name . ', ' . ($addr ?: ($city ?: 'Santa Rita')) . (stripos($addr, 'Santa Rita') === false && stripos($addr, $city ?: 'zz') === false ? ', ' . ($city ?: 'Santa Rita') : '')) . (stripos($addr, 'Alto Paran') === false ? ', Alto Paraná' : '') . ', Paraguay';
 // sempre com o país: sem ele, 'Fogão Mineiro, Centro' caía num restaurante de Juiz de Fora (Brasil)
@@ -118,27 +118,28 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <div class="wrap">
 <span class="lg"><?php if ($logo): ?><img src="<?= $e($logo) ?>" alt="Logo de <?= $e($name) ?>"><?php else: ?><b><?= $e($ini($name)) ?></b><?php endif; ?></span>
 <div class="ht"><h1><?= $e($name) ?></h1><p><?= $e(implode(' · ', array_filter([$slogan ?: $seg, $city]))) ?></p>
-<div class="bdg"><?php if ($c['dest']): ?><span class="bd st"><?= $ic($I['seal'], 13) ?>Recomendado</span><?php endif; ?><?php if ($open): ?><span class="bd <?= $open['on'] ? 'on' : 'off' ?>"><?= $open['on'] ? 'Abierto ahora' . (!empty($open['until']) ? ' · hasta las ' . $e($open['until']) : '') : 'Cerrado ahora' ?></span><?php endif; ?><?php if (!empty($st['delivery'])): ?><span class="bd dl"><?= $ic($I['bike'], 13) ?>Delivery</span><?php endif; ?><?php if (!empty($st['pickup'])): ?><span class="bd dl"><?= $ic($I['store'], 13) ?>Retiro</span><?php endif; ?></div></div>
+<div class="bdg"><?php if ($c['dest']): ?><span class="bd st"><?= $ic($I['seal'], 13) ?><span data-pt="Recomendado">Recomendado</span></span><?php endif; ?><?php if ($open): ?><span class="bd <?= $open['on'] ? 'on' : 'off' ?>"><span data-pt="<?= $open['on'] ? 'Aberto agora' . (!empty($open['until']) ? ' · até as ' . $e($open['until']) : '') : 'Fechado agora' ?>"><?= $open['on'] ? 'Abierto ahora' . (!empty($open['until']) ? ' · hasta las ' . $e($open['until']) : '') : 'Cerrado ahora' ?></span></span><?php endif; ?><?php if (!empty($st['delivery'])): ?><span class="bd dl"><?= $ic($I['bike'], 13) ?>Delivery</span><?php endif; ?><?php if (!empty($st['pickup'])): ?><span class="bd dl"><?= $ic($I['store'], 13) ?><span data-pt="Retirada">Retiro</span></span><?php endif; ?></div></div>
 </div></section>
 <main class="wrap">
 <div class="acts">
-<a class="btn pri" href="<?= $e($catUrl) ?>"><?= $ic($I['cat']) ?>Ver catálogo y pedir</a>
+<a class="btn pri" href="<?= $e($catUrl) ?>"><?= $ic($I['cat']) ?><span data-pt="Ver catálogo e pedir">Ver catálogo y pedir</span></a>
 <?php if ($waUrl): ?><a class="btn wa" href="<?= $e($waUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['wa']) ?>WhatsApp</a><?php endif; ?>
-<a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?>Cómo llegar</a>
-<button class="btn" type="button" id="sh"><?= $ic($I['share']) ?>Compartir</button>
+<a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?><span data-pt="Como chegar">Cómo llegar</span></a>
+<button class="btn" type="button" id="sh"><?= $ic($I['share']) ?><span data-pt="Compartilhar">Compartir</span></button>
 </div>
-<?php if ($prods): ?><section class="sec"><h2><?= $ic($I['cat'], 22) ?>Productos destacados</h2><div class="pg">
+<?php if ($prods): ?><section class="sec"><h2><?= $ic($I['cat'], 22) ?><span data-pt="Produtos em destaque">Productos destacados</span></h2><div class="pg">
 <?php foreach ($prods as $p): ?><a class="pr" href="<?= $e($catUrl . ($p['id'] !== '' ? '?p=' . rawurlencode($p['id']) : '')) ?>"><img src="<?= $e($p['img']) ?>" alt="<?= $e($p['n']) ?>" loading="lazy" onerror="this.style.visibility='hidden'"><span><b><?= $e($p['n']) ?></b><?php if ($p['pm']): ?><i><?= $e($money($p['pm'])) ?></i><?php if ($p['pr'] > 0): ?><s><?= $e($money($p['pr'])) ?></s><?php endif; ?><?php elseif ($p['pr'] > 0): ?><i><?= $e($money($p['pr'])) ?></i><?php endif; ?></span></a>
 <?php endforeach; ?></div></section><?php endif; ?>
-<?php if ($days): ?><section class="sec"><h2><?= $ic($I['clock'], 22) ?>Horarios</h2><div class="box hrs">
-<?php foreach ([1, 2, 3, 4, 5, 6, 0] as $i): $v = $ivs($days[$i]); ?><div class="<?= $i === $wd ? 'td' : '' ?>"><span><?= $DN[$i] ?><?= $i === $wd ? ' · hoy' : '' ?></span><span><?= $v ? $e(implode(' · ', array_map(function ($x) { return $x[2] . '–' . $x[3]; }, $v))) : 'Cerrado' ?></span></div>
+<?php if ($days): ?><section class="sec"><h2><?= $ic($I['clock'], 22) ?><span data-pt="Horários">Horarios</span></h2><div class="box hrs">
+<?php foreach ([1, 2, 3, 4, 5, 6, 0] as $i): $v = $ivs($days[$i]); ?><div class="<?= $i === $wd ? 'td' : '' ?>"><span data-pt="<?= $DP[$i] ?><?= $i === $wd ? ' · hoje' : '' ?>"><?= $DN[$i] ?><?= $i === $wd ? ' · hoy' : '' ?></span><span<?= $v ? '' : ' data-pt="Fechado"' ?>><?= $v ? $e(implode(' · ', array_map(function ($x) { return $x[2] . '–' . $x[3]; }, $v))) : 'Cerrado' ?></span></div>
 <?php endforeach; ?></div></section><?php endif; ?>
-<section class="sec"><h2><?= $ic($I['pin'], 22) ?>Ubicación</h2><div class="box"><p><?= $e($addr ?: ($city ?: 'Santa Rita') . ', Alto Paraná') ?></p>
+<section class="sec"><h2><?= $ic($I['pin'], 22) ?><span data-pt="Localização">Ubicación</span></h2><div class="box"><p><?= $e($addr ?: ($city ?: 'Santa Rita') . ', Alto Paraná') ?></p>
 <iframe class="map" title="Mapa de <?= $e($name) ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=<?= rawurlencode($mapQ) ?>&amp;z=<?= $hasGeo ? 16 : 15 ?>&amp;output=embed"></iframe>
-<p style="margin-top:10px"><a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?>Abrir en Google Maps</a></p></div></section>
-<section class="cta"><div><b>Más negocios de Santa Rita</b><p>Ofertas, farmacia de turno, ómnibus y todo lo útil de la ciudad.</p></div><a href="/guia/">Abrir la Guía Vitrix</a></section>
+<p style="margin-top:10px"><a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?><span data-pt="Abrir no Google Maps">Abrir en Google Maps</span></a></p></div></section>
+<section class="cta"><div><b data-pt="Mais negócios de Santa Rita">Más negocios de Santa Rita</b><p data-pt="Ofertas, farmácia de plantão, ônibus e tudo o que é útil na cidade.">Ofertas, farmacia de turno, ómnibus y todo lo útil de la ciudad.</p></div><a href="/guia/" data-pt="Abrir a Guia Vitrix">Abrir la Guía Vitrix</a></section>
 </main>
-<footer><div class="wrap">Guía Vitrix · Una iniciativa de <a href="/">Araújo Tech Sistemas</a> y Tu Delivery</div></footer>
+<footer><div class="wrap"><span data-pt="Guia Vitrix · Uma iniciativa de">Guía Vitrix · Una iniciativa de</span> <a href="/">Araújo Tech Sistemas</a> <span data-pt="e">y</span> Tu Delivery</div></footer>
+<script>try{if(localStorage.getItem('at_lang')==='pt'){document.documentElement.lang='pt';document.querySelectorAll('[data-pt]').forEach(function(e){e.textContent=e.getAttribute('data-pt')})}}catch(e){}</script>
 <script>
 document.getElementById('sh').addEventListener('click',function(){var u=<?= json_encode($url) ?>,t=<?= json_encode($name . ' · Guía Vitrix') ?>;if(navigator.share){navigator.share({title:t,url:u}).catch(function(){})}else{window.open('https://wa.me/?text='+encodeURIComponent(t+' '+u),'_blank','noopener')}});
 try{if(!navigator.webdriver){var u='/sitio/guia_hit.php?t=c&id=<?= rawurlencode($id) ?>';if(navigator.sendBeacon)navigator.sendBeacon(u);else fetch(u,{method:'POST',keepalive:true})}}catch(e){}
