@@ -28,8 +28,8 @@ https://araujotechsistemas.com/demo-farmacia/|q_none
 https://araujotechsistemas.com/demo-agenda/|badPhone
 https://araujotechsistemas.com/demo-pesca/|Puerto Dorado
 https://araujotechsistemas.com/demo-comida/|Sabor Casero
-https://araujotechsistemas.com/admin/|gvCard
-https://araujotechsistemas.com/painel/|gvCard
+https://araujotechsistemas.com/admin/|grBlocks
+https://araujotechsistemas.com/painel/|grBlocks
 https://araujotechsistemas.com/licencia.js|
 https://araujotechsistemas.com/clientes.js|AT_CLIENTES
 https://araujotechsistemas.com/sitemap.xml|
@@ -175,6 +175,8 @@ gh1=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' -A 'Mozilla/5.0 (con
 gd=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/sitio/datos/" 2>/dev/null || true); [ "$gd" = "403" ] && ok "pasta de números da Guía fechada ao público (403)" || bad "sitio/datos/ -> $gd (devia ser 403)"
 gst=$(curl -sS --max-time 30 -X POST -d '{"t":"x"}' "https://araujotechsistemas.com/sitio/guia_stats.php" 2>/dev/null || true); [ "$gst" = '{"ok":false}' ] && ok "guia_stats.php recusa quem não é admin" || bad "guia_stats.php -> $gst"
 gn=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?news=1" 2>/dev/null | head -c 300 || true); echo "$gn" | grep -q '"items":\[' && ok "guia.php?news -> notícias do parceiro (desligadas até configurar)" || bad "guia.php?news -> $(echo "$gn" | head -c 120)"
+gt=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?top=1" 2>/dev/null | head -c 300 || true); echo "$gt" | grep -q '"q":\[' && ok "guia.php?top -> 'Lo más buscado'" || bad "guia.php?top -> $(echo "$gt" | head -c 120)"
+gq=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 -A "Mozilla/5.0 (iPhone)" "https://araujotechsistemas.com/sitio/guia_hit.php?t=q&id=0981123456" 2>/dev/null || true); [ "$gq" = "204" ] && ok "guia_hit t=q recusa número de telefone" || bad "guia_hit t=q -> $gq"
 echo "$gs" | grep -q "more:'Ver negocio'" && ok "na Guía, tocar no negócio abre a página dele" || bad "Guía ainda manda direto para o catálogo"
 echo "$gs" | grep -q 'class="seo-l"' && ok "Guía com a lista de negócios já no HTML (Google)" || bad "Guía sem a lista para o Google (index.php não rodou?)"
 gsm=$(curl -sS --max-time 40 "https://araujotechsistemas.com/guia/sitemap.php" 2>/dev/null | head -c 3000 || true); echo "$gsm" | grep -q '/guia/lojastatus</loc>' && ok "sitemap da Guía com as páginas dos negócios" || bad "sitemap da Guía -> $(echo "$gsm" | head -c 120)"

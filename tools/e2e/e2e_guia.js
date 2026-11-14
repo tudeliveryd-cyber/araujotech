@@ -106,6 +106,11 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check((d.gev || []).length === 1 && (d.gbus || []).length === 3, 'eventos e ônibus continuam');
   const rep = await a.evaluate(() => { PL.shops.push({ id: 'rep-t', name: 'Loja Rel', contact: '0981 222 333' }); const h = gnRep('rep-t', { c: { 'rep-t': 7 }, s: { 'c-rep-t': 3 } }); PL.shops.pop(); return decodeURIComponent(h); });
   check(/wa\.me\/595981222333/.test(rep) && /7 veces/.test(rep) && /3 veces en el slider/.test(rep), 'resumo do mês por WhatsApp com os números do cliente');
+  const d0 = new Date(); const dk = d0.getFullYear() + '-' + String(d0.getMonth() + 1).padStart(2, '0') + '-' + String(d0.getDate()).padStart(2, '0');
+  const gr = await a.evaluate((dk) => { PL.shops.push({ id: 'rep-t', name: 'Loja Rel' }); const st = { v: 40, c: { 'rep-t': 7 }, s: { 'c-rep-t': 3 }, q: { pizza: 5, 'farmacia-de-turno': 2 }, vd: { [dk]: 12 } }; const t = grText(st), h = grBlocks(st); PL.shops.pop(); return { t, h }; }, dk);
+  info(gr.t.replace(/\n/g, ' | '));
+  check(/Visitas a la Guía: 40/.test(gr.t) && /1\. Loja Rel — 7/.test(gr.t) && /1\. pizza — 5/.test(gr.t) && /farmacia de turno — 2/.test(gr.t) && /Mejor día: .*\(12\)/.test(gr.t), 'resumo do mês para copiar: visitas, negócios, buscas e melhor dia');
+  check(/Lo más buscado en la Guía/.test(gr.h) && /gr-bars/.test(gr.h) && /data-act="gucopy"/.test(gr.h), 'números da Guía mostram buscas, visitas por dia e botão de copiar');
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
