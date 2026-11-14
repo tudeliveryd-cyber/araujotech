@@ -157,6 +157,9 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
  .tu{max-width:720px;margin-left:auto;margin-right:auto}
  .sub2{justify-content:center}
 }
+/* celular: os destinos do ônibus lado a lado, do mesmo tamanho (até 4; com mais, em linhas de 3) */
+@media (max-width:640px){.bus-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.bus-tabs:has(button:nth-child(2):last-child){grid-template-columns:repeat(2,1fr)}.bus-tabs:has(button:nth-child(4):last-child){grid-template-columns:repeat(4,1fr)}.bus-tabs button{justify-content:center;text-align:center;padding:9px 6px;font-size:13px;line-height:1.15;border-radius:14px;gap:5px;min-width:0}.bus-tabs:has(button:nth-child(3)) button svg{display:none}}
+@media (max-width:360px){.bus-tabs button{font-size:12px;padding:9px 3px}}
 /* celular: o último quadro sozinho ocupa a linha inteira */
 @media (max-width:640px){.tg>.tile:last-child:nth-child(odd){grid-column:1/-1}}
 .pjoin{font-size:13.5px;color:var(--muted);margin-top:12px}.pjoin a{color:var(--deep);font-weight:700}
