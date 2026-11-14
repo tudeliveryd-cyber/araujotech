@@ -4304,7 +4304,12 @@ function render(){try{if(!window.__deepP&&MODE!=='panel'&&SHOP_READY&&pub&&pub.p
  const vp=document.getElementById('vPl');vp.hidden=MODE==='platform'||!plVisible();if(ui.view==='platform'&&!plVisible()&&MODE!=='platform')ui.view=MODE==='panel'?'admin':'catalog';vp.innerHTML=ic('layers',15)+'<span>'+t('nav_platform')+'</span>';vp.setAttribute('aria-pressed',ui.view==='platform');
  document.getElementById('lPt').setAttribute('aria-pressed',lang==='pt');document.getElementById('lEs').setAttribute('aria-pressed',lang==='es');
  const app=document.getElementById('app');
+ /* login e senha nova: guarda o que já foi digitado (e o foco) antes de redesenhar */
+ const keep={};['lg_user','lg_pass','np_a','np_b'].forEach(id=>{const e=document.getElementById(id);if(e&&e.value)keep[id]={v:e.value,ty:e.type}});const kf=document.activeElement&&keep[document.activeElement.id]?{id:document.activeElement.id,a:document.activeElement.selectionStart,b:document.activeElement.selectionEnd}:null;
+ const kErr={};['lgErr','npErr'].forEach(id=>{const e=document.getElementById(id);if(e&&e.textContent)kErr[id]=e.textContent});
  app.innerHTML=(CLOUD_ON&&CLOUD.boot&&MODE!=='catalog'&&ui.view!=='catalog'?'<div class="bootld" aria-busy="true"><i></i></div>':ui.view==='catalog'?(shopSuspended()?suspendedHTML():catalogHTML(pub,true)):ui.view==='admin'?(panelAuthed()?(CLOUD_ON&&CLOUD.mc?newPassHTML():adminHTML()):loginHTML()):(MODE==='platform'&&!plAuthed()?loginPlHTML():platformHTML()))+(ui.view==='catalog'||(ui.view==='admin'&&(!panelAuthed()||(CLOUD_ON&&CLOUD.mc)))||(MODE==='platform'&&!plAuthed())?'':`<footer class="credit admin-credit" style="padding-bottom:28px">${vxMark()} <span class="vx-sep">·</span> ${t('dev_by')} ${devMark()}</footer>`);
+ Object.keys(keep).forEach(id=>{const e=document.getElementById(id);if(e&&!e.value){e.value=keep[id].v;if(keep[id].ty==='text'&&e.type==='password'&&id!=='lg_user')e.type='text'}});Object.keys(kErr).forEach(id=>{const e=document.getElementById(id);if(e&&!e.textContent)e.textContent=kErr[id]});
+ if(kf){const e=document.getElementById(kf.id);if(e&&document.activeElement!==e){try{e.focus({preventScroll:true});if(kf.a!=null)e.setSelectionRange(kf.a,kf.b)}catch(x){}}}
  document.documentElement.style.setProperty('--topH',document.getElementById('top').offsetHeight+'px');
  if(MODE==='catalog')document.body.style.setProperty('--band',pub.theme.header);
  if(document.getElementById('qrBox'))makeQR();

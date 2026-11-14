@@ -83,8 +83,10 @@ async function open(opt = {}) {
   p.set = async (sel, v) => { await p.fill(sel, v); await p.dispatchEvent(sel, 'input'); await p.dispatchEvent(sel, 'change'); };
   p.txt = async sel => p.evaluate(sel => { const s = document.querySelector(sel || 'body'); return s ? s.innerText.replace(/\n+/g, ' / ') : '(nada)'; }, sel);
   p.dump = async (t, n) => console.log('   · ' + t + ': ' + (await p.evaluate(() => [...new Set([...document.querySelectorAll('[data-act],input[id],select[id],textarea[id],button[type=submit]')].filter(e => e.getBoundingClientRect().width > 0).map(e => (e.dataset.act ? '@' + e.dataset.act + (e.dataset.tab ? '=' + e.dataset.tab : '') + (e.dataset.t ? '=' + e.dataset.t : '') + (e.dataset.v ? '=' + e.dataset.v : '') : '#' + (e.id || 'submit') + '(' + e.tagName[0] + (e.type || '') + ')')))].join(' '))).slice(0, n || 900) + '\n     TXT ' + (await p.txt()).slice(0, n || 500));
+  PAGES.push(p);
   return { ctx, p };
 }
+const PAGES = [];
 // ---- acesso direto ao emulador (preparação e conferência) ----
 const FSB = proj => `http://${FSH}:${FSP}/v1/projects/${proj}/databases/(default)/documents`;
 async function signUp(email, password) { const r = await fetch(`http://${FSH}:${AUP}/identitytoolkit.googleapis.com/v1/accounts:signUp?key=x`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, password, returnSecureToken: true }) }); return r.json(); }
@@ -97,5 +99,5 @@ const val = v => v == null ? { nullValue: null } : typeof v === 'string' ? { str
 const fields = o => ({ fields: Object.fromEntries(Object.entries(o).map(([k, x]) => [k, val(x)])) });
 const unval = v => !v ? null : 'stringValue' in v ? v.stringValue : 'integerValue' in v ? +v.integerValue : 'doubleValue' in v ? v.doubleValue : 'booleanValue' in v ? v.booleanValue : 'arrayValue' in v ? (v.arrayValue.values || []).map(unval) : 'mapValue' in v ? Object.fromEntries(Object.entries(v.mapValue.fields || {}).map(([k, x]) => [k, unval(x)])) : 'timestampValue' in v ? v.timestampValue : null;
 const unfields = d => d && d.fields ? Object.fromEntries(Object.entries(d.fields).map(([k, x]) => [k, unval(x)])) : null;
-async function done() { if (browser) await browser.close(); console.log('\n== RESULTADO: ' + oks + ' aprovado(s), ' + fails + ' falha(s)'); if (process.env.E2E_OUT) fs.writeFileSync(process.env.E2E_OUT, JSON.stringify(log)); process.exit(fails ? 1 : 0); }
+async function done() { if (fails) for (const p of PAGES) { try { console.log('   · tela ao falhar (' + p.url().slice(0, 70) + '): ' + (await p.evaluate(() => document.body.innerText.replace(/\s+/g, ' ').slice(0, 320))) + (p.errs.length ? ' | erros: ' + p.errs.join(' | ').slice(0, 200) : '')); } catch (e) {} } if (browser) await browser.close(); console.log('\n== RESULTADO: ' + oks + ' aprovado(s), ' + fails + ' falha(s)'); if (process.env.E2E_OUT) fs.writeFileSync(process.env.E2E_OUT, JSON.stringify(log)); process.exit(fails ? 1 : 0); }
 module.exports = { open, ok, bad, info, sec, check, signUp, signIn, verifyEmail, setPassword, fsReq, fields, unfields, val, done, DIRS, get fails() { return fails; } };
