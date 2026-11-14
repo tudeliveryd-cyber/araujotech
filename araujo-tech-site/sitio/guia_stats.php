@@ -22,12 +22,13 @@ if (!$admin) { // dono do local: só os números da própria loja (confere em sh
   if ((string)($u['fields']['shop']['stringValue'] ?? '') !== $shop) { echo '{"ok":false}'; exit; }
 }
 $tz = new DateTimeZone('America/Asuncion'); $now = new DateTime('now', $tz); $from = (clone $now)->modify('-29 days');
-$out = ['ok' => true, 'v' => 0, 'c' => [], 's' => []];
+$out = ['ok' => true, 'v' => 0, 'c' => [], 's' => [], 'q' => [], 'vd' => []];
 foreach (array_unique([$from->format('Y-m'), $now->format('Y-m')]) as $m) {
   $d = json_decode((string)@file_get_contents(__DIR__ . '/datos/hits-' . $m . '.json'), true); if (!is_array($d)) continue;
   // visitas: conta só os dias dentro dos 30 dias; toques e slider: o mês inteiro (aproximado)
   foreach (($d['vd'] ?? []) as $day => $n) { $dt = $m . '-' . $day; if ($dt >= $from->format('Y-m-d')) $out['v'] += (int)$n; }
-  foreach (['c', 's'] as $k) foreach (($d[$k] ?? []) as $id => $n) $out[$k][$id] = ($out[$k][$id] ?? 0) + (int)$n;
+  foreach (['c', 's', 'q'] as $k) foreach (($d[$k] ?? []) as $id => $n) $out[$k][$id] = ($out[$k][$id] ?? 0) + (int)$n;
+  foreach (($d['vd'] ?? []) as $day => $n) { $dt = $m . '-' . $day; if ($dt >= $from->format('Y-m-d')) $out['vd'][$dt] = (int)$n; }
 }
 if ($shop !== '') { echo json_encode(['ok' => true, 'shop' => $shop, 'c' => (int)($out['c'][$shop] ?? 0), 's' => (int)($out['s']['c-' . $shop] ?? 0)]); exit; }
 if (!$admin) { echo '{"ok":false}'; exit; }

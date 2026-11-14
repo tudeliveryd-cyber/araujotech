@@ -30,6 +30,12 @@ if (isset($_GET['ofs'])) { // ofertas de hoje: produtos em promoção (com foto)
   usort($o, function ($a, $b) { return ($b['pm'] <=> $a['pm']); });
   echo json_encode(array_slice($o, 0, 16), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit;
 }
+if (isset($_GET['top'])) { // 'Lo más buscado': as buscas da Guía com resultado, deste mês e do anterior (só as que se repetem)
+  $tz = new DateTimeZone('America/Asuncion'); $now = new DateTime('now', $tz); $q = [];
+  foreach ([(clone $now)->modify('first day of last month')->format('Y-m'), $now->format('Y-m')] as $m) { $d = json_decode((string)@file_get_contents(__DIR__ . '/datos/hits-' . $m . '.json'), true); foreach ((array)($d['q'] ?? []) as $k => $n) $q[$k] = ($q[$k] ?? 0) + (int)$n; }
+  arsort($q); $o = []; foreach ($q as $k => $n) { if ($n < 2) break; $o[] = str_replace('-', ' ', $k); if (count($o) >= 8) break; }
+  header('Cache-Control: public, max-age=900'); echo json_encode(['q' => $o], JSON_UNESCAPED_UNICODE); exit;
+}
 if (isset($_GET['news'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_news(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }
 if (isset($_GET['g'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_pub(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; } // banners pagos e lugares públicos
 $out = [];
