@@ -82,7 +82,7 @@ a{color:inherit}
 .allies img{height:32px;width:auto;display:block}.allies img+img{height:42px}
 footer{padding:26px 0 40px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);text-align:center}
 footer a{color:var(--deep);font-weight:700;text-decoration:none}
-.sl{position:relative;max-width:900px;margin:0 0 30px;border-radius:22px;overflow:hidden;aspect-ratio:12/5;background:#1A0730;box-shadow:0 24px 50px -28px rgba(0,0,0,.8);isolation:isolate}
+.sl{position:relative;max-width:960px;margin:4px auto 34px;border-radius:22px;overflow:hidden;aspect-ratio:12/5;background:#1A0730;box-shadow:0 22px 44px -26px rgba(36,9,63,.55);isolation:isolate}
 .sl[hidden]{display:none}
 .sl-tr{display:flex;height:100%;transition:transform .55s cubic-bezier(.2,.7,.2,1)}
 .sd{flex:0 0 100%;height:100%;position:relative;display:block;text-decoration:none;color:#fff;overflow:hidden}
@@ -120,7 +120,6 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
  <div class="right"><a class="back" href="../vitrix/" data-t="what">¿Qué es Vitrix?</a><div class="lang" role="group" aria-label="Idioma"><button data-lang="es">ES</button><button data-lang="pt">PT</button></div></div>
 </div></header>
 <section class="hero"><div class="wrap">
- <div class="sl" id="sl" hidden role="region" aria-roledescription="carrusel" tabindex="0"></div>
  <img class="vx" src="../img/vitrix/vitrix-blanco-nombre.png" alt="Vitrix">
  <h1 data-th="h1"></h1>
  <p data-t="sub"></p>
@@ -128,6 +127,7 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
 </div></section>
 <main class="wrap">
  <div class="chips" id="chips" role="group"></div>
+ <div class="sl" id="sl" hidden role="region" aria-roledescription="carrusel" tabindex="0"></div>
  <div id="list"><p class="empty" data-t="loading"></p></div>
  <section class="cta"><div><h2 data-t="cta_h"></h2><p data-t="cta_p"></p></div><a href="../vitrix/" data-t="cta_b"></a></section>
  <div class="allies"><span data-t="by"></span><img src="../img/logo-completo.png" alt="Araújo Tech Sistemas"><img src="../img/tu-delivery.png" alt="Tu Delivery"></div>
@@ -181,7 +181,7 @@ const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math
 let SL={items:[],i:0,tm:null,sig:'',ord:null};
 /* banners da casa (Tu Delivery e planos Vitrix): sempre no slider, depois dos pagos e dos Premium/VIP */
 const TD_WA='https://wa.me/595982086171?text='+encodeURIComponent('Hola Tu Delivery, quiero pedir un delivery');
-const HOUSE=[{id:'h-td',t:'Tu Delivery · 0982 086 171',u:TD_WA,img:'/img/guia/tu-delivery.jpg?v=1',imgm:'/img/guia/tu-delivery-m.jpg?v=1'},{id:'h-vx',t:'Planes Vitrix',u:'https://araujotechsistemas.com/vitrix/#planes',img:'/img/guia/vitrix-planes.jpg?v=1',imgm:'/img/guia/vitrix-planes-m.jpg?v=1'}];
+const HOUSE=[{id:'h-td',t:'Tu Delivery · 0982 086 171',u:TD_WA,img:'/img/guia/tu-delivery.jpg?v=2',imgm:'/img/guia/tu-delivery-m.jpg?v=2'},{id:'h-vx',t:'Planes Vitrix',u:'https://araujotechsistemas.com/vitrix/#planes',img:'/img/guia/vitrix-planes.jpg?v=2',imgm:'/img/guia/vitrix-planes-m.jpg?v=2'}];
 function slItems(){const ads=(G.ads||[]).filter(a=>a&&a.img).map(a=>({k:'ad',a}));
  const dest=(LIST||[]).filter(c=>c.dest).map(c=>({k:'cl',c}));
  if(!SL.ord)SL.ord={};const o=x=>{const id=x.k==='ad'?'a'+x.a.id:'c'+x.c.id;if(SL.ord[id]==null)SL.ord[id]=Math.random();return SL.ord[id]};
