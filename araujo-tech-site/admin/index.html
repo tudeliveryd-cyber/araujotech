@@ -3797,7 +3797,7 @@ function shopWa(s){if(s.wa)return s.wa;if(String(s.contact||'').replace(/\D/g,''
 function shopAddr(s){try{const c=s.live&&SHOP===FM?pub:S.get(mkK(s.id).pub,null);return (c&&c.store&&c.store.address)||''}catch(e){return''}}
 function genSite(s){const o=genSite0(s);return applyCfgToSite(o,shopCfg(s))}
 function genSite0(s){const tpl=tplFor(s);const D=SITE_DEF[tpl];let base=slugify(s.name)||s.id;if(!slugFree(base,s.id))base=s.id;let sl=base,k=2;while(!slugFree(sl,s.id))sl=base+'-'+(k++);
- const cat=sysOf(s)==='catalogo'?(s.live?'https://fogaomineiro.araujotechsistemas.com/':'https://fogaomineiro.araujotechsistemas.com/'+s.id+'/'):'';
+ const cat=sysOf(s)==='catalogo'?(s.live?'https://fogaomineiro.araujotechsistemas.com/':'https://'+s.id+'.araujotechsistemas.com/'):'';
  return {tpl,slug:sl,name:s.name,tag:D.tag,about:D.about,svc:D.svc.slice(),wa:shopWa(s),addr:shopAddr(s),city:'',maps:'',hours:D.hours,cat,ig:'',fb:'',email:'',color:'',lang:'es',ph:{h:0,l:0,g:0},created:new Date().toISOString()}}
 function ensureSite(s,quiet){if(!s||!hasSite(s)||s.site)return false;s.site=genSite(s);ensureAccess(s);sitePush(s,true);setTimeout(()=>siteFromCatalog(s),50);if(!quiet)toast(t('site_created')+': araujotechsistemas.com/'+s.site.slug);return true}
 function pubSite(s){const o=JSON.parse(JSON.stringify(s.site||{}));delete o.loc;o.on=hasSite(s)&&s.status!=='suspenso'&&!o.hide;return o}
@@ -3821,6 +3821,7 @@ async function siteSyncCfg(id,cfg){try{const api=CLOUD.api;if(!api||!api.getShop
  // WhatsApp, endereço e mapa do site acompanham o catálogo, a não ser que tenham sido trocados no editor do site depois da última sincronização
  const S0=d.site,src=S0.src||null,nv={wa:String(st0.whatsapp||''),addr:String(st0.address||''),lat:st0.lat||null,lng:st0.lng||null},up={};
  const follow=k=>!src||!S0[k]||S0[k]===src[k];
+ {const m=/^https:\/\/fogaomineiro\.araujotechsistemas\.com\/([a-z0-9-]+)\/?$/.exec(S0.cat||'');if(m&&m[1]!=='painel')up.cat='https://'+m[1]+'.araujotechsistemas.com/'}/* link antigo do catálogo (fogaomineiro.../loja/) vira o endereço próprio da loja */
  if(nv.wa&&nv.wa!==S0.wa&&follow('wa'))up.wa=nv.wa;if(nv.addr&&nv.addr!==S0.addr&&follow('addr'))up.addr=nv.addr;
  if(nv.lat&&nv.lng&&(nv.lat!==S0.lat||nv.lng!==S0.lng)&&(!src||(S0.lat===src.lat&&S0.lng===src.lng)||!S0.lat)){up.lat=nv.lat;up.lng=nv.lng}
  const srcCh=!src||src.wa!==nv.wa||src.addr!==nv.addr||src.lat!==nv.lat||src.lng!==nv.lng;

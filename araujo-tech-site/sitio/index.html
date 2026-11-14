@@ -223,7 +223,7 @@ async function main(){
  const slug=slugNow();if(!slug){state(L.es.nf_t,L.es.nf_p);return}
  let rec;try{rec=await fetchSite(slug)}catch(e){console.warn(e);state(L.es.err_t,L.es.err_p,true);return}
  if(!rec||!rec.site){state(L.es.nf_t,L.es.nf_p);return}
- const s=rec.site,lang=s.lang==='pt'?'pt':'es',l=L[lang];document.documentElement.lang=lang;
+ const s=rec.site,lang=s.lang==='pt'?'pt':'es',l=L[lang];{const m=/^https:\/\/fogaomineiro\.araujotechsistemas\.com\/([a-z0-9-]+)\/?$/.exec(s.cat||'');if(m&&m[1]!=='painel')s.cat='https://'+m[1]+'.araujotechsistemas.com/'}/* link antigo do catálogo vira o endereço próprio da loja */document.documentElement.lang=lang;
  if(s.on===false||rec.status==='suspenso'){state(l.off_t,l.off_p,false,lang);return}
  const T=TPL[s.tpl]||TPL.comercio,tx=T[lang];const R=document.documentElement.style;Object.entries(T.v).forEach(([k,v])=>R.setProperty(k,v));
  const ph=s.ph||{};const IU=k=>window.TDC_FAKE_SITE?fetchImg(rec.id,k):Promise.resolve('/sitio/img.php?id='+encodeURIComponent(rec.id)+'&k='+k+'&v='+encodeURIComponent(ph.v||1));
