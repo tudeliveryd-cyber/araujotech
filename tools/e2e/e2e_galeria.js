@@ -29,6 +29,18 @@ const FX = __dirname + '/fix/';
   const cl = await o.evaluate(() => [...document.querySelectorAll('a.btn')].filter(a => /Catálogo|Catalogo/i.test(a.textContent)).map(a => a.getAttribute('href'))); info(JSON.stringify(cl));
   check(cl.length && cl.every(h => h === HOST + '/'), 'o botão Catálogo do painel abre o endereço próprio da loja (não fogaomineiro.../loja/)');
 
+  sec('0b. Asistencia: o cliente fala com a Araújo Tech');
+  check(await o.locator('[data-act=help]').count() >= 1, 'o painel tem o botão Asistencia');
+  await o.evaluate(() => { window.__wo = []; window.open = u => { window.__wo.push(u); return null; }; });
+  await o.locator('[data-act=help]:visible').first().click(); await o.w(400);
+  check(await o.locator('.hp-opt').count() === 3, 'mostra as 3 opções: duda, ayuda y agendar');
+  await o.locator('[data-act=hpk][data-k=agenda]').click(); await o.w(300);
+  await o.selectOption('#hp_when', 't'); await o.selectOption('#hp_how', 'call'); await o.fill('#hp_txt', 'cargar productos');
+  await o.locator('[data-act=hpsend]').click(); await o.w(300);
+  const wo = await o.evaluate(() => window.__wo[0] || ''); const msg = decodeURIComponent((wo.split('text=')[1] || ''));
+  info(msg.replace(/\n/g, ' | '));
+  check(/^https:\/\/wa\.me\/595982086171\?text=/.test(wo) && /Galeria E2E/.test(msg) && /galeriae2e\.araujotechsistemas\.com/.test(msg) && /agendar una asistencia/.test(msg) && /por la tarde/.test(msg) && /por llamada/.test(msg) && /cargar productos/.test(msg), 'abre o WhatsApp da Araújo Tech com a loja, o dia, o horário, como e o tema');
+  await o.evaluate(() => { ui.tab = 'products'; render(); }); await o.w(300);
   sec('A. Painel: produto com foto principal e 2 fotos a mais');
   await o.evaluate(() => acts.newprod()); await o.w(500);
   await o.set('#ed_nes', 'Campera Galería'); await o.set('#ed_pr', '150000');
