@@ -29,6 +29,7 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stro
 .hd .w{display:flex;align-items:center;gap:28px;height:76px}
 .logo{display:flex;align-items:center;gap:12px;min-width:0}
 .logo img{height:46px;width:auto;max-width:150px;object-fit:contain;border-radius:6px}
+.logo img.wm{height:38px;max-width:210px;border-radius:0}
 .logo b{font-family:var(--hf);font-weight:var(--hw);font-size:20px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nav{display:flex;gap:26px;margin-left:auto;font-size:15px;color:var(--mute)}
 .nav a:hover{color:var(--ink)}
@@ -100,7 +101,7 @@ footer .bot a{color:var(--ft-ink);font-weight:500}
 .state h1{font-size:30px}.state p{color:var(--mute)}.state small{margin-top:24px;color:var(--mute)}.state small a{color:var(--ink);font-weight:600}
 .sk{min-height:100vh}
 @media (max-width:960px){.hd .btn{margin-left:auto}.nav{display:none}.hero{padding:20px 0 56px}.hero .w{grid-template-columns:1fr;gap:28px}.photo{order:-1;aspect-ratio:4/3}.split,.visit{grid-template-columns:1fr;gap:28px}.list{grid-template-columns:1fr}.gal{grid-template-columns:1fr 1fr;grid-auto-rows:170px}footer .cols{grid-template-columns:1fr 1fr}footer .cols>div:first-child{grid-column:1/-1}.sec{padding:68px 0}}
-@media (max-width:560px){.w{padding:0 18px}.hd .w{height:66px}.logo img{height:38px}.hero h1{margin:12px 0}.hero .cta .btn{flex:1 1 100%}.facts{grid-template-columns:1fr}.facts div,.facts div+div{padding:14px 0;border-left:0;border-bottom:1px solid var(--line)}.contact .btn{width:100%}footer .cols{grid-template-columns:1fr}.hd .btn span{display:none}.hd .btn{width:42px;padding:0}}
+@media (max-width:560px){.w{padding:0 18px}.hd .w{height:66px}.logo img{height:38px}.logo img.wm{height:30px;max-width:170px}.hero h1{margin:12px 0}.hero .cta .btn{flex:1 1 100%}.facts{grid-template-columns:1fr}.facts div,.facts div+div{padding:14px 0;border-left:0;border-bottom:1px solid var(--line)}.contact .btn{width:100%}footer .cols{grid-template-columns:1fr}.hd .btn span{display:none}.hd .btn{width:42px;padding:0}}
 
 /* rodapé centralizado (computador e celular) */
 footer{text-align:center}footer .cols{justify-items:center}footer .ln{justify-content:center}footer .bot{flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px}footer .soc,footer .socs{justify-content:center}
@@ -148,6 +149,8 @@ async function fetchSite(slug){
 async function fetchImg(id,k){if(window.TDC_FAKE_SITE)return (window.TDC_FAKE_SITE.imgs||{})[k]||null;try{const r=await fetch(FS+'/shops/'+encodeURIComponent(id)+'/media/'+k+'?key='+KEY);if(!r.ok)return null;const j=await r.json();return dv((j.fields||{}).m)}catch(e){return null}}
 function state(t,p,retry,lang){const l=L[lang||'es'];document.title=t;app.innerHTML=`<div class="state"><div><h1>${esc(t)}</h1><p>${esc(p)}</p>${retry?`<button class="btn out sm" onclick="location.reload()">${l.retry}</button>`:''}<small>${l.by} <a href="https://araujotechsistemas.com/">Araújo Tech Sistemas</a></small></div></div>`}
 const hoursRows=txt=>String(txt||'').split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const m=x.match(/^([^:]{2,40}):\s*(.+)$/);return m?[m[1],m[2]]:[x,'']});
+function coordsIn(u){u=decodeURIComponent(String(u||''));const P=[/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/,/@(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/,/[?&](?:q|query|ll|center|destination)=(-?\d{1,2}\.\d+),\s*\+?(-?\d{1,3}\.\d+)/,/\/(?:search|place|dir)\/(-?\d{1,2}\.\d+),\s*\+?(-?\d{1,3}\.\d+)/];for(const p of P){const m=u.match(p);if(m)return{lat:+m[1],lng:+m[2]}}return null}
+async function linkCoords(u){const c=coordsIn(u);if(c)return c;if(window.TDC_FAKE_SITE&&!window.TDC_MAPS_API)return null;try{const ac=new AbortController();setTimeout(()=>ac.abort(),5000);const r=await fetch((window.TDC_MAPS_API||'/maps.php')+'?u='+encodeURIComponent(u),{signal:ac.signal});const j=await r.json();return j&&typeof j.lat==='number'&&typeof j.lng==='number'?j:null}catch(e){return null}}
 function mapsSrc(s){if(s.lat&&s.lng)return`https://maps.google.com/maps?q=${s.lat},${s.lng}&z=16&output=embed`;const q=s.maps&&!/^https?:/.test(s.maps)?s.maps:(s.addr||'');return q?`https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=16&output=embed`:''}
 function mapsLink(s){if(s.maps&&/^https?:/.test(s.maps))return s.maps;if(s.lat&&s.lng)return`https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}`;const q=s.maps||s.addr;return q?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q):''}
 const igUser=v=>String(v||'').trim().replace(/^@/,'').replace(/^https?:\/\/(www\.)?instagram\.com\//,'').replace(/[/?].*$/,'');
@@ -168,10 +171,13 @@ function logoPal(src){return new Promise(res=>{if(!src)return res(null);const im
  ca/=cs.length;const bg=[0,1,2].map(k=>cs.reduce((t,p)=>t+p[k],0)/cs.length);const opaque=ca>200;
  const B={};for(let k=0;k<d.length;k+=4){if(d[k+3]<200)continue;const c=[d[k],d[k+1],d[k+2]];if(opaque&&Math.abs(c[0]-bg[0])+Math.abs(c[1]-bg[1])+Math.abs(c[2]-bg[2])<60)continue;const h=hsl(c);if(h.s<.3||h.l<.16||h.l>.86)continue;const key=c.map(v=>v>>5).join(',');const o=B[key]||(B[key]={n:0,s:0,r:0,g:0,b:0});o.n++;o.s+=h.s;o.r+=c[0];o.g+=c[1];o.b+=c[2]}
  let best=null,sc=0,tot=0;for(const k in B)tot+=B[k].n;for(const k in B){const o=B[k],v=o.n*(o.s/o.n);if(o.n>=Math.max(6,tot*.04)&&v>sc){sc=v;best=[o.r/o.n,o.g/o.n,o.b/o.n]}}
- const bgH=hsl(bg);res({bg,opaque,dark:opaque&&lumi(bg)<.06,ac:best||(opaque&&bgH.s>.35&&bgH.l>.15&&bgH.l<.85?bg:null)})}catch(e){res(null)}};im.onerror=()=>res(null);im.src=src})}
+ // área desenhada do logo (sem o fundo): logo "escrito" (bem mais largo que alto) vira a marca do cabeçalho, sem repetir o nome
+ let x0=N,y0=N,x1=-1,y1=-1;for(let j=0;j<N;j++)for(let i=0;i<N;i++){const k=(j*N+i)*4;const on=opaque?Math.abs(d[k]-bg[0])+Math.abs(d[k+1]-bg[1])+Math.abs(d[k+2]-bg[2])>60:d[k+3]>40;if(on){if(i<x0)x0=i;if(i>x1)x1=i;if(j<y0)y0=j;if(j>y1)y1=j}}
+ let crop=null,wide=false;if(x1>x0&&y1>y0){const bw=x1-x0+1,bh=y1-y0+1;wide=bw/bh>=2.2;if(wide){const sx=im.naturalWidth/N,sy=im.naturalHeight/N,pd=1;const cx=Math.max(0,(x0-pd)*sx),cy=Math.max(0,(y0-pd)*sy),cw=Math.min(im.naturalWidth-cx,(bw+2*pd)*sx),ch=Math.min(im.naturalHeight-cy,(bh+2*pd)*sy);const c2=document.createElement('canvas');const sc=Math.min(1,600/cw);c2.width=Math.round(cw*sc);c2.height=Math.round(ch*sc);c2.getContext('2d').drawImage(im,cx,cy,cw,ch,0,0,c2.width,c2.height);crop=c2.toDataURL('image/png')}}
+ const bgH=hsl(bg);res({bg,opaque,dark:opaque&&lumi(bg)<.06,ac:best||(opaque&&bgH.s>.35&&bgH.l>.15&&bgH.l<.85?bg:null),wide,crop})}catch(e){res(null)}};im.onerror=()=>res(null);im.src=src})}
 function applyPal(R,T,p,manual){
  const W=[255,255,255],K=[17,17,17];let ac=manual?rgb(manual):(p&&p.ac);const dark=!!(p&&p.dark);
- if(dark){const base=mixc(p.bg,[10,10,12],.35);const ink=[245,243,238];
+ if(dark){const base=p.bg.map(Math.round);/* fundo igual ao do logo: o logo some no fundo, sem quadrado */const ink=[245,243,238];
   if(!ac)ac=[230,230,230];{const m=Math.max(...ac);if(m<225)ac=ac.map(v=>v*225/Math.max(m,1))}if(contr(ac,base)<3)ac=mixc(ac,W,.45);
   R.setProperty('--bg',hx(base));R.setProperty('--paper',hx(mixc(base,ac,.06).map((v,i)=>v+8)));R.setProperty('--ink',hx(ink));R.setProperty('--mute',hx(mixc(ink,base,.38)));
   R.setProperty('--line',hx(mixc(base,ink,.13)));R.setProperty('--ft-bg',hx(mixc(base,[0,0,0],.5)));R.setProperty('--ft-ink',hx(ink));
@@ -193,6 +199,8 @@ async function main(){
  const heroUrl=hero||UNS(T.img);const name=s.name||'';
  const wa=waNum(s.wa),waL=wa?`https://wa.me/${wa}?text=${encodeURIComponent(tx.hi)}`:'';
  const svc=(s.svc||[]).map(x=>String(x).split('|').map(y=>y.trim())).filter(x=>x[0]);
+ // link do Maps escolhido no site manda no mapa também (antes o mapa usava outro ponto e o "Cómo llegar" este link)
+ if(s.maps&&/^https?:/.test(s.maps)){const c=await linkCoords(s.maps);if(c){s.lat=c.lat;s.lng=c.lng}}
  const hr=hoursRows(s.hours);const ml=mapsLink(s),ms=mapsSrc(s);
  document.title=name+(s.tag?' — '+s.tag:'');document.querySelector('meta[name=description]').content=(s.about||s.tag||name).slice(0,155);
  if(logo){const li=document.createElement('link');li.rel='icon';li.href=logo;document.head.appendChild(li)}
@@ -201,7 +209,7 @@ async function main(){
  const nav=[s.about?['nosotros',l.nav[0]]:null,svc.length?['servicios',l.nav[1]]:null,(hr.length||s.addr)?['horarios',l.nav[2]]:null,['contacto',l.nav[3]]].filter(Boolean);
  const ig=igUser(s.ig);const fb=s.fb?(/^https?:/.test(s.fb)?s.fb:'https://facebook.com/'+String(s.fb).replace(/^@/,'')):'';
  app.innerHTML=`
- <header class="hd" id="hd"><div class="w"><a class="logo" href="#">${logo?`<img src="${logo}" alt="${esc(name)}">`:''}<b>${esc(name)}</b></a>
+ <header class="hd" id="hd"><div class="w"><a class="logo" href="#">${pal&&pal.wide&&pal.crop?`<img class="wm" src="${pal.crop}" alt="${esc(name)}">`:`${logo?`<img src="${logo}" alt="${esc(name)}">`:''}<b>${esc(name)}</b>`}</a>
   <nav class="nav">${nav.map(([h,t])=>`<a href="#${h}">${esc(t)}</a>`).join('')}</nav>${waL?`<a class="btn pri sm" href="${waL}" target="_blank" rel="noopener" aria-label="WhatsApp" style="${nav.length?'':'margin-left:auto'}">${ic('chat')}<span>${l.write}</span></a>`:''}</div></header>
  <section class="hero"><div class="w">
   <div><p class="where"><i></i>${esc(where)}</p><h1>${esc(name)}</h1>${s.tag?`<p class="tag">${esc(s.tag)}</p>`:''}
