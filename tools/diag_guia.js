@@ -8,6 +8,11 @@ const sh = c => { try { return execSync(c, { encoding: 'utf8', timeout: 60000 })
     console.log('==== ' + p);
     console.log(sh(`curl -sS -o /dev/null -D - --max-time 40 -w 'TEMPO total=%{time_total}s ttfb=%{time_starttransfer}s bytes=%{size_download}\\n' '${U}${p}' | grep -iE '^(HTTP|cache-control|expires|last-modified|etag|age|x-|cf-|server|content-encoding|TEMPO)'`));
   }
+  console.log('==== clientes publicados (platform/sitio)');
+  try { const r = await fetch('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U&mask.fieldPaths=clientes&mask.fieldPaths=clientesAt'); const j = await r.json(); const f = j.fields || {};
+    console.log('clientesAt', (f.clientesAt || {}).stringValue);
+    ((f.clientes || {}).arrayValue || {}).values?.forEach(v => { const m = v.mapValue.fields || {}; const g = k => m[k] ? (m[k].stringValue ?? m[k].booleanValue) : undefined; console.log(' ', g('id'), '|', g('name'), '| dest', g('dest'), '| vip', g('vip'), '| since', g('since')); });
+  } catch (e) { console.log('erro', e.message); }
   const b = await chromium.launch();
   for (let run = 1; run <= 2; run++) {
     const ctx = await b.newContext({ ...devices['iPhone 13'] }); const p = await ctx.newPage();
