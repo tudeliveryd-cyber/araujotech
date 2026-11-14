@@ -3808,7 +3808,7 @@ async function siteSyncCfg(id,cfg){try{const api=CLOUD.api;if(!api||!api.getShop
  if(!ph.lc&&lg.startsWith('data:')&&ph.lh!==hashStr(lg)){await api.putSiteImg(id,'sl',lg);ph.l=1;ph.lh=hashStr(lg);ch=true}
  if(!ph.hc&&cv.startsWith('data:')&&ph.hh!==hashStr(cv)){await api.putSiteImg(id,'sh',cv);ph.h=1;ph.hh=hashStr(cv);ch=true}
  // WhatsApp, endereço e mapa do site acompanham o catálogo, a não ser que tenham sido trocados no editor do site depois da última sincronização
- const S0=d.site,src=S0.src||null,nv={wa:String(st0.whatsapp||''),addr:String(st0.address||''),lat:st0.lat||null,lng:st0.lng||null},up={};
+ const S0=d.site,src=S0.src||null,nv={wa:String(st0.whatsapp||''),addr:String(st0.address||''),lat:st0.locSet?st0.lat||null:null,lng:st0.locSet?st0.lng||null:null},up={};
  const follow=k=>!src||!S0[k]||S0[k]===src[k];
  {const m=/^https:\/\/fogaomineiro\.araujotechsistemas\.com\/([a-z0-9-]+)\/?$/.exec(S0.cat||'');if(m&&m[1]!=='painel')up.cat='https://'+m[1]+'.araujotechsistemas.com/'}/* link antigo do catálogo (fogaomineiro.../loja/) vira o endereço próprio da loja */
  if(nv.wa&&nv.wa!==S0.wa&&follow('wa'))up.wa=nv.wa;if(nv.addr&&nv.addr!==S0.addr&&follow('addr'))up.addr=nv.addr;

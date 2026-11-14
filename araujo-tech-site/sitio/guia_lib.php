@@ -125,3 +125,19 @@ function guia_clients() {
   @file_put_contents($cache, json_encode($out));
   return $out;
 }
+
+// Localização confiável de um catálogo para a Guía (mapa, "Cerca de mí", página do negócio):
+// 1) a ubicación marcada no catálogo (store.locSet); 2) o link do Google/Apple Maps do site do negócio;
+// nunca a coordenada padrão de exemplo (centro de Santa Rita). Sem nenhuma: null (o mapa busca pelo nome e endereço).
+function guia_loc($id, $sh) {
+  $st = $sh['cfg']['store'] ?? []; $dflt = function ($la, $ln) { return abs($la + 25.7917) < 0.00005 && abs($ln + 55.0886) < 0.00005; };
+  if (!empty($st['locSet']) && is_numeric($st['lat'] ?? null) && is_numeric($st['lng'] ?? null) && abs($st['lat']) > 0.01) return ['lat' => round((float)$st['lat'], 6), 'lng' => round((float)$st['lng'], 6), 'src' => 'cat'];
+  $m = (string)($sh['site']['maps'] ?? '');
+  if (preg_match('#^https://#i', $m)) {
+    $cache = sys_get_temp_dir() . '/at_gloc_' . md5($m) . '.json';
+    if (is_file($cache) && time() - filemtime($cache) < 7 * 86400) $c = json_decode((string)@file_get_contents($cache), true);
+    else { $r = at_get('https://araujotechsistemas.com/maps.php?u=' . rawurlencode($m)); $c = $r ? json_decode($r, true) : null; if (is_array($c)) @file_put_contents($cache, json_encode($c)); }
+    if (is_array($c) && isset($c['lat'], $c['lng']) && !$dflt($c['lat'], $c['lng'])) return ['lat' => round((float)$c['lat'], 6), 'lng' => round((float)$c['lng'], 6), 'src' => 'site'];
+  }
+  return null;
+}

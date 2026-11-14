@@ -46,8 +46,8 @@ if ($days && empty($st['paused'])) {
   if (!$open['on']) foreach ($ivs($days[($wd + 6) % 7]) as $v) if ($v[1] > 1440 && $nm < $v[1] - 1440) $open = ['on' => true, 'until' => $v[3]];
 }
 $DN = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; $SCH = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-$addr = trim((string)($st['address'] ?? '')); $lat = $st['lat'] ?? null; $lng = $st['lng'] ?? null; $hasGeo = is_numeric($lat) && is_numeric($lng) && abs($lat) > 0.01;
-$mapQ = $hasGeo ? $lat . ',' . $lng : trim($name . ' ' . $addr . ' ' . ($city ?: 'Santa Rita'));
+$addr = trim(preg_replace('/^[\s—-]+/u', '', (string)($st['address'] ?? ''))); $loc = guia_loc($id, $sh); $lat = $loc['lat'] ?? null; $lng = $loc['lng'] ?? null; $hasGeo = (bool)$loc;
+$mapQ = $hasGeo ? $lat . ',' . $lng : trim($name . ', ' . ($addr ?: ($city ?: 'Santa Rita')) . (stripos($addr, 'Santa Rita') === false && stripos($addr, $city ?: 'zz') === false ? ', ' . ($city ?: 'Santa Rita') : ''));
 $mapUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($mapQ);
 $wa = preg_replace('/\D/', '', (string)($st['whatsapp'] ?? '')); if ($wa && $wa[0] === '0') $wa = '595' . substr($wa, 1); elseif ($wa && strpos($wa, '595') !== 0 && strlen($wa) <= 10) $wa = '595' . $wa;
 $waUrl = $wa ? 'https://wa.me/' . $wa . '?text=' . rawurlencode('Hola ' . $name . ', te encontré en la Guía Vitrix') : '';
@@ -128,7 +128,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <?php foreach ([1, 2, 3, 4, 5, 6, 0] as $i): $v = $ivs($days[$i]); ?><div class="<?= $i === $wd ? 'td' : '' ?>"><span><?= $DN[$i] ?><?= $i === $wd ? ' · hoy' : '' ?></span><span><?= $v ? $e(implode(' · ', array_map(function ($x) { return $x[2] . '–' . $x[3]; }, $v))) : 'Cerrado' ?></span></div>
 <?php endforeach; ?></div></section><?php endif; ?>
 <section class="sec"><h2><?= $ic($I['pin'], 22) ?>Ubicación</h2><div class="box"><p><?= $e($addr ?: ($city ?: 'Santa Rita') . ', Alto Paraná') ?></p>
-<?php if ($hasGeo): ?><iframe class="map" title="Mapa de <?= $e($name) ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=<?= rawurlencode($lat . ',' . $lng) ?>&amp;z=16&amp;output=embed"></iframe><?php endif; ?>
+<iframe class="map" title="Mapa de <?= $e($name) ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=<?= rawurlencode($mapQ) ?>&amp;z=<?= $hasGeo ? 16 : 15 ?>&amp;output=embed"></iframe>
 <p style="margin-top:10px"><a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?>Abrir en Google Maps</a></p></div></section>
 <section class="cta"><div><b>Más negocios de Santa Rita</b><p>Ofertas, farmacia de turno, ómnibus y todo lo útil de la ciudad.</p></div><a href="/guia/">Abrir la Guía Vitrix</a></section>
 </main>
