@@ -772,6 +772,8 @@ function tryLogin(){
   else{ui.pin="";ui.pinErr=true;renderLogin()}
 }
 function renderAuth(){
+  /* lo que ya se escribió (y el foco) no se pierde si la pantalla se vuelve a dibujar, p. ej. al terminar de conectar */
+  const kp={};["au-email","au-pass"].forEach(id=>{const e=document.getElementById(id);if(e&&e.value)kp[id]=e.value});const kfo=document.activeElement&&/^au-(email|pass)$/.test(document.activeElement.id||"")?document.activeElement.id:"";
   $("#root").innerHTML=`<div class="login"><div class="box">
     <div class="row" style="justify-content:flex-end">${prefsBar()}</div>${brandBlock()}
     <div class="field"><label for="au-email">${FB_ON?(LG()!=="pt"?"Usuario":"Usuário"):t("email")}</label><input class="inp" id="au-email" type="${FB_ON?"text":"email"}" autocapitalize="off" spellcheck="false" autocomplete="username" value="${esc(ui.authEmail)}"></div>
@@ -779,6 +781,7 @@ function renderAuth(){
     ${ui.authErr?`<div class="warnbox">${ic("alert")}${esc(ui.authErr)}</div>`:""}
     <button class="btn pri" data-act="authLogin" ${sb||FA?"":"disabled"}>${ic("lock")}${sb||FA?t("login"):t("connecting")}</button>
     <p class="help" style="text-align:center;margin:0">Desarrollado por <b>Araújo Tech</b></p></div></div>`;
+  Object.keys(kp).forEach(id=>{const e=document.getElementById(id);if(e&&!e.value)e.value=kp[id]});if(kfo){const e=document.getElementById(kfo);if(e)try{e.focus({preventScroll:true})}catch(x){}}
 }
 
 /* ---------- Estructura ---------- */
@@ -1508,6 +1511,7 @@ async function fbInit(){ui.cloudMode=true;ui.user=null;render();
   let busy=false;FA.onAuth(async u=>{if(!u){ui.user=null;ui.mc=false;render();return}if(!ui.user&&!busy){busy=true;try{await fbAfterAuth(u)}finally{busy=false}}});
 }
 function renderNewPass(){const es=LG()!=="pt";
+  const kp={};["np-a","np-b"].forEach(id=>{const e=document.getElementById(id);if(e&&e.value)kp[id]=e.value});const kfo=document.activeElement&&/^np-[ab]$/.test(document.activeElement.id||"")?document.activeElement.id:"";
   $("#root").innerHTML=`<div class="login"><div class="box">
     <div class="row" style="justify-content:flex-end">${prefsBar()}</div>${brandBlock()}
     <div><h1>${es?"Creá tu contraseña":"Crie sua senha"}</h1><p class="help" style="margin:6px 0 0;font-size:14px">${es?"Por seguridad, cambiá la contraseña provisoria por una solo tuya. La vas a usar para entrar de ahora en adelante.":"Por segurança, troque a senha provisória por uma só sua. Você vai usar ela para entrar daqui em diante."}</p></div>
@@ -1515,7 +1519,8 @@ function renderNewPass(){const es=LG()!=="pt";
     <div class="field"><label for="np-b">${es?"Repetí la nueva contraseña":"Repita a nova senha"}</label><input class="inp" id="np-b" type="password" autocomplete="new-password"></div>
     ${ui.authErr?`<div class="warnbox">${ic("alert")}${esc(ui.authErr)}</div>`:""}
     <button class="btn pri" data-act="setNewPass">${ic("lock")}${es?"Guardar y entrar":"Salvar e entrar"}</button>
-    <p class="help" style="text-align:center;margin:0">Desarrollado por <b>Araújo Tech</b></p></div></div>`}
+    <p class="help" style="text-align:center;margin:0">Desarrollado por <b>Araújo Tech</b></p></div></div>`;
+  Object.keys(kp).forEach(id=>{const e=document.getElementById(id);if(e&&!e.value)e.value=kp[id]});if(kfo){const e=document.getElementById(kfo);if(e)try{e.focus({preventScroll:true})}catch(x){}}}
 
 /* ---------- Nube (Supabase) ---------- */
 function publicInfo(){
