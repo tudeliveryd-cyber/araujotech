@@ -29,6 +29,30 @@ service cloud.firestore {
     // campos que só o administrador muda
     function same(f) { return request.resource.data.get(f, null) == resource.data.get(f, null); }
     function siteSame(f) { return request.resource.data.get('site', {}).get(f, null) == resource.data.get('site', {}).get(f, null); }
+    // função do funcionário dentro do local ('dono' quando não há campo role)
+    function shopRole() {
+      return get(/databases/$(database)/documents/shopUsers/$(request.auth.uid)).data.get('role', 'dono');
+    }
+    // v11: o local existe e não está suspenso (pedidos de fora só entram em loja no ar)
+    function shopLive(shop) {
+      return exists(/databases/$(database)/documents/shops/$(shop))
+        && get(/databases/$(database)/documents/shops/$(shop)).data.get('status', 'ativo') != 'suspenso';
+    }
+    // v11: tipos dos campos de um pedido (campos ausentes ou nulos são aceitos)
+    function numOk(d, k) { return !(k in d) || d[k] == null || d[k] is number; }
+    function strOk(d, k, n) { return !(k in d) || d[k] == null || (d[k] is string && d[k].size() <= n); }
+    function okOrder(d) {
+      return d.size() <= 48
+        && (!('lines' in d) || (d.lines is list && d.lines.size() <= 80))
+        && (!('items' in d) || (d.items is list && d.items.size() <= 80))
+        && (!('no' in d) || d.no is int)
+        && numOk(d, 'total') && numOk(d, 'sub') && numOk(d, 'fee') && numOk(d, 'disc')
+        && strOk(d, 'name', 120) && strOk(d, 'phone', 40) && strOk(d, 'status', 20)
+        && strOk(d, 'mode', 20) && strOk(d, 'pay', 20) && strOk(d, 'msg', 8000)
+        && (!('proof' in d) || d.proof == null
+            || (d.proof is string && d.proof.size() <= 1000000
+                && d.proof.matches('^data:image/(jpeg|png|webp);base64,.*')));
+    }
     function noAdminFields() {
       return !('feeApproved' in request.resource.data) && !('status' in request.resource.data)
         && !('lim' in request.resource.data) && !('site' in request.resource.data);
@@ -50,6 +74,22 @@ service cloud.firestore {
       allow update: if request.resource.data.keys().hasOnly(['n', 'u'])
         && request.resource.data.n == resource.data.n + 1
         && (request.resource.data.u == resource.data.u || request.resource.data.u == resource.data.u + 1);
+    }
+    // v13: contatos pelo WhatsApp a partir do site (wa) e das demonstrações (demo): qualquer um só soma 1 em um dos dois; só o admin lê
+    function cliqueMais1(k) {
+      return request.resource.data.get(k, 0) == resource.data.get(k, 0) + 1;
+    }
+    function cliqueIgual(k) {
+      return request.resource.data.get(k, 0) == resource.data.get(k, 0);
+    }
+    match /cliques/{dia} {
+      allow read: if isAdmin();
+      allow create: if dia.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.keys().hasOnly(['wa', 'demo'])
+        && request.resource.data.size() == 1
+        && (request.resource.data.get('wa', 0) == 1 || request.resource.data.get('demo', 0) == 1);
+      allow update: if request.resource.data.keys().hasOnly(['wa', 'demo'])
+        && ((cliqueMais1('wa') && cliqueIgual('demo')) || (cliqueMais1('demo') && cliqueIgual('wa')));
     }
 
 
@@ -101,7 +141,9 @@ service cloud.firestore {
       match /reservas/{r} {
         allow create: if request.resource.data.keys().hasOnly(['json', 'at', 'p'])
           && request.resource.data.json is string && request.resource.data.json.size() <= 6000
-          && request.resource.data.p == false;
+          && request.resource.data.p == false
+          && (!exists(/databases/$(database)/documents/licencias/$(ag))
+              || get(/databases/$(database)/documents/licencias/$(ag)).data.get('status', 'activo') != 'suspenso');
         allow read, update, delete: if isAdmin() || agMember(ag);
       }
     }
@@ -110,7 +152,8 @@ service cloud.firestore {
       allow read: if true;
       allow create: if isAdmin() || (isShop(shop) && noAdminFields());
       allow update: if isAdmin()
-        || (isShop(shop) && same('feeApproved') && same('status') && same('lim')
+        || (isShop(shop) && shopRole() != 'cocina'
+            && same('feeApproved') && same('status') && same('lim')
             && siteSame('on') && siteSame('slug'));
       allow delete: if isAdmin();
 
@@ -120,26 +163,39 @@ service cloud.firestore {
       }
       match /media/{pack} {
         allow read: if true;
-        allow write: if isAdmin() || isShop(shop);
+        allow write: if isAdmin() || (isShop(shop) && shopRole() != 'cocina');
+      }
+      // v14: visitas ao catálogo — pessoas por dia (o catálogo conta cada pessoa uma vez por dia).
+      // Qualquer visitante só cria com 1 ou soma 1; só o local e o admin leem.
+      match /visitas/{dia} {
+        allow read: if isAdmin() || isShop(shop);
+        allow create: if dia.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') && shopLive(shop)
+          && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == 1;
+        allow update: if request.resource.data.keys().hasOnly(['n'])
+          && request.resource.data.n == resource.data.n + 1;
+        allow delete: if isAdmin();
       }
       match /meta/{m} {
         allow read: if true;
         allow write: if isAdmin() || isShop(shop);
         // contador de pedidos: o catálogo só pode criar em 1 ou somar 1 (ninguém zera a numeração)
-        allow create: if m == 'counter' && request.resource.data.keys().hasOnly(['n']) && request.resource.data.n == 1;
-        allow update: if m == 'counter' && request.resource.data.keys().hasOnly(['n'])
-          && request.resource.data.n == resource.data.n + 1;
+        allow create: if m == 'counter' && request.resource.data.keys().hasOnly(['n', 't']) && request.resource.data.n == 1
+          && (!('t' in request.resource.data) || request.resource.data.t == request.time);
+        allow update: if m == 'counter' && request.resource.data.keys().hasOnly(['n', 't'])
+          && request.resource.data.n == resource.data.n + 1
+          && (!('t' in request.resource.data) || request.resource.data.t == request.time || request.resource.data.t == resource.data.get('t', null));
       }
       match /orders/{id} {
         // pedidos e chamados do catálogo: qualquer cliente cria, com tamanho limitado
-        allow create: if request.resource.data.size() <= 48
-          && (!('lines' in request.resource.data) || request.resource.data.lines.size() <= 80)
-          && (!('items' in request.resource.data) || request.resource.data.items.size() <= 80);
-        allow read, update, delete: if isAdmin() || isShop(shop);
+        allow create: if (isAdmin() || isShop(shop) || shopLive(shop))
+          && okOrder(request.resource.data);
+        allow read, update: if isAdmin() || isShop(shop);
+        allow delete: if isAdmin() || isOwner(shop);
       }
       match /track/{id} {
         allow read: if true;
-        allow create: if request.resource.data.size() <= 20;
+        allow create: if request.resource.data.size() <= 20
+          && (isAdmin() || isShop(shop) || shopLive(shop));
         allow update, delete: if isAdmin() || isShop(shop);
       }
       // opiniões: só de pedidos que existem, uma por pedido
@@ -151,7 +207,7 @@ service cloud.firestore {
           && request.resource.data.stars >= 1 && request.resource.data.stars <= 5
           && request.resource.data.text is string && request.resource.data.text.size() <= 400
           && request.resource.data.name is string && request.resource.data.name.size() <= 40;
-        allow update, delete: if isAdmin() || isShop(shop);
+        allow update, delete: if isAdmin() || isOwner(shop);
       }
     }
   }
