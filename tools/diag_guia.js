@@ -13,6 +13,9 @@ const sh = c => { try { return execSync(c, { encoding: 'utf8', timeout: 60000 })
     console.log('clientesAt', (f.clientesAt || {}).stringValue);
     ((f.clientes || {}).arrayValue || {}).values?.forEach(v => { const m = v.mapValue.fields || {}; const g = k => m[k] ? (m[k].stringValue ?? m[k].booleanValue) : undefined; console.log(' ', g('id'), '|', g('name'), '| dest', g('dest'), '| vip', g('vip'), '| since', g('since')); });
   } catch (e) { console.log('erro', e.message); }
+  console.log('==== localização dos catálogos');
+  for (const id of ['fogao-mineiro', 'lojastatus', 'nauticabrustolin']) { try { const r = await fetch('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/shops/' + id + '?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U&mask.fieldPaths=cfg&mask.fieldPaths=site'); const j = await r.json(); const c = JSON.parse(j.fields.cfg.stringValue); const st = c.store || {}; const si = ((j.fields.site || {}).mapValue || {}).fields || {}; const g = k => si[k] ? (si[k].stringValue ?? si[k].doubleValue ?? si[k].integerValue) : undefined;
+    console.log('LOC', id, JSON.stringify({ locSet: st.locSet, lat: st.lat, lng: st.lng, address: st.address, site_maps: g('maps'), site_lat: g('lat'), site_lng: g('lng'), site_addr: g('addr'), site_src: si.src ? Object.keys(si.src.mapValue.fields || {}) : null })); } catch (e) { console.log('LOC', id, 'erro', e.message); } }
   const b = await chromium.launch();
   for (let run = 1; run <= 2; run++) {
     const ctx = await b.newContext({ ...devices['iPhone 13'] }); const p = await ctx.newPage();
