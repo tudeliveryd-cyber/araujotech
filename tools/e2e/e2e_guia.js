@@ -198,6 +198,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(await a.locator(`input[data-gutu="${ki}"]`).count() === 0, 'ficha de roupas não mostra turnos');
   const bi = await a.evaluate(() => ui.gu.dir.findIndex(x => x.n === 'Divina Mesa'));
   check(await a.locator(`[data-act="gudir2vx"][data-i="${bi}"]`).count() === 1, 'cada aliado tem o botão "Pasar a Vitrix"');
+  check(await a.evaluate((i) => { const h = (document.querySelectorAll('.gu-dir')[i] || document).querySelector('a[href*="/guia/cartel.php?id=d-"]'); return !!h && h.getAttribute('href').endsWith('d-' + ui.gu.dir[i].id); }, bi), 'cada ficha tem o botão "Cartel" com o QR da Guía');
   await a.act('gudir2vx', `[data-i="${bi}"]`); await a.w(2500);
   const ns = await a.evaluate(() => ({ n: (document.getElementById('ns_name') || {}).value, w: ui.ns && ui.ns.wa }));
   info(JSON.stringify(ns));

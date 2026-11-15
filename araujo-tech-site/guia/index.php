@@ -23,4 +23,9 @@ try {
     $html = str_replace('</head>', '<script type="application/ld+json">' . str_replace('</', '<\/', json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) . "</script>\n<style>.seo-l ul{list-style:none;padding:0;margin:0 0 30px;display:grid;gap:8px;font-size:15px;color:var(--muted)}.seo-l a{color:var(--deep);font-weight:700}</style>\n</head>", $html);
   }
 } catch (Throwable $e) {}
+// domínio próprio guiadesantarita.com: app instalado com escopo na raiz e endereços curtos para o Google
+if (strtolower(preg_replace('/^www\./', '', (string)($_SERVER['HTTP_HOST'] ?? ''))) === 'guiadesantarita.com') {
+  $html = str_replace('href="/guia/manifest.webmanifest"', 'href="/manifest.webmanifest"', $html);
+  $html = str_replace(['https://araujotechsistemas.com/guia/', 'href="/guia/'], ['https://guiadesantarita.com/', 'href="/'], $html);
+}
 echo $html;
