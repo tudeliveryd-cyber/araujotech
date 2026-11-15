@@ -71,7 +71,7 @@ async function open(opt = {}) {
   const initJs = opt.init || null;
   if (!browser) browser = await chromium.launch({ args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--disable-web-security', '--allow-running-insecure-content', '--disable-features=PrivateNetworkAccessSendPreflights,BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessRespectPreflightResults,LocalNetworkAccessChecks'] });
   const W = opt.w || 390;
-  const ctx = await browser.newContext({ viewport: { width: W, height: W < 500 ? 844 : 800 }, isMobile: W < 500, hasTouch: W < 500, timezoneId: 'America/Asuncion', locale: opt.locale || 'es-PY', serviceWorkers: 'block' });
+  const ctx = await browser.newContext({ viewport: { width: W, height: W < 500 ? 844 : 800 }, deviceScaleFactor: opt.dpr || 1, isMobile: W < 500, hasTouch: W < 500, timezoneId: 'America/Asuncion', locale: opt.locale || 'es-PY', serviceWorkers: 'block' });
   await route(ctx);
   const p = await ctx.newPage(); p.errs = []; p.dialogs = []; p.autoDialog = true;
   p.on('pageerror', e => p.errs.push(String(e.message).slice(0, 200)));
