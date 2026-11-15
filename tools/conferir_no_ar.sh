@@ -159,10 +159,11 @@ if echo "$pm" | grep -q '"name":"Panel Status"'; then ok "atalho do painel da St
 # site padrão no endereço próprio da empresa (status.araujotechsistemas.com)
 sb=$(curl -sS --max-time 30 "https://status.araujotechsistemas.com/" 2>/dev/null | head -c 20000 || true)
 if echo "$sb" | grep -q 'AT_SITE_SLUG="status"' && echo "$sb" | grep -q '<link rel="canonical" href="https://status.araujotechsistemas.com/">'; then ok "site da Status em status.araujotechsistemas.com"; else bad "status.araujotechsistemas.com não mostra o site ($(echo "$sb" | grep -o '<title>[^<]*' | head -1))"; fi
-rd=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code} %{redirect_url}' "https://araujotechsistemas.com/status" 2>/dev/null || true)
-if [ "$rd" = "301 https://status.araujotechsistemas.com/" ]; then ok "araujotechsistemas.com/status leva para status.araujotechsistemas.com"; else bad "araujotechsistemas.com/status -> $rd"; fi
-rf=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code} %{redirect_url}' "https://araujotechsistemas.com/fogao-mineiro" 2>/dev/null || true)
-if [ "$rf" = "301 https://fogao-mineiro.araujotechsistemas.com/" ]; then ok "araujotechsistemas.com/fogao-mineiro leva para fogao-mineiro.araujotechsistemas.com"; else bad "araujotechsistemas.com/fogao-mineiro -> $rf"; fi
+# o site abre direto no domínio principal (sem ir para o subdomínio: no iPhone a troca dá "Misdirected Request")
+for sl in status fogao-mineiro; do
+  rd=$(curl -sS --max-time 30 -o /tmp/st_$sl.html -w '%{http_code}' "https://araujotechsistemas.com/$sl" 2>/dev/null || true)
+  if [ "$rd" = "200" ] && grep -q "<link rel=\"canonical\" href=\"https://$sl.araujotechsistemas.com/\">" /tmp/st_$sl.html; then ok "araujotechsistemas.com/$sl mostra o site ali mesmo (endereço oficial $sl.araujotechsistemas.com)"; else bad "araujotechsistemas.com/$sl -> HTTP $rd $(grep -o '<title>[^<]*' /tmp/st_$sl.html 2>/dev/null | head -1)"; fi
+done
 sf=$(curl -sS --max-time 30 "https://fogao-mineiro.araujotechsistemas.com/" 2>/dev/null | head -c 20000 || true)
 if echo "$sf" | grep -q 'AT_SITE_SLUG="fogao-mineiro"'; then ok "site do Fogão em fogao-mineiro.araujotechsistemas.com"; else bad "fogao-mineiro.araujotechsistemas.com não mostra o site ($(echo "$sf" | grep -o '<title>[^<]*' | head -1))"; fi
 for gv in Guia GUIA guia; do gr=$(curl -sS --max-time 30 -o /dev/null -w '%{http_code} %{redirect_url}' "https://araujotechsistemas.com/$gv" 2>/dev/null || true); case "$gr" in 301\ https://araujotechsistemas.com/guia/) ok "/$gv leva para a Guía";; *) bad "/$gv -> $gr";; esac; done

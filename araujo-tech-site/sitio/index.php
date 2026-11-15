@@ -18,11 +18,9 @@ try {
   if (isset($_GET['low']) && !isset($_GET['s']) && preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $slug)) { header('Location: /' . $slug, true, 301); exit; } // /Status → /status
   if ($slug !== '' && $slug !== 'sitio' && preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $slug)) {
     $rec = at_site($slug);
-    // araujotechsistemas.com/nome → nome.araujotechsistemas.com (o nome da empresa na frente). Só quando nenhuma loja tem esse nome.
-    if ($rec && !isset($_GET['s']) && at_own_sub($rec, $slug) && $slug !== 'www' && preg_match('/^(www\.)?araujotechsistemas\.com$/i', $_SERVER['HTTP_HOST'] ?? '')) {
-      $site = $rec['site'] ?? [];
-      if (($site['on'] ?? true) !== false && ($rec['status'] ?? '') !== 'suspenso') { header('Location: https://' . $slug . '.araujotechsistemas.com/', true, 301); exit; }
-    }
+    // Antes daqui ia para nome.araujotechsistemas.com; agora o site fica neste endereço: no iPhone, trocar de
+    // araujotechsistemas.com para um subdomínio dá "Misdirected Request" (erro da hospedagem). O endereço oficial
+    // (canonical) continua sendo o subdomínio quando a empresa tem um.
     if ($rec) $html = at_meta($html, $rec, $slug);
   }
 } catch (Throwable $e) { /* segue com o html normal */ }
