@@ -7,6 +7,7 @@ const out = (n, f) => { const b64 = fs.readFileSync(f).toString('base64'); for (
   fs.mkdirSync('guia-video', { recursive: true });
   const b = await chromium.launch();
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'es-PY', timezoneId: 'America/Asuncion', userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
+  if (process.env.GLANG === 'pt') await ctx.addInitScript(() => { try { localStorage.setItem('at_lang', 'pt'); } catch (e) {} }); // telas em português
   const p = await ctx.newPage();
   const shot = async (n, o) => { const f = 'guia-video/' + n + '.jpg'; await p.screenshot(Object.assign({ path: f, type: 'jpeg', quality: 86 }, o || {})); out(n, f); console.log('OK ' + n); };
   await p.goto(U + '/guia/', { waitUntil: 'networkidle' }).catch(() => {}); await p.waitForTimeout(4500);
