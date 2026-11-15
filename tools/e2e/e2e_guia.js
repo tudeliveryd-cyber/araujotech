@@ -171,6 +171,23 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   d = await doc(); const al = (d.gdir || []).find(x => x.n === 'Pizzería Aliada'); info(JSON.stringify(al && { ...al, lg: al.lg && al.lg.slice(0, 30) }));
   check(al && al.td === true && al.ig === 'pizzeria.aliada' && al.wa === '0981 123 456' && /^data:image\/jpeg/.test(al.lg) && al.lg.length < 20000, 'aliado salvo com selo, Instagram limpo, WhatsApp e logo pequeno');
   check((d.gdir || []).filter(x => x.n !== 'Pizzería Aliada').every(x => !x.td), 'as outras fichas continuam como ficha simples');
+  await a.evaluate(() => { ui.gu.dir = ui.gu.dir.filter(x => !x.td); guSheet(); }); await a.w(300);
+  check(await a.locator('[data-act="gutdseed"]').count() === 1, 'sem aliados ainda: aparece o botão "Cargar clientes Tu Delivery"');
+  await a.act('gutdseed'); await a.w(400);
+  const sd = await a.evaluate(() => ui.gu.dir.filter(x => x.td).map(x => ({ n: x.n, g: x.g, on: x.on })));
+  info(sd.length + ' aliados: ' + sd.map(x => x.n).join(', '));
+  check(sd.length === 20 && sd.every(x => x.on === false) && sd.some(x => x.n === 'Nick Lanches') && !sd.some(x => /Fog/.test(x.n)) && sd.filter(x => x.g === 'shop').length === 2, 'carrega os 20 clientes da lista como aliados ocultos (sem o Fogão, que já é Vitrix; roperías em Tiendas)');
+  check(await a.locator('[data-act="gutdseed"]').count() === 0 && await a.locator('.gu-dir .pill.gu-off', { hasText: 'Falta WhatsApp' }).count() === 20, 'o botão some e cada aliado avisa "Falta WhatsApp"');
+  await a.act('gusave'); await a.w(2500); d = await doc();
+  check((d.gdir || []).filter(x => x.td && x.on === false).length === 20, 'os 20 ficam salvos e ocultos até completar os dados');
+  const tus = Object.fromEntries((d.gdir || []).filter(x => x.td).map(x => [x.n, (x.tu || []).join(',')]));
+  check(tus['Bom Corte'] === 'al,ce' && tus['Le Café'] === 'de,me' && tus['Nick Lanches'] === 'ce' && tus['Grido'] === 'me' && tus['Kyrios'] === '', 'turnos do caderno: Bom Corte almoço e janta, Le Café café e merienda, Nick janta, Grido merienda, roupas sem turno');
+  const ti = await a.evaluate(() => ui.gu.dir.findIndex(x => x.n === 'Boi'));
+  check(await a.locator(`input[data-gutu="${ti}"]`).count() === 4, 'ficha de comida mostra as 4 opções de turno');
+  await a.locator(`input[data-gutu="${ti}"][value="ce"]`).check(); await a.w(200);
+  check(await a.evaluate((i) => ui.gu.dir[i].tu.join(','), ti) === 'al,ce', 'marcar Cena no Boi soma ao Almuerzo');
+  const ki = await a.evaluate(() => ui.gu.dir.findIndex(x => x.n === 'Kyrios'));
+  check(await a.locator(`input[data-gutu="${ki}"]`).count() === 0, 'ficha de roupas não mostra turnos');
   const G3 = await L.open(); const gr3 = G3.p;
   await gr3.goto('https://araujotechsistemas.com/guia/'); await gr3.w(2500);
   const out = await gr3.evaluate(() => { G.dir = [{ id: 'c1', n: 'Almacén Común', g: 'food', d: 'Almacén', wa: '0981 000 000' }, { id: 't1', n: 'Pizzería Aliada', g: 'food', d: 'Pizzería', wa: '0981123456', ig: 'pizzeria.aliada', td: true, lg: '/sitio/gimg.php?d=t1&v=1' }, { id: 'x1', n: 'Mala', g: 'food', td: true, lg: 'https://malo.test/x.png' }]; CAT = 'food'; render();
@@ -180,6 +197,13 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     return { order, pseal: p && p.querySelector('.bdg').textContent, pord: po && po.getAttribute('href'), pig: p && !!p.querySelector('a[href="https://instagram.com/pizzeria.aliada"]'), plg: p && p.querySelector('.lg img') && p.querySelector('.lg img').getAttribute('src'), mseal: m && !!m.querySelector('.bdg'), mwa: m && [...m.querySelectorAll('.dact a')].map(a => a.textContent.trim()), xlg: x && !!x.querySelector('.lg img'), del };
   });
   info(JSON.stringify(out));
+  const qa = await gr3.evaluate(() => { G.dir = [{ id: 'q1', n: 'Chipa Teste', g: 'food', td: true, tu: ['de', 'me'] }, { id: 'q2', n: 'Pizza Noche', g: 'food', td: true, tu: ['ce'] }, { id: 'q3', n: 'Almuerzo Teste', g: 'food', td: true, tu: ['al', 'ce'] }]; CAT = 'home'; document.getElementById('q').value = ''; const r = {};
+    for (const k of ['de', 'al', 'me', 'ce']) { QTU = k; render(); const sec = document.getElementById('comer'); r[k] = sec ? [...sec.querySelectorAll('.card h3')].map(h => h.textContent).join(',') : null; }
+    QTU = null; render(); r.sel = document.querySelector('#comer [aria-selected=true]').dataset.qt; r.now = tuNow(); document.querySelector('#comer [data-qt="ce"]').click(); r.click = document.querySelector('#comer [aria-selected=true]').dataset.qt; r.meta = [...document.querySelectorAll('#comer .dmeta')].map(x => x.textContent).join('|'); QTU = null; return r; });
+  info(JSON.stringify(qa));
+  check(qa.de === 'Chipa Teste' && qa.al === 'Almuerzo Teste' && qa.me === 'Chipa Teste' && /Pizza Noche/.test(qa.ce) && /Almuerzo Teste/.test(qa.ce) && !/Chipa/.test(qa.ce), '"¿Qué comer ahora?" mostra cada negócio só nos turnos marcados');
+  check(qa.sel === qa.now && qa.click === 'ce', 'abre no turno da hora atual e troca ao tocar');
+  check(/Almuerzo · Cena/.test(qa.meta), 'o cartão mostra os turnos do negócio');
   check(out.order.indexOf('Pizzería Aliada') < out.order.indexOf('Almacén Común'), 'aliado Tu Delivery aparece antes das outras fichas da categoria');
   check(/Recomendado/.test(out.pseal) && /Entrega Tu Delivery/.test(out.pseal), 'aliado mostra os selos Recomendado e Entrega Tu Delivery');
   check(out.pord === 'https://wa.me/595981123456?text=' + encodeURIComponent('Hola, vi tu negocio en la Guía Vitrix y quiero hacer un pedido'), '"Pedir por WhatsApp" vai direto ao WhatsApp do negócio com a mensagem da Guía');
