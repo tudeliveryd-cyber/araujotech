@@ -231,8 +231,10 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   info(JSON.stringify(dup));
   check(!dup.some(x => /fogao/i.test(x)) && dup.includes('Otro Local'), 'ficha com o mesmo nome de um cliente Vitrix não aparece repetida (sai com a página dele)');
   check(/Cerrado hoy/.test(op.c) && !/Hoy: Cerrado/.test(op.c), 'dia fechado mostra só "Cerrado hoy"');
+  const vxs = await gr3.evaluate(() => { const L0 = LIST; LIST = [{ id: 'vxt', name: 'Cliente VX', _g: 'food', segEs: 'Restaurante' }]; G.dir = [{ id: 'z1', n: 'Ficha Z', g: 'food', td: true }]; CAT = 'all'; render(); const v = [...document.querySelectorAll('a.card')].map(c => c.textContent).join('|'), z = [...document.querySelectorAll('.card.dir')].map(c => c.textContent).join('|'); LIST = L0; render(); return { v, z }; });
+  check(/Catálogo Vitrix/.test(vxs.v) && !/Catálogo Vitrix/.test(vxs.z), 'clientes Vitrix mostram o selo "Catálogo Vitrix"; aliados não');
   check(out.order.indexOf('Pizzería Aliada') < out.order.indexOf('Almacén Común'), 'aliado Tu Delivery aparece antes das outras fichas da categoria');
-  check(/Recomendado/.test(out.pseal) && /Entrega Tu Delivery/.test(out.pseal), 'aliado mostra os selos Recomendado e Entrega Tu Delivery');
+  check(/Recomendado/.test(out.pseal) && /Aliado Tu Delivery/.test(out.pseal), 'aliado mostra os selos Recomendado e Aliado Tu Delivery');
   check(out.pord === 'https://wa.me/595981123456?text=' + encodeURIComponent('Hola, vi tu negocio en la Guía Vitrix y quiero hacer un pedido'), '"Pedir por WhatsApp" vai direto ao WhatsApp do negócio com a mensagem da Guía');
   check(out.pig && out.plg === '/sitio/gimg.php?d=t1&v=1', 'aliado mostra Instagram e logo');
   check(!out.mseal && out.mwa.includes('WhatsApp') && !out.mwa.includes('Pedir por WhatsApp'), 'ficha comum continua sem selo e com WhatsApp normal');
