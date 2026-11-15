@@ -47,7 +47,7 @@ body{background:#E9E3F0;font-family:"Red Hat Text",system-ui,sans-serif;color:#1
 .top{background:radial-gradient(calc(120mm*var(--k)) calc(70mm*var(--k)) at 90% 0%,#6A17BD,transparent 70%),var(--night);color:#fff;padding:calc(10mm*var(--k)) calc(10mm*var(--k)) calc(16mm*var(--k));text-align:center}
 .brand{display:flex;align-items:center;justify-content:center;gap:calc(3mm*var(--k))}
 .brand img{height:calc(10mm*var(--k));width:auto}.brand span{width:1px;height:calc(7mm*var(--k));background:rgba(255,255,255,.4)}.brand b{font-family:"Red Hat Display",system-ui,sans-serif;font-weight:900;font-size:calc(7mm*var(--k));color:var(--yellow)}
-.top p{margin-top:calc(6mm*var(--k));font-size:calc(5.2mm*var(--k));font-weight:500;color:#E3D3FA}
+.top p.es{font-size:calc(5.4mm*var(--k));font-weight:600;color:#E3D3FA}.top .gl{display:block;margin:calc(2mm*var(--k)) auto 0;height:calc(34mm*var(--k));width:auto}.top p.por{display:flex;align-items:center;justify-content:center;gap:calc(1.5mm*var(--k));margin-top:calc(2mm*var(--k));font-size:calc(3.4mm*var(--k));font-weight:600;color:#D9C9F2}.top p.por img{height:calc(4.4mm*var(--k));width:auto}
 .top h1{font-family:"Red Hat Display",system-ui,sans-serif;font-weight:900;font-size:calc(11.5mm*var(--k));line-height:1;letter-spacing:-.02em;margin-top:calc(1mm*var(--k))}
 .biz{margin:calc(-9mm*var(--k)) auto 0;position:relative;display:flex;align-items:center;gap:calc(4mm*var(--k));background:#fff;border:1px solid #E4DAF0;border-radius:calc(5mm*var(--k));padding:calc(3.5mm*var(--k)) calc(6mm*var(--k)) calc(3.5mm*var(--k)) calc(3.5mm*var(--k));max-width:88%;box-shadow:0 10px 24px -14px rgba(36,9,63,.5)}
 .lg{width:calc(16mm*var(--k));height:calc(16mm*var(--k));border-radius:calc(3.5mm*var(--k));overflow:hidden;flex:none;background:#F3ECFB;display:grid;place-items:center;border:1px solid #E4DAF0}
@@ -66,8 +66,7 @@ body{background:#E9E3F0;font-family:"Red Hat Text",system-ui,sans-serif;color:#1
 </style></head><body>
 <div class="bar"><button class="pri" onclick="print()">Imprimir o guardar PDF</button><a href="?id=<?= $e($id) ?>">Tamaño A5</a><a href="?id=<?= $e($id) ?>&amp;t=a4">Tamaño A4</a></div>
 <div class="pg">
- <div class="top"><div class="brand"><img src="/img/vitrix/vitrix-blanco-nombre.png" alt="Vitrix"><span></span><b>Guía</b></div>
- <p>Estamos en la</p><h1>Guía de Santa Rita</h1></div>
+ <div class="top"><p class="es">Estamos en la</p><img class="gl" src="/img/guia/guia-logo-blanco-hd.png" alt="Guía de Santa Rita"><p class="por">por <img src="/img/vitrix/vitrix-blanco-nombre.png" alt="Vitrix"></p></div>
  <div class="biz"><span class="lg"><?= $logo ? '<img src="' . $e($logo) . '" alt="">' : '<b>' . $e($ini) . '</b>' ?></span><span><h2><?= $e($name) ?></h2><?= $seg !== '' ? '<small>' . $e($seg) . '</small>' : '' ?></span></div>
  <div class="mid">
   <div class="qr" id="qr" data-u="<?= $e($url) ?>"></div>
