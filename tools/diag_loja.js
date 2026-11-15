@@ -12,6 +12,18 @@ const kb = n => Math.round(n / 1024) + ' KB';
   let tot = 0; for (let i = 0; i < Math.max(n, 1); i++) { const t = Date.now(); const m = await fetch(FS + '/shops/' + LOJA + '/media/p' + i + '?key=' + KEY); const s = await m.text(); tot += s.length; let k = 0; try { k = Object.keys(JSON.parse(s).fields.m.mapValue.fields).length } catch (e) {} console.log('  imagens p' + i + ': HTTP ' + m.status + ', ' + kb(s.length) + ', ' + k + ' imagens, ' + (Date.now() - t) + ' ms'); }
   console.log('total de imagens: ' + kb(tot));
   const b = await chromium.launch();
+  // produtos e categorias da nuvem, e o que aparece no subdomínio e em araujotechsistemas.com/loja/<nome>/
+  try { const f = JSON.parse(txt).fields || {}; const c = JSON.parse(f.cfg.stringValue); const ps = c.products || []; const by = {}; ps.forEach(x => { const k = (x.cat || '?') + (x.on === false ? ' (oculto)' : ''); by[k] = (by[k] || 0) + 1; });
+    console.log('nuvem: ' + ps.length + ' produtos; categorias: ' + JSON.stringify((c.cats || []).map(x => [x.id, (x.n && (x.n.es || x.n.pt)) || x.n, x.hide ? 'oculta' : ''])) + '; produtos por categoria: ' + JSON.stringify(by) + '; status: ' + JSON.stringify(f.status || null)); } catch (e) { console.log('nuvem: não deu para ler o catálogo: ' + e.message); }
+  for (const u of ['https://' + LOJA + '.araujotechsistemas.com/', 'https://araujotechsistemas.com/loja/' + LOJA + '/']) {
+    const ctx0 = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const p0 = await ctx0.newPage(); const er0 = []; p0.on('pageerror', e => er0.push(e.message));
+    try { await p0.goto(u, { waitUntil: 'load', timeout: 60000 }); await p0.waitForTimeout(9000);
+      const st = await p0.evaluate(() => ({ shop: typeof SHOP !== 'undefined' ? SHOP : '?', name: typeof pub !== 'undefined' && pub && pub.store ? pub.store.name : '?', np: typeof pub !== 'undefined' && pub ? (pub.products || []).length : -1, cards: document.querySelectorAll('.pcard').length, chips: [...document.querySelectorAll('.cats button, .catnav button, [data-act=cat]')].map(x => x.textContent.trim()).slice(0, 12), ready: typeof SHOP_READY !== 'undefined' ? SHOP_READY : '?', err: typeof CLOUD !== 'undefined' ? CLOUD.err : '?' }));
+      console.log('[' + u + '] ' + JSON.stringify(st) + (er0.length ? ' erros: ' + er0.slice(0, 3).join(' | ') : ''));
+    } catch (e) { console.log('[' + u + '] falhou: ' + e.message.slice(0, 160)); }
+    await ctx0.close();
+  }
+  if (process.env.SO_COMPARAR) { await b.close(); return; }
   for (const [net, path] of [['rápida', '/#painel'], ['rápida', '/painel/'], ['4G lento', '/painel/']]) {
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true }); const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('response', x => { if (x.status() >= 400) errs.push(x.status() + ' ' + x.url().slice(0, 140)); }); p.on('console', m => { if (m.type() === 'warning' || m.type() === 'error') errs.push(m.text().slice(0, 160)); });
     if (net !== 'rápida') { const c = await ctx.newCDPSession(p); await c.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: 1.5e6 / 8, uploadThroughput: 750e3 / 8 }); }

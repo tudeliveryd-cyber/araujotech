@@ -22,6 +22,9 @@ on:
       video:
         description: 'Só tirar as telas da Guía para o vídeo de divulgação (sim/não)'
         default: 'não'
+      comparar:
+        description: 'Só comparar o catálogo da loja no subdomínio e em /loja/<nome>/ (sim/não)'
+        default: 'não'
 
 jobs:
   diag:
@@ -72,4 +75,5 @@ jobs:
         if: ${{ inputs.topo != 'sim' && inputs.capturas != 'sim' && inputs.guia != 'sim' && inputs.video != 'sim' }}
         env:
           LOJA: ${{ inputs.loja }}
+          SO_COMPARAR: ${{ inputs.comparar == 'sim' && '1' || '' }}
         run: node tools/diag_loja.js
