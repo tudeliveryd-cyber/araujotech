@@ -273,7 +273,8 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
 
   sec('J. Entrega, avaliação e CRM');
   await step('avaliação', async () => {
-    await tab(o2, 'orders'); const sel = o2.locator('.ord:has-text("Cliente E2E") select:visible, select:visible').first(); await sel.selectOption('entregue').catch(async () => { await sel.selectOption({ index: (await sel.evaluate(e => e.options.length)) - 2 }); }); await o2.w(3000);
+    await tab(o2, 'orders'); const sel = o2.locator('.ord:has-text("Cliente E2E") select:visible, select:visible').first(); await sel.selectOption('entregue').catch(async () => { await sel.selectOption({ index: (await sel.evaluate(e => e.options.length)) - 2 }); }); await o2.w(1500);
+    await c.waitForFunction(() => typeof TRACK !== 'undefined' && TRACK && TRACK.status === 'entregue', null, { timeout: 25000 }).catch(() => {}); // o aviso chega pela nuvem: espera em vez de contar segundos
     const tr = await c.evaluate(() => (typeof TRACK !== 'undefined' && TRACK ? TRACK.status : null));
     check(tr === 'entregue', 'cliente: vê o pedido como entregue', 'track=' + tr);
     await c.act('close'); await c.w(500);

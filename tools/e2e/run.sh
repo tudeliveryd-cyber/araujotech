@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # uso: tools/e2e/run.sh <script.js> [arquivo de regras] [projeto]
 cd "$(dirname "$0")/../../firebase"
+export TZ="America/Asuncion" # o navegador dos testes usa a hora do Paraguai; o Node precisa da mesma data (no CI, em UTC, das 21h às 24h do Paraguai a data já era a do dia seguinte)
 export RULES="${2:-firestore.rules}"; PROJ="${3:-araujotech-catalogos}"
 # regras de outro repositório: copia para cá (o emulador só lê dentro da pasta do projeto)
 if [ -n "${RULES_SRC:-}" ]; then cp "$RULES_SRC" "_externas.rules"; RULES="_externas.rules"; fi
