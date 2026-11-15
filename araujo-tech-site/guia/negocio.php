@@ -136,7 +136,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <a class="btn pri" href="<?= $e($catUrl) ?>"><?= $ic($I['cat']) ?><span data-pt="Ver catálogo e pedir">Ver catálogo y pedir</span></a>
 <?php if ($waUrl): ?><a class="btn wa" href="<?= $e($waUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['wa']) ?>WhatsApp</a><?php endif; ?>
 <a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?><span data-pt="Como chegar">Cómo llegar</span></a>
-<?php if (empty($st['delivery']) && empty($st['paused'])): /* o negócio não tem entrega própria: a Tu Delivery busca e leva */ ?><a class="btn td" href="<?= $e('https://wa.me/595982086171?text=' . rawurlencode('Hola Tu Delivery, quiero pedir un delivery de ' . $name . ' (lo vi en la Guía Vitrix)')) ?>" target="_blank" rel="noopener"><?= $ic($I['bike']) ?><span data-pt="Pedir com a Tu Delivery">Pedir con Tu Delivery</span></a><?php endif; ?>
+<?php if (empty($st['delivery']) && empty($st['paused'])): /* o negócio não tem entrega própria: a Tu Delivery busca e leva */ ?><a class="btn td" id="tdb" href="<?= $e('https://wa.me/595982086171?text=' . rawurlencode('Hola Tu Delivery, quiero pedir un delivery de ' . $name . ' (lo vi en la Guía Vitrix)')) ?>" target="_blank" rel="noopener"><?= $ic($I['bike']) ?><span data-pt="Pedir com a Tu Delivery">Pedir con Tu Delivery</span></a><?php endif; ?>
 <button class="btn" type="button" id="sh"><?= $ic($I['share']) ?><span data-pt="Compartilhar">Compartir</span></button>
 </div>
 <?php if ($prods): ?><section class="sec"><h2><?= $ic($I['cat'], 22) ?><span data-pt="Produtos em destaque">Productos destacados</span></h2><div class="pg">
@@ -160,6 +160,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <footer><div class="wrap"><span data-pt="Guia Vitrix · Uma iniciativa de">Guía Vitrix · Una iniciativa de</span> <a href="/">Araújo Tech Sistemas</a> <span data-pt="e">y</span> Tu Delivery</div></footer>
 <script>try{if(localStorage.getItem('at_lang')==='pt'){document.documentElement.lang='pt';document.querySelectorAll('[data-pt]').forEach(function(e){e.textContent=e.getAttribute('data-pt')})}}catch(e){}</script>
 <script>
+(function(){var b=document.getElementById('tdb');if(b)b.addEventListener('click',function(){try{if(!navigator.webdriver&&navigator.sendBeacon)navigator.sendBeacon('/sitio/guia_hit.php?t=p&id=td')}catch(e){}})})();
 document.getElementById('sh').addEventListener('click',function(){var u=<?= json_encode($url) ?>,t=<?= json_encode($name . ' · Guía Vitrix') ?>;if(navigator.share){navigator.share({title:t,url:u}).catch(function(){})}else{window.open('https://wa.me/?text='+encodeURIComponent(t+' '+u),'_blank','noopener')}});
 try{if(!navigator.webdriver){var u='/sitio/guia_hit.php?t=c&id=<?= rawurlencode($id) ?>';if(navigator.sendBeacon)navigator.sendBeacon(u);else fetch(u,{method:'POST',keepalive:true})}}catch(e){}
 </script>

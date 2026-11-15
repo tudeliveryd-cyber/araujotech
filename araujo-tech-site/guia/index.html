@@ -255,7 +255,7 @@ let OFT=null;function ofsAuto(){clearInterval(OFT);const r=document.querySelecto
 let FAV=[];try{const v=JSON.parse(localStorage.getItem('at_gfav')||'[]');if(Array.isArray(v))FAV=v.filter(x=>typeof x==='string'&&/^[a-z0-9-]{1,61}$/.test(x)).slice(0,200)}catch(e){}
 const isFav=id=>FAV.includes(id);
 function favBtn(id){const t=TX[L],on=isFav(id);return `<span class="fav" role="button" tabindex="0" data-fav="${esc(id)}" aria-pressed="${on}" aria-label="${on?t.fav_rm:t.fav_add}" title="${on?t.fav_rm:t.fav_add}">${ic('heart')}</span>`}
-function favToggle(id){FAV=isFav(id)?FAV.filter(x=>x!==id):FAV.concat(id);try{localStorage.setItem('at_gfav',JSON.stringify(FAV))}catch(e){}if(!FAV.length)F_FAV=false;render()}
+function favToggle(id){if(!isFav(id))hit('p','fav');FAV=isFav(id)?FAV.filter(x=>x!==id):FAV.concat(id);try{localStorage.setItem('at_gfav',JSON.stringify(FAV))}catch(e){}if(!FAV.length)F_FAV=false;render()}
 document.addEventListener('click',e=>{const f=e.target.closest&&e.target.closest('[data-fav]');if(!f)return;e.preventDefault();e.stopPropagation();favToggle(f.dataset.fav)},true);
 document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const f=e.target.closest&&e.target.closest('[data-fav]');if(!f)return;e.preventDefault();e.stopPropagation();favToggle(f.dataset.fav)},true);
 function llegarHTML(){const t=TX[L];return `<a class="lgr" href="/guia/llegar/"><span class="lgr-i">${ic('pin')}</span><span class="lgr-t"><b>${t.lg_h}</b><small>${t.lg_p}</small></span><span class="lgr-b">${t.lg_b}${ic('arrow')}</span></a>`}

@@ -122,6 +122,9 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   info(gr.t.replace(/\n/g, ' | '));
   check(/Visitas a la Guía: 40/.test(gr.t) && /1\. Loja Rel — 7/.test(gr.t) && /1\. pizza — 5/.test(gr.t) && /farmacia de turno — 2/.test(gr.t) && /Mejor día: .*\(12\)/.test(gr.t), 'resumo do mês para copiar: visitas, negócios, buscas e melhor dia');
   check(/Lo más buscado en la Guía/.test(gr.h) && /gr-bars/.test(gr.h) && /data-act="gucopy"/.test(gr.h), 'números da Guía mostram buscas, visitas por dia e botão de copiar');
+  const gp = await a.evaluate(() => { const st = { v: 5, c: {}, s: {}, q: {}, vd: {}, p: { llegar: 9, fav: 4 } }; return { t: grText(st), h: grBlocks(st), z: grBlocks({ v: 1 }) }; });
+  check(/Aperturas de "Recién llegado a Santa Rita": 9/.test(gp.t) && /guardaron favoritos: 4/.test(gp.t) && !/Pedir con Tu Delivery/.test(gp.t), 'resumo traz as aberturas da página de quem chega e os favoritos (e omite o que está em zero)');
+  check(/gr-pg/.test(gp.h) && /Otros números/.test(gp.h) && !/gr-pg/.test(gp.z), 'painel mostra "Otros números" só quando há algum');
   sec('L. Notícias cadastradas à mão (parceiro que publica no Instagram)');
   await a.act('guadd', '[data-k="man"]'); await a.w(300);
   await a.fill('[data-gu="news.man.0.t"]', 'Inauguran plaza Teste'); await a.fill('[data-gu="news.man.0.u"]', 'http://inseguro/p/1'); await a.w(200);

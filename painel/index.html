@@ -3955,17 +3955,20 @@ const GX_T={es:{tu_h:'Farmacia de turno',tu_sub:'Cargá la farmacia de turno de 
 const gxt=k=>GX_T[lang==='pt'?'pt':'es'][k];
 function gxFld(p,lab,val,o){o=o||{};return `<div class="fld"><label for="gu_${p}">${lab}</label><input class="inp" id="gu_${p}" data-gu="${p}" value="${esc(val||'')}"${o.type?` type="${o.type}"`:''}${o.ph?` placeholder="${esc(o.ph)}"`:''}${o.im?` inputmode="${o.im}"`:''}></div>`}
 /* relatório do mês da Guía (buscas, visitas por dia, resumo para copiar) */
-const GR_T={es:{q:'Lo más buscado en la Guía',vd:'Visitas por día',cp:'Copiar resumen del mes',ok:'Resumen copiado',r_h:'Guía Vitrix · resumen de los últimos 30 días',r_v:'Visitas a la Guía',r_c:'Toques en negocios',r_s:'Veces en el slider',r_biz:'Negocios más tocados',r_q:'Lo más buscado',r_best:'Mejor día'},
- pt:{q:'O mais buscado na Guia',vd:'Visitas por dia',cp:'Copiar resumo do mês',ok:'Resumo copiado',r_h:'Guia Vitrix · resumo dos últimos 30 dias',r_v:'Visitas à Guia',r_c:'Toques em negócios',r_s:'Vezes no slider',r_biz:'Negócios mais tocados',r_q:'O mais buscado',r_best:'Melhor dia'}};
+const GR_T={es:{q:'Lo más buscado en la Guía',vd:'Visitas por día',cp:'Copiar resumen del mes',ok:'Resumen copiado',r_h:'Guía Vitrix · resumen de los últimos 30 días',r_v:'Visitas a la Guía',r_c:'Toques en negocios',r_s:'Veces en el slider',r_biz:'Negocios más tocados',r_q:'Lo más buscado',r_best:'Mejor día',p_h:'Otros números',p_llegar:'Aperturas de "Recién llegado a Santa Rita"',p_fav:'Veces que guardaron favoritos',p_td:'Toques en "Pedir con Tu Delivery"'},
+ pt:{q:'O mais buscado na Guia',vd:'Visitas por dia',cp:'Copiar resumo do mês',ok:'Resumo copiado',r_h:'Guia Vitrix · resumo dos últimos 30 dias',r_v:'Visitas à Guia',r_c:'Toques em negócios',r_s:'Vezes no slider',r_biz:'Negócios mais tocados',r_q:'O mais buscado',r_best:'Melhor dia',p_h:'Outros números',p_llegar:'Aberturas de "Cheguei em Santa Rita"',p_fav:'Vezes que guardaram favoritos',p_td:'Toques em "Pedir con Tu Delivery"'}};
 const grt=k=>GR_T[lang==='pt'?'pt':'es'][k];
 function grDays(st){const vd=st.vd||{},o=[];const d=new Date();for(let i=29;i>=0;i--){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()-i);const k=x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');o.push([k,+vd[k]||0])}return o}
-function grBlocks(st){const q=Object.entries(st.q||{}).sort((a,b)=>b[1]-a[1]).slice(0,10);const ds=grDays(st),mx=Math.max(1,...ds.map(x=>x[1]));const anyD=ds.some(x=>x[1]);
+const grPages=st=>['llegar','fav','td'].map(k=>[grt('p_'+k),+((st.p||{})[k])||0]);
+function grBlocks(st){const pg=grPages(st);const q=Object.entries(st.q||{}).sort((a,b)=>b[1]-a[1]).slice(0,10);const ds=grDays(st),mx=Math.max(1,...ds.map(x=>x[1]));const anyD=ds.some(x=>x[1]);
  return `${q.length?`<div class="gx-list"><span class="lbl">${grt('q')}</span>${q.map(([k,n])=>`<div><span>${esc(k.replace(/-/g,' '))}</span><b>${n}</b></div>`).join('')}</div>`:''}
  ${anyD?`<div class="gr-vd"><span class="lbl">${grt('vd')}</span><div class="gr-bars">${ds.map(([k,n])=>`<i title="${k.slice(8)}/${k.slice(5,7)}: ${n}" style="height:${Math.max(3,Math.round(n/mx*100))}%"></i>`).join('')}</div><div class="gr-ax"><span>${ds[0][0].slice(8)}/${ds[0][0].slice(5,7)}</span><span>${ds[29][0].slice(8)}/${ds[29][0].slice(5,7)}</span></div></div>`:''}
+ ${pg.some(x=>x[1])?`<div class="gx-list gr-pg"><span class="lbl">${grt('p_h')}</span>${pg.map(([k,n])=>`<div><span>${esc(k)}</span><b>${n}</b></div>`).join('')}</div>`:''}
  <button class="btn sm" data-act="gucopy" style="margin-top:12px">${ic('copy',14)}${grt('cp')}</button>`}
 function grText(st){const nm=id=>{const s=(PL.shops||[]).find(x=>x.id===id);return s?s.name:id};const sum=o=>Object.values(o||{}).reduce((a,b)=>a+b,0);
  const L=[grt('r_h'),'',grt('r_v')+': '+(st.v||0),grt('r_c')+': '+sum(st.c),grt('r_s')+': '+sum(st.s)];
  const ds=grDays(st).filter(x=>x[1]);if(ds.length){const b=ds.slice().sort((a,c)=>c[1]-a[1])[0];L.push(grt('r_best')+': '+b[0].slice(8)+'/'+b[0].slice(5,7)+' ('+b[1]+')')}
+ grPages(st).filter(x=>x[1]).forEach(x=>L.push(x[0]+': '+x[1]));
  const c=Object.entries(st.c||{}).sort((a,b)=>b[1]-a[1]).slice(0,5);if(c.length){L.push('',grt('r_biz')+':');c.forEach(([k,n],i)=>L.push((i+1)+'. '+nm(k)+' — '+n))}
  const q=Object.entries(st.q||{}).sort((a,b)=>b[1]-a[1]).slice(0,5);if(q.length){L.push('',grt('r_q')+':');q.forEach(([k,n],i)=>L.push((i+1)+'. '+k.replace(/-/g,' ')+' — '+n))}
  L.push('','araujotechsistemas.com/guia');return L.join('\n')}
