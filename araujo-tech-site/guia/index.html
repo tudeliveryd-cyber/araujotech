@@ -289,7 +289,7 @@ const newL=()=>(LIST||[]).filter(c=>c.since&&Date.now()-Date.parse(c.since)<30*8
 /* ¿Qué comer ahora?: turnos do dia (aliados marcam no painel; clientes Vitrix pelo horário real) */
 const TUW={de:[300,660],al:[660,900],me:[900,1140],ce:[1140,1560]};let QTU=null;
 const tuNow=()=>{const d=new Date(),n=d.getHours()*60+d.getMinutes();if(n<120)return 'ce';return Object.keys(TUW).find(k=>n>=TUW[k][0]&&n<TUW[k][1])||'de'};
-function openIn(days,k){const [a,b]=TUW[k];return [a+30,(a+b)/2,b-30].some(m=>{const d=new Date();d.setHours(0,0,0,0);d.setMinutes(m);return (openNow(days,d)||{}).on})}
+function openIn(days,k){const [a,b]=TUW[k],q=(b-a)/4;return [a+q/2,a+q*1.5,a+q*2.5,a+q*3.5].filter(m=>{const d=new Date();d.setHours(0,0,0,0);d.setMinutes(Math.round(m));return (openNow(days,d)||{}).on}).length>=3}/* precisa estar aberto em quase todo o turno (quem abre às 17h não é merienda) */
 function qcaHTML(){const t=TX[L],k=QTU||tuNow();const ds=dirL().filter(c=>c.tu.length);if(!ds.length)return '';
  const vx=(LIST||[]).filter(c=>c._g==='food'&&(INFO[c.id]||{}).days&&!(INFO[c.id]||{}).paused&&openIn(INFO[c.id].days,k)).sort((a,b)=>(b.dest?1:0)-(a.dest?1:0));
  const l=vx.concat(ds.filter(c=>c.tu.includes(k)));
