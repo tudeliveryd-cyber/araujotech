@@ -122,6 +122,21 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   info(gr.t.replace(/\n/g, ' | '));
   check(/Visitas a la Guía: 40/.test(gr.t) && /1\. Loja Rel — 7/.test(gr.t) && /1\. pizza — 5/.test(gr.t) && /farmacia de turno — 2/.test(gr.t) && /Mejor día: .*\(12\)/.test(gr.t), 'resumo do mês para copiar: visitas, negócios, buscas e melhor dia');
   check(/Lo más buscado en la Guía/.test(gr.h) && /gr-bars/.test(gr.h) && /data-act="gucopy"/.test(gr.h), 'números da Guía mostram buscas, visitas por dia e botão de copiar');
+  sec('L. Notícias cadastradas à mão (parceiro que publica no Instagram)');
+  await a.act('guadd', '[data-k="man"]'); await a.w(300);
+  await a.fill('[data-gu="news.man.0.t"]', 'Inauguran plaza Teste'); await a.fill('[data-gu="news.man.0.u"]', 'http://inseguro/p/1'); await a.w(200);
+  await a.act('gusave'); await a.w(1500);
+  check(!(((await doc()).gnews || {}).man || []).length, 'notícia manual com link sem https não deixa salvar');
+  await a.fill('[data-gu="news.man.0.u"]', 'https://www.instagram.com/p/abc123/'); await a.fill('[data-gu="news.man.0.d"]', '2026-11-14');
+  await a.act('guadd', '[data-k="man"]'); await a.w(300); // a segunda fica vazia: é descartada
+  check(await a.locator('[data-gu="news.man.1.t"]').inputValue() === 'Inauguran plaza Teste', 'a notícia nova entra em cima e a anterior mantém o que foi digitado');
+  await a.act('gusave'); await a.w(2500);
+  d = await doc(); info(JSON.stringify(d.gnews));
+  check(d.gnews && (d.gnews.man || []).length === 1 && d.gnews.man[0].t === 'Inauguran plaza Teste' && d.gnews.man[0].u === 'https://www.instagram.com/p/abc123/' && d.gnews.man[0].d === '2026-11-14' && /^[a-z0-9]+$/i.test(d.gnews.man[0].id), 'notícia manual salva com manchete, link e data; a vazia é descartada');
+  check(d.gnews.feed === 'https://diario.test/feed' && d.gnews.on === true && (d.gdir || []).length === 1, 'feed do parceiro e fichas continuam');
+  await a.act('gurm', '[data-k="man"]', 1); await a.w(300); await a.act('gusave'); await a.w(2500); // a de cima é a vazia; remove a que foi salva
+  d = await doc();
+  check(d.gnews && !(d.gnews.man || []).length && d.gnews.n === 'Diario Teste', 'remover a notícia manual apaga só ela');
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });

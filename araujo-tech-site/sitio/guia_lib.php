@@ -87,10 +87,21 @@ function guia_pub() {
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
 function guia_news() {
   $cfg = guia_doc()['gnews'] ?? null;
-  if (!is_array($cfg) || empty($cfg['on']) || !preg_match('#^https://[^\s"\'<>]+$#i', (string)($cfg['feed'] ?? ''))) return ['items' => []];
+  if (!is_array($cfg) || empty($cfg['on'])) return ['items' => []];
   $name = (string)($cfg['n'] ?? ''); $site = preg_match('#^https://[^\s"\'<>]+$#i', (string)($cfg['site'] ?? '')) ? (string)$cfg['site'] : '';
+  // notícias cadastradas à mão no painel (parceiro que só publica no Instagram): saem primeiro, a mais nova em cima
+  $man = [];
+  foreach ((array)($cfg['man'] ?? []) as $x) {
+    if (!is_array($x) || trim((string)($x['t'] ?? '')) === '' || !preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['u'] ?? ''))) continue;
+    $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
+    $dd = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($x['d'] ?? '')) ? (string)$x['d'] : '';
+    $man[] = ['t' => mb_substr(trim((string)$x['t']), 0, 140), 'u' => (string)$x['u'], 'img' => !empty($x['ph']) ? '/sitio/gimg.php?n=' . $id . '&v=' . substr(md5((string)$x['ph']), 0, 8) : '', 'd' => $dd];
+    if (count($man) >= 8) break;
+  }
+  usort($man, function ($a, $b) { return strcmp($b['d'], $a['d']); });
+  if (!preg_match('#^https://[^\s"\'<>]+$#i', (string)($cfg['feed'] ?? ''))) return ['n' => $name, 'site' => $site, 'items' => $man];
   $cache = sys_get_temp_dir() . '/at_news_' . md5($cfg['feed']) . '.json';
-  if (is_file($cache) && time() - filemtime($cache) < 1800) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return ['n' => $name, 'site' => $site, 'items' => $d]; }
+  if (is_file($cache) && time() - filemtime($cache) < 1800) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return ['n' => $name, 'site' => $site, 'items' => array_slice(array_merge($man, $d), 0, 8)]; }
   $r = at_get($cfg['feed']); $items = [];
   if ($r && function_exists('simplexml_load_string')) {
     $x = @simplexml_load_string($r, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NONET);
@@ -115,7 +126,7 @@ function guia_news() {
   }
   if ($items || !is_file($cache)) @file_put_contents($cache, json_encode($items));
   elseif (is_file($cache)) { $items = json_decode((string)@file_get_contents($cache), true) ?: []; }
-  return ['n' => $name, 'site' => $site, 'items' => $items];
+  return ['n' => $name, 'site' => $site, 'items' => array_slice(array_merge($man, $items), 0, 8)];
 }
 
 // Clientes publicados pelo Panel Araújo Tech (platform/sitio → clientes), só catálogos. Cache de 10 minutos.
