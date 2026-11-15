@@ -26,6 +26,7 @@ function guia_dy($dy) {
   $ok = function ($v) { return preg_match('/^\d{2}:\d{2}$/', (string)$v) ? (string)$v : ''; }; $o = []; $any = false;
   foreach (array_values($dy) as $d) { $d = is_array($d) ? $d : []; $a = (array)($d['a'] ?? []); $b = (array)($d['b'] ?? []);
     $x = ['on' => !empty($d['on']), 'a' => [$ok($a[0] ?? ''), $ok($a[1] ?? '')], 'b' => [$ok($b[0] ?? ''), $ok($b[1] ?? '')]];
+    if ($x['a'][0] !== '' && $x['a'][1] === '' && $x['b'][0] === '' && $x['b'][1] !== '') { $x['a'][1] = $x['b'][1]; $x['b'] = ['', '']; } // 07:00 … 23:00 nas pontas = horário corrido
     if ($x['on'] && $x['a'][0] !== '' && $x['a'][1] !== '') $any = true; $o[] = $x; }
   return $any ? $o : null;
 }

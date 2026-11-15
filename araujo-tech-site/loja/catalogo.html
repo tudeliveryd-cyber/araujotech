@@ -4040,7 +4040,7 @@ function gmCard(g){const T=GM_T[lang==='pt'?'pt':'es'],l=g.news.man||[];
   ${gxFld('news.man.'+i+'.t',T.t,x.t)}
   <div class="row2">${gxFld('news.man.'+i+'.u',T.u,x.u,{im:'url',ph:'https://www.instagram.com/p/…'})}${gxFld('news.man.'+i+'.d',T.d,x.d,{type:'date'})}</div></div>`).join('')}</div>`}
 function guSet(path,v){guDraftLater();const ks=path.split('.');let o=ui.gu;for(const k of ks.slice(0,-1)){o=o[k];if(o==null)return}o[ks[ks.length-1]]=v;if(/\.(on|td)$/.test(path)||/^dir\.\d+\.g$/.test(path)||/^bus\.\d+\.d$/.test(path))guSheet()}
-function guDy(dy){const ok=v=>/^\d{2}:\d{2}$/.test(v||'')?v:'';if(!Array.isArray(dy)||dy.length!==7)return null;const o=dy.map(d=>({on:!!(d&&d.on),a:[ok(d&&d.a&&d.a[0]),ok(d&&d.a&&d.a[1])],b:[ok(d&&d.b&&d.b[0]),ok(d&&d.b&&d.b[1])]}));return o.some(d=>d.on&&d.a[0]&&d.a[1])?o:null}
+function guDy(dy){const ok=v=>/^\d{2}:\d{2}$/.test(v||'')?v:'';if(!Array.isArray(dy)||dy.length!==7)return null;const o=dy.map(d=>({on:!!(d&&d.on),a:[ok(d&&d.a&&d.a[0]),ok(d&&d.a&&d.a[1])],b:[ok(d&&d.b&&d.b[0]),ok(d&&d.b&&d.b[1])]})).map(d=>d.a[0]&&!d.a[1]&&!d.b[0]&&d.b[1]?{on:d.on,a:[d.a[0],d.b[1]],b:['','']}:d);/* abre 07:00 e fecha 23:00 escrito nas pontas = horário corrido */return o.some(d=>d.on&&d.a[0]&&d.a[1])?o:null}
 const GU_DK='at_gu_draft';let GU_DT=null;
 function guSig(g){try{return JSON.stringify(guClean(g))}catch(e){return ''}}
 function guDraftClear(){try{localStorage.removeItem(GU_DK)}catch(e){}}
