@@ -104,7 +104,7 @@ $ini = function ($n) { $w = preg_split('/\s+/', trim($n)); $o = ''; foreach (arr
 .bd.on{background:#E7F7EE;color:#11845A}.bd.off{background:#F1EEF4;color:var(--muted)}.bd.dl{background:rgba(255,255,255,.14);color:#fff}.bd.st{background:var(--yellow);color:#3D2600}
 .acts{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 8px}
 .btn{display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:15.5px;text-decoration:none;padding:13px 18px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--deep);cursor:pointer}
-.btn.pri{background:var(--yellow);border-color:var(--yellow);color:var(--night)}.btn.wa{background:#16A34A;border-color:#16A34A;color:#fff}
+.btn.pri{background:var(--yellow);border-color:var(--yellow);color:var(--night)}.btn.wa{background:#16A34A;border-color:#16A34A;color:#fff}.btn.td{background:var(--night);border-color:var(--night);color:#fff}
 .sec{margin:28px 0}.sec h2{font-family:var(--display);font-weight:900;font-size:22px;margin-bottom:12px;display:flex;gap:10px;align-items:center}.sec h2 svg{color:var(--purple)}
 .box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}
 .hrs{display:grid;gap:4px}.hrs div{display:flex;justify-content:space-between;gap:10px;padding:7px 10px;border-radius:10px;font-size:15px}.hrs div.td{background:var(--lilac);font-weight:700}.hrs span:first-child{white-space:nowrap}.hrs span:last-child{color:var(--muted);text-align:right}.hrs div.td span:last-child{color:var(--deep)}
@@ -136,6 +136,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <a class="btn pri" href="<?= $e($catUrl) ?>"><?= $ic($I['cat']) ?><span data-pt="Ver catálogo e pedir">Ver catálogo y pedir</span></a>
 <?php if ($waUrl): ?><a class="btn wa" href="<?= $e($waUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['wa']) ?>WhatsApp</a><?php endif; ?>
 <a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?><span data-pt="Como chegar">Cómo llegar</span></a>
+<?php if (empty($st['delivery']) && empty($st['paused'])): /* o negócio não tem entrega própria: a Tu Delivery busca e leva */ ?><a class="btn td" href="<?= $e('https://wa.me/595982086171?text=' . rawurlencode('Hola Tu Delivery, quiero pedir un delivery de ' . $name . ' (lo vi en la Guía Vitrix)')) ?>" target="_blank" rel="noopener"><?= $ic($I['bike']) ?><span data-pt="Pedir com a Tu Delivery">Pedir con Tu Delivery</span></a><?php endif; ?>
 <button class="btn" type="button" id="sh"><?= $ic($I['share']) ?><span data-pt="Compartilhar">Compartir</span></button>
 </div>
 <?php if ($prods): ?><section class="sec"><h2><?= $ic($I['cat'], 22) ?><span data-pt="Produtos em destaque">Productos destacados</span></h2><div class="pg">
