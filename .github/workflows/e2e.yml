@@ -90,6 +90,7 @@ jobs:
           echo "######## MOEDA DO LOCAL (Gs. / US$) · regras v13"; tools/e2e/run.sh e2e_moeda.js firestore-v13.rules || F=1
           echo "######## VISITAS AO CATÁLOGO · regras v14"; tools/e2e/run.sh e2e_visitas.js firestore-v14.rules || F=1
           echo "######## AVISO DE VENCIMENTO E RESUMO DO DIA · regras v14"; tools/e2e/run.sh e2e_aviso.js firestore-v14.rules || F=1
+          echo "######## CATÁLOGO PELO DOMÍNIO PRINCIPAL (/loja/<nome>/) · regras v14"; tools/e2e/run.sh e2e_loja.js firestore-v14.rules || F=1
           echo "######## AGENDA";                                      tools/e2e/run.sh e2e_agenda.js || F=1
           echo "######## AGENDA · regras novas (v11)";                 tools/e2e/run.sh e2e_agenda.js firestore-v11.rules || F=1
           echo "######## AGENDA · regras v12";                         tools/e2e/run.sh e2e_agenda.js firestore-v12.rules || F=1

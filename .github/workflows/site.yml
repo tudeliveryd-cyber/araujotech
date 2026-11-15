@@ -81,6 +81,11 @@ jobs:
           RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
           RewriteCond %{REQUEST_URI} !^/guia/$
           RewriteRule ^gu(i|í|%C3%AD)a/?$ /guia/ [R=301,NC,L]
+          # catálogo pelo domínio principal (o iPhone dá "Misdirected Request" ao trocar para o subdomínio)
+          RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
+          RewriteRule ^loja/([a-z0-9][a-z0-9-]+)$ /loja/$1/ [R=301,L]
+          RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
+          RewriteRule ^loja/([a-z0-9][a-z0-9-]+)/(index\.html)?$ /loja/index.php?s=$1 [L,QSA]
           # endereço com letras maiúsculas (ex.: /Status) vira minúsculo
           RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
           RewriteCond %{REQUEST_FILENAME} !-f

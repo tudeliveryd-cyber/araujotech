@@ -24,6 +24,7 @@ function localFile(u) {
   else if (h === 'meupulpito.com' || h === 'www.meupulpito.com') root = DIRS.pulpito;
   else if (h === 'tudeliveryd-cyber.github.io' && p.startsWith('/Caj-Entrega')) { root = DIRS.caja; rel = p.slice('/Caj-Entrega'.length) || '/'; }
   else return null;
+  if (root === DIRS.site && /^\/loja\/[a-z0-9][a-z0-9-]+\/(index\.html)?$/.test(p)) return { file: path.join(root, 'loja', 'catalogo.html') }; // mesmo que o .htaccess do domínio principal (sem a parte PHP das etiquetas)
   let f = path.join(root, rel);
   if (!f.startsWith(root)) return { status: 403 };
   try { if (fs.statSync(f).isDirectory()) { if (!p.endsWith('/')) return { redirect: u.origin + p + '/' + u.search }; f = path.join(f, 'index.html'); } } catch (e) {}

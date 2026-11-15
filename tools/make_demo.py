@@ -236,3 +236,5 @@ if __name__ == '__main__':
     main()
     casofarma()
     rubros()
+    import subprocess, sys
+    subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'make_loja.py')], check=True)

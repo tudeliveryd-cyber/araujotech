@@ -18,6 +18,9 @@ $name = $c['name'] ?: $tx($st['name'] ?? $id);
 $slogan = $tx($st['slogan'] ?? '');
 $seg = $c['segEs']; $city = $c['city'];
 $catUrl = preg_match('#^https://[^\s"\'<>]+$#', $c['url']) ? $c['url'] : 'https://' . $id . '.araujotechsistemas.com/';
+$catAbs = $catUrl;
+// no domínio principal o catálogo abre em /loja/<nome>/: no iPhone, ir para o subdomínio dá "Misdirected Request" (erro da hospedagem)
+if (preg_match('#^https://([a-z0-9-]+)\.araujotechsistemas\.com/?$#i', $catUrl, $cm) && !in_array(strtolower($cm[1]), ['www', 'guia'], true)) $catUrl = '/loja/' . (strtolower($cm[1]) === 'fogaomineiro' ? 'fogao-mineiro' : strtolower($cm[1])) . '/';
 $logo = preg_match('#^https://[^\s"\'<>]+$#', $c['logo']) ? (preg_match('#/logo\.php$#', $c['logo']) ? $c['logo'] . '?v=2' : $c['logo']) : '';
 $pimg = function ($ref) use ($id) { return preg_match('/^m:([a-z0-9]{2,24})$/', (string)$ref, $m) ? '/sitio/pimg.php?s=' . rawurlencode($id) . '&k=' . $m[1] : ''; };
 $cover = $pimg($st['cover'] ?? '');
@@ -61,7 +64,7 @@ if ($wa) $ld['telephone'] = '+' . $wa;
 if ($addr || $city) $ld['address'] = array_filter(['@type' => 'PostalAddress', 'streetAddress' => $addr, 'addressLocality' => $city ?: 'Santa Rita', 'addressRegion' => 'Alto Paraná', 'addressCountry' => 'PY']);
 if ($hasGeo) $ld['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => +$lat, 'longitude' => +$lng];
 if ($days) { $oh = []; foreach ($days as $i => $d) foreach ($ivs($d) as $v) $oh[] = ['@type' => 'OpeningHoursSpecification', 'dayOfWeek' => 'https://schema.org/' . ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][$i], 'opens' => $v[2], 'closes' => $v[3]]; if ($oh) $ld['openingHoursSpecification'] = $oh; }
-$ld['sameAs'] = [$catUrl];
+$ld['sameAs'] = [$catAbs];
 // opiniões dos clientes (mesmas regras do catálogo) e fotos do local (as do site padrão da empresa, quando existem)
 $rv = guia_reviews($id, $sh);
 if ($rv) $ld['aggregateRating'] = ['@type' => 'AggregateRating', 'ratingValue' => $rv['avg'], 'reviewCount' => $rv['n'], 'bestRating' => 5, 'worstRating' => 1];
