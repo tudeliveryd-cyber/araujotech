@@ -3,7 +3,7 @@
 // Guía Vitrix: conta visitas da Guía (t=v), toques em negócios (t=c&id=loja), páginas e ações (t=p&id=llegar|fav|td) vezes que um anúncio passou no slider (t=s&id=c-loja|a-banner|h-casa) e toques no slider (t=k, mesmos ids).
 // Guarda só números por mês, sem dados de quem visitou. Os números só o admin vê (guia_stats.php).
 header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store');
-$o = $_SERVER['HTTP_ORIGIN'] ?? ''; if ($o !== '' && !preg_match('#^https://(www\.)?araujotechsistemas\.com$#', $o)) { http_response_code(204); exit; }
+$o = $_SERVER['HTTP_ORIGIN'] ?? ''; if ($o !== '' && !preg_match('#^https://(www\.)?(araujotechsistemas|guiadesantarita)\.com$#', $o)) { http_response_code(204); exit; }
 $ua = strtolower((string)($_SERVER['HTTP_USER_AGENT'] ?? ''));
 if ($ua === '' || preg_match('/bot|crawl|spider|headless|lighthouse|preview|facebookexternalhit|whatsapp/', $ua)) { http_response_code(204); exit; }
 $t = (string)($_REQUEST['t'] ?? ''); $id = (string)($_REQUEST['id'] ?? ''); if ($t !== 'q') $id = strtolower($id);

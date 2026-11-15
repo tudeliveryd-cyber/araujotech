@@ -77,6 +77,38 @@ jobs:
           # BEGIN araujotech-sitios
           <IfModule mod_rewrite.c>
           RewriteEngine On
+          # Guía de Santa Rita no domínio próprio guiadesantarita.com (mesma pasta do site; só vale quando o domínio aponta para cá)
+          RewriteCond %{HTTP_HOST} ^www\.guiadesantarita\.com$ [NC]
+          RewriteRule ^(.*)$ https://guiadesantarita.com/$1 [R=301,L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteCond %{HTTPS} off
+          RewriteRule ^(.*)$ https://guiadesantarita.com/$1 [R=301,L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteCond %{ENV:REDIRECT_STATUS} ^$
+          RewriteRule ^guia/?$ / [R=301,L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteCond %{ENV:REDIRECT_STATUS} ^$
+          RewriteRule ^guia/(negocios|llegar|terminos)/?$ /$1/ [R=301,L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteCond %{ENV:REDIRECT_STATUS} ^$
+          RewriteRule ^guia/aparecer/?$ /negocios/ [R=301,L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteCond %{ENV:REDIRECT_STATUS} ^$
+          RewriteRule ^guia/([a-z0-9][a-z0-9-]{1,60})/?$ /$1 [R=301,L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteRule ^(loja|vitrix|admin|painel|catalogo-digital|demo[a-z-]*)(/.*)?$ https://araujotechsistemas.com/$1$2 [R=302,L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteRule ^$ /guia/index.php [L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteRule ^(negocios|llegar|terminos)/?$ /guia/$1/ [L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteRule ^(manifest\.webmanifest|icon-(180|192|512)\.png|robots\.txt)$ /guia/$1 [L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteRule ^sitemap\.xml$ /guia/sitemap.php [L]
+          RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteRule ^([a-z0-9][a-z0-9-]{1,60})/?$ /guia/negocio.php?id=$1 [L,QSA]
           # Guía Vitrix: aceita /Guia, /GUIA, /guía, /guia (com ou sem barra)
           RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
           RewriteCond %{REQUEST_URI} !^/guia/$
