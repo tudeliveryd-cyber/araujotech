@@ -22,5 +22,17 @@ const out = (n, f) => { const b64 = fs.readFileSync(f).toString('base64'); for (
   const u = p.locator('[data-c]').filter({ hasText: /Santa Rita útil/ }).first();
   if (await u.count()) { await u.click(); await p.waitForTimeout(1500); await shot('util');
     await p.evaluate(() => { const e = [...document.querySelectorAll('.uh')].find(x => /mnibus/.test(x.textContent)); if (e) window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 90); }); await p.waitForTimeout(800); await shot('bus'); }
+  // telas para a apresentação (Guía nova): 'Hoy en Santa Rita', página de quem chega e a capa no computador
+  await p.goto(U + '/guia/', { waitUntil: 'networkidle' }).catch(() => {}); await p.waitForTimeout(4000);
+  const tit = await p.title(); console.log('titulo ' + tit);
+  await p.evaluate(() => { const e = document.getElementById('hoy') || document.getElementById('farmacia'); if (e) window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 14); }); await p.waitForTimeout(900); await shot('hoy');
+  await p.evaluate(() => { const e = document.querySelector('.tiles'); if (e) window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 10); }); await p.waitForTimeout(700); await shot('tiles');
+  await p.goto(U + '/guia/llegar/', { waitUntil: 'networkidle' }).catch(() => {}); await p.waitForTimeout(2000); await shot('llegar');
+  await p.evaluate(() => { const e = document.getElementById('documentos'); if (e) window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 10); }); await p.waitForTimeout(600); await shot('llegar2');
+  const d = await (await b.newContext({ viewport: { width: 1366, height: 820 }, locale: 'es-PY', timezoneId: 'America/Asuncion' })).newPage();
+  await d.goto(U + '/guia/', { waitUntil: 'networkidle' }).catch(() => {}); await d.waitForTimeout(4500);
+  { const f = 'guia-video/desk.jpg'; await d.screenshot({ path: f, type: 'jpeg', quality: 86 }); out('desk', f); console.log('OK desk'); }
+  await d.evaluate(() => { const e = document.querySelector('.tiles'); if (e) window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 10); }); await d.waitForTimeout(700);
+  { const f = 'guia-video/desk2.jpg'; await d.screenshot({ path: f, type: 'jpeg', quality: 86 }); out('desk2', f); console.log('OK desk2'); }
   await b.close();
 })().catch(e => { console.log('ERRO ' + e); process.exit(1); });
