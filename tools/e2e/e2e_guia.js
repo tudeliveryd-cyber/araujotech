@@ -140,6 +140,23 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   await a.act('gurm', '[data-k="man"]', 1); await a.w(300); await a.act('gusave'); await a.w(2500); // a de cima é a vazia; remove a que foi salva
   d = await doc();
   check(d.gnews && !(d.gnews.man || []).length && d.gnews.n === 'Diario Teste', 'remover a notícia manual apaga só ela');
+  sec('M. Toques no slider (números para vender o anúncio)');
+  await a.evaluate(() => { ui.gu.ads = [{ id: 'z9', t: 'Farmacia Teste', img: '', on: true }]; ui.guSt = { ok: true, v: 120, c: {}, s: { 'h-td': 70, 'a-z9': 40, 'a-old': 5 }, k: { 'h-td': 6, 'a-z9': 3 }, q: {}, p: {}, vd: {} }; guSheet(); }); await a.w(500);
+  const sl = await a.evaluate(() => [...document.querySelectorAll('.gx-sl>div:not(.gx-slh)')].map(d => d.innerText.replace(/\s+/g, ' ').trim()));
+  info(JSON.stringify(sl));
+  check(sl.some(x => /Banner Tu Delivery.*70\s*6$/.test(x)) && sl.some(x => /Publicidad · Farmacia Teste.*40\s*3$/.test(x)) && sl.some(x => /Publicidad \(ya borrada\).*5\s*0$/.test(x)), 'cada banner mostra nome, veces que apareció e toques');
+  check(await a.evaluate(() => [...document.querySelectorAll('.gx-kpi b')].map(b => b.textContent).join(',')) === '120,0,115,9', 'o resumo mostra o total de toques no slider');
+  const tx = await a.evaluate(() => slTxt('a-z9')), sv = await a.evaluate(() => slSell());
+  info(tx.replace(/\n/g, ' / ')); info(sv.replace(/\n/g, ' / '));
+  check(/Farmacia Teste/.test(tx) && /apareció: 40/.test(tx) && /anuncio: 3/.test(tx) && /Guía: 120/.test(tx), 'texto para o anunciante com aparições, toques e visitas');
+  check(/promedio\): 38/.test(sv) && /promedio\): 3$/m.test(sv) && /250\.000/.test(sv), 'texto para vender o slider com as médias reais');
+  const G2 = await L.open({ init: "Object.defineProperty(navigator,'webdriver',{get:()=>false})" }); const gq = G2.p; const ks = [];
+  gq.on('request', r => { const u = r.url(); if (/guia_hit\.php\?t=k/.test(u)) ks.push(u); });
+  await gq.goto('https://araujotechsistemas.com/guia/'); await gq.w(3000);
+  await gq.evaluate(() => { const el = document.getElementById('sl'); const d = el.querySelectorAll('.sd')[SL.i]; d.addEventListener('click', e => e.preventDefault(), { once: true }); d.click(); }); await gq.w(800);
+  info(JSON.stringify(ks));
+  check(ks.length === 1 && /id=h-/.test(ks[0]), 'tocar um banner do slider conta um toque com o mesmo id das aparições');
+  check(!gq.errs.length, 'Guía sem erros de JavaScript', gq.errs.join(' | '));
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });

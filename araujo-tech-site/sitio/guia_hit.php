@@ -1,6 +1,6 @@
 <?php
 @ini_set('display_errors', '0'); error_reporting(0);
-// Guía Vitrix: conta visitas da Guía (t=v), toques em negócios (t=c&id=loja), páginas e ações (t=p&id=llegar|fav|td) e vezes que um anúncio passou no slider (t=s&id=c-loja|a-banner).
+// Guía Vitrix: conta visitas da Guía (t=v), toques em negócios (t=c&id=loja), páginas e ações (t=p&id=llegar|fav|td) vezes que um anúncio passou no slider (t=s&id=c-loja|a-banner|h-casa) e toques no slider (t=k, mesmos ids).
 // Guarda só números por mês, sem dados de quem visitou. Os números só o admin vê (guia_stats.php).
 header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store');
 $o = $_SERVER['HTTP_ORIGIN'] ?? ''; if ($o !== '' && !preg_match('#^https://(www\.)?araujotechsistemas\.com$#', $o)) { http_response_code(204); exit; }
@@ -9,7 +9,7 @@ if ($ua === '' || preg_match('/bot|crawl|spider|headless|lighthouse|preview|face
 $t = (string)($_REQUEST['t'] ?? ''); $id = (string)($_REQUEST['id'] ?? ''); if ($t !== 'q') $id = strtolower($id);
 if ($t === 'q') { $id = trim(preg_replace('/-+/', '-', preg_replace('/[^a-z0-9ñ]+/u', '-', mb_strtolower($id))), '-'); if (!preg_match('/^[a-zñ][a-z0-9ñ-]{2,23}$/u', $id) || preg_match('/\d{4,}/', $id)) { http_response_code(204); exit; } } // buscas (só palavras curtas, sem números longos)
 elseif ($t === 'p') { if (!in_array($id, ['llegar', 'fav', 'td'], true)) { http_response_code(204); exit; } } // páginas e ações: só nomes conhecidos
-elseif (!in_array($t, ['v', 'c', 's'], true) || ($t !== 'v' && !preg_match('/^[a-z0-9][a-z0-9-]{1,70}$/', $id))) { http_response_code(204); exit; }
+elseif (!in_array($t, ['v', 'c', 's', 'k'], true) || ($t !== 'v' && !preg_match('/^[a-z0-9][a-z0-9-]{1,70}$/', $id))) { http_response_code(204); exit; }
 // freio por aparelho: no máximo 40 contagens por minuto vindas do mesmo endereço (evita inflar os números com um script)
 $rl = sys_get_temp_dir() . '/at_ghl_' . md5(($_SERVER['REMOTE_ADDR'] ?? '') . '|' . date('YmdHi'));
 $rn = (int)@file_get_contents($rl); if ($rn >= 40) { http_response_code(204); exit; } @file_put_contents($rl, (string)($rn + 1));
