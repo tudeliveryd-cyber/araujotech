@@ -245,7 +245,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(/Catálogo Vitrix/.test(vxs.v) && !/Catálogo Vitrix/.test(vxs.z), 'clientes Vitrix mostram o selo "Catálogo Vitrix"; aliados não');
   check(out.order.indexOf('Pizzería Aliada') < out.order.indexOf('Almacén Común'), 'aliado Tu Delivery aparece antes das outras fichas da categoria');
   check(/Recomendado/.test(out.pseal) && /Aliado Tu Delivery/.test(out.pseal), 'aliado mostra os selos Recomendado e Aliado Tu Delivery');
-  check(out.pord === 'https://wa.me/595981123456?text=' + encodeURIComponent('Hola, vi tu negocio en la Guía Vitrix y quiero hacer un pedido'), '"Pedir por WhatsApp" vai direto ao WhatsApp do negócio com a mensagem da Guía');
+  check(out.pord === 'https://wa.me/595981123456?text=' + encodeURIComponent('Hola, vi tu negocio en la Guía de Santa Rita y quiero hacer un pedido'), '"Pedir por WhatsApp" vai direto ao WhatsApp do negócio com a mensagem da Guía');
   check(out.pig && out.plg === '/sitio/gimg.php?d=t1&v=1', 'aliado mostra Instagram e logo');
   check(!out.mseal && out.mwa.includes('WhatsApp') && !out.mwa.includes('Pedir por WhatsApp'), 'ficha comum continua sem selo e com WhatsApp normal');
   check(!out.xlg, 'logo de endereço desconhecido não é mostrado');

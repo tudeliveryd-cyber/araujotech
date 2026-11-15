@@ -1,6 +1,6 @@
 <?php
 @ini_set('display_errors', '0'); error_reporting(0);
-// Página de cada negócio na Guía Vitrix: /guia/<negocio>. Só negócios publicados na Guía (Panel Araújo Tech).
+// Página de cada negócio na Guía de Santa Rita: /guia/<negocio>. Só negócios publicados na Guía (Panel Araújo Tech).
 // Tudo vem do catálogo público (nome, horário, endereço, WhatsApp, produtos em destaque). Pronta para o Google e para compartilhar.
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: public, max-age=300');
@@ -54,7 +54,7 @@ $mapQ = $hasGeo ? $lat . ',' . $lng : trim($name . ', ' . ($addr ?: ($city ?: 'S
 // sempre com o país: sem ele, 'Fogão Mineiro, Centro' caía num restaurante de Juiz de Fora (Brasil)
 $mapUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($mapQ);
 $wa = preg_replace('/\D/', '', (string)($st['whatsapp'] ?? '')); if ($wa && $wa[0] === '0') $wa = '595' . substr($wa, 1); elseif ($wa && strpos($wa, '595') !== 0 && strlen($wa) <= 10) $wa = '595' . $wa;
-$waUrl = $wa ? 'https://wa.me/' . $wa . '?text=' . rawurlencode('Hola ' . $name . ', te encontré en la Guía Vitrix') : '';
+$waUrl = $wa ? 'https://wa.me/' . $wa . '?text=' . rawurlencode('Hola ' . $name . ', te encontré en la Guía de Santa Rita') : '';
 $url = 'https://araujotechsistemas.com/guia/' . $id;
 $desc = ($slogan ?: ($seg ?: 'Negocio')) . ' en ' . ($city ?: 'Santa Rita') . '. Mirá el catálogo, horarios y ubicación, y pedí por WhatsApp.';
 $img = $cover ? 'https://araujotechsistemas.com' . $cover : ($logo ?: 'https://araujotechsistemas.com/img/vitrix/og.jpg');
@@ -78,10 +78,10 @@ $ini = function ($n) { $w = preg_split('/\s+/', trim($n)); $o = ''; foreach (arr
 ?><!doctype html>
 <html lang="es"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title><?= $e($name) ?> · <?= $e($seg ?: 'Santa Rita') ?> | Guía Vitrix</title>
+<title><?= $e($name) ?> · <?= $e($seg ?: 'Santa Rita') ?> | Guía de Santa Rita</title>
 <meta name="description" content="<?= $e($desc) ?>">
 <link rel="canonical" href="<?= $e($url) ?>">
-<meta property="og:type" content="business.business"><meta property="og:title" content="<?= $e($name) ?> · Guía Vitrix"><meta property="og:description" content="<?= $e($desc) ?>"><meta property="og:url" content="<?= $e($url) ?>"><meta property="og:image" content="<?= $e($img) ?>"><meta name="twitter:card" content="summary_large_image">
+<meta property="og:type" content="business.business"><meta property="og:title" content="<?= $e($name) ?> · Guía de Santa Rita"><meta property="og:description" content="<?= $e($desc) ?>"><meta property="og:url" content="<?= $e($url) ?>"><meta property="og:image" content="<?= $e($img) ?>"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/img/vitrix/vitrix-icono.png?v=4"><link rel="manifest" href="/guia/manifest.webmanifest"><link rel="apple-touch-icon" href="/guia/icon-180.png"><meta name="theme-color" content="#24093F">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
@@ -127,7 +127,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 @media (max-width:600px){.lg{width:82px;height:82px;border-radius:20px}.btn{flex:1 1 auto;justify-content:center}.bk span{display:none}.bk{padding:7px}}
 </style></head>
 <body>
-<header class="hdr"><div class="wrap nav"><a class="bk" href="/guia/" aria-label="Volver a la Guía"><?= $ic($I['back'], 18) ?><span>Guía Vitrix</span></a><span class="sp"></span><a href="/guia/" aria-label="Guía Vitrix"><img src="/img/vitrix/vitrix-blanco-nombre.png" alt="Vitrix"></a></div></header>
+<header class="hdr"><div class="wrap nav"><a class="bk" href="/guia/" aria-label="Volver a la Guía"><?= $ic($I['back'], 18) ?><span>Volver a la Guía</span></a><span class="sp"></span><a class="gsr" href="/guia/" aria-label="Guía de Santa Rita" style="display:flex;align-items:center;gap:9px;text-decoration:none;color:#fff"><span style="width:32px;height:32px;border-radius:10px;background:#FFC21A;color:#24093F;display:grid;place-items:center;flex:none"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span><span style="display:flex;flex-direction:column;line-height:1"><b style="font-family:'Red Hat Display',system-ui,sans-serif;font-weight:900;font-size:17px;letter-spacing:-.01em;white-space:nowrap">Guía de <span style="color:#FFC21A">Santa Rita</span></b><small style="display:flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:#D9C9F2;margin-top:4px">por <img src="/img/vitrix/vitrix-blanco-nombre.png" alt="Vitrix" style="height:15px;width:auto;display:block"></small></span></a></div></header>
 <section class="hero"><?php if ($cover): ?><img class="cv" src="<?= $e($cover) ?>" alt="" onerror="this.remove()"><?php endif; ?>
 <div class="wrap">
 <span class="lg"><?php if ($logo): ?><img src="<?= $e($logo) ?>" alt="Logo de <?= $e($name) ?>"><?php else: ?><b><?= $e($ini($name)) ?></b><?php endif; ?></span>
@@ -139,7 +139,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <a class="btn pri" href="<?= $e($catUrl) ?>"><?= $ic($I['cat']) ?><span data-pt="Ver catálogo e pedir">Ver catálogo y pedir</span></a>
 <?php if ($waUrl): ?><a class="btn wa" href="<?= $e($waUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['wa']) ?>WhatsApp</a><?php endif; ?>
 <a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?><span data-pt="Como chegar">Cómo llegar</span></a>
-<?php if (empty($st['delivery']) && empty($st['paused'])): /* o negócio não tem entrega própria: a Tu Delivery busca e leva */ ?><a class="btn td" id="tdb" href="<?= $e('https://wa.me/595982086171?text=' . rawurlencode('Hola Tu Delivery, quiero pedir un delivery de ' . $name . ' (lo vi en la Guía Vitrix)')) ?>" target="_blank" rel="noopener"><?= $ic($I['bike']) ?><span data-pt="Pedir com a Tu Delivery">Pedir con Tu Delivery</span></a><?php endif; ?>
+<?php if (empty($st['delivery']) && empty($st['paused'])): /* o negócio não tem entrega própria: a Tu Delivery busca e leva */ ?><a class="btn td" id="tdb" href="<?= $e('https://wa.me/595982086171?text=' . rawurlencode('Hola Tu Delivery, quiero pedir un delivery de ' . $name . ' (lo vi en la Guía de Santa Rita)')) ?>" target="_blank" rel="noopener"><?= $ic($I['bike']) ?><span data-pt="Pedir com a Tu Delivery">Pedir con Tu Delivery</span></a><?php endif; ?>
 <button class="btn" type="button" id="sh"><?= $ic($I['share']) ?><span data-pt="Compartilhar">Compartir</span></button>
 </div>
 <?php if ($prods): ?><section class="sec"><h2><?= $ic($I['cat'], 22) ?><span data-pt="Produtos em destaque">Productos destacados</span></h2><div class="pg">
@@ -158,13 +158,13 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <section class="sec"><h2><?= $ic($I['pin'], 22) ?><span data-pt="Localização">Ubicación</span></h2><div class="box"><p><?= $e($addr ?: ($city ?: 'Santa Rita') . ', Alto Paraná') ?></p>
 <iframe class="map" title="Mapa de <?= $e($name) ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=<?= rawurlencode($mapQ) ?>&amp;z=<?= $hasGeo ? 16 : 15 ?>&amp;output=embed"></iframe>
 <p style="margin-top:10px"><a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?><span data-pt="Abrir no Google Maps">Abrir en Google Maps</span></a></p></div></section>
-<section class="cta"><div><b data-pt="Mais negócios de Santa Rita">Más negocios de Santa Rita</b><p data-pt="Ofertas, farmácia de plantão, ônibus e tudo o que é útil na cidade.">Ofertas, farmacia de turno, ómnibus y todo lo útil de la ciudad.</p></div><a href="/guia/" data-pt="Abrir a Guia Vitrix">Abrir la Guía Vitrix</a></section>
+<section class="cta"><div><b data-pt="Mais negócios de Santa Rita">Más negocios de Santa Rita</b><p data-pt="Ofertas, farmácia de plantão, ônibus e tudo o que é útil na cidade.">Ofertas, farmacia de turno, ómnibus y todo lo útil de la ciudad.</p></div><a href="/guia/" data-pt="Abrir a Guia de Santa Rita">Abrir la Guía de Santa Rita</a></section>
 </main>
-<footer><div class="wrap"><span data-pt="Guia Vitrix · Uma iniciativa de">Guía Vitrix · Una iniciativa de</span> <a href="/">Araújo Tech Sistemas</a> <span data-pt="e">y</span> Tu Delivery</div></footer>
+<footer><div class="wrap"><span data-pt="Guia de Santa Rita · Uma iniciativa de">Guía de Santa Rita · Una iniciativa de</span> <a href="/">Araújo Tech Sistemas</a> <span data-pt="e">y</span> Tu Delivery</div></footer>
 <script>try{if(localStorage.getItem('at_lang')==='pt'){document.documentElement.lang='pt';document.querySelectorAll('[data-pt]').forEach(function(e){e.textContent=e.getAttribute('data-pt')})}}catch(e){}</script>
 <script>
 (function(){var b=document.getElementById('tdb');if(b)b.addEventListener('click',function(){try{if(!navigator.webdriver&&navigator.sendBeacon)navigator.sendBeacon('/sitio/guia_hit.php?t=p&id=td')}catch(e){}})})();
-document.getElementById('sh').addEventListener('click',function(){var u=<?= json_encode($url) ?>,t=<?= json_encode($name . ' · Guía Vitrix') ?>;if(navigator.share){navigator.share({title:t,url:u}).catch(function(){})}else{window.open('https://wa.me/?text='+encodeURIComponent(t+' '+u),'_blank','noopener')}});
+document.getElementById('sh').addEventListener('click',function(){var u=<?= json_encode($url) ?>,t=<?= json_encode($name . ' · Guía de Santa Rita') ?>;if(navigator.share){navigator.share({title:t,url:u}).catch(function(){})}else{window.open('https://wa.me/?text='+encodeURIComponent(t+' '+u),'_blank','noopener')}});
 try{if(!navigator.webdriver){var u='/sitio/guia_hit.php?t=c&id=<?= rawurlencode($id) ?>';if(navigator.sendBeacon)navigator.sendBeacon(u);else fetch(u,{method:'POST',keepalive:true})}}catch(e){}
 </script>
 </body></html>

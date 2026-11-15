@@ -170,7 +170,7 @@ for gv in Guia GUIA guia; do gr=$(curl -sS --max-time 30 -o /dev/null -w '%{http
 nf=$(curl -sS --max-time 30 "https://araujotechsistemas.com/nao-existe-xyz/a.html" 2>/dev/null | head -c 3000 || true)
 if echo "$nf" | grep -q 'No encontramos esta página'; then ok "página de 'não encontrado' amigável"; else bad "endereço errado não mostra a página amigável"; fi
 gu=$(curl -sS --max-time 30 "https://araujotechsistemas.com/guia/" 2>/dev/null | head -c 6000 || true)
-if echo "$gu" | grep -q 'Guía Vitrix'; then ok "Guía Vitrix no ar (araujotechsistemas.com/guia/)"; else bad "araujotechsistemas.com/guia/ não abriu a Guía Vitrix"; fi
+if echo "$gu" | grep -q 'Guía de Santa Rita'; then ok "Guía de Santa Rita no ar (araujotechsistemas.com/guia/)"; else bad "araujotechsistemas.com/guia/ não abriu a Guía Vitrix"; fi
 gp=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?ids=lojastatus" 2>/dev/null | head -c 2000 || true)
 if echo "$gp" | grep -q '"lojastatus":{"days":\['; then ok "guia.php -> horários da Status para o 'Abierto ahora'"; else bad "guia.php -> resposta inesperada: $(echo "$gp" | head -c 160)"; fi
 gg=$(curl -sS --max-time 40 "https://araujotechsistemas.com/sitio/guia.php?g=1" 2>/dev/null | head -c 3000 || true)
