@@ -20,6 +20,15 @@ function guia_doc() {
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
+// horário por dia de uma ficha simples (mesmo formato do catálogo: 7 dias, domingo = 0)
+function guia_dy($dy) {
+  if (!is_array($dy) || count($dy) !== 7) return null;
+  $ok = function ($v) { return preg_match('/^\d{2}:\d{2}$/', (string)$v) ? (string)$v : ''; }; $o = []; $any = false;
+  foreach (array_values($dy) as $d) { $d = is_array($d) ? $d : []; $a = (array)($d['a'] ?? []); $b = (array)($d['b'] ?? []);
+    $x = ['on' => !empty($d['on']), 'a' => [$ok($a[0] ?? ''), $ok($a[1] ?? '')], 'b' => [$ok($b[0] ?? ''), $ok($b[1] ?? '')]];
+    if ($x['on'] && $x['a'][0] !== '' && $x['a'][1] !== '') $any = true; $o[] = $x; }
+  return $any ? $o : null;
+}
 function guia_pub() {
   $d = guia_doc();
   $now = new DateTime('now', new DateTimeZone('America/Asuncion')); $day = $now->format('Y-m-d');
@@ -78,7 +87,7 @@ function guia_pub() {
     $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
     $m = (string)($x['map'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $m)) $m = '';
     $g = (string)($x['g'] ?? 'serv'); if (!in_array($g, ['food', 'shop', 'health', 'home', 'car', 'serv'], true)) $g = 'serv';
-    $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'td' => !empty($x['td']), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : ''];
+    $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'td' => !empty($x['td']), 'dy' => guia_dy($x['dy'] ?? null), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : ''];
     if (count($dir) >= 300) break;
   }
   return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 8), 'dir' => $dir, 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
