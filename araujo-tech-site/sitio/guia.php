@@ -49,6 +49,36 @@ if (isset($_GET['top'])) { // 'Lo más buscado': as buscas da Guía com resultad
   }
   header('Cache-Control: public, max-age=900'); echo json_encode(['q' => $o], JSON_UNESCAPED_UNICODE); exit;
 }
+if (isset($_GET['hoy'])) { // 'Hoy en Santa Rita': clima (MET Norway) e câmbio de referência (ExchangeRate-API), buscados pelo servidor e guardados em cache
+  $get = function ($url) { if (!function_exists('curl_init')) return null; $c = curl_init($url); curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8, CURLOPT_CONNECTTIMEOUT => 4, CURLOPT_ENCODING => '', CURLOPT_USERAGENT => 'GuiaVitrix/1.0 (https://araujotechsistemas.com/guia/)']); $r = curl_exec($c); $code = curl_getinfo($c, CURLINFO_HTTP_CODE); return ($r !== false && $code === 200) ? $r : null; };
+  // $fresh = tempo em que não busca de novo; $stale = até quando o dado velho ainda pode ser mostrado se a fonte falhar
+  $cached = function ($name, $fresh, $stale, $make) { $f = sys_get_temp_dir() . '/at_hoy_' . $name . '.json'; $old = is_file($f) ? json_decode((string)@file_get_contents($f), true) : null; $age = is_file($f) ? time() - filemtime($f) : PHP_INT_MAX;
+    if (is_array($old) && $age < $fresh) return $old;
+    if ($age < 120 && $old === false) return null; // falhou há pouco: não insiste a cada visita
+    $new = $make(); if (is_array($new)) { @file_put_contents($f, json_encode($new)); return $new; }
+    if (is_array($old) && $age < $stale) return $old;
+    if (!is_array($old)) @file_put_contents($f, 'false');
+    return null; };
+  $tz = new DateTimeZone('America/Asuncion');
+  $w = $cached('w', 1800, 3 * 3600, function () use ($get, $tz) {
+    $j = json_decode((string)$get('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-25.79&lon=-55.08'), true); $ts = $j['properties']['timeseries'] ?? null; if (!is_array($ts) || !$ts) return null;
+    $now = time(); $cur = null; $mx = null; $mn = null; $rain = 0.0;
+    foreach ($ts as $e) { $t = strtotime((string)($e['time'] ?? '')); $v = $e['data']['instant']['details']['air_temperature'] ?? null; if (!$t || !is_numeric($v)) continue;
+      if ($t < $now - 3600 || $t > $now + 24 * 3600) continue;
+      if ($cur === null) $cur = ['t' => (float)$v, 'c' => (string)($e['data']['next_1_hours']['summary']['symbol_code'] ?? ($e['data']['next_6_hours']['summary']['symbol_code'] ?? ''))];
+      $mx = $mx === null ? (float)$v : max($mx, (float)$v); $mn = $mn === null ? (float)$v : min($mn, (float)$v);
+      $pr = $e['data']['next_1_hours']['details']['precipitation_amount'] ?? null; if (is_numeric($pr)) $rain += (float)$pr; }
+    if ($cur === null || $cur['t'] < -10 || $cur['t'] > 55 || !preg_match('/^[a-z_]{0,40}$/', $cur['c'])) return null;
+    return ['t' => (int)round($cur['t']), 'c' => $cur['c'], 'max' => (int)round($mx), 'min' => (int)round($mn), 'rain' => round($rain, 1), 'at' => (new DateTime('now', $tz))->format('H:i')];
+  });
+  $fx = $cached('fx', 6 * 3600, 48 * 3600, function () use ($get, $tz) {
+    $j = json_decode((string)$get('https://open.er-api.com/v6/latest/USD'), true); if (($j['result'] ?? '') !== 'success') return null;
+    $pyg = $j['rates']['PYG'] ?? null; $brl = $j['rates']['BRL'] ?? null; if (!is_numeric($pyg) || !is_numeric($brl) || $pyg < 3000 || $pyg > 30000 || $brl < 1 || $brl > 30) return null;
+    $u = (int)($j['time_last_update_unix'] ?? 0);
+    return ['usd' => (int)(round($pyg / 10) * 10), 'brl' => (int)round($pyg / $brl), 'd' => (new DateTime('@' . ($u > 1600000000 ? $u : time())))->setTimezone($tz)->format('Y-m-d')];
+  });
+  header('Cache-Control: public, max-age=600'); echo json_encode(['w' => $w, 'fx' => $fx]); exit;
+}
 if (isset($_GET['news'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_news(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }
 if (isset($_GET['g'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_pub(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; } // banners pagos e lugares públicos
 $out = [];
