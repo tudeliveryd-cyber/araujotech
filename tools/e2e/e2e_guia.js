@@ -241,6 +241,28 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(!out.xlg, 'logo de endereço desconhecido não é mostrado');
   check(out.del.includes('Pizzería Aliada') && !out.del.includes('Almacén Común'), 'filtro "Con delivery" inclui os aliados Tu Delivery');
   check(!gr3.errs.length, 'Guía sem erros de JavaScript (aliado)', gr3.errs.join(' | '));
+  sec('O. Não perder o que foi preenchido; localização');
+  await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(3000);
+  const fi = await a.evaluate(() => ui.gu.dir.findIndex(x => x.n === 'Boi'));
+  await a.fill(`[data-gu="dir.${fi}.wa"]`, '0981 555 111'); await a.w(300);
+  await a.evaluate(() => document.querySelector('.sheet [data-act="close"]').click()); await a.w(3000);
+  d = await doc();
+  check(((d.gdir || []).find(x => x.n === 'Boi') || {}).wa === '0981 555 111', 'fechar a janela com mudanças salva sozinho');
+  await a.act('gusite'); await a.w(3000);
+  await a.fill(`[data-gu="dir.${fi}.wa"]`, '0981 777 222'); await a.w(1500);
+  check(await a.evaluate(() => { try { return /0981 777 222/.test(localStorage.getItem('at_gu_draft') || '') } catch (e) { return false } }), 'o que se digita fica guardado no aparelho enquanto não salva');
+  await a.reload(); await a.w(4000);
+  if (await a.locator('#lg_user').count()) { await a.fill('#lg_user', ADM[0]); await a.fill('#lg_pass', ADM[1]); await a.press('#lg_pass', 'Enter'); await a.w(5000); }
+  await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(3000);
+  check(await a.locator('.gu-rec').count() === 1 && await a.locator(`[data-gu="dir.${fi}.wa"]`).inputValue() === '0981 777 222', 'depois de recarregar, a Guía recupera o que não foi salvo e avisa');
+  await a.act('gudraftx'); await a.w(3000);
+  check(await a.locator('.gu-rec').count() === 0 && await a.locator(`[data-gu="dir.${fi}.wa"]`).inputValue() === '0981 555 111', '"Descartar" volta ao que estava salvo');
+  await a.context().grantPermissions(['geolocation'], { origin: 'https://araujotechsistemas.com' }); await a.context().setGeolocation({ latitude: -25.7912, longitude: -55.0871 });
+  await a.act('gudirgps', `[data-i="${fi}"]`); await a.w(1500);
+  check(await a.locator(`[data-gu="dir.${fi}.map"]`).inputValue() === 'https://www.google.com/maps?q=-25.791200,-55.087100', '"Usar mi ubicación" preenche o link do mapa com a posição do celular');
+  check(/maps\/search\/\?api=1&query=Boi/.test(await a.locator('.gu-loc a').nth(fi).getAttribute('href').catch(() => '')) || (await a.locator('.gu-loc a[href*="query=Boi"]').count()) === 1, '"Buscar en Maps" abre a busca pelo nome do negócio em Santa Rita');
+  await a.act('gusave'); await a.w(2500); d = await doc();
+  check(/maps\?q=-25\.791200/.test(((d.gdir || []).find(x => x.n === 'Boi') || {}).map || ''), 'localização salva');
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
