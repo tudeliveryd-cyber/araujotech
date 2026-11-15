@@ -165,11 +165,14 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   await a.locator(`input[data-gu="dir.${di}.td"]`).check(); await a.w(400);
   check(await a.locator(`label[for="gu_dir.${di}.wa"]`).innerText().then(x => /pedidos/.test(x)), 'marcar "Cliente Tu Delivery" troca o rótulo: WhatsApp do negócio recebe os pedidos');
   await a.fill(`[data-gu="dir.${di}.wa"]`, '0981 123 456'); await a.fill(`[data-gu="dir.${di}.ig"]`, 'https://www.instagram.com/pizzeria.aliada/');
+  await a.fill(`[data-gu="dir.${di}.mu"]`, 'http://sem-https.test/menu'); await a.act('gusave'); await a.w(1200);
+  check(!((await doc()).gdir || []).some(x => x.n === 'Pizzería Aliada'), 'link do menú sem https não deixa salvar');
+  await a.fill(`[data-gu="dir.${di}.mu"]`, 'https://pizzeria.test/menu'); await a.locator(`select[data-gu="dir.${di}.mt"]`).selectOption('menu');
   await a.locator(`input[data-gudirlogo="${di}"]`).setInputFiles(img); await a.w(1500);
   check(await a.evaluate((i) => /^data:image\/jpeg/.test(ui.gu.dir[i].lg), di), 'logo carregado e reduzido (JPEG)');
   await a.act('gusave'); await a.w(2500);
   d = await doc(); const al = (d.gdir || []).find(x => x.n === 'Pizzería Aliada'); info(JSON.stringify(al && { ...al, lg: al.lg && al.lg.slice(0, 30) }));
-  check(al && al.td === true && al.ig === 'pizzeria.aliada' && al.wa === '0981 123 456' && /^data:image\/jpeg/.test(al.lg) && al.lg.length < 20000, 'aliado salvo com selo, Instagram limpo, WhatsApp e logo pequeno');
+  check(al && al.td === true && al.ig === 'pizzeria.aliada' && al.wa === '0981 123 456' && /^data:image\/jpeg/.test(al.lg) && al.lg.length < 20000 && al.mu === 'https://pizzeria.test/menu' && al.mt === 'menu', 'aliado salvo (com link do menú) com selo, Instagram limpo, WhatsApp e logo pequeno');
   check((d.gdir || []).filter(x => x.n !== 'Pizzería Aliada').every(x => !x.td), 'as outras fichas continuam como ficha simples');
   await a.evaluate(() => { ui.gu.dir = ui.gu.dir.filter(x => !x.td); guSheet(); }); await a.w(300);
   check(await a.locator('[data-act="gutdseed"]').count() === 1, 'sem aliados ainda: aparece o botão "Cargar clientes Tu Delivery"');
@@ -204,6 +207,9 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(qa.de === 'Chipa Teste' && qa.al === 'Almuerzo Teste' && qa.me === 'Chipa Teste' && /Pizza Noche/.test(qa.ce) && /Almuerzo Teste/.test(qa.ce) && !/Chipa/.test(qa.ce), '"¿Qué comer ahora?" mostra cada negócio só nos turnos marcados');
   check(qa.sel === qa.now && qa.click === 'ce', 'abre no turno da hora atual e troca ao tocar');
   check(/Almuerzo · Cena/.test(qa.meta), 'o cartão mostra os turnos do negócio');
+  const mn = await gr3.evaluate(() => { G.dir = [{ id: 'm1', n: 'Con Menu', g: 'food', td: true, wa: '0981000001', mt: 'menu', mu: 'https://menu.test/carta.pdf' }, { id: 'm2', n: 'Con Cat', g: 'shop', td: true, wa: '0981000002', mt: 'cat', mu: 'https://tienda.test/' }, { id: 'm3', n: 'Malo', g: 'food', td: true, mu: 'javascript:alert(1)' }]; CAT = 'all'; render(); const f = n => { const c = [...document.querySelectorAll('.card.dir')].find(x => x.querySelector('h3').textContent === n); return c ? [...c.querySelectorAll('.dact a')].map(a => a.textContent.trim() + '>' + a.getAttribute('href')).join('|') : '' }; return { m: f('Con Menu'), c: f('Con Cat'), x: f('Malo') }; });
+  info(JSON.stringify(mn));
+  check(/Ver menú>https:\/\/menu\.test\/carta\.pdf/.test(mn.m) && /Ver catálogo>https:\/\/tienda\.test\//.test(mn.c) && !/javascript/.test(mn.x) && !/Ver menú/.test(mn.x), 'botão Ver menú / Ver catálogo abre o link do negócio (link inválido não aparece)');
   check(out.order.indexOf('Pizzería Aliada') < out.order.indexOf('Almacén Común'), 'aliado Tu Delivery aparece antes das outras fichas da categoria');
   check(/Recomendado/.test(out.pseal) && /Entrega Tu Delivery/.test(out.pseal), 'aliado mostra os selos Recomendado e Entrega Tu Delivery');
   check(out.pord === 'https://wa.me/595981123456?text=' + encodeURIComponent('Hola, vi tu negocio en la Guía Vitrix y quiero hacer un pedido'), '"Pedir por WhatsApp" vai direto ao WhatsApp do negócio com a mensagem da Guía');
