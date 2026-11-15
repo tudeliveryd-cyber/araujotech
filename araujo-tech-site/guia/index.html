@@ -24,7 +24,7 @@ a{color:inherit}
 .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
 .hdr{color:#fff;background:var(--night)}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;height:68px}
-.brand img{height:34px;width:auto;display:block}.nav>a.bk{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:14px;font-weight:700;padding:7px 12px 7px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.35)}.nav>a.bk svg{width:18px;height:18px}.nav>a.bk+.brand{margin-right:auto;margin-left:14px}
+.brand{display:flex;align-items:center;text-decoration:none}.brand img{height:30px;width:auto;display:block}.bguia{font-family:var(--display);font-weight:900;font-size:19px;line-height:1;color:var(--yellow);margin-left:11px;padding-left:11px;border-left:1.5px solid rgba(255,255,255,.35);letter-spacing:-.01em}.nav>a.bk{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:14px;font-weight:700;padding:7px 12px 7px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.35)}.nav>a.bk svg{width:18px;height:18px}.nav>a.bk+.brand{margin-right:auto;margin-left:14px}
 .right{display:flex;align-items:center;gap:10px}
 .back{font-size:15px;font-weight:500;text-decoration:none;opacity:.85}.back:hover{opacity:1}
 .lang{display:flex;padding:2px;border-radius:999px;border:1px solid rgba(255,255,255,.4);font-size:12px;font-weight:700}
@@ -194,12 +194,11 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
 </style></head>
 <body>
 <header class="hdr"><div class="wrap nav">
- <a class="bk" href="../" id="bk" aria-label="Volver al sitio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span data-t="bk">Volver</span></a><a class="brand" href="../" aria-label="Araújo Tech Sistemas"><img src="../img/logo-blanco.png" alt="Araújo Tech Sistemas"></a>
+ <a class="bk" href="../" id="bk" aria-label="Volver al sitio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span data-t="bk">Volver</span></a><a class="brand" href="/guia/" aria-label="Guía Vitrix"><img src="../img/vitrix/vitrix-blanco-nombre.png" alt="Vitrix" width="122" height="38"><span class="bguia">Guía</span></a>
  <div class="right"><a class="back" href="../vitrix/" data-t="what">¿Qué es Vitrix?</a><button class="shb" id="share" type="button" aria-label="Compartir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="m8.3 10.8 7.4-4.4M8.3 13.2l7.4 4.4"/></svg></button><div class="lang" role="group" aria-label="Idioma"><button data-lang="es">ES</button><button data-lang="pt">PT</button></div></div>
 </div></header>
 <section class="hero"><div class="wrap">
- <img class="vx" src="../img/vitrix/vitrix-blanco-nombre.png" alt="Vitrix">
- <h1 data-th="h1"></h1>
+  <h1 data-th="h1"></h1>
  <p data-t="sub"></p>
  <div class="sl" id="sl" hidden role="region" aria-roledescription="carrusel" tabindex="0"></div><div class="sl-dt" id="sld"></div>
  <label class="srch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" autocomplete="off" aria-label="Buscar"></label>
