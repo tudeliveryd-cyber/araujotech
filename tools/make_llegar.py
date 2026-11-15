@@ -100,7 +100,7 @@ T.append(dict(id='ayuda', ic='help', es='Quién te puede ayudar', pt='Quem pode 
  bpt='''<p>Muitos trâmites dá para fazer sozinho, mas um profissional da cidade poupa viagens e erros:</p>
 <ul><li><b>Gestor de documentos (despachante):</b> radicação, cédula, antecedentes e apostilas.</li><li><b>Escrivão ("escribano") e advogado:</b> contratos, compra de imóveis e procurações.</li><li><b>Contador:</b> abrir empresa, RUC e emissão de notas.</li><li><b>Imobiliária:</b> aluguel e compra com contrato.</li><li><b>Eletricista credenciado na ANDE:</b> ligação nova.</li></ul>
 <p>Na Guia, a seção <b>Profissionais</b> mostra os que atendem em Santa Rita, com WhatsApp direto. Peça sempre orçamento por escrito e recibo do que pagar.</p>''',
- links=[gl('/guia/', 'Buscar profesionales en la Guía', 'Buscar profissionais na Guia'), gl('/guia/aparecer/', '¿Sos profesional? Aparecé acá', 'É profissional? Apareça aqui')]))
+ links=[gl('/guia/', 'Buscar profesionales en la Guía', 'Buscar profissionais na Guia'), gl('/guia/negocios/', '¿Sos profesional? Aparecé acá', 'É profissional? Apareça aqui')]))
 
 def sec(i, t):
     return ('<section class="tp" id="%s"><h2><span class="ti">%s</span><span><small>%d</small><span data-l="es">%s</span><span data-l="pt">%s</span></span></h2>'
