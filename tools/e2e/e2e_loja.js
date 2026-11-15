@@ -54,6 +54,10 @@ const VT = () => { window.TDC_VTEST = true; };
   const od = docs.find(d => d.name === 'Cliente Camino');
   check(!!od, 'o pedido feito no domínio principal chega à loja', od ? 'Nº ' + od.no : (await c.txt('.sheet')).slice(0, 200));
 
+  sec('D. "Días en que aparece" só vale para comida');
+  const dz = await c.evaluate(() => { const r0 = pub.store.ramo; const nf = (typeof RAMOS !== 'undefined' ? RAMOS : []).find(x => !x.food); const f0 = (typeof RAMOS !== 'undefined' ? RAMOS : []).find(x => x.food); const nunca = { days: [9] }; pub.store.ramo = f0 && f0.id; const food = availDay(nunca); pub.store.ramo = nf && nf.id; const loja = availDay(nunca); pub.store.ramo = r0; return { nf: nf && nf.id, f0: f0 && f0.id, food, loja }; });
+  info(JSON.stringify(dz));
+  check(dz.nf && dz.f0 && dz.food === false && dz.loja === true, 'em restaurante o produto some fora dos dias marcados; em loja aparece sempre');
   sec('C. A Guía e o site levam a este endereço');
   const G = await L.open({ w: 390 }); const g = G.p;
   await g.goto('https://araujotechsistemas.com/guia/'); await g.w(1500);
