@@ -4,7 +4,7 @@
 function guia_doc() {
   $cache = sys_get_temp_dir() . '/at_guia7.json';
   if (is_file($cache) && time() - filemtime($cache) < 180) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gadsAt');
+  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -183,7 +183,7 @@ function guia_pub() {
     $dir[] = ['id' => 'f' . $x['uid'], 'n' => $x['n'], 'g' => in_array($x['g'], ['food', 'shop', 'health', 'home', 'car', 'serv'], true) ? $x['g'] : 'serv', 'd' => mb_substr(preg_split('/\R/', $x['d'])[0], 0, 60), 'tel' => $x['tel'], 'wa' => $x['wa'], 'a' => $x['a'], 'map' => $x['map'], 'hrs' => mb_substr($x['hrs'], 0, 80), 'ig' => $x['ig'], 'td' => false, 'dy' => null, 'mt' => 'menu', 'mu' => '', 'web' => $x['web'], 'tu' => [], 'lg' => $x['lg'], 'ph' => $x['ph'], 'acc' => 1];
   }
   $clas = []; // clasificados e inmuebles publicados pela Guía (só os ativos e dentro da data)
-  foreach (array_slice((array)($d['gclas'] ?? []), 0, 15) as $x) {
+  foreach (array_slice((array)($d['gclas'] ?? []), 0, 40) as $x) { // até 15 com foto (painel) + aprovados sem conta
     if (!is_array($x) || empty($x['on'])) continue; $u = (string)($x['until'] ?? ''); $wa = preg_replace('/\D/', '', (string)($x['wa'] ?? '')); $t = trim((string)($x['t'] ?? ''));
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $u) || $u < $day || strlen($wa) < 8 || mb_strlen($t) < 3) continue;
     $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;

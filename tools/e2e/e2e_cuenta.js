@@ -1,5 +1,5 @@
 // Guía de Santa Rita: contas próprias (igrejas, ONGs, escolas, clubes, negócios sem Vitrix) e opiniões do público.
-// Regras v16 (gfichas com avisos grátis, gresenas), a página /cuenta/ (cadastro, confirmação de e-mail, ficha, opinião, moderação),
+// Regras v17 (gfichas com avisos grátis, gresenas, gsub = publicar sem conta), a página /cuenta/ (cadastro, confirmação de e-mail, ficha, opinião, moderação),
 // o servidor (guia_lib.php lê só o aprovado) e a Guía (nota e "Opinar" nos cards).
 const L = require('./lib'); const P = 'araujotech-catalogos';
 const { sec, check, info } = L; const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
@@ -185,6 +185,42 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   check(out2.jobs.some(j => j.t === 'Ayudante de cocina' && j.co.n === 'Juan Pérez'), 'a vaga sai em Empleos');
   check(!out2.dir.some(x => x.n === 'Juan Pérez'), 'conta só de avisos não vira ficha no diretório');
   await g.evaluate(o => { G.clas = o; go('cla'); }, out2.clas); await g.w(400);
-  check(/Perdidos y encontrados/.test(await g.txt()) && /Se encontró/.test(await g.txt()) && await g.locator('a.jbp[href*="cuenta/?t=avisos"]').count() >= 1, 'Guía: aviso com o tipo certo e botão "Publicar gratis"');
+  check(/Perdidos y encontrados/.test(await g.txt()) && /Se encontró/.test(await g.txt()) && await g.locator('a.jbp[href*="cuenta/?publicar=cla"]').count() >= 1, 'Guía: aviso com o tipo certo e botão "Publicar gratis"');
+
+  sec('J. Publicar sem conta (regras v17): qualquer pessoa envia, só o admin vê e aprova');
+  const S = o => L.fields(Object.assign({ tp: 'cla', k: 'per', op: 'enc', t: 'Documento encontrado', d: 'Encontré una cédula cerca del banco.', wa: '595981444555', until: tomorrow(7), at: '2026-11-16T13:00:00Z', st: 'pend', l: 'es' }, o));
+  check(st(await L.fsReq(P, 'POST', 'gsub', null, S({ st: 'ok' }))) === 403, 'pedido sem conta não nasce aprovado');
+  check(st(await L.fsReq(P, 'POST', 'gsub', null, S({ x: 'y' }))) === 403, 'campo desconhecido é recusado');
+  check(st(await L.fsReq(P, 'POST', 'gsub', null, S({ d: 'x'.repeat(800) }))) === 403, 'texto grande demais é recusado');
+  check(st(await L.fsReq(P, 'POST', 'gsub', null, S({}))) === 200, 'qualquer pessoa, sem login, envia um pedido em revisão');
+  check(st(await L.fsReq(P, 'GET', 'gsub', null)) === 403 && st(await L.fsReq(P, 'GET', 'gsub', b.tok)) === 403, 'ninguém além do admin lê os pedidos');
+  const E = await L.open({ w: 390 }); const e = E.p;
+  await e.goto('https://araujotechsistemas.com/cuenta/?publicar=job'); await e.w(2500);
+  check(/Publicar gratis en la Guía/.test(await e.txt()) && await e.locator('#fau').count() === 0, 'abre o formulário direto, sem pedir login');
+  await e.fill('#pb_t', 'Cajera'); await e.fill('#pb_d', 'Turno tarde, con experiencia.'); await e.fill('#pb_wa', '0981 777 888');
+  await e.click('#fpb button[type=submit]'); await e.w(400);
+  check(/empresa/.test(await e.txt('#am')), 'vaga sem empresa: pede o nome');
+  await e.fill('#pb_co', 'Supermercado Teste'); await e.selectOption('#pb_k', 'part');
+  await e.click('#fpb button[type=submit]'); await e.w(2500);
+  check(/Recibimos tu publicación/.test(await e.txt()), 'enviado: avisa que vai ser revisado');
+  await e.click('[data-a="pbmore"]'); await e.w(300); await e.click('[data-pt="cla"]'); await e.w(300);
+  check(await e.locator('#pb_k').inputValue() === 'per' && await e.locator('#pb_op').inputValue() === 'perd', 'aviso começa em Perdidos y encontrados');
+  await e.selectOption('#pb_op', 'enc'); await e.fill('#pb_t', 'Llaves encontradas'); await e.fill('#pb_d', 'Llavero azul en la plaza central.'); await e.fill('#pb_wa', '0981777888');
+  await e.click('#fpb button[type=submit]'); await e.w(2500);
+  check(e.errs.length === 0, 'formulário sem erros de JavaScript', e.errs.join(' | '));
+  const subs = ((await L.fsReq(P, 'GET', 'gsub?pageSize=50', 'owner')).json.documents || []).map(x => L.unfields(x));
+  check(subs.some(x => x.tp === 'job' && x.co === 'Supermercado Teste' && x.k === 'part' && x.wa === '0981777888') && subs.some(x => x.tp === 'cla' && x.t === 'Llaves encontradas' && x.op === 'enc'), 'os dois pedidos chegaram em revisão');
+  await e.goto('https://araujotechsistemas.com/cuenta/'); await e.w(2000);
+  await e.fill('#ae', ADM[0]); await e.fill('#ap', ADM[1]); await e.click('#fau button[type=submit]'); await e.w(3500);
+  check(/Publicaciones sin cuenta/.test(await e.txt()) && await e.locator('[data-sid]').count() === 3, 'admin vê os 3 pedidos sem conta');
+  await e.locator('[data-sid]', { hasText: 'Cajera' }).locator('[data-sok]').click(); await e.w(2000);
+  await e.locator('[data-sid]', { hasText: 'Llaves encontradas' }).locator('[data-sok]').click(); await e.w(2000);
+  e.autoDialog = true; await e.locator('[data-sid]', { hasText: 'Documento encontrado' }).locator('[data-sno]').click(); await e.w(2000);
+  const sitio = L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json) || {};
+  check((sitio.gjobs || []).some(j => j.t === 'Cajera' && j.co === 'Supermercado Teste' && j.k === 'part' && j.on) && (sitio.gclas || []).some(c => c.t === 'Llaves encontradas' && c.k === 'per' && c.op === 'enc' && c.on), 'aprovar publica a vaga e o aviso na Guía (platform/sitio)');
+  check(((await L.fsReq(P, 'GET', 'gsub?pageSize=50', 'owner')).json.documents || []).length === 0, 'aprovados e recusado saem da fila');
+  const out3 = JSON.parse(cp.execFileSync('php', ['-r', "require 'prods_lib.php'; require 'guia_lib.php'; $p = guia_pub(); echo json_encode(['clas' => $p['clas'], 'jobs' => guia_jobs(false)]);"], { cwd: path.join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gacc3-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }), timeout: 40000 }).toString());
+  check(out3.jobs.some(j => j.t === 'Cajera' && j.co.n === 'Supermercado Teste') && out3.clas.some(c => c.t === 'Llaves encontradas' && c.k === 'per'), 'servidor mostra a vaga e o aviso aprovados');
+  check(e.errs.length === 0, 'moderação sem erros de JavaScript', e.errs.join(' | '));
   await L.done();
 })().catch(async e => { console.error(e); L.bad('erro: ' + e.message); await L.done(); });
