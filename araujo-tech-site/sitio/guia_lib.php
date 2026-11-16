@@ -196,7 +196,7 @@ function guia_pub() {
   $atl = []; // accesos da portada, na ordem do painel
   foreach (array_slice((array)($d['gatl'] ?? []), 0, 16) as $x) { if (!is_array($x)) continue; $k = (string)($x['k'] ?? ''); if (!in_array($k, ['all', 'gas', 'del', 'em', 'sal', 'far', 'igl', 'edu', 'tra', 'ev', 'job', 'mas', 'q', 'p'], true)) continue;
     $atl[] = ['k' => $k, 'es' => mb_substr(trim((string)($x['es'] ?? '')), 0, 24), 'pt' => mb_substr(trim((string)($x['pt'] ?? '')), 0, 24), 'ic' => preg_replace('/[^a-z]/', '', (string)($x['ic'] ?? '')), 'q' => mb_substr(trim((string)($x['q'] ?? '')), 0, 60)]; }
-  return ['atl' => $atl, 'ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
+  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10), 'atl' => $atl];
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
