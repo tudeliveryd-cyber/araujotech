@@ -314,9 +314,9 @@ footer .allies{justify-content:flex-start;padding:24px 0 14px;border-bottom:1px 
 @media (max-width:899px){.bnav{background:var(--deep);border-top:0;border-radius:20px 20px 0 0;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}.bnav button{color:#D7C6F1;border-radius:14px;padding:7px 0 6px}.bnav button[aria-current]{color:#fff;background:#7A2BD0}.bnav button[aria-current]::before{display:none}}
 .sh-lang{display:flex;align-items:center;gap:8px;padding:10px 10px}.sh-lang span{flex:1;font-weight:600;color:var(--muted)}.sh-lang button{font:inherit;font-size:14px;font-weight:700;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}.sh-lang button[aria-pressed=true]{background:var(--deep);color:#fff;border-color:var(--deep)}
 
-.atl{grid-template-columns:repeat(5,minmax(0,1fr))}.atl button{min-width:0;overflow-wrap:anywhere}
-@media (max-width:420px){.atl{gap:6px}.atl button{font-size:10.5px;padding:11px 1px 9px}.atl button svg{width:28px;height:28px}}
-@media (min-width:900px){.atl{grid-template-columns:repeat(10,minmax(0,1fr))}}
+.atl{grid-template-columns:repeat(5,minmax(0,1fr))}.atl button{min-width:0;letter-spacing:-.01em}.atl button[data-a=gas],.atl button[data-a=em],.atl button[data-a=tra],.atl button[data-a=far],.atl button[data-a=all]{white-space:nowrap}
+@media (max-width:420px){.atl{gap:6px}.atl button{font-size:10px;padding:11px 0 9px}.atl button svg{width:28px;height:28px}}
+@media (min-width:900px){.atl{grid-template-columns:repeat(10,minmax(0,1fr))}.atl button{font-size:13px;padding:16px 2px 13px}}
 .fr{scroll-padding-left:16px}@media (min-width:640px){.fr{scroll-padding-left:0}}
 .tagl{white-space:nowrap}
 @media (max-width:420px){.tagl{font-size:10.5px;padding-left:10px}}
