@@ -7,6 +7,9 @@ on:
       pages:
         description: 'Páginas separadas por vírgula'
         default: '/'
+      audit:
+        description: 'Auditar os botões (1)'
+        default: ''
       local:
         description: 'Prévia: usar a página do ramo escolhido (1) em vez da publicada'
         default: ''
@@ -31,7 +34,10 @@ jobs:
         env:
           PAGES: ${{ github.event.inputs.pages }}
           LOCAL: ${{ github.event.inputs.local }}
-        run: node tools/fotos_guia.js
+          AUDIT: ${{ github.event.inputs.audit }}
+        run: |
+          node tools/fotos_guia.js
+          [ "$AUDIT" = "1" ] && node tools/auditar_guia.js || true
       - name: Guardar as fotos no ramo fotos-guia (separado do site; nada é publicado)
         run: |
           cd fotos
