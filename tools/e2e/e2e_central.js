@@ -10,6 +10,7 @@ const { sec, check, info } = L;
     'iglesia-vida': { name: 'Iglesia Vida', sys: 'pulpito', plan: '', due: day(5), status: 'suspenso', city: 'Naranjal', pays: [], created: day(-20) } };
   for (const [id, x] of Object.entries(B)) await L.fsReq(P, 'PATCH', 'billing/' + id, 'owner', L.fields(x));
   const cfgDoc = async () => L.unfields((await L.fsReq(P, 'GET', 'platform/config', 'owner')).json) || {};
+  await L.fsReq(P, 'POST', 'gsub', null, L.fields({ tp: 'job', co: 'Empresa X', t: 'Cajero', d: 'Turno mañana con experiencia.', wa: '595981000222', until: day(10), at: '2026-11-16T10:00:00Z', st: 'pend', l: 'es' }));
   const A = await L.open({ w: 1366, central: true }); const a = A.p;
   const td = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
   await a.route('**/sitio/guia_stats.php', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true, v: 50, vd: { [td]: 7 }, c: { a: 3, b: 2 }, s: { x: 10 }, k: {}, q: {}, p: { conoce: 4 }, geo: { 'Santa Rita|PY': 6, 'Asunción|PY': 3, 'Paraná|BR': 1 } }) }));
@@ -30,6 +31,9 @@ const { sec, check, info } = L;
   const geo = await a.evaluate(() => [...document.querySelectorAll('.cg-geo li')].map(li => li.querySelector('span').textContent + '=' + li.querySelector('b').textContent));
   check(geo.length === 3 && geo[0] === 'Santa Rita, Paraguay=60%' && /Brasil=10%/.test(geo[2]), 'de onde entram: lugares com porcentagem (' + geo.join(' · ') + ')');
   check(await a.locator('.cg-gu [data-act="gusite"]').count() === 1 && await a.locator('.cg-gu [data-act="cggur"]').count() === 1, 'botões Ver detalles e Actualizar na Guía');
+  const md = await a.evaluate(() => { const e = document.querySelector('.cg-mod'); return e ? e.innerText : ''; });
+  check(/1 para revisar/.test(md) && /publicaciones sin cuenta/.test(md) && await a.locator('.cg-mod a[href*="/cuenta/"]').count() === 1, 'aviso de publicações esperando revisão na visão geral');
+  check(/Últimos 7 días: 7 visitas/.test(await a.txt('.cg-gu')), 'resumo da semana com as visitas dos últimos 7 dias');
   sec('B. Navegação por todos os módulos');
   for (const k of ['cli', 'sis', 'pla', 'sub', 'fin', 'dom', 'sup', 'rep', 'usr', 'sec', 'cfg', 'home']) {
     await a.click(`.cg-nav button[data-k="${k}"]`); await a.w(300);
