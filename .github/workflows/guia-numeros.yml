@@ -21,7 +21,7 @@ jobs:
           lftp -e "
             set ftp:ssl-force true; set ftp:ssl-protect-data true;
             set ssl:verify-certificate yes; set ssl:verify-certificate/CC:40:F0:6A:08:0C:63:04:01:05:A9:20:7B:23:53:CA:60:35:A7:05 no; set ftp:passive-mode true; set net:max-retries 3; set net:timeout 30;
-            open --env-password -u \"$SITE_FTP_USERNAME\" ftp://$FTP_SERVER;
+            open --env-password -u $SITE_FTP_USERNAME ftp://$FTP_SERVER;
             cls -l sitio/datos/;
             mget -O h sitio/datos/hits-*.json;
             bye" || true
