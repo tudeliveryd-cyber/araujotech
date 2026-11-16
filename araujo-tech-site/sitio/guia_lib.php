@@ -91,10 +91,17 @@ function guia_pub() {
     $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'td' => !empty($x['td']), 'dy' => guia_dy($x['dy'] ?? null), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : '', 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&k=ph&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
     if (count($dir) >= 300) break;
   }
+  $clas = []; // clasificados e inmuebles publicados pela Guía (só os ativos e dentro da data)
+  foreach (array_slice((array)($d['gclas'] ?? []), 0, 15) as $x) {
+    if (!is_array($x) || empty($x['on'])) continue; $u = (string)($x['until'] ?? ''); $wa = preg_replace('/\D/', '', (string)($x['wa'] ?? '')); $t = trim((string)($x['t'] ?? ''));
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $u) || $u < $day || strlen($wa) < 8 || mb_strlen($t) < 3) continue;
+    $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
+    $clas[] = ['id' => $id, 'k' => in_array($x['k'] ?? '', ['inm', 'veh', 'var', 'ser'], true) ? $x['k'] : 'var', 'op' => in_array($x['op'] ?? '', ['venta', 'alq', 'na'], true) ? $x['op'] : 'na', 't' => mb_substr($t, 0, 80), 'pr' => mb_substr(trim((string)($x['pr'] ?? '')), 0, 40), 'z' => mb_substr(trim((string)($x['z'] ?? '')), 0, 60), 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 500), 'wa' => $wa, 'until' => $u, 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?c=' . $id . '&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
+  }
   $so = (array)($d['gsoc'] ?? []); $soc = []; // redes da Guía (rodapé), configuradas no painel
   $w = preg_replace('/\D/', '', (string)($so['wa'] ?? '')); if (strlen($w) >= 8) $soc['wa'] = $w;
   foreach (['fb', 'ig', 'yt', 'tt'] as $k) { $u = trim((string)($so[$k] ?? '')); if (preg_match('#^https://[^\s"\'<>]+$#i', $u)) $soc[$k] = $u; }
-  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
+  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.

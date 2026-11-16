@@ -50,7 +50,15 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   await a.act('gusave'); await a.w(2000); d = await doc();
   check((d.gjobs || []).length === 1 && d.gjobs[0].co === 'Panadería Teste' && d.gjobs[0].wa === '0981000111', 'vaga de empresa sem catálogo salva pela Guía no painel');
   await a.evaluate(() => { ui.gu.jobx = ['g:abc1234']; }); await a.act('gusave'); await a.w(1500); d = await doc();
-  check((d.gjobx || []).join() === 'g:abc1234', 'moderação: vaga ocultada fica salva'); info(JSON.stringify({ ads: (d.gads || []).length, util: (d.gutil || []).length, at: d.gadsAt }));
+  check((d.gjobx || []).join() === 'g:abc1234', 'moderação: vaga ocultada fica salva');
+  await a.act('guclsadd'); await a.evaluate(() => { const c = ui.gu.clas[ui.gu.clas.length - 1]; Object.assign(c, { t: 'Casa en alquiler', pr: 'Gs. 2.500.000', z: 'Centro', wa: '0981000444' }); }); await a.act('gusave'); await a.w(1800); d = await doc();
+  check((d.gclas || []).length === 1 && d.gclas[0].t === 'Casa en alquiler' && d.gclas[0].k === 'inm' && d.gclas[0].wa === '0981000444', 'clasificado/inmueble salvo pelo painel');
+  await a.w(1500); const osm = await a.evaluate(() => [...document.querySelectorAll('[data-act="guosmadd"]')].length); check(osm >= 10, 'painel lista lugares sugeridos pelo mapa aberto para aprovar (' + osm + ')');
+  const u0 = await a.evaluate(() => ui.gu.util.length); await a.act('guosmadd'); const u1 = await a.evaluate(() => ui.gu.util.length);
+  check(u1 === u0 + 1 && await a.evaluate(() => /google\.com\/maps\?q=-25\./.test(ui.gu.util[ui.gu.util.length - 1].map)), 'aprovar uma sugestão do mapa adiciona o lugar com a localização');
+  await a.evaluate(() => { ui.gu.util.pop(); });
+  const js = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); closeSheet(); ui.jobs = null; acts.jobopen(); await W(50); const r = {}; acts.jobadd(); await W(30); r.f = document.querySelectorAll('[data-jb^="0."]').length; Object.assign(ui.jobs[0], { t: 'Vendedor', d: 'Atención en el salón de ventas', wa: '0981999888' }); acts.jobsave(); await W(50); r.saved = (pub.jobs || []).length === 1 && pub.jobs[0].t === 'Vendedor' && pub.jobs[0].wa === '0981999888'; applyBoth(p => { delete p.jobs }); return r; });
+  check(js.f >= 9 && js.saved, 'painel do negócio: publicar vaga (formulário completo e salva no catálogo)'); info(JSON.stringify({ ads: (d.gads || []).length, util: (d.gutil || []).length, at: d.gadsAt }));
   check((d.gads || []).length === 1 && d.gads[0].u === 'https://example.com/promo' && d.gads[0].to === '2026-12-31' && d.gads[0].on === true, 'banner salvo com link, data e ativo');
   check((d.gutil || []).length === n0 + 1 && d.gutil[0].tel === '061 000 000' && d.gutil[n0].c === 'ocio', 'lugares salvos com telefone e tipo');
   check((d.clientes || []).length === 1, 'os clientes da vitrine continuam lá');
@@ -312,6 +320,8 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     document.querySelector('[data-ja="coc"]').click(); await W(20); r.f = [...document.querySelectorAll('.jb-t b')].map(b => b.textContent);
     goHome(); render(); for (const k of ['igl', 'edu']) { document.querySelector('#atl [data-a="' + k + '"]').click(); await W(30); r[k] = (document.querySelector('.spv h2') || {}).textContent || ''; r[k + 'n'] = document.querySelectorAll('.spv .pc').length; goHome(); render(); }
     r.pub = document.querySelectorAll('#cats [data-pk]').length; document.querySelector('#cats [data-pk="fin"]').click(); await W(30); r.fin = document.querySelectorAll('.spv .pc').length; r.sug = !!document.querySelector('.spv .sug2 a[href*="wa.me"]');
+    const C0 = G.clas; G.clas = [{ id: 'c1', k: 'inm', op: 'alq', t: 'Casa en alquiler', pr: 'Gs. 2.500.000', z: 'Centro', d: '3 dormitorios', wa: '595981000444', until: day(20), ph: '' }, { id: 'c2', k: 'veh', op: 'venta', t: 'Moto 150cc', pr: 'Gs. 9.000.000', z: '', d: '', wa: '595981000555', until: day(20), ph: '' }]; goHome(); render(); go('cla'); await W(30);
+    r.cl = document.querySelectorAll('.cl').length; r.clwa = (document.querySelector('.cl a.pri') || {}).href || ''; const cb = document.querySelector('[data-clk="veh"]'); if (cb) { cb.click(); await W(20); } r.clf = [...document.querySelectorAll('.cl-b > b')].map(b => b.textContent); G.clas = C0; CLF = '';
     const E0 = G.ev; G.ev = [{ t: 'Culto de jóvenes', k: 'rel', d: day(3), h: '19:30', l: 'Iglesia', u: '' }, { t: 'Torneo de futsal', k: 'dep', d: day(4), h: '', l: 'Polideportivo', u: '' }]; goHome(); render(); await W(20);
     const fb = document.querySelector('#agenda [data-evk="dep"]'); r.evf = !!fb; if (fb) { fb.click(); await W(20); } r.evl = [...document.querySelectorAll('#agenda .ev h3')].map(h => h.textContent); G.ev = E0; EVF = '';
     JOBS = null; goHome(); render(); return r; });
@@ -319,6 +329,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(/Empleos/.test(v5.h) && v5.n === 2 && /wa\.me\/595981000222\?text=/.test(v5.ap), 'Empleos: lista as vagas com botão de candidatura pelo WhatsApp');
   check(v5.f.join() === 'Cocinero', 'Empleos: filtro por área');
   check(/Iglesias/.test(v5.igl) && v5.igln >= 1 && /Educación/.test(v5.edu) && v5.edun >= 5, 'Iglesias e Educación abrem com os lugares públicos (mapa aberto, com fonte)');
+  check(v5.cl === 2 && /wa\.me\/595981000444/.test(v5.clwa) && v5.clf.join() === 'Moto 150cc', 'Clasificados e inmuebles: anúncios com consulta por WhatsApp e filtro por tipo');
   check(v5.evf && v5.evl.join() === 'Torneo de futsal', 'Agenda: filtro por tipo (religioso, deportivo, cultural…)');
   check(v5.pub >= 12 && v5.fin >= 5 && v5.sug, 'categorias públicas gratuitas com página própria e "Ayudá a completar la Guía"');
   const v3 = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms)); const L0 = LIST, G0 = G.dir, I0 = Object.assign({}, INFO);
