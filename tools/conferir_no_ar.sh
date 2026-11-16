@@ -263,6 +263,9 @@ try:
   d=json.load(sys.stdin);print("ok" if isinstance(d.get("fu"),list) and isinstance(d.get("rv"),dict) else "")
 except Exception: print("")' 2>/dev/null || true)
 if [ "$gp" = "ok" ]; then ok "Guía publica fichas próprias e notas (fu, rv)"; else bad "Guía: guia.php?g=1 sem fu/rv"; fi
+for pg in privacidad terminos; do pc=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/$pg/" 2>/dev/null || true); if [ "$pc" = "200" ]; then ok "página /$pg/ no ar"; else bad "/$pg/ -> $pc"; fi; done
+hm=$(curl -sS --max-time 20 "https://araujotechsistemas.com/" 2>/dev/null || true)
+if echo "$hm" | grep -q 'id="soluciones"' && echo "$hm" | grep -q 'id="servicios"'; then ok "site da Araújo Tech: página nova no ar (soluções e serviços)"; else bad "site da Araújo Tech: página nova não encontrada"; fi
 cu=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/cuenta/" 2>/dev/null || true)
 if [ "$cu" = "200" ]; then ok "página Mi cuenta no ar (/cuenta/)"; else bad "/cuenta/ -> $cu"; fi
 # vídeo do produto: o servidor responde, recusa envio sem login e aceita a origem do painel

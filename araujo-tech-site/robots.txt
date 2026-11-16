@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /sitio/datos/
+Disallow: /cuenta/
+Disallow: /admin/
+Disallow: /painel/
 Sitemap: https://araujotechsistemas.com/sitemap.xml
 Sitemap: https://araujotechsistemas.com/guia/sitemap.php
