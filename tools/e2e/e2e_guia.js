@@ -175,10 +175,12 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   const G2 = await L.open({ init: "Object.defineProperty(navigator,'webdriver',{get:()=>false})" }); const gq = G2.p; const ks = [];
   gq.on('request', r => { const u = r.url(); if (/guia_hit\.php\?t=k/.test(u)) ks.push(u); });
   await gq.goto('https://araujotechsistemas.com/guia/'); await gq.w(3000);
+  await gq.evaluate(() => { G.ads = [{ id: 'k1', t: 'Banner teste', img: '/img/guia/tu-delivery.jpg', u: 'https://example.com/' }]; SL.sig = ''; slRender(); }); await gq.w(500);
   await gq.evaluate(() => { const el = document.getElementById('sl'); const d = el.querySelectorAll('.sd')[SL.i]; d.addEventListener('click', e => e.preventDefault(), { once: true }); d.click(); }); await gq.w(800);
   info(JSON.stringify(ks));
-  check(ks.length === 1 && /id=h-/.test(ks[0]), 'tocar um banner do slider conta um toque com o mesmo id das aparições');
+  check(ks.length === 1 && /id=a-k1/.test(ks[0]), 'tocar um banner do slider conta um toque com o mesmo id das aparições');
   check(!gq.errs.length, 'Guía sem erros de JavaScript', gq.errs.join(' | '));
+  check(await gq.evaluate(() => typeof HOUSE_ON !== 'undefined' && !HOUSE_ON), 'banners da casa (Tu Delivery, Vitrix, Araújo Tech) fora do slider');
   sec('N. Aliado Tu Delivery (ficha simples com logo, Instagram e selos)');
   await a.evaluate(() => { ui.guSt = null; guSheet(); }); await a.w(300);
   await a.act('guadd', '[data-k="dir"]'); await a.w(300);
