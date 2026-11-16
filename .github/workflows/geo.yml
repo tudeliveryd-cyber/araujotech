@@ -1,0 +1,41 @@
+name: Guía - tabela de "de onde entram" (DB-IP Lite)
+
+# Uma vez por mês baixa o DB-IP IP to City Lite (grátis, CC BY 4.0, https://db-ip.com), monta a tabela compacta
+# (tools/geo_build.py) e envia para sitio/datos/geo/ (pasta fechada ao público). O guia_hit.php usa a tabela para
+# somar a visita na cidade/estado/país aproximado, sem guardar o endereço de ninguém.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 3 * *'
+
+jobs:
+  geo:
+    runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      SITE_FTP_USERNAME: ${{ secrets.SITE_FTP_USERNAME }}
+      SITE_FTP_PASSWORD: ${{ secrets.SITE_FTP_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Baixar o DB-IP City Lite do mês
+        run: |
+          for m in $(date -u +%Y-%m) $(date -u -d '-1 month' +%Y-%m); do
+            if curl -fsSL --retry 3 -o dbip.csv.gz "https://download.db-ip.com/free/dbip-city-lite-$m.csv.gz"; then echo "mês $m"; break; fi
+          done
+          ls -la dbip.csv.gz
+      - name: Montar a tabela
+        run: python3 tools/geo_build.py dbip.csv.gz geo && ls -la geo
+      - name: Enviar para o servidor
+        if: env.SITE_FTP_USERNAME != '' && env.SITE_FTP_PASSWORD != ''
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          export LFTP_PASSWORD="$SITE_FTP_PASSWORD"
+          lftp -e "
+            set ftp:ssl-force true; set ftp:ssl-protect-data true;
+            set ssl:verify-certificate yes; set ssl:verify-certificate/CC:40:F0:6A:08:0C:63:04:01:05:A9:20:7B:23:53:CA:60:35:A7:05 no;
+            set ftp:passive-mode true; set net:max-retries 3; set net:timeout 30;
+            open --env-password -u $SITE_FTP_USERNAME ftp://$FTP_SERVER;
+            mkdir -p sitio/datos/geo;
+            mirror --reverse --verbose ./geo/ ./sitio/datos/geo/;
+            cls -l sitio/datos/geo/;
+            bye"

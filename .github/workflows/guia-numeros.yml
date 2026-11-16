@@ -32,5 +32,6 @@ jobs:
               print(os.path.basename(f), 'visitas no mês:', d.get('v',0))
               print('  por dia:', dict(sorted((d.get('vd') or {}).items())))
               print('  páginas:', d.get('p',{}))
+              print('  de onde (top 15):', sorted((d.get('geo') or {}).items(), key=lambda x:-x[1])[:15])
               print('  toques em negócios (total):', sum((d.get('c') or {}).values()), '| slider exibido:', sum((d.get('s') or {}).values()), '| toques no slider:', sum((d.get('k') or {}).values()))
           P

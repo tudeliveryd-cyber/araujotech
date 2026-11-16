@@ -2,6 +2,19 @@
 @ini_set('display_errors', '0'); error_reporting(0);
 // Guía Vitrix: conta visitas da Guía (t=v), toques em negócios (t=c&id=loja), páginas e ações (t=p&id=llegar|fav|td) vezes que um anúncio passou no slider (t=s&id=c-loja|a-banner|h-casa) e toques no slider (t=k, mesmos ids).
 // Guarda só números por mês, sem dados de quem visitou. Os números só o admin vê (guia_stats.php).
+// "De onde entram": procura o endereço na tabela do DB-IP (datos/geo/, atualizada todo mês pelo workflow geo.yml) e devolve só "Cidade|PY", "Estado|BR" ou "|XX".
+// O endereço não é guardado em lugar nenhum: só o rótulo soma 1 no contador do mês.
+function guia_geo($ip) {
+  $dir = __DIR__ . '/datos/geo/'; $b = @inet_pton($ip); if ($b === false) return '';
+  $v4 = strlen($b) === 4; $w = $v4 ? 4 : 16; $f = $dir . ($v4 ? 'geo4.bin' : 'geo6.bin'); $rs = $w + 2;
+  $n = (int)(@filesize($f) / $rs); if ($n < 1) return ''; $h = @fopen($f, 'rb'); if (!$h) return '';
+  $lo = 0; $hi = $n - 1; $hit = -1;
+  while ($lo <= $hi) { $m = ($lo + $hi) >> 1; fseek($h, $m * $rs); $k = fread($h, $w); if (strcmp($k, $b) <= 0) { $hit = $m; $lo = $m + 1; } else $hi = $m - 1; }
+  if ($hit < 0) { fclose($h); return ''; }
+  fseek($h, $hit * $rs + $w); $li = unpack('n', fread($h, 2))[1]; fclose($h);
+  $labs = json_decode((string)@file_get_contents($dir . 'geo-labels.json'), true);
+  return is_array($labs) && isset($labs[$li]) ? (string)$labs[$li] : '';
+}
 header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store');
 $o = $_SERVER['HTTP_ORIGIN'] ?? ''; if ($o !== '' && !preg_match('#^https://(www\.)?(araujotechsistemas|guiadesantarita)\.com$#', $o)) { http_response_code(204); exit; }
 $ua = strtolower((string)($_SERVER['HTTP_USER_AGENT'] ?? ''));
@@ -19,7 +32,8 @@ $h = @fopen($f, 'c+'); if (!$h) { http_response_code(204); exit; }
 if (flock($h, LOCK_EX)) {
   $d = json_decode((string)stream_get_contents($h), true); if (!is_array($d)) $d = ['v' => 0, 'c' => [], 's' => []];
   $day = (new DateTime('now', new DateTimeZone('America/Asuncion')))->format('d');
-  if ($t === 'v') { $d['v'] = ($d['v'] ?? 0) + 1; $d['vd'][$day] = ($d['vd'][$day] ?? 0) + 1; }
+  if ($t === 'v') { $d['v'] = ($d['v'] ?? 0) + 1; $d['vd'][$day] = ($d['vd'][$day] ?? 0) + 1;
+    $g = guia_geo((string)($_SERVER['REMOTE_ADDR'] ?? '')); if ($g !== '' && (count($d['geo'] ?? []) < 500 || isset($d['geo'][$g]))) $d['geo'][$g] = ($d['geo'][$g] ?? 0) + 1; }
   elseif (count($d[$t] ?? []) < 2000 || isset($d[$t][$id])) $d[$t][$id] = ($d[$t][$id] ?? 0) + 1;
   ftruncate($h, 0); rewind($h); fwrite($h, json_encode($d)); fflush($h); flock($h, LOCK_UN);
 }
