@@ -22,7 +22,7 @@ const out = (n, f) => { const b64 = fs.readFileSync(f).toString('base64'); for (
     await go(m, '/'); const mp = m.locator('button,a').filter({ hasText: /^\s*Mapa\s*$/ }).first(); if (await mp.count()) { await mp.click(); await m.waitForTimeout(3500); await shot(m, 'm-mapa'); }
     await go(m, '/'); const u = m.locator('[data-c]').filter({ hasText: /Santa Rita útil/ }).first(); if (await u.count()) { await u.click(); await m.waitForTimeout(1800); await shot(m, 'm-util'); }
     await go(m, '/conoce/', 3000); await shot(m, 'm-conoce');
-    await m.goto('https://araujotechsistemas.com/cuenta/?publicar=job', { waitUntil: 'networkidle' }).catch(() => {}); await m.waitForTimeout(3000); await shot(m, 'm-publicar');
+    await m.goto('https://araujotechsistemas.com/cuenta/?publicar=job' + (process.env.GLANG === 'pt' ? '&l=pt' : ''), { waitUntil: 'networkidle' }).catch(() => {}); await m.waitForTimeout(3000); await shot(m, 'm-publicar');
   } catch (e) { console.log('ERRO ' + e); }
   await b.close();
 })();
