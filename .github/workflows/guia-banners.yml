@@ -24,10 +24,10 @@ jobs:
               f = x['mapValue']['fields']
               g = lambda k: (list(f[k].values())[0] if k in f else None)
               img = str(g('img') or '')
-              print(' -', repr(g('t')), '| on:', g('on'), '| desde:', g('from'), '| hasta:', g('to'), '| link:', g('u'), '| id:', g('id'), '| imagem:', (img[:30] + '... ' + str(len(img)) + ' chars') if img else 'SEM IMAGEM')
+              print(' -', repr(g('t')), '| on:', g('on'), '| desde:', g('from'), '| hasta:', g('to'), '| imgd:', 'sim' if g('imgd') else 'não', '| own:', g('own'), '| link:', g('u'), '| id:', g('id'), '| imagem:', (img[:30] + '... ' + str(len(img)) + ' chars') if img else 'SEM IMAGEM')
           try:
               p = json.load(open('pub.json'))
-              print('NO AR AGORA (guia.php):', [(a.get('t'), a.get('id')) for a in p.get('ads', [])])
+              print('NO AR AGORA (guia.php):', [(a.get('t'), a.get('id'), 'imgd=' + str(bool(a.get('imgd'))), 'own=' + str(a.get('own'))) for a in p.get('ads', [])])
           except Exception as e:
               print('guia.php não respondeu JSON:', open('pub.json').read()[:200])
           P
