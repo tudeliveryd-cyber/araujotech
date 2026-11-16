@@ -283,7 +283,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     document.getElementById('q').value = 'ropa'; document.getElementById('qgo').click(); await W(30); r.search = CAT === 'all' && [...document.querySelectorAll('#list .card h3')].some(h => /Pre X|Com X/.test(h.textContent));
     LIST = L0; G.dir = G0; INFO = Object.assign(INFO, I0); delete INFO.vipx; goHome(); render(); return r; });
   info(JSON.stringify(v3));
-  check(v3.fd.join('|') === 'Vip X|Pre X' && /VIP/.test(v3.tags[0]) && /Premium/.test(v3.tags[1]), 'Negocios destacados: só VIP e Premium, VIP primeiro, com etiqueta');
+  check(v3.fd.join('|') === 'Vip X|Pre X' && v3.tags.length === 2 && v3.tags.every(x => /Catálogo Vitrix/.test(x)) && !v3.tags.some(x => /VIP|Premium/.test(x)), 'Negocios destacados: clientes Vitrix com a etiqueta "Catálogo Vitrix" (sem VIP/Premium à vista)');
   check(v3.wa.length === 1 && /wa\.me\/595981000000/.test(v3.wa[0]) && /4,8/.test(v3.rt), 'destacado com WhatsApp do catálogo e nota real (só quando existem)');
   check(v3.rc.join('|') === 'Aliado Foto|Aliado Uno' && v3.rcwa === 1 && v3.rcph[0] === '/sitio/gimg.php?d=td2&k=ph&v=abc123', 'Recomendados Aliado Tu Delivery: só clientes Tu Delivery, com WhatsApp; os com foto do local primeiro');
   check(v3.rclink.length === 1 && /wa\.me/.test(v3.rclink[0]) && v3.vxlink.every(h => !/wa\.me/.test(h)) && v3.vxlink.length === 2, 'aliado: tocar no card abre o WhatsApp; cliente Vitrix: abre a página dele na Guía');
