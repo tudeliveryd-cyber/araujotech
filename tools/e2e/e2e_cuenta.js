@@ -7,7 +7,7 @@ const AU = 'http://127.0.0.1:9099';
 const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.toLocaleDateString('en-CA', { timeZone: 'America/Asuncion' }); });
 (async () => {
   const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026'];
-  const adm = await L.signUp(...ADM); await L.verifyEmail(adm.localId);
+  const adm = await L.signUp(...ADM); // admin sem e-mail confirmado (como a conta real do painel)
   const admTok = (await L.signIn(...ADM)).idToken;
   const mk = async (e, verified) => { const u = await L.signUp(e, 'Senha#123'); if (verified) await L.verifyEmail(u.localId); const s = await L.signIn(e, 'Senha#123'); return { uid: u.localId, tok: s.idToken }; };
   const nv = await mk('naover@teste.py', false), a = await mk('iglesia@teste.py', true), b = await mk('vecino@teste.py', true);

@@ -202,7 +202,7 @@ async function loadAdm(){try{const [a,b]=await Promise.all([getDocs(collection(d
 function render(){chrome();
  if(U===undefined){app$.innerHTML='<p class="ld">…</p>';return}
  if(!U){app$.innerHTML=authView();return}
- if(!U.emailVerified){app$.innerHTML=verView();return}
+ if(!U.emailVerified&&U.email!==ADMIN){app$.innerHTML=verView();return}/* o admin não precisa confirmar: a conta dele já é a do painel */
  if(VIEW==='adm'){app$.innerHTML=admView();return}
  if(OP){app$.innerHTML=opView();return}
  if(!FE){app$.innerHTML='<p class="ld">…</p>';return}
@@ -214,7 +214,7 @@ async function loadMine(){
  render()}
 async function loadOp(){try{const s=await getDoc(doc(db,'gresenas',OP+'_'+U.uid));RV=s.exists()?s.data():null}catch(e){RV=null}
  RVE=RV?{r:RV.r,x:RV.x||'',n:RV.n||''}:{r:0,x:'',n:(U.displayName||'').split(' ')[0]||''};render()}
-function afterLogin(){NOTE='';if(!U||!U.emailVerified){render();return}
+function afterLogin(){NOTE='';if(!U||(!U.emailVerified&&U.email!==ADMIN)){render();return}
  if(U.email===ADMIN&&!OP){VIEW='adm';render();loadAdm();return}
  VIEW='me';if(OP){render();loadOp()}else{render();loadMine()}}
 onAuthStateChanged(auth,u=>{U=u||null;FICHA=null;FE=null;MY_RV=null;ADM=null;RV=null;if(!U){if(VIEW!=='up'&&VIEW!=='rs')VIEW='in';render();return}afterLogin()});
