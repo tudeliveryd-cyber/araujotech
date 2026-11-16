@@ -25,6 +25,9 @@ on:
       idioma:
         description: 'Idioma das telas da Guía (es/pt)'
         default: 'es'
+      apresentacao:
+        description: 'Só tirar as telas da Guía para a apresentação aos empresários (sim/não)'
+        default: 'não'
       comparar:
         description: 'Só comparar o catálogo da loja no subdomínio e em /loja/<nome>/ (sim/não)'
         default: 'não'
@@ -63,6 +66,9 @@ jobs:
       - name: Telas das demonstrações
         if: ${{ inputs.capturas == 'sim' }}
         run: node tools/capturas.js
+      - name: Telas para a apresentação
+        if: ${{ inputs.apresentacao == 'sim' }}
+        run: node tools/capt_apres.js
       - name: Velocidade da Guía
         if: ${{ inputs.guia == 'sim' }}
         run: node tools/diag_guia.js
@@ -77,7 +83,7 @@ jobs:
           GLANG: ${{ inputs.idioma }}
         run: node tools/diag_video.js
       - name: Diagnóstico
-        if: ${{ inputs.topo != 'sim' && inputs.capturas != 'sim' && inputs.guia != 'sim' && inputs.video != 'sim' }}
+        if: ${{ inputs.topo != 'sim' && inputs.apresentacao != 'sim' && inputs.capturas != 'sim' && inputs.guia != 'sim' && inputs.video != 'sim' }}
         env:
           LOJA: ${{ inputs.loja }}
           SO_COMPARAR: ${{ inputs.comparar == 'sim' && '1' || '' }}
