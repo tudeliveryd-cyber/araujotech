@@ -91,7 +91,7 @@ jobs:
           echo "######## MOEDA DO LOCAL (Gs. / US$) · regras v13"; tools/e2e/run.sh e2e_moeda.js firestore-v13.rules || F=1
           echo "######## CENTRAL DE GESTÃO (Panel Araújo Tech) · regras v15"; tools/e2e/run.sh e2e_central.js firestore-v15.rules || F=1
           echo "######## SITE DA ARAÚJO TECH (página nova) · regras v15"; tools/e2e/run.sh e2e_site.js firestore-v15.rules || F=1
-          echo "######## GUÍA: CONTAS PRÓPRIAS E OPINIÕES · regras v15"; tools/e2e/run.sh e2e_cuenta.js firestore-v15.rules || F=1
+          echo "######## GUÍA: CONTAS PRÓPRIAS, OPINIÕES E AVISOS · regras v16"; tools/e2e/run.sh e2e_cuenta.js firestore-v16.rules || F=1
           echo "######## VISITAS AO CATÁLOGO · regras v14"; tools/e2e/run.sh e2e_visitas.js firestore-v14.rules || F=1
           echo "######## AVISO DE VENCIMENTO E RESUMO DO DIA · regras v14"; tools/e2e/run.sh e2e_aviso.js firestore-v14.rules || F=1
           echo "######## CATÁLOGO PELO DOMÍNIO PRINCIPAL (/loja/<nome>/) · regras v14"; tools/e2e/run.sh e2e_loja.js firestore-v14.rules || F=1

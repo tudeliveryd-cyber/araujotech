@@ -1,5 +1,5 @@
 // Guía de Santa Rita: contas próprias (igrejas, ONGs, escolas, clubes, negócios sem Vitrix) e opiniões do público.
-// Regras v15 (gfichas, gresenas), a página /cuenta/ (cadastro, confirmação de e-mail, ficha, opinião, moderação),
+// Regras v16 (gfichas com avisos grátis, gresenas), a página /cuenta/ (cadastro, confirmação de e-mail, ficha, opinião, moderação),
 // o servidor (guia_lib.php lê só o aprovado) e a Guía (nota e "Opinar" nos cards).
 const L = require('./lib'); const P = 'araujotech-catalogos';
 const { sec, check, info } = L; const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
@@ -154,5 +154,37 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   check(/4/.test(v.rvb) && /\(1\)/.test(v.rvb), 'card mostra a nota do público (' + v.rvb + ')');
   check(v.acc, 'Mi cuenta tem "Publicar mi iglesia, ONG o negocio"');
   check(g.errs.length === 0, 'Guía sem erros de JavaScript', g.errs.join(' | '));
+
+  sec('I. Empleos y avisos: conta grátis para qualquer pessoa ou empresa (regras v16)');
+  const AV = o => L.fields(Object.assign({ tipo: 'avisos', n: 'Juan Pérez', wa: '595981222333', st: 'pend', at: '2026-11-16T10:00:00Z' }, o));
+  const cl1 = { id: 'c1', k: 'per', op: 'enc', t: 'Cédula encontrada', pr: '', z: 'Centro', d: 'Encontré una cédula a nombre de M. G. cerca de la plaza.', wa: '595981222333', until: tomorrow(10) };
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + b.uid, b.tok, AV({ cla: Array(6).fill(cl1) }))) === 403, 'mais de 5 avisos é recusado');
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + b.uid, b.tok, AV({ cla: [cl1] }))) === 200, 'conta grátis "avisos" criada com um aviso (em revisão)');
+  check(st(await L.fsReq(P, 'GET', 'gfichas/' + b.uid, null)) === 403, 'aviso em revisão não é público');
+  await L.fsReq(P, 'DELETE', 'gfichas/' + b.uid, 'owner');
+  const D = await L.open({ w: 390 }); const d = D.p;
+  await d.goto('https://araujotechsistemas.com/cuenta/?t=avisos'); await d.w(2500);
+  await d.fill('#ae', 'vecino@teste.py'); await d.fill('#ap', 'Senha#123'); await d.click('#fau button[type=submit]'); await d.w(3000);
+  check(await d.locator('input[name=tipo][value=avisos]').isChecked(), 'link "Publicar gratis" já abre com "Empleos y avisos"');
+  check(/Gratis para cualquier persona o empresa/.test(await d.txt()) && await d.locator('#f_a').count() === 0 && await d.locator('input[data-img]').count() === 0, 'formulário simples: sem dirección, horários nem fotos');
+  await d.fill('#f_n', 'Juan Pérez'); await d.fill('#f_wa', '0981 222 333');
+  await d.click('[data-a="cladd"]'); await d.w(300);
+  check(await d.locator('#cl_k0').inputValue() === 'per' && await d.locator('#cl_o0').inputValue() === 'perd', 'aviso novo começa em "Perdidos y encontrados"');
+  await d.click('#ffi button[type=submit]'); await d.w(400);
+  check(/avisos/i.test(await d.txt('#am')), 'aviso sem título é recusado');
+  await d.selectOption('#cl_o0', 'enc'); await d.fill('#cl_t0', 'Cédula encontrada'); await d.fill('#cl_d0', 'Cerca de la plaza. Llamá para retirarla.');
+  await d.click('[data-a="jbadd"]'); await d.w(300); await d.fill('#jb_t0', 'Ayudante de cocina'); await d.fill('#jb_d0', 'Medio tiempo, sin experiencia previa.');
+  await d.click('#ffi button[type=submit]'); await d.w(2500);
+  const me = L.unfields((await L.fsReq(P, 'GET', 'gfichas/' + b.uid, 'owner')).json) || {};
+  check(me.tipo === 'avisos' && me.st === 'pend' && me.cla && me.cla[0].k === 'per' && me.cla[0].op === 'enc' && me.cla[0].wa === '0981222333' && me.jobs && me.jobs[0].t === 'Ayudante de cocina', 'conta salva em revisão com o aviso e a vaga');
+  check(d.errs.length === 0, 'sem erros de JavaScript (celular)', d.errs.join(' | '));
+  await L.fsReq(P, 'PATCH', 'gfichas/' + b.uid + '?updateMask.fieldPaths=st', admTok, L.fields({ st: 'ok' }));
+  const out2 = JSON.parse(cp.execFileSync('php', ['-r', "require 'prods_lib.php'; require 'guia_lib.php'; $p = guia_pub(); echo json_encode(['dir' => $p['dir'], 'clas' => $p['clas'], 'jobs' => guia_jobs(false)]);"], { cwd: path.join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gacc2-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }), timeout: 40000 }).toString());
+  const c0 = out2.clas.find(x => x.t === 'Cédula encontrada');
+  check(c0 && c0.k === 'per' && c0.op === 'enc' && c0.id === 'f' + b.uid + 'x0', 'aprovado: o aviso sai em Clasificados como "Perdidos y encontrados"');
+  check(out2.jobs.some(j => j.t === 'Ayudante de cocina' && j.co.n === 'Juan Pérez'), 'a vaga sai em Empleos');
+  check(!out2.dir.some(x => x.n === 'Juan Pérez'), 'conta só de avisos não vira ficha no diretório');
+  await g.evaluate(o => { G.clas = o; go('cla'); }, out2.clas); await g.w(400);
+  check(/Perdidos y encontrados/.test(await g.txt()) && /Se encontró/.test(await g.txt()) && await g.locator('a.jbp[href*="cuenta/?t=avisos"]').count() >= 1, 'Guía: aviso com o tipo certo e botão "Publicar gratis"');
   await L.done();
 })().catch(async e => { console.error(e); L.bad('erro: ' + e.message); await L.done(); });
