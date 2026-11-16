@@ -2,9 +2,9 @@
 // Guía Vitrix: banners pagos (platform/sitio.gads) e lugares públicos (platform/sitio.gutil), cadastrados no Panel Araújo Tech.
 // Os banners só saem entre as datas escolhidas (hora do Paraguai). A imagem vai por gimg.php (o JSON fica leve).
 function guia_doc() {
-  $cache = sys_get_temp_dir() . '/at_guia6.json';
+  $cache = sys_get_temp_dir() . '/at_guia7.json';
   if (is_file($cache) && time() - filemtime($cache) < 180) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gadsAt');
+  $r = at_get('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -16,7 +16,7 @@ function guia_doc() {
     if (isset($v['arrayValue'])) return array_map($val, $v['arrayValue']['values'] ?? []);
     return null;
   };
-  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
+  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
@@ -78,7 +78,7 @@ function guia_pub() {
   foreach ((array)($d['gev'] ?? []) as $x) {
     if (!is_array($x) || trim((string)($x['t'] ?? '')) === '' || empty($x['d']) || $x['d'] < $day) continue;
     $u = (string)($x['u'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $u)) $u = '';
-    $ev[] = ['t' => (string)$x['t'], 'd' => (string)$x['d'], 'h' => (string)($x['h'] ?? ''), 'l' => (string)($x['l'] ?? ''), 'u' => $u];
+    $ev[] = ['t' => (string)$x['t'], 'k' => in_array($x['k'] ?? '', ['rel', 'dep', 'cul', 'com', 'neg', 'inf', 'otr'], true) ? $x['k'] : 'otr', 'd' => (string)$x['d'], 'h' => (string)($x['h'] ?? ''), 'l' => (string)($x['l'] ?? ''), 'u' => $u];
   }
   usort($ev, function ($a, $b) { return strcmp($a['d'] . $a['h'], $b['d'] . $b['h']); });
   // negócios sem catálogo (ficha simples cadastrada no Panel Araújo Tech)
@@ -94,7 +94,7 @@ function guia_pub() {
   $so = (array)($d['gsoc'] ?? []); $soc = []; // redes da Guía (rodapé), configuradas no painel
   $w = preg_replace('/\D/', '', (string)($so['wa'] ?? '')); if (strlen($w) >= 8) $soc['wa'] = $w;
   foreach (['fb', 'ig', 'yt', 'tt'] as $k) { $u = trim((string)($so[$k] ?? '')); if (preg_match('#^https://[^\s"\'<>]+$#i', $u)) $soc[$k] = $u; }
-  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 8), 'dir' => $dir, 'soc' => (object)$soc, 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
+  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
@@ -143,6 +143,31 @@ function guia_news() {
 }
 
 // Clientes publicados pelo Panel Araújo Tech (platform/sitio → clientes), só catálogos. Cache de 10 minutos.
+// Empleos: vagas publicadas pelos próprios negócios no painel (cfg.jobs) + vagas cadastradas pela Guía (gjobs). Só as ativas e dentro da data.
+function guia_jobs($all = false) {
+  $cache = sys_get_temp_dir() . '/at_gjobs2_' . ($all ? 'a' : 'p') . '.json';
+  if (is_file($cache) && time() - filemtime($cache) < 300) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
+  $today = (new DateTime('now', new DateTimeZone('America/Asuncion')))->format('Y-m-d');
+  $doc = guia_doc(); $hide = array_flip(array_map('strval', (array)($doc['gjobx'] ?? [])));
+  $A = ['ven', 'coc', 'rep', 'adm', 'ofi', 'lim', 'sal', 'edu', 'tec', 'agr', 'otr']; $K = ['full', 'part', 'temp', 'first'];
+  $one = function ($x, $co, $src) use ($today, $A, $K, $hide, $all) {
+    if (!is_array($x) || empty($x['on'])) return null;
+    $t = trim((string)($x['t'] ?? '')); $d = trim((string)($x['d'] ?? '')); $wa = preg_replace('/\D/', '', (string)($x['wa'] ?? '')); $u = (string)($x['until'] ?? '');
+    if (mb_strlen($t) < 3 || mb_strlen($d) < 10 || strlen($wa) < 8 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $u) || $u < $today) return null;
+    $id = $src . ':' . preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? ''));
+    if (isset($hide[$id]) && !$all) return null;
+    return ['id' => $id, 't' => mb_substr($t, 0, 70), 'a' => in_array($x['a'] ?? '', $A, true) ? $x['a'] : 'otr', 'k' => in_array($x['k'] ?? '', $K, true) ? $x['k'] : 'full', 'd' => mb_substr($d, 0, 700), 'r' => mb_substr(trim((string)($x['r'] ?? '')), 0, 400), 'sal' => mb_substr(trim((string)($x['sal'] ?? '')), 0, 40), 'n' => max(1, min(999, (int)($x['n'] ?? 1))), 'wa' => $wa, 'until' => $u, 'co' => $co, 'hid' => isset($hide[$id])];
+  };
+  $out = [];
+  foreach (guia_clients() as $c) {
+    $s = at_shop_cfg($c['id']); if (!$s || ($s['status'] ?? '') === 'suspenso') continue;
+    foreach (array_slice((array)($s['cfg']['jobs'] ?? []), 0, 20) as $x) { $j = $one($x, ['n' => $c['name'], 'id' => $c['id'], 'logo' => $c['logo']], $c['id']); if ($j) $out[] = $j; }
+  }
+  foreach (array_slice((array)($doc['gjobs'] ?? []), 0, 100) as $x) { $j = $one($x, ['n' => mb_substr(trim((string)($x['co'] ?? '')), 0, 80), 'id' => '', 'logo' => ''], 'g'); if ($j && $j['co']['n'] !== '') $out[] = $j; }
+  usort($out, function ($a, $b) { return strcmp($a['until'], $b['until']); });
+  @file_put_contents($cache, json_encode($out));
+  return $out;
+}
 function guia_clients() {
   $cache = sys_get_temp_dir() . '/at_gcl1.json';
   if (is_file($cache) && time() - filemtime($cache) < 600) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
