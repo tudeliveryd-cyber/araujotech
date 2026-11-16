@@ -10,6 +10,8 @@ const fs = require('fs');
     const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1 GuiaFotos' });
     const p = await ctx.newPage(); const errs = [];
     p.on('pageerror', e => errs.push(e.message));
+    // prévia: a página inicial vem do repositório (mudanças ainda não publicadas); dados e imagens continuam os do ar
+    if (process.env.LOCAL) await p.route(u => u.href === base + '/' || u.href === base + '/?' , r => r.fulfill({ body: fs.readFileSync('araujo-tech-site/guia/index.html'), contentType: 'text/html; charset=utf-8' }));
     for (const u of pages) {
       await p.goto(base + u, { waitUntil: 'networkidle', timeout: 60000 }).catch(() => {});
       await p.waitForTimeout(2500);

@@ -7,6 +7,9 @@ on:
       pages:
         description: 'Páginas separadas por vírgula'
         default: '/'
+      local:
+        description: 'Prévia: usar a página do ramo escolhido (1) em vez da publicada'
+        default: ''
 
 permissions:
   contents: write
@@ -27,6 +30,7 @@ jobs:
       - name: Tirar as fotos
         env:
           PAGES: ${{ github.event.inputs.pages }}
+          LOCAL: ${{ github.event.inputs.local }}
         run: node tools/fotos_guia.js
       - name: Guardar as fotos no ramo fotos-guia (separado do site; nada é publicado)
         run: |
