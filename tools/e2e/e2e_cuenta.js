@@ -206,6 +206,9 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   await e.click('[data-a="pbmore"]'); await e.w(300); await e.click('[data-pt="cla"]'); await e.w(300);
   check(await e.locator('#pb_k').inputValue() === 'per' && await e.locator('#pb_op').inputValue() === 'perd', 'aviso começa em Perdidos y encontrados');
   await e.selectOption('#pb_op', 'enc'); await e.fill('#pb_t', 'Llaves encontradas'); await e.fill('#pb_d', 'Llavero azul en la plaza central.'); await e.fill('#pb_wa', '0981777888');
+  await e.click('#fpb button[type=submit]'); await e.w(400);
+  check(/tu nombre/.test(await e.txt('#am')), 'aviso sem nome de quem publica é recusado');
+  await e.fill('#pb_co', 'María López'); await e.fill('#pb_d', 'Llavero azul en la plaza central.'); await e.fill('#pb_wa', '0981777888');
   await e.click('#fpb button[type=submit]'); await e.w(2500);
   check(e.errs.length === 0, 'formulário sem erros de JavaScript', e.errs.join(' | '));
   const subs = ((await L.fsReq(P, 'GET', 'gsub?pageSize=50', 'owner')).json.documents || []).map(x => L.unfields(x));
