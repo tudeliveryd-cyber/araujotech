@@ -11,6 +11,8 @@ const { sec, check, info } = L;
   for (const [id, x] of Object.entries(B)) await L.fsReq(P, 'PATCH', 'billing/' + id, 'owner', L.fields(x));
   const cfgDoc = async () => L.unfields((await L.fsReq(P, 'GET', 'platform/config', 'owner')).json) || {};
   const A = await L.open({ w: 1366, central: true }); const a = A.p;
+  const td = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+  await a.route('**/sitio/guia_stats.php', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true, v: 50, vd: { [td]: 7 }, c: { a: 3, b: 2 }, s: { x: 10 }, k: {}, q: {}, p: { conoce: 4 } }) }));
   await a.goto('https://araujotechsistemas.com/admin/'); await a.w(2500);
   await a.fill('#lg_user', ADM[0]); await a.fill('#lg_pass', ADM[1]); await a.press('#lg_pass', 'Enter'); await a.w(5000);
   check(await a.evaluate(() => CLOUD.plLoaded === true && PL.shops.length === 3), 'clientes reais carregados da nuvem (3)');
@@ -22,6 +24,10 @@ const { sec, check, info } = L;
   const rev = await a.evaluate(() => { const m = new Date().toISOString().slice(0, 7); return PL.shops.reduce((t, s) => t + (s.pays || []).filter(p => String(p.date).slice(0, 7) === m).reduce((x, p) => x + (+p.v || 0), 0), 0); });
   check(h.kp[4] === 'Gs. ' + rev.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'), 'cobrado no mês = soma dos pagamentos registrados');
 
+  await a.w(1500);
+  const gu = await a.evaluate(() => [...document.querySelectorAll('.cg-gu .cg-k b')].map(x => x.textContent));
+  check(gu.join(',') === '7,50,5,10,4', 'visão geral mostra os números da Guía (hoje, 30 dias, toques, anúncios, Conocé): ' + gu.join(','));
+  check(await a.locator('.cg-gu [data-act="gusite"]').count() === 1 && await a.locator('.cg-gu [data-act="cggur"]').count() === 1, 'botões Ver detalles e Actualizar na Guía');
   sec('B. Navegação por todos os módulos');
   for (const k of ['cli', 'sis', 'pla', 'sub', 'fin', 'dom', 'sup', 'rep', 'usr', 'sec', 'cfg', 'home']) {
     await a.click(`.cg-nav button[data-k="${k}"]`); await a.w(300);
