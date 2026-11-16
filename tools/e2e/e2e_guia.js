@@ -23,6 +23,13 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   fs.writeFileSync(img, Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAIAAAB7QOjdAAAAEElEQVR4nGP4z8DAwMDAAAAN+AH/2s0B3wAAAABJRU5ErkJggg==', 'base64'));
   await a.locator('input[data-gufile="0"]').setInputFiles(img); await a.w(1500);
   check(await a.evaluate(() => /^data:image\/jpeg/.test(ui.gu.ads[0].img)), 'a imagem do banner foi carregada (JPEG)');
+  check(await a.locator('input[data-gufiled="0"]').count() === 1 && await a.locator('[data-act="gurmimgd"]').count() === 0, 'banner tem o campo opcional de imagem para computador (1920 × 480)');
+  await a.locator('input[data-gufiled="0"]').setInputFiles(img); await a.w(1500);
+  check(await a.evaluate(() => /^data:image\/jpeg/.test(ui.gu.ads[0].imgd)) && await a.locator('[data-act="gurmimgd"]').count() === 1, 'imagem para computador carregada, com botão para tirar');
+  await a.act('gurmimgd', '[data-i="0"]'); await a.w(200);
+  check(await a.evaluate(() => ui.gu.ads[0].imgd === '' && /^data:image/.test(ui.gu.ads[0].img)), 'tirar a imagem do computador mantém a imagem principal');
+  await a.locator('input[data-gufiled="0"]').setInputFiles(img); await a.w(1500);
+  await a.evaluate(() => { ui.gu.ads[0].own = true; });
   await a.fill('[data-gu="ads.0.t"]', 'Promo Teste'); await a.fill('[data-gu="ads.0.u"]', 'javascript:alert(1)');
   await a.act('gusave'); await a.w(1500);
   check(!(await doc()).gads, 'link inválido no banner não deixa salvar');
@@ -62,6 +69,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   const js = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); closeSheet(); ui.jobs = null; acts.jobopen(); await W(50); const r = {}; acts.jobadd(); await W(30); r.f = document.querySelectorAll('[data-jb^="0."]').length; Object.assign(ui.jobs[0], { t: 'Vendedor', d: 'Atención en el salón de ventas', wa: '0981999888' }); acts.jobsave(); await W(50); r.saved = (pub.jobs || []).length === 1 && pub.jobs[0].t === 'Vendedor' && pub.jobs[0].wa === '0981999888'; applyBoth(p => { delete p.jobs }); return r; });
   check(js.f >= 9 && js.saved, 'painel do negócio: publicar vaga (formulário completo e salva no catálogo)'); info(JSON.stringify({ ads: (d.gads || []).length, util: (d.gutil || []).length, at: d.gadsAt }));
   check((d.gads || []).length === 1 && d.gads[0].u === 'https://example.com/promo' && d.gads[0].to === '2026-12-31' && d.gads[0].on === true, 'banner salvo com link, data e ativo');
+  check(/^data:image\/jpeg/.test(d.gads[0].imgd || '') && d.gads[0].own === true, 'banner salvo com a imagem para computador e a marca "banner da Guía"');
   check((d.gutil || []).length === n0 + 1 && d.gutil[0].tel === '061 000 000' && d.gutil[n0].c === 'ocio', 'lugares salvos com telefone e tipo');
   check((d.clientes || []).length === 1, 'os clientes da vitrine continuam lá');
 
@@ -179,6 +187,13 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   await gq.evaluate(() => { const el = document.getElementById('sl'); const d = el.querySelectorAll('.sd')[SL.i]; d.addEventListener('click', e => e.preventDefault(), { once: true }); d.click(); }); await gq.w(800);
   info(JSON.stringify(ks));
   check(ks.length === 1 && /id=a-k1/.test(ks[0]), 'tocar um banner do slider conta um toque com o mesmo id das aparições');
+  await gq.setViewportSize({ width: 1366, height: 700 }); await gq.w(500);
+  const wd = await gq.evaluate(async () => { G.ads = [{ id: 'k2', t: 'Wide', img: '/img/guia/tu-delivery.jpg', imgd: '/img/guia/vitrix-planes.jpg', u: '' }]; SL.sig = ''; slRender(); await new Promise(f => setTimeout(f, 600)); const d = document.querySelector('#sl .sd.wd'); if (!d) return null; const im = d.querySelector('.fgw img'), fg = d.querySelector(':scope>img.fg'); return { w: innerWidth, shown: getComputedStyle(d.querySelector('.fgw')).display, fit: getComputedStyle(im).objectFit, src: im.currentSrc, fg: getComputedStyle(fg).display, ow: im.offsetWidth, sw: d.offsetWidth }; });
+  info(JSON.stringify(wd));
+  check(wd && wd.shown === 'block' && wd.fit === 'cover' && /vitrix-planes/.test(wd.src) && wd.fg === 'none' && wd.ow === wd.sw, 'no computador o banner usa a imagem larga e enche a faixa toda');
+  await gq.setViewportSize({ width: 390, height: 800 }); await gq.w(500);
+  const wm = await gq.evaluate(() => { const d = document.querySelector('#sl .sd.wd'); return { fgw: getComputedStyle(d.querySelector('.fgw')).display, fg: getComputedStyle(d.querySelector(':scope>img.fg')).display }; });
+  check(wm.fgw === 'none' && wm.fg === 'block', 'no celular o mesmo banner continua com a imagem de 1920 × 820');
   check(!gq.errs.length, 'Guía sem erros de JavaScript', gq.errs.join(' | '));
   check(await gq.evaluate(() => typeof HOUSE_ON !== 'undefined' && !HOUSE_ON), 'banners da casa (Tu Delivery, Vitrix, Araújo Tech) fora do slider');
   sec('N. Aliado Tu Delivery (ficha simples com logo, Instagram e selos)');

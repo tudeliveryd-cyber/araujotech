@@ -104,6 +104,8 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
 .sd{flex:0 0 100%;height:100%;position:relative;display:block;text-decoration:none;color:#fff;overflow:hidden}
 .sd>img.bgi{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .sd.ad-s>img.bgi{filter:blur(18px) brightness(.7);transform:scale(1.15)}.sd.ad-s img.fg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.ad-s .fgw{display:none}
+@media (min-width:641px){.ad-s.wd .fgw{display:block;position:absolute;inset:0}.ad-s.wd .fgw img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}.ad-s.wd>img.fg,.ad-s.wd>img.bgi{display:none}}
 .sd.cl{background:radial-gradient(500px 260px at 85% 20%,#6A22C0 0%,transparent 70%),linear-gradient(120deg,#3B0E70,#24093F)}
 .sd.cl>img.bgi{opacity:.92}
 .sd.cl::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,4,36,.88) 0%,rgba(20,4,36,.55) 48%,rgba(20,4,36,.05) 100%)}
@@ -734,7 +736,7 @@ function slItems(){const ads=(G.ads||[]).filter(a=>a&&a.img).map(a=>({k:'ad',a})
  const dest=(LIST||[]).filter(c=>c.vip).map(c=>({k:'cl',c}));/* slider: só plano VIP; Premium fica com o selo Recomendado na lista */
  if(!SL.ord)SL.ord={};const o=x=>{const id=x.k==='ad'?'a'+x.a.id:'c'+x.c.id;if(SL.ord[id]==null)SL.ord[id]=Math.random();return SL.ord[id]};
  return ads.sort((x,y)=>o(x)-o(y)).concat(dest.sort((x,y)=>o(x)-o(y)),HOUSE_ON?HOUSE.map(a=>({k:'own',a})):[])}
-function slideHTML(x){const t=TX[L];if(x.k==='ad'||x.k==='own'){const a=x.a,u=safe(a.u),tag=u?'a':'div',pd=x.k==='ad'&&!a.own;return `<${tag} class="sd ad-s"${u?` href="${esc(u)}" target="_blank" rel="noopener${pd?' sponsored':''}"`:''} aria-label="${esc(pd?t.ad+(a.t?': '+a.t:''):a.t)}"><img class="bgi" src="${esc(a.img)}" alt="" aria-hidden="true">${a.imgm?`<picture><source media="(max-width:640px)" srcset="${esc(a.imgm)}">`:''}<img class="fg" src="${esc(a.img)}" alt="${esc(a.t||t.ad)}">${a.imgm?'</picture>':''}${pd?`<span class="ad">${t.ad}</span>`:''}</${tag}>`}
+function slideHTML(x){const t=TX[L];if(x.k==='ad'||x.k==='own'){const a=x.a,u=safe(a.u),tag=u?'a':'div',pd=x.k==='ad'&&!a.own;return `<${tag} class="sd ad-s${a.imgd?' wd':''}"${u?` href="${esc(u)}" target="_blank" rel="noopener${pd?' sponsored':''}"`:''} aria-label="${esc(pd?t.ad+(a.t?': '+a.t:''):a.t)}"><img class="bgi" src="${esc(a.img)}" alt="" aria-hidden="true">${a.imgm?`<picture><source media="(max-width:640px)" srcset="${esc(a.imgm)}">`:''}${a.imgd?`<picture class="fgw"><source media="(min-width:641px)" srcset="${esc(a.imgd)}"><img src="${esc(a.img)}" alt="" aria-hidden="true"></picture>`:''}<img class="fg" src="${esc(a.img)}" alt="${esc(a.t||t.ad)}">${a.imgm?'</picture>':''}${pd?`<span class="ad">${t.ad}</span>`:''}</${tag}>`}
  const c=x.c,i=INFO[c.id]||{},u=safe(c.url),lg=logoU(c.logo),seg=L==='pt'?(c.segPt||c.segEs):(c.segEs||c.segPt),sl=i.sl?(i.sl[L]||i.sl.es||''):'';
  return `<a class="sd cl" href="${GB}${esc(c.id)}" data-id="${esc(c.id)}">${i.cv?`<img class="bgi" src="${esc(i.cv)}" alt="" loading="lazy">`:''}<span class="in"><span class="tg vip">${ic('star')}VIP</span><span style="display:flex;gap:12px;align-items:center"><span class="sl-lg">${lg?`<img src="${esc(lg)}" alt="">`:`<b>${esc(ini(c.name))}</b>`}</span><h3>${esc(c.name)}</h3></span><p>${esc(sl||[seg,c.city].filter(Boolean).join(' · '))}</p><span class="bt">${t.more}${ic('arrow')}</span></span></a>`}
 const RM=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;

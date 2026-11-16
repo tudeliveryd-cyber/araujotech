@@ -33,8 +33,9 @@ $list = $pp !== '' ? (array)($doc['gpro'] ?? []) : (array)($doc['gads'] ?? []); 
 if ($pp === '' && $nn !== '' && $i === 'n' . $nn) { $list = (array)(($doc['gnews'] ?? [])['man'] ?? []); $want = $nn; $fld = 'ph'; }
 if ($pp === '' && $nn === '' && $dd !== '' && $i === 'd' . $dd) { $list = (array)($doc['gdir'] ?? []); $want = $dd; $fld = $dk; }
 if ($pp === '' && $nn === '' && $dd === '' && $cc !== '' && $i === 'c' . $cc) { $list = (array)($doc['gclas'] ?? []); $want = $cc; $fld = 'ph'; }
+$wd = ($pp === '' && $nn === '' && $dd === '' && $cc === '' && (($_GET['k'] ?? '') === 'd')); if ($wd) $fld = 'imgd'; // imagem larga do banner, só para computador
 foreach ($list as $x) { if (is_array($x) && ($x['id'] ?? '') === $want) { $src = (string)($x[$fld] ?? ''); break; } }
 if (!preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#s', $src, $m)) { http_response_code(404); exit; }
-$f = sys_get_temp_dir() . '/at_gimg_' . $i . ($fld === 'ph' && $dd !== '' ? 'ph' : '') . '_' . substr(md5($src), 0, 12) . '.img';
+$f = sys_get_temp_dir() . '/at_gimg_' . $i . ($fld === 'ph' && $dd !== '' ? 'ph' : '') . ($wd ? 'd' : '') . '_' . substr(md5($src), 0, 12) . '.img';
 if (!is_file($f)) { $bin = base64_decode($m[2]); if (!$bin) { http_response_code(404); exit; } @file_put_contents($f, $bin); }
 header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $m[1]); header('Cache-Control: public, max-age=86400'); header('Content-Length: ' . filesize($f)); readfile($f);
