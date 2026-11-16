@@ -261,6 +261,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(simp.srchBeforeSl, 'a busca fica no topo e os destacados (slider) saem do topo');
   const nav = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms));
     document.querySelector('#atl [data-a="open"]').click(); await W(50); r.open = F_OPEN && CAT === 'all' && !document.body.classList.contains('home');
+    goHome(); render(); const ye = []; window.addEventListener('error', ev => ye.push(ev.message)); for (const k of ['tra', 'ev', 'gas', 'sal', 'far', 'em', 'del']) { goHome(); render(); try { document.querySelector('#atl [data-a="' + k + '"]').click() } catch (x) { ye.push(k + ': ' + x.message) } await W(30) } r.atlErr = ye; r.uf = UFULL;
     document.querySelector('#bnav [data-b="home"]').click(); await W(50); r.home = CAT === 'home' && !F_OPEN && document.body.classList.contains('home');
     document.querySelector('#bnav [data-b="more"]').click(); await W(50); r.moreOpen = !document.getElementById('more').hidden;
     document.querySelector('#more [data-go="util"]').click(); await W(80); r.util = document.getElementById('more').hidden && !!document.querySelector('#util .ugp');
@@ -270,6 +271,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     goHome(); render(); return r; });
   info(JSON.stringify(nav));
   check(nav.open && nav.home, 'acesso "Abierto ahora" filtra e "Inicio" da barra volta ao começo');
+  check(nav.atlErr.length === 0, 'todos os acessos rápidos (Transporte, Eventos, Gastronomía, Salud, Farmacias, Emergencias, Delivery) respondem sem erro');
   check(nav.moreOpen && nav.util, 'barra de baixo: "Más" abre o menu e "Santa Rita útil" abre a central completa');
   check(nav.map && nav.mnav, 'barra de baixo abre o mapa; menu do topo leva aos negócios');
   check(nav.labels.join('|') === 'Inicio|Categorías|Mapa|Agenda|Más', 'barra de baixo com Inicio, Categorías, Mapa, Agenda e Más');
