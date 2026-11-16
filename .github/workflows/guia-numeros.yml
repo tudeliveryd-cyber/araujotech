@@ -1,0 +1,36 @@
+name: Números da Guía (leitura)
+
+# Só leitura: mostra os totais de visitas da Guía guardados no servidor (sem dados de quem visitou).
+on:
+  workflow_dispatch:
+
+jobs:
+  ler:
+    runs-on: ubuntu-latest
+    env:
+      SITE_FTP_USERNAME: ${{ secrets.SITE_FTP_USERNAME }}
+      SITE_FTP_PASSWORD: ${{ secrets.SITE_FTP_PASSWORD }}
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+    steps:
+      - name: Instalar lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+      - name: Ler os arquivos de contagem
+        run: |
+          export LFTP_PASSWORD="$SITE_FTP_PASSWORD"
+          mkdir -p h
+          lftp -e "
+            set ftp:ssl-force true; set ftp:ssl-protect-data true;
+            set ssl:verify-certificate yes; set ssl:verify-certificate/CC:40:F0:6A:08:0C:63:04:01:05:A9:20:7B:23:53:CA:60:35:A7:05 no; set ftp:passive-mode true; set net:max-retries 3; set net:timeout 30;
+            open --env-password -u \"$SITE_FTP_USERNAME\" ftp://$FTP_SERVER;
+            cls -l sitio/datos/;
+            mget -O h sitio/datos/hits-*.json;
+            bye" || true
+          python3 - <<'P'
+          import json,glob,os
+          for f in sorted(glob.glob('h/hits-*.json')):
+              d=json.load(open(f))
+              print(os.path.basename(f), 'visitas no mês:', d.get('v',0))
+              print('  por dia:', dict(sorted((d.get('vd') or {}).items())))
+              print('  páginas:', d.get('p',{}))
+              print('  toques em negócios (total):', sum((d.get('c') or {}).values()), '| slider exibido:', sum((d.get('s') or {}).values()), '| toques no slider:', sum((d.get('k') or {}).values()))
+          P

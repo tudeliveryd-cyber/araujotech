@@ -139,7 +139,7 @@ __SECS__
 document.querySelectorAll('.vd').forEach(function(d){var im=d.querySelector('img');function chk(){if(im.naturalWidth&&im.naturalWidth<=120)d.remove()}if(im.complete)chk();im.addEventListener('load',chk);im.addEventListener('error',function(){d.remove()});
 d.querySelector('.vp').addEventListener('click',function(){var f=document.createElement('iframe');f.src='https://www.youtube-nocookie.com/embed/'+d.dataset.v+'?autoplay=1&rel=0';f.title=d.querySelector('.vt').textContent;f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';f.allowFullscreen=true;f.loading='lazy';this.replaceWith(f)})});
 if(/(^|\\.)guiadesantarita\\.com$/.test(location.hostname))document.querySelectorAll('a[href^="/guia/"]').forEach(function(a){a.setAttribute('href',a.getAttribute('href').replace(/^\\/guia\\//,'/'))});
-try{if(!navigator.webdriver&&navigator.sendBeacon)navigator.sendBeacon('/sitio/guia_hit.php?t=p&id=conoce')}catch(e){}})();</script>
+try{if(!navigator.webdriver&&navigator.sendBeacon)navigator.sendBeacon((location.hostname.endsWith('guiadesantarita.com')?'https://araujotechsistemas.com':'')+'/sitio/guia_hit.php?t=p&id=conoce')}catch(e){}})();</script>
 </body></html>
 '''
 out = (HTML.replace('__CSS__', CSS + EXTRA_CSS).replace('__HDR__', HDR).replace('__IDX__', idx).replace('__FACTS__', facts).replace('__REV__', REV)
