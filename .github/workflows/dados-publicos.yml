@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python3 tools/osm_santa_rita.py
+      - run: python3 tools/osm_santa_rita.py || true
       - run: python3 tools/mec_santa_rita.py || true
       - name: Guardar no ramo dados
         run: |
           cd dados
           git init -q -b dados
           git config user.name "Araújo Tech (dados)"; git config user.email "actions@users.noreply.github.com"
-          git add -A && git commit -qm "OSM Santa Rita $(date -u +%F)"
+          ls; git add -A && git commit -qm "OSM Santa Rita $(date -u +%F)"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" dados
