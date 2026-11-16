@@ -10,7 +10,7 @@ const { sec, check, info } = L;
     'iglesia-vida': { name: 'Iglesia Vida', sys: 'pulpito', plan: '', due: day(5), status: 'suspenso', city: 'Naranjal', pays: [], created: day(-20) } };
   for (const [id, x] of Object.entries(B)) await L.fsReq(P, 'PATCH', 'billing/' + id, 'owner', L.fields(x));
   const cfgDoc = async () => L.unfields((await L.fsReq(P, 'GET', 'platform/config', 'owner')).json) || {};
-  const A = await L.open({ w: 1366 }); const a = A.p;
+  const A = await L.open({ w: 1366, central: true }); const a = A.p;
   await a.goto('https://araujotechsistemas.com/admin/'); await a.w(2500);
   await a.fill('#lg_user', ADM[0]); await a.fill('#lg_pass', ADM[1]); await a.press('#lg_pass', 'Enter'); await a.w(5000);
   check(await a.evaluate(() => CLOUD.plLoaded === true && PL.shops.length === 3), 'clientes reais carregados da nuvem (3)');
@@ -88,7 +88,7 @@ const { sec, check, info } = L;
   check(a.errs.length === 0, 'sem erros de JavaScript no computador', a.errs.join(' | '));
 
   sec('H. Celular');
-  const M = await L.open({ w: 390 }); const m = M.p;
+  const M = await L.open({ w: 390, central: true }); const m = M.p;
   await m.goto('https://araujotechsistemas.com/admin/'); await m.w(2500);
   if (await m.locator('#lg_user').count()) { await m.fill('#lg_user', ADM[0]); await m.fill('#lg_pass', ADM[1]); await m.press('#lg_pass', 'Enter'); await m.w(6000); }
   const r = await m.evaluate(() => ({ side: getComputedStyle(document.querySelector('.cg-side')).display, bn: getComputedStyle(document.querySelector('.cg-bnav')).display, sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
