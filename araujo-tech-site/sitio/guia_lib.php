@@ -160,11 +160,11 @@ function guia_pub() {
   foreach ((array)($d['gev'] ?? []) as $x) {
     if (!is_array($x) || trim((string)($x['t'] ?? '')) === '' || empty($x['d']) || $x['d'] < $day) continue;
     $u = (string)($x['u'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $u)) $u = '';
-    $ev[] = ['t' => (string)$x['t'], 'k' => in_array($x['k'] ?? '', ['rel', 'dep', 'cul', 'com', 'neg', 'inf', 'otr'], true) ? $x['k'] : 'otr', 'd' => (string)$x['d'], 'h' => (string)($x['h'] ?? ''), 'l' => (string)($x['l'] ?? ''), 'u' => $u];
+    $ev[] = ['id' => substr(md5((string)$x['t'] . '|' . (string)$x['d'] . '|' . (string)($x['h'] ?? '')), 0, 10), 't' => (string)$x['t'], 'k' => in_array($x['k'] ?? '', ['rel', 'dep', 'cul', 'com', 'neg', 'inf', 'otr'], true) ? $x['k'] : 'otr', 'd' => (string)$x['d'], 'h' => (string)($x['h'] ?? ''), 'l' => (string)($x['l'] ?? ''), 'u' => $u];
   }
   $acc = guia_acc(); $fu = [];
   foreach ($acc['fichas'] as $x) {
-    foreach ($x['ev'] as $e) $ev[] = ['t' => $e['t'], 'k' => $x['tipo'] === 'iglesia' ? 'rel' : ($x['tipo'] === 'club' ? 'dep' : 'com'), 'd' => $e['d'], 'h' => $e['h'], 'l' => $e['l'] !== '' ? $e['l'] : $x['n'], 'u' => ''];
+    foreach ($x['ev'] as $e) $ev[] = ['id' => substr(md5($e['t'] . '|' . $e['d'] . '|' . $e['h']), 0, 10), 't' => $e['t'], 'k' => $x['tipo'] === 'iglesia' ? 'rel' : ($x['tipo'] === 'club' ? 'dep' : 'com'), 'd' => $e['d'], 'h' => $e['h'], 'l' => $e['l'] !== '' ? $e['l'] : $x['n'], 'u' => ''];
     if (isset(GUIA_FU[$x['tipo']])) $fu[] = ['id' => 'f' . $x['uid'], 'c' => GUIA_FU[$x['tipo']], 'n' => $x['n'], 'a' => $x['a'], 'tel' => $x['tel'], 'h' => $x['hrs'], 'map' => $x['map'], 'd' => $x['d'], 'wa' => $x['wa'], 'ig' => $x['ig'], 'web' => $x['web'], 'lg' => $x['lg'], 'ph' => $x['ph']];
   }
   usort($ev, function ($a, $b) { return strcmp($a['d'] . $a['h'], $b['d'] . $b['h']); });
@@ -321,4 +321,23 @@ function guia_reviews($id, $sh) {
   $out = $n >= 3 ? ['n' => $n, 'avg' => round($sum / $n, 1), 'top' => array_slice($top, 0, 4)] : [];
   @file_put_contents($cache, json_encode($out));
   return $out ?: null;
+}
+// "Lo nuevo en la Guía": as últimas vagas e avisos publicados (a ordem salva já põe o mais novo primeiro; 'at' quando existe)
+function guia_nov() {
+  $doc = guia_doc(); $today = (new DateTime('now', new DateTimeZone('America/Asuncion')))->format('Y-m-d'); $o = [];
+  foreach (array_slice((array)($doc['gjobs'] ?? []), 0, 30) as $i => $x) {
+    if (!is_array($x) || empty($x['on']) || ($x['until'] ?? '') < $today || mb_strlen(trim((string)($x['t'] ?? ''))) < 3 || trim((string)($x['co'] ?? '')) === '') continue;
+    $o[] = ['k' => 'job', 'id' => 'g:' . preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')), 't' => mb_substr(trim((string)$x['t']), 0, 70), 's' => mb_substr(trim((string)$x['co']), 0, 60), 'at' => (string)($x['at'] ?? ''), 'i' => $i, 'ph' => ''];
+  }
+  foreach (guia_pub()['clas'] as $i => $x) $o[] = ['k' => 'cla', 'id' => $x['id'], 't' => $x['t'], 's' => $x['k'], 'op' => $x['op'], 'at' => '', 'i' => $i + 0.5, 'ph' => $x['ph']];
+  usort($o, function ($a, $b) { return [$b['at'], $a['i']] <=> [$a['at'], $b['i']]; });
+  return array_map(function ($x) { unset($x['at'], $x['i']); return $x; }, array_slice($o, 0, 8));
+}
+// uma vaga, um aviso ou um evento pelo id (página própria /vacante/<id>, /aviso/<id>, /evento/<id>)
+function guia_item($k, $id) {
+  if ($k === 'vacante') { foreach (guia_jobs(false) as $j) if ($j['id'] === $id) return $j; return null; }
+  $p = guia_pub();
+  if ($k === 'aviso') { foreach ($p['clas'] as $c) if ($c['id'] === $id) return $c; return null; }
+  if ($k === 'evento') { foreach ($p['ev'] as $e) if (($e['id'] ?? '') === $id) return $e; return null; }
+  return null;
 }

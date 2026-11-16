@@ -245,5 +245,25 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   const out3 = JSON.parse(cp.execFileSync('php', ['-r', "require 'prods_lib.php'; require 'guia_lib.php'; $p = guia_pub(); echo json_encode(['clas' => $p['clas'], 'jobs' => guia_jobs(false)]);"], { cwd: path.join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gacc3-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }), timeout: 40000 }).toString());
   check(out3.jobs.some(j => j.t === 'Cajera' && j.co.n === 'Supermercado Teste') && out3.clas.some(c => c.t === 'Llaves encontradas' && c.k === 'per'), 'servidor mostra a vaga e o aviso aprovados');
   check(e.errs.length === 0, 'moderação sem erros de JavaScript', e.errs.join(' | '));
+
+  sec('K. Páginas próprias, "Lo nuevo" e busca');
+  const tmp4 = fs.mkdtempSync(path.join(os.tmpdir(), 'gacc4-')); const envp = Object.assign({}, process.env, { TMPDIR: tmp4, GUIA_FS_BASE: 'http://127.0.0.1:8080' });
+  const phpq = code => cp.execFileSync('php', ['-r', code], { cwd: path.join(L.DIRS.site, 'sitio'), env: envp, timeout: 40000 }).toString();
+  const pub = JSON.parse(phpq("require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(guia_pub() + ['nov' => guia_nov(), 'jobs' => guia_jobs(false)]);"));
+  check(pub.nov.length >= 2 && pub.nov.some(x => x.k === 'job' && x.t === 'Cajera') && pub.nov.some(x => x.k === 'cla' && x.t === 'Perro perdido' && /gimg\.php\?c=/.test(x.ph)), 'Lo nuevo: as últimas vagas e avisos aprovados (com foto)');
+  const job = pub.jobs.find(j => j.t === 'Cajera'), av = pub.clas.find(c => c.t === 'Perro perdido'), ev = pub.ev.find(v => v.t === 'Culto de jóvenes');
+  const page = (k, id) => cp.execFileSync('php', ['-r', "$_SERVER['HTTP_HOST'] = 'guiadesantarita.com'; $_GET = ['k' => '" + k + "', 'id' => '" + id + "']; chdir('../guia'); include 'p.php';"], { cwd: path.join(L.DIRS.site, 'sitio'), env: envp, timeout: 40000 }).toString();
+  const pj = page('vacante', job.id.replace(/:/g, '.'));
+  check(/<title>Vacante: Cajera — Supermercado Teste/.test(pj) && /og:url" content="https:\/\/guiadesantarita\.com\/vacante\//.test(pj) && /"@type":"JobPosting"/.test(pj) && /Postularme por WhatsApp/.test(pj), 'página da vaga: título, prévia, Google (JobPosting) e botão de postular');
+  const pa = page('aviso', av.id);
+  check(/Se perdió: Perro perdido/.test(pa) && /og:image" content="https:\/\/araujotechsistemas\.com\/sitio\/gimg\.php\?c=/.test(pa), 'página do aviso com a foto na prévia do WhatsApp');
+  check(/Culto de jóvenes/.test(page('evento', ev.id)) && /"@type":"Event"/.test(page('evento', ev.id)), 'página do evento (Google: Event)');
+  check(/ya no está disponible/.test(page('aviso', 'naoexiste1')), 'publicação vencida ou apagada: página avisa e manda para a Guía');
+  const H = await L.open({ w: 390 }); const h = H.p;
+  await h.goto('https://araujotechsistemas.com/guia/'); await h.w(2500);
+  const hv = await h.evaluate(o => { G.nov = o.nov; G.clas = o.clas; G.ev = o.ev; JOBS = o.jobs; CAT = 'home'; document.getElementById('q').value = ''; render(); const n = [...document.querySelectorAll('.nov .nv-c')].map(a => a.getAttribute('href')); document.getElementById('q').value = 'perro'; CAT = 'all'; render(); const r = [...document.querySelectorAll('.nov-q .nv-c b')].map(b => b.textContent); return { n, r }; }, pub);
+  check(hv.n.length >= 2 && hv.n.some(u => /\/guia\/vacante\/g\./.test(u)), 'tela inicial mostra "Lo nuevo en la Guía" com links próprios');
+  check(hv.r.includes('Perro perdido'), 'buscar "perro" encontra o aviso');
+  check(h.errs.length === 0, 'Guía sem erros de JavaScript', h.errs.join(' | '));
   await L.done();
 })().catch(async e => { console.error(e); L.bad('erro: ' + e.message); await L.done(); });
