@@ -238,6 +238,19 @@ vd=2000-01-01
 vr=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents:commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data "{\"writes\":[{\"update\":{\"name\":\"projects/araujotech-catalogos/databases/(default)/documents/shops/fogao-mineiro/visitas/$vd\",\"fields\":{}},\"updateMask\":{\"fieldPaths\":[]},\"updateTransforms\":[{\"fieldPath\":\"n\",\"increment\":{\"integerValue\":\"1\"}}]}]}" 2>/dev/null || true)
 vx=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents:commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data "{\"writes\":[{\"update\":{\"name\":\"projects/araujotech-catalogos/databases/(default)/documents/shops/fogao-mineiro/visitas/$vd\",\"fields\":{}},\"updateMask\":{\"fieldPaths\":[]},\"updateTransforms\":[{\"fieldPath\":\"n\",\"increment\":{\"integerValue\":\"50\"}}]}]}" 2>/dev/null || true)
 if [ "$vr" = "200" ] && [ "$vx" != "200" ]; then ok "regras v14 no ar: visita soma 1 e não aceita +50"; elif [ "$vr" = "403" ]; then echo "AVISO | regras v14 ainda não publicadas (visitas ao catálogo ainda não contam)"; else bad "regras v14: +1 -> $vr, +50 -> $vx"; fi
+# textos do site editados no painel (só informação: mostra o que está salvo, para não sobrescrever sem querer)
+curl -sS --max-time 30 "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U&mask.fieldPaths=txt&mask.fieldPaths=sis&mask.fieldPaths=faq&mask.fieldPaths=testi&mask.fieldPaths=contacto" 2>/dev/null | python3 -c 'import sys,json
+def dv(v):
+  if not isinstance(v,dict): return None
+  for k in ("stringValue","booleanValue","integerValue","doubleValue"):
+    if k in v: return v[k]
+  if "arrayValue" in v: return [dv(x) for x in v["arrayValue"].get("values",[])]
+  if "mapValue" in v: return {k:dv(x) for k,x in v["mapValue"].get("fields",{}).items()}
+  return None
+try:
+  d=json.load(sys.stdin); f={k:dv(x) for k,x in d.get("fields",{}).items()}
+  print("INFO  | textos salvos no painel: "+json.dumps(f,ensure_ascii=False)[:6000])
+except Exception as e: print("INFO  | textos do painel: sem leitura")' || true
 # regras v15 (contas próprias e opiniões da Guía): a consulta pública do que foi aprovado funciona; ler tudo e escrever sem login, não
 fq() { curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents:runQuery?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data "$1" 2>/dev/null || true; }
 fa=$(fq '{"structuredQuery":{"from":[{"collectionId":"gfichas"}],"where":{"fieldFilter":{"field":{"fieldPath":"st"},"op":"EQUAL","value":{"stringValue":"ok"}}},"limit":1}}')
