@@ -163,8 +163,9 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <footer><div class="wrap"><span data-pt="Guia de Santa Rita · Uma iniciativa de">Guía de Santa Rita · Una iniciativa de</span> <a href="/">Araújo Tech Sistemas</a> <span data-pt="e">y</span> Tu Delivery</div></footer>
 <script>try{if(localStorage.getItem('at_lang')==='pt'){document.documentElement.lang='pt';document.querySelectorAll('[data-pt]').forEach(function(e){e.textContent=e.getAttribute('data-pt')})}}catch(e){}</script>
 <script>
-(function(){var b=document.getElementById('tdb');if(b)b.addEventListener('click',function(){try{if(!navigator.webdriver&&navigator.sendBeacon)navigator.sendBeacon('/sitio/guia_hit.php?t=p&id=td')}catch(e){}})})();
+var HU=(location.hostname.endsWith('guiadesantarita.com')?'https://araujotechsistemas.com':'')+'/sitio/guia_hit.php';/* os números ficam todos no servidor principal */
+(function(){var b=document.getElementById('tdb');if(b)b.addEventListener('click',function(){try{if(!navigator.webdriver&&navigator.sendBeacon)navigator.sendBeacon(HU+'?t=p&id=td')}catch(e){}})})();
 document.getElementById('sh').addEventListener('click',function(){var u=<?= json_encode($url) ?>,t=<?= json_encode($name . ' · Guía de Santa Rita') ?>;if(navigator.share){navigator.share({title:t,url:u}).catch(function(){})}else{window.open('https://wa.me/?text='+encodeURIComponent(t+' '+u),'_blank','noopener')}});
-try{if(!navigator.webdriver){var u='/sitio/guia_hit.php?t=c&id=<?= rawurlencode($id) ?>';if(navigator.sendBeacon)navigator.sendBeacon(u);else fetch(u,{method:'POST',keepalive:true})}}catch(e){}
+try{if(!navigator.webdriver){var u=HU+'?t=c&id=<?= rawurlencode($id) ?>';if(navigator.sendBeacon)navigator.sendBeacon(u);else fetch(u,{method:'POST',keepalive:true})}}catch(e){}
 </script>
 </body></html>

@@ -31,6 +31,11 @@ if (isset($_GET['ofs'])) { // ofertas de hoje: produtos em promoção (com foto)
   echo json_encode(array_slice($o, 0, 16), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit;
 }
 if (isset($_GET['top'])) { // 'Lo más buscado': as buscas da Guía com resultado, deste mês e do anterior (só as que se repetem)
+  if (stripos((string)($_SERVER['HTTP_HOST'] ?? ''), 'araujotechsistemas.com') === false) { // hospedagem própria da Guía: as contagens ficam no servidor principal
+    $f = sys_get_temp_dir() . '/guia-top.json'; $j = (is_file($f) && time() - filemtime($f) < 900) ? (string)@file_get_contents($f) : '';
+    if ($j === '') { $j = (string)@file_get_contents('https://araujotechsistemas.com/sitio/guia.php?top=1', false, stream_context_create(['http' => ['timeout' => 4]])); $t = json_decode($j, true); if (is_array($t) && isset($t['q'])) @file_put_contents($f, $j); else $j = '{"q":[]}'; }
+    header('Cache-Control: public, max-age=900'); echo $j; exit;
+  }
   $tz = new DateTimeZone('America/Asuncion'); $now = new DateTime('now', $tz); $q = [];
   foreach ([(clone $now)->modify('first day of last month')->format('Y-m'), $now->format('Y-m')] as $m) { $d = json_decode((string)@file_get_contents(__DIR__ . '/datos/hits-' . $m . '.json'), true); foreach ((array)($d['q'] ?? []) as $k => $n) $q[$k] = ($q[$k] ?? 0) + (int)$n; }
   // Só aparece em público o que bate com um negócio da Guía ou com um rubro conhecido: o contador é aberto,

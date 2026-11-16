@@ -1,0 +1,105 @@
+name: Publicar Guía de Santa Rita
+
+# Envia só a Guía para a hospedagem própria de guiadesantarita.com.
+# Os catálogos, o painel e as contagens de visitas continuam em araujotechsistemas.com.
+# Precisa dos secrets GUIA_FTP_USERNAME e GUIA_FTP_PASSWORD (conta FTP criada no cPanel de guiadesantarita.com).
+# GUIA_FTP_SERVER é opcional (se faltar, usa ftp.guiadesantarita.com).
+# GUIA_FTP_FINGERPRINT é opcional: a impressão SHA1 do certificado do servidor, se ele não bater com o nome.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'araujo-tech-site/guia/**'
+      - 'araujo-tech-site/img/**'
+      - 'araujo-tech-site/sitio/guia.php'
+      - 'araujo-tech-site/sitio/guia_lib.php'
+      - 'araujo-tech-site/sitio/prods_lib.php'
+      - 'araujo-tech-site/sitio/gimg.php'
+      - 'araujo-tech-site/sitio/pimg.php'
+      - 'araujo-tech-site/sitio/img.php'
+      - 'araujo-tech-site/clientes.js'
+      - 'tools/guia_htaccess.txt'
+      - '.github/workflows/guia.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: guia-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      GUIA_FTP_SERVER: ${{ secrets.GUIA_FTP_SERVER }}
+      GUIA_FTP_USERNAME: ${{ secrets.GUIA_FTP_USERNAME }}
+      GUIA_FTP_PASSWORD: ${{ secrets.GUIA_FTP_PASSWORD }}
+      GUIA_FTP_FINGERPRINT: ${{ secrets.GUIA_FTP_FINGERPRINT }}
+    steps:
+      - name: Aguardando os dados do FTP da Guía
+        if: env.GUIA_FTP_USERNAME == '' || env.GUIA_FTP_PASSWORD == ''
+        run: echo "Faltam GUIA_FTP_USERNAME e GUIA_FTP_PASSWORD nos secrets. Nada foi enviado."
+      - uses: actions/checkout@v4
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+      - name: Instalar lftp
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+        run: |
+          timeout 120 sudo apt-get update -qq || true
+          if ! timeout 240 sudo apt-get install -y -qq -o Acquire::Retries=2 lftp; then
+            echo "apt indisponível; usando lftp via contêiner"
+            printf 'FROM alpine:3.20\nRUN apk add --no-cache lftp ca-certificates\n' | docker build -q -t at-lftp -
+            printf '#!/bin/sh\nexec docker run --rm -i --network host -e LFTP_PASSWORD -v "$PWD:$PWD" -w "$PWD" at-lftp lftp "$@"\n' | sudo tee /usr/local/bin/lftp >/dev/null
+            sudo chmod +x /usr/local/bin/lftp
+          fi
+          lftp --version | head -1
+      - name: Montar a pasta da Guía
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+        run: |
+          S=araujo-tech-site; D=out; rm -rf $D; mkdir -p $D/sitio
+          cp -r $S/guia $S/img $D/
+          for f in guia.php guia_lib.php prods_lib.php gimg.php pimg.php img.php; do cp $S/sitio/$f $D/sitio/; done
+          cp $S/clientes.js $S/nao-encontrado.html $D/
+          # Nada de contagens, painel ou dados aqui: isso fica só no servidor principal.
+          find $D -type f | wc -l; du -sh $D
+      - name: Certificado do servidor FTP
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+        run: |
+          H="${GUIA_FTP_SERVER:-ftp.guiadesantarita.com}"; echo "SRV=$H" >> $GITHUB_ENV
+          # Só mostra a impressão digital e o nome do certificado (ajuda se a conexão recusar o certificado).
+          timeout 20 openssl s_client -starttls ftp -connect "$H:21" -servername "$H" </dev/null 2>/dev/null \
+            | openssl x509 -noout -subject -fingerprint -sha1 || echo "Não deu para ler o certificado agora."
+      - name: Enviar arquivos para guiadesantarita.com
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+        run: |
+          export LFTP_PASSWORD="$GUIA_FTP_PASSWORD"
+          PIN=""; [ -n "$GUIA_FTP_FINGERPRINT" ] && PIN="set ssl:verify-certificate/$GUIA_FTP_FINGERPRINT no;"
+          L="set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate yes; set ssl:verify-certificate/CC:40:F0:6A:08:0C:63:04:01:05:A9:20:7B:23:53:CA:60:35:A7:05 no; $PIN set ftp:passive-mode true; set net:max-retries 3; set net:timeout 30; open --env-password -u $GUIA_FTP_USERNAME ftp://$SRV"
+          echo "L=$L" >> $GITHUB_ENV
+          # Sem --delete: nada que já está no servidor é apagado.
+          lftp -e "$L; mirror --reverse --verbose --only-newer --parallel=3 ./out/ ./; bye"
+      - name: Regras de endereço (.htaccess)
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+        run: |
+          export LFTP_PASSWORD="$GUIA_FTP_PASSWORD"
+          rm -f ht_old
+          # Baixa o .htaccess que já existe (o do cPanel) para não perder nada dele.
+          if ! lftp -e "$L; get .htaccess -o ht_old; bye"; then
+            if lftp -e "$L; cls -1 .htaccess; bye" 2>/dev/null | grep -q htaccess; then
+              echo "Existe .htaccess mas não deu para baixar. Não mexo nele."; exit 1
+            fi
+            : > ht_old
+          fi
+          awk '/^# BEGIN guia-santa-rita/{skip=1} !skip{print} /^# END guia-santa-rita/{skip=0}' ht_old > ht_new
+          cat tools/guia_htaccess.txt >> ht_new
+          echo "----- .htaccess final -----"; cat ht_new
+          if cmp -s ht_old ht_new; then echo "Sem mudanças"; exit 0; fi
+          lftp -e "$L; put ht_new -o .htaccess; bye"
+      - name: Conferir no ar
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+        run: |
+          sleep 5; ok=1
+          for u in / /negocios/ /sobre/ /terminos/ /manifest.webmanifest /sitemap.xml /guia/qr.js /img/guia/favicon.png; do
+            c=$(curl -s -o /dev/null -w '%{http_code}' "https://guiadesantarita.com$u"); echo "$c $u"; [ "$c" = 200 ] || ok=0
+          done
+          curl -s https://guiadesantarita.com/ | grep -q 'Guía de Santa Rita' && echo "página da Guía OK" || { echo "a página inicial não é a Guía"; ok=0; }
+          c=$(curl -s -o /dev/null -w '%{http_code}' "https://guiadesantarita.com/sitio/guia.php?g=1"); echo "$c dados da Guía"; [ "$c" = 200 ] || ok=0
+          [ $ok = 1 ] || { echo "Alguma coisa não respondeu como esperado (veja acima)."; exit 1; }

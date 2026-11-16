@@ -145,7 +145,7 @@ function trAll(root){if(L!=='pt')return;document.documentElement.lang='pt';const
   if(bad.length){er.textContent=tr(wb&&bad.length===1?'Revisá tu número de WhatsApp.':'Completá los datos marcados.');er.style.display='block';document.getElementById(bad[0]).focus();return}
   er.style.display='none';const pl=(f.querySelector('input[name=pl]:checked')||{}).value||'';
   const m=['Hola Araújo Tech! Quiero aparecer en la Guía de Santa Rita (Vitrix).','','Negocio: '+v('n'),'Rubro: '+v('r'),'Nombre: '+v('p'),'WhatsApp: '+v('w'),'Ciudad: '+(v('c')||'Santa Rita'),'Plan: '+pl].join('\n');
-  try{if(!navigator.webdriver&&navigator.sendBeacon)navigator.sendBeacon('/sitio/guia_hit.php?t=c&id=lead-guia')}catch(x){}
+  try{if(!navigator.webdriver&&navigator.sendBeacon)navigator.sendBeacon((location.hostname.endsWith('guiadesantarita.com')?'https://araujotechsistemas.com':'')+'/sitio/guia_hit.php?t=c&id=lead-guia')}catch(x){}
   location.href='https://wa.me/595982086171?text='+encodeURIComponent(m)});
  f.addEventListener('input',e=>{if(e.target.classList)e.target.classList.remove('bad')});
  document.querySelectorAll('[data-pl]').forEach(a=>a.addEventListener('click',()=>{const r=f.querySelector('input[name=pl][value="'+a.dataset.pl+'"]');if(r)r.checked=true}));
