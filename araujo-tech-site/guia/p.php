@@ -47,6 +47,7 @@ if (!$x) {
     $ld = ''; $kind = $CK[$x['k']] ?? 'Aviso';
   } elseif ($k === 'lugar') {
     $PC = ['gob' => 'Gobierno y trámites', 'doc' => 'Documentos', 'salud' => 'Salud', 'far' => 'Farmacia', 'seg' => 'Seguridad', 'ocio' => 'Plazas y recreación', 'trans' => 'Transporte', 'serv' => 'Servicios públicos', 'edu' => 'Educación', 'gua' => 'Guardería y jardín', 'escpub' => 'Escuela o colegio público', 'escpri' => 'Colegio privado', 'unipub' => 'Universidad pública', 'unipri' => 'Universidad privada', 'inst' => 'Instituto, cursos e idiomas', 'igl' => 'Iglesia', 'com' => 'Comunidad y ONGs', 'dep' => 'Deportes y clubes', 'ani' => 'Animales y adopción', 'fin' => 'Bancos y finanzas'];
+    foreach (guia_cat(guia_doc()['gcat'] ?? [])['pub'] as $cg) { if (!$cg['tabs'] && $cg['n']['es'] !== '') $PC[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '') $PC[$ct['k']] = $ct['n']['es']; } // nomes das pastas e abas do painel
     $kind = $PC[$x['c']] ?? 'Lugar público';
     $x['t'] = $x['n'];
     $title = $x['n'] . ' — Santa Rita';

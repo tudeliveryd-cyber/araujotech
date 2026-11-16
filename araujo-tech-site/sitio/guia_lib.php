@@ -2,9 +2,9 @@
 // Guía Vitrix: banners pagos (platform/sitio.gads) e lugares públicos (platform/sitio.gutil), cadastrados no Panel Araújo Tech.
 // Os banners só saem entre as datas escolhidas (hora do Paraguai). A imagem vai por gimg.php (o JSON fica leve).
 function guia_doc() {
-  $cache = sys_get_temp_dir() . '/at_guia7.json';
+  $cache = sys_get_temp_dir() . '/at_guia8.json';
   if (is_file($cache) && time() - filemtime($cache) < 180) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gatl&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gadsAt');
+  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gatl&mask.fieldPaths=gcat&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -16,7 +16,7 @@ function guia_doc() {
     if (isset($v['arrayValue'])) return array_map($val, $v['arrayValue']['values'] ?? []);
     return null;
   };
-  $d = ['gatl' => $val($f['gatl'] ?? null) ?: [], 'gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
+  $d = ['gcat' => $val($f['gcat'] ?? null) ?: [], 'gatl' => $val($f['gatl'] ?? null) ?: [], 'gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
@@ -112,8 +112,24 @@ function guia_dy($dy) {
     if ($x['on'] && $x['a'][0] !== '' && $x['a'][1] !== '') $any = true; $o[] = $x; }
   return $any ? $o : null;
 }
+// Categorias organizadas pelo painel ("pastas"): pub = informação pública (lugares), neg = negócios. Cada grupo pode ter abas.
+function guia_cat($raw) {
+  $txt = function ($n) { $n = is_array($n) ? $n : []; return ['es' => mb_substr(trim((string)($n['es'] ?? '')), 0, 40), 'pt' => mb_substr(trim((string)($n['pt'] ?? '')), 0, 40)]; };
+  $key = function ($k) { $k = (string)$k; return preg_match('/^[a-z][a-z0-9]{0,15}$/', $k) ? $k : ''; };
+  $out = ['pub' => [], 'neg' => []];
+  foreach (['pub', 'neg'] as $sec) {
+    foreach (array_slice((array)(($raw[$sec] ?? []) ?: []), 0, 40) as $g) {
+      if (!is_array($g) || ($k = $key($g['k'] ?? '')) === '') continue;
+      $tabs = [];
+      foreach (array_slice((array)($g['tabs'] ?? []), 0, 12) as $t) { if (is_array($t) && ($tk = $key($t['k'] ?? '')) !== '') $tabs[] = ['k' => $tk, 'n' => $txt($t['n'] ?? [])]; }
+      $out[$sec][] = ['k' => $k, 'n' => $txt($g['n'] ?? []), 'ic' => $key($g['ic'] ?? '') ?: 'grid', 'kw' => mb_substr(trim((string)($g['kw'] ?? '')), 0, 120), 'tabs' => $tabs];
+    }
+  }
+  return $out;
+}
 function guia_pub() {
   $d = guia_doc();
+  $cat = guia_cat($d['gcat'] ?? []); $negk = array_merge(['food', 'shop', 'health', 'home', 'car', 'serv'], array_column($cat['neg'], 'k'));
   $now = new DateTime('now', new DateTimeZone('America/Asuncion')); $day = $now->format('Y-m-d');
   $ads = [];
   foreach ((array)($d['gads'] ?? []) as $x) {
@@ -130,7 +146,7 @@ function guia_pub() {
     foreach ($d['gutil'] as $x) {
       if (!is_array($x) || trim((string)($x['n'] ?? '')) === '') continue;
       $m = (string)($x['map'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $m)) $m = '';
-      $util[] = ['c' => (string)($x['c'] ?? 'gob'), 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'h' => (string)($x['h'] ?? ''), 'map' => $m, 'o' => empty($x['o']) ? 0 : 1];
+      $util[] = ['c' => preg_match('/^[a-z][a-z0-9]{0,15}$/', (string)($x['c'] ?? '')) ? (string)$x['c'] : 'gob', 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'h' => (string)($x['h'] ?? ''), 'map' => $m, 'o' => empty($x['o']) ? 0 : 1];
     }
   }
   $pros = [];
@@ -174,8 +190,8 @@ function guia_pub() {
     if (!is_array($x) || ($x['on'] ?? true) === false || trim((string)($x['n'] ?? '')) === '') continue;
     $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
     $m = (string)($x['map'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $m)) $m = '';
-    $g = (string)($x['g'] ?? 'serv'); if (!in_array($g, ['food', 'shop', 'health', 'home', 'car', 'serv'], true)) $g = 'serv';
-    $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'td' => !empty($x['td']), 'dy' => guia_dy($x['dy'] ?? null), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : '', 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&k=ph&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
+    $g = (string)($x['g'] ?? 'serv'); if (!in_array($g, $negk, true)) $g = 'serv';
+    $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'sub' => preg_match('/^[a-z][a-z0-9]{0,15}$/', (string)($x['sub'] ?? '')) ? (string)$x['sub'] : '', 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'td' => !empty($x['td']), 'dy' => guia_dy($x['dy'] ?? null), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : '', 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&k=ph&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
     if (count($dir) >= 300) break;
   }
   foreach ($acc['fichas'] as $x) { // negócios e profissionais com conta própria (aprovados pela Guía depois do pagamento)
@@ -196,7 +212,7 @@ function guia_pub() {
   $atl = []; // accesos da portada, na ordem do painel
   foreach (array_slice((array)($d['gatl'] ?? []), 0, 16) as $x) { if (!is_array($x)) continue; $k = (string)($x['k'] ?? ''); if (!in_array($k, ['all', 'gas', 'del', 'em', 'sal', 'far', 'igl', 'edu', 'tra', 'ev', 'job', 'mas', 'q', 'p'], true)) continue;
     $atl[] = ['k' => $k, 'es' => mb_substr(trim((string)($x['es'] ?? '')), 0, 24), 'pt' => mb_substr(trim((string)($x['pt'] ?? '')), 0, 24), 'ic' => preg_replace('/[^a-z]/', '', (string)($x['ic'] ?? '')), 'q' => mb_substr(trim((string)($x['q'] ?? '')), 0, 60)]; }
-  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10), 'atl' => $atl];
+  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10), 'cat' => $cat, 'atl' => $atl];
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
