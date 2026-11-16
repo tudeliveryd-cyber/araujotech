@@ -437,8 +437,8 @@ body.spvm #chips,body.spvm #filt{display:none}.evf{margin:4px 0 12px}
 
 /* celular: slider de ponta a ponta, sem cantos arredondados nem margens */
 @media (max-width:640px){.dst .sl{width:100vw;max-width:none;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);border-radius:0}}
-/* computador e tablet: também de ponta a ponta; a altura tem limite e a arte inteira aparece no centro, com o fundo desfocado nos lados */
-@media (min-width:641px){.dst.wrap{max-width:none;padding:0;margin:0 0 36px}.dst .sl{width:100%;max-width:none;margin:0;border-radius:0;aspect-ratio:auto;height:clamp(300px,36vw,560px)}.dst .sd .in{padding-left:max(6%,calc((100vw - 1160px)/2 + 24px))}.dst .sd .ad{right:max(14px,calc((100vw - 1160px)/2 + 24px));bottom:14px}}
+/* computador e tablet: também de ponta a ponta, na proporção da arte (1920 × 820): a arte enche a faixa inteira, sem cortes */
+@media (min-width:641px){.dst.wrap{max-width:none;padding:0;margin:0 0 36px}.dst .sl{width:100%;max-width:none;margin:0;border-radius:0;aspect-ratio:1920/820;height:auto}.dst .sd .in{padding-left:max(6%,calc((100vw - 1160px)/2 + 24px))}.dst .sd .ad{right:max(14px,calc((100vw - 1160px)/2 + 24px));bottom:14px}}
 </style></head>
 <body>
 <div class="tbar"><div class="wrap"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Santa Rita – Alto Paraná, PY</span><span class="tb-r"><span id="tbw"></span><span id="tbd"></span></span></div></div>
