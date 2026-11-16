@@ -105,7 +105,8 @@ footer a{color:var(--deep);font-weight:700;text-decoration:none}
 .sd>img.bgi{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .sd.ad-s>img.bgi{filter:blur(18px) brightness(.7);transform:scale(1.15)}.sd.ad-s img.fg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
 .ad-s .fgw{display:none}
-@media (min-width:641px){.ad-s.wd .fgw{display:block;position:absolute;inset:0}.ad-s.wd .fgw img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}.ad-s.wd>img.fg,.ad-s.wd>img.bgi{display:none}}
+/* computador: a arte do computador aparece inteira (contain), sem cortar em cima nem embaixo; o fundo desfocado completa as laterais */
+@media (min-width:641px){.ad-s.wd .fgw{display:block;position:absolute;inset:0}.ad-s.wd .fgw img{width:100%;height:100%;object-fit:contain;object-position:center;display:block}.ad-s.wd>img.fg{display:none}}
 .sd.cl{background:radial-gradient(500px 260px at 85% 20%,#6A22C0 0%,transparent 70%),linear-gradient(120deg,#3B0E70,#24093F)}
 .sd.cl>img.bgi{opacity:.92}
 .sd.cl::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,4,36,.88) 0%,rgba(20,4,36,.55) 48%,rgba(20,4,36,.05) 100%)}
