@@ -8,7 +8,7 @@ $ua = strtolower((string)($_SERVER['HTTP_USER_AGENT'] ?? ''));
 if ($ua === '' || preg_match('/bot|crawl|spider|headless|lighthouse|preview|facebookexternalhit|whatsapp/', $ua)) { http_response_code(204); exit; }
 $t = (string)($_REQUEST['t'] ?? ''); $id = (string)($_REQUEST['id'] ?? ''); if ($t !== 'q') $id = strtolower($id);
 if ($t === 'q') { $id = trim(preg_replace('/-+/', '-', preg_replace('/[^a-z0-9ñ]+/u', '-', mb_strtolower($id))), '-'); if (!preg_match('/^[a-zñ][a-z0-9ñ-]{2,23}$/u', $id) || preg_match('/\d{4,}/', $id)) { http_response_code(204); exit; } } // buscas (só palavras curtas, sem números longos)
-elseif ($t === 'p') { if (!in_array($id, ['llegar', 'fav', 'td'], true)) { http_response_code(204); exit; } } // páginas e ações: só nomes conhecidos
+elseif ($t === 'p') { if (!in_array($id, ['llegar', 'conoce', 'fav', 'td'], true)) { http_response_code(204); exit; } } // páginas e ações: só nomes conhecidos
 elseif (!in_array($t, ['v', 'c', 's', 'k'], true) || ($t !== 'v' && !preg_match('/^[a-z0-9][a-z0-9-]{1,70}$/', $id))) { http_response_code(204); exit; }
 // freio por aparelho: no máximo 40 contagens por minuto vindas do mesmo endereço (evita inflar os números com um script)
 $rl = sys_get_temp_dir() . '/at_ghl_' . md5(($_SERVER['REMOTE_ADDR'] ?? '') . '|' . date('YmdHi'));
