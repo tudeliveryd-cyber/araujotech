@@ -78,6 +78,7 @@ async function open(opt = {}) {
   p.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') { const t = m.text(); if (!/Failed to load resource|net::ERR|ERR_FAILED|favicon|emulator/i.test(t)) (p.cons = p.cons || []).push(t.slice(0, 220)); } });
   p.on('dialog', d => { p.dialogs.push(d.message()); if (p.autoDialog) d.accept().catch(() => {}); else d.dismiss().catch(() => {}); });
   if (initJs) await p.addInitScript(initJs);
+  if (!opt.central) await p.addInitScript(() => { window.__cgDefault = 'all'; }); // testes antigos do painel usam a vista completa
   await p.addInitScript(() => { window.__opened = []; const o = window.open; window.open = (u) => { window.__opened.push(String(u)); return null; }; });
   p.w = ms => p.waitForTimeout(ms || 400);
   p.act = async (a, extra, n) => { const l = p.locator('[data-act=' + a + ']' + (extra || '') + ':visible'); const c = await l.count(); if (!c) return false; await (n == null ? l.first() : l.nth(n)).click(); await p.w(); return true; };
