@@ -31,3 +31,11 @@ jobs:
           except Exception as e:
               print('guia.php não respondeu JSON:', open('pub.json').read()[:200])
           P
+          for id in $(python3 -c "import json;print(' '.join(a['id'] for a in json.load(open('pub.json')).get('ads',[])))"); do
+            img=$(python3 -c "import json;print([a['img'] for a in json.load(open('pub.json'))['ads'] if a['id']=='$id'][0])")
+            for h in https://guiadesantarita.com https://araujotechsistemas.com; do
+              echo "IMG $h$img -> $(curl -s -o /dev/null -w '%{http_code} %{content_type} %{size_download}' "$h$img")"
+            done
+          done
+          echo "HOME contém o banner: $(curl -s https://guiadesantarita.com/ | grep -c 'gimg.php?i=')"
+          curl -s https://guiadesantarita.com/ | grep -o '"ads":\[[^]]\{0,300\}' | head -c 400; echo
