@@ -276,7 +276,7 @@ footer .allies{justify-content:flex-start;padding:24px 0 14px;border-bottom:1px 
 @media (min-width:900px){.hmenu{display:none}.mnav{margin-left:22px}}
 .dst{margin:12px auto 12px;padding-top:0}.dst .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .dst .sl{border-radius:18px;max-width:none}
-@media (min-width:900px){.dst{max-width:1160px;margin:16px auto 14px}.dst .sl{aspect-ratio:1920/440}}
+@media (min-width:900px){.dst{max-width:1040px;margin:16px auto 14px}.dst .sl{aspect-ratio:1920/820}}/* no computador o banner aparece inteiro, no mesmo formato em que é enviado (1920 × 820) */
 .hero{background:linear-gradient(115deg,#3E0A70 0%,#5E14A6 55%,#7E1BCB 100%);padding:22px 0 22px}
 .hero h1{font-size:clamp(25px,4vw,40px);line-height:1.12;max-width:640px}.hero h1 b{color:var(--yellow)}
 .hero p{font-size:clamp(14.5px,1.4vw,17px);margin-top:8px;max-width:560px}
@@ -627,45 +627,45 @@ const mapU=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURICompon
 const telU=t=>{let d=String(t||'').replace(/[^\d+]/g,'');return d?'tel:'+d:''};
 /* farmácias e saúde do OpenStreetMap (dados abertos, © colaboradores do OpenStreetMap), conferidos em 16/11/2026; Farmacenter pelo site oficial da rede */
 const OSMP=[
- {c:'far',n:'Farmacenter Santa Rita',a:'Calle Ñanawa y Avda. Inmigrantes',tel:'021 262 6000',h:'Lun a sáb 6:00–22:00 · Dom y feriados 8:00–20:00',map:'https://www.google.com/maps?q=-25.79308,-55.08668',src:'farmacenter.com.py',k:/farmacenter/},
- {c:'far',n:'Farmavida',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79818,-55.09047',src:'OpenStreetMap',k:/farmavida/},
- {c:'far',n:'Farmacia Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79901,-55.0902',src:'OpenStreetMap',k:/farmacia santa rita/},
- {c:'far',n:'Drugstore Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79848,-55.08973',src:'OpenStreetMap',k:/drugstore/},
- {c:'salud',n:'Hospital Distrital de Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.78365,-55.07603',src:'OpenStreetMap',k:/hospital/},
- {c:'salud',n:'IPS Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79925,-55.0864',src:'OpenStreetMap',k:/\\bips\\b/},
- {c:'seg',n:'Comisaría 18ª Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.80078,-55.09203',src:'OpenStreetMap',k:/comisar[^ ]* (n[°º]? ?)?18|18.{0,3}comisar/},
- {c:'seg',n:'Sub Comisaría N° 41 Cerro Largo',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.73768,-55.08422',src:'OpenStreetMap',k:/cerro largo/},
- {c:'seg',n:'Policía Caminera · 14 de Mayo',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.86793,-55.11806',src:'OpenStreetMap',k:/caminera/},
- {c:'seg',n:'Bomberos Voluntarios de Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.80026,-55.08612',src:'OpenStreetMap',k:/bomber/},
- {c:'trans',n:'Terminal de Ómnibus de Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79925,-55.09135',src:'OpenStreetMap',k:/terminal/},
- {c:'ocio',n:'Plaza de la Juventud',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79573,-55.08648',src:'OpenStreetMap',k:/juventud/},
- {c:'ocio',n:'Plaza Sinuelo',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.78267,-55.07557',src:'OpenStreetMap',k:/sinuelo/},
- {c:'ocio',n:'Plaza Pública Nueva Esperanza',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.80645,-55.09215',src:'OpenStreetMap',k:/nueva esperanza|nva esperanza/},
- {c:'ocio',n:'Plaza Fracción Razera',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.83137,-55.12919',src:'OpenStreetMap',k:/plaza.*razera/},
- {c:'ocio',n:'Túnel Natural Razera',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.83417,-55.11579',src:'OpenStreetMap',k:/tunel/},
- {c:'igl',n:'Iglesia Católica Matriz de Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79767,-55.0976',src:'OpenStreetMap',k:/matriz/},
- {c:'igl',n:'Salón del Reino de los Testigos de Jehová',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.80435,-55.09199',src:'OpenStreetMap',k:/testigos/},
- {c:'fin',n:'Banco Atlas',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79634,-55.08911',src:'OpenStreetMap',k:/atlas/},
- {c:'fin',n:'Banco Continental',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79989,-55.09119',src:'OpenStreetMap',k:/continental/},
- {c:'fin',n:'Banco Familiar',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79362,-55.08713',src:'OpenStreetMap',k:/familiar/},
- {c:'fin',n:'Banco Nacional de Fomento (BNF)',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.80096,-55.09221',src:'OpenStreetMap',k:/fomento|\\bbnf\\b/},
- {c:'fin',n:'Banco Regional',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79584,-55.08882',src:'OpenStreetMap',k:/regional/},
- {c:'fin',n:'Banco Sudameris',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79463,-55.08817',src:'OpenStreetMap',k:/sudameris/},
- {c:'fin',n:'Visión Banco',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79388,-55.08731',src:'OpenStreetMap',k:/vision/},
- {c:'dep',n:'X Pádel',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.80378,-55.1092',src:'OpenStreetMap',k:/padel/},
- {c:'edu',n:'Escuela 14 de Mayo',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.84174,-55.11947',src:'OpenStreetMap',k:/14 de mayo/},
- {c:'edu',n:'Escuela San Jorge',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.8399,-55.03701',src:'OpenStreetMap',k:/san jorge/},
- {c:'edu',n:'Escuela N° 4392',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.8106,-55.10031',src:'OpenStreetMap',k:/4392/},
- {c:'edu',n:'Escuela San Lorenzo',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.74983,-55.0588',src:'OpenStreetMap',k:/san lorenzo/},
- {c:'edu',n:'Escuela Buen Jesús',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.82457,-55.11142',src:'OpenStreetMap',k:/buen jesus/},
- {c:'edu',n:'Escuela Jardín de América',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.78702,-55.09595',src:'OpenStreetMap',k:/jardin de america/},
- {c:'edu',n:'Escuela General Andrés Rodríguez',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.76114,-55.09075',src:'OpenStreetMap',k:/general andres rodriguez/},
- {c:'edu',n:'Colegio Mariscal Francisco Solano López',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79664,-55.08459',src:'OpenStreetMap',k:/mariscal francisco solano lopez/},
- {c:'edu',n:'Escuela San Pedro',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.74219,-55.08201',src:'OpenStreetMap',k:/san pedro/},
- {c:'edu',n:'Escuela Santa Lourdes',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.7398,-55.1411',src:'OpenStreetMap',k:/santa lourdes/},
- {c:'edu',n:'Escuela Santa Rita',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.79293,-55.08791',src:'OpenStreetMap',k:/santa rita/},
- {c:'edu',n:'Escuela Silvio Petirossi',a:'',tel:'',h:'',map:'https://www.google.com/maps?q=-25.7724,-55.07783',src:'OpenStreetMap',k:/silvio petirossi/}];
-function utilAll(){const base=(G.util&&G.util.length?G.util:PDEF).filter(p=>PCAT[p.c]).concat((G.fu||[]).filter(p=>p&&PCAT[p.c]&&p.n));const has=base.map(p=>[p.c,norm(p.n)]);const dup=p=>has.some(([c,h])=>(c===p.c||(p.c==='far'&&c==='salud'))&&(h===norm(p.n)||h.includes(norm(p.n))||(p.k&&p.k.test(h))));return base.concat(OSMP.filter(p=>!dup(p)))}
+ {c:"far",n:"Farmacenter Santa Rita",a:"Calle Ñanawa y Avda. Inmigrantes",tel:"021 262 6000",h:"Lun a sáb 6:00–22:00 · Dom y feriados 8:00–20:00",map:"https://www.google.com/maps?q=-25.79308,-55.08668",src:"farmacenter.com.py",k:/farmacenter/},
+ {c:"far",n:"Farmavida",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79818,-55.09047",src:"OpenStreetMap",k:/farmavida/},
+ {c:"far",n:"Farmacia Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79901,-55.0902",src:"OpenStreetMap",k:/farmacia santa rita/},
+ {c:"far",n:"Drugstore Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79848,-55.08973",src:"OpenStreetMap",k:/drugstore/},
+ {c:"salud",n:"Hospital Distrital de Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.78365,-55.07603",src:"OpenStreetMap",k:/hospital/},
+ {c:"salud",n:"IPS Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79925,-55.0864",src:"OpenStreetMap",k:/\\bips\\b/},
+ {c:"seg",n:"Comisaría 18ª Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.80078,-55.09203",src:"OpenStreetMap",k:/comisar[^ ]* (n[°º]? ?)?18|18.{0,3}comisar/},
+ {c:"seg",n:"Sub Comisaría N° 41 Cerro Largo",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.73768,-55.08422",src:"OpenStreetMap",k:/cerro largo/},
+ {c:"seg",n:"Policía Caminera · 14 de Mayo",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.86793,-55.11806",src:"OpenStreetMap",k:/caminera/},
+ {c:"seg",n:"Bomberos Voluntarios de Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.80026,-55.08612",src:"OpenStreetMap",k:/bomber/},
+ {c:"trans",n:"Terminal de Ómnibus de Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79925,-55.09135",src:"OpenStreetMap",k:/terminal/},
+ {c:"ocio",n:"Plaza de la Juventud",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79573,-55.08648",src:"OpenStreetMap",k:/juventud/},
+ {c:"ocio",n:"Plaza Sinuelo",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.78267,-55.07557",src:"OpenStreetMap",k:/sinuelo/},
+ {c:"ocio",n:"Plaza Pública Nueva Esperanza",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.80645,-55.09215",src:"OpenStreetMap",k:/nueva esperanza|nva esperanza/},
+ {c:"ocio",n:"Plaza Fracción Razera",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.83137,-55.12919",src:"OpenStreetMap",k:/plaza.*razera/},
+ {c:"ocio",n:"Túnel Natural Razera",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.83417,-55.11579",src:"OpenStreetMap",k:/tunel/},
+ {c:"igl",n:"Iglesia Católica Matriz de Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79767,-55.0976",src:"OpenStreetMap",k:/matriz/},
+ {c:"igl",n:"Salón del Reino de los Testigos de Jehová",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.80435,-55.09199",src:"OpenStreetMap",k:/testigos/},
+ {c:"fin",n:"Banco Atlas",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79634,-55.08911",src:"OpenStreetMap",k:/atlas/},
+ {c:"fin",n:"Banco Continental",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79989,-55.09119",src:"OpenStreetMap",k:/continental/},
+ {c:"fin",n:"Banco Familiar",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79362,-55.08713",src:"OpenStreetMap",k:/familiar/},
+ {c:"fin",n:"Banco Nacional de Fomento (BNF)",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.80096,-55.09221",src:"OpenStreetMap",k:/fomento|\\bbnf\\b/},
+ {c:"fin",n:"Banco Regional",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79584,-55.08882",src:"OpenStreetMap",k:/regional/},
+ {c:"fin",n:"Banco Sudameris",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79463,-55.08817",src:"OpenStreetMap",k:/sudameris/},
+ {c:"fin",n:"Visión Banco",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79388,-55.08731",src:"OpenStreetMap",k:/vision/},
+ {c:"dep",n:"X Pádel",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.80378,-55.1092",src:"OpenStreetMap",k:/padel/},
+ {c:"edu",n:"Escuela 14 de Mayo",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.84174,-55.11947",src:"OpenStreetMap",k:/14 de mayo/},
+ {c:"edu",n:"Escuela San Jorge",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.8399,-55.03701",src:"OpenStreetMap",k:/san jorge/},
+ {c:"edu",n:"Escuela N° 4392",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.8106,-55.10031",src:"OpenStreetMap",k:/4392/},
+ {c:"edu",n:"Escuela San Lorenzo",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.74983,-55.0588",src:"OpenStreetMap",k:/san lorenzo/},
+ {c:"edu",n:"Escuela Buen Jesús",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.82457,-55.11142",src:"OpenStreetMap",k:/buen jesus/},
+ {c:"edu",n:"Escuela Jardín de América",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.78702,-55.09595",src:"OpenStreetMap",k:/jardin de america/},
+ {c:"edu",n:"Escuela General Andrés Rodríguez",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.76114,-55.09075",src:"OpenStreetMap",k:/general andres rodriguez/},
+ {c:"edu",n:"Colegio Mariscal Francisco Solano López",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79664,-55.08459",src:"OpenStreetMap",k:/mariscal francisco solano lopez/},
+ {c:"edu",n:"Escuela San Pedro",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.74219,-55.08201",src:"OpenStreetMap",k:/san pedro/},
+ {c:"edu",n:"Escuela Santa Lourdes",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.7398,-55.1411",src:"OpenStreetMap",k:/santa lourdes/},
+ {c:"edu",n:"Escuela Santa Rita",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.79293,-55.08791",src:"OpenStreetMap",k:/santa rita/},
+ {c:"edu",n:"Escuela Silvio Petirossi",a:"",tel:"",h:"",map:"https://www.google.com/maps?q=-25.7724,-55.07783",src:"OpenStreetMap",k:/silvio petirossi/}];
+function utilAll(){const base=(G.util&&G.util.length?G.util:PDEF).filter(p=>PCAT[p.c]).concat((G.fu||[]).filter(p=>p&&PCAT[p.c]&&p.n));const has=base.map(p=>[p.c,norm(p.n)]);const dup=p=>has.some(([c,h])=>(c===p.c||(p.c==='far'&&c==='salud'))&&(h===norm(p.n)||h.includes(norm(p.n))||(p.k&&p.k.test(h))));if(G.util&&G.util.some(p=>p.o))return base;/* o painel já trouxe a lista da Guía: vale só o que está lá (editado ou apagado) */return base.concat(OSMP.filter(p=>!dup(p)))}
 function utilHTML(q){const t=TX[L];const SHORT=!q&&!UFULL;const all=utilAll();
  let pl=all;if(q){const ws=q.split(/\s+/).filter(w=>w.length>2),cs=Object.keys(PSYN).filter(k=>ws.some(w=>PSYN[k].test(w)));const m=all.filter(p=>norm([p.n,p.a,PCAT[p.c][1].es,PCAT[p.c][1].pt].join(' ')).includes(q)||cs.includes(p.c));if(m.length)pl=m}
  const groups=Object.keys(PCAT).map(k=>[k,pl.filter(p=>p.c===k)]).filter(([,l])=>l.length);
