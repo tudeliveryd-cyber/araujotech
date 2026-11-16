@@ -68,6 +68,8 @@ jobs:
         run: node tools/capturas.js
       - name: Telas para a apresentação
         if: ${{ inputs.apresentacao == 'sim' }}
+        env:
+          GLANG: ${{ inputs.idioma }}
         run: node tools/capt_apres.js
       - name: Velocidade da Guía
         if: ${{ inputs.guia == 'sim' }}

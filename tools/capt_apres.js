@@ -7,6 +7,7 @@ const out = (n, f) => { const b64 = fs.readFileSync(f).toString('base64'); for (
   const b = await chromium.launch();
   const m = await (await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'es-PY', timezoneId: 'America/Asuncion', serviceWorkers: 'block' })).newPage();
   const d = await (await b.newContext({ viewport: { width: 1440, height: 860 }, deviceScaleFactor: 1.5, locale: 'es-PY', timezoneId: 'America/Asuncion', serviceWorkers: 'block' })).newPage();
+  if (process.env.GLANG === 'pt') for (const pg of [m, d]) await pg.context().addInitScript(() => { try { localStorage.setItem('at_lang', 'pt'); } catch (e) {} });
   const shot = async (p, n) => { const f = 'apres/' + n + '.jpg'; await p.addStyleTag({ content: '.ins,.inst,#inst,[class*=install]{display:none!important}' }).catch(() => {}); await p.screenshot({ path: f, type: 'jpeg', quality: 88 }); out(n, f); console.log('OK ' + n); };
   const go = async (p, u, w) => { await p.goto(U + u, { waitUntil: 'networkidle', timeout: 60000 }).catch(() => {}); await p.waitForTimeout(w || 4000); };
   const to = async (p, sel, off) => { await p.evaluate(([s, o]) => { const e = document.querySelector(s); if (e) window.scrollTo(0, e.getBoundingClientRect().top + scrollY - (o || 10)); }, [sel, off]); await p.waitForTimeout(900); };
