@@ -22,10 +22,10 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   const img = path.join(os.tmpdir(), 'e2e_banner.png');
   fs.writeFileSync(img, Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAIAAAB7QOjdAAAAEElEQVR4nGP4z8DAwMDAAAAN+AH/2s0B3wAAAABJRU5ErkJggg==', 'base64'));
   await a.locator('input[data-gufile="0"]').setInputFiles(img); await a.w(1500);
-  check(await a.evaluate(() => /^data:image\/jpeg/.test(ui.gu.ads[0].img)), 'a imagem do banner foi carregada (JPEG)');
+  check(await a.evaluate(() => /^data:image\/(jpeg|webp)/.test(ui.gu.ads[0].img)), 'a imagem do banner foi carregada (WebP)');
   check(await a.locator('input[data-gufiled="0"]').count() === 1 && await a.locator('[data-act="gurmimgd"]').count() === 0, 'banner tem o campo opcional de imagem para computador (1920 × 480)');
   await a.locator('input[data-gufiled="0"]').setInputFiles(img); await a.w(1500);
-  check(await a.evaluate(() => /^data:image\/jpeg/.test(ui.gu.ads[0].imgd)) && await a.locator('[data-act="gurmimgd"]').count() === 1, 'imagem para computador carregada, com botão para tirar');
+  check(await a.evaluate(() => /^data:image\/(jpeg|webp)/.test(ui.gu.ads[0].imgd)) && await a.locator('[data-act="gurmimgd"]').count() === 1, 'imagem para computador carregada, com botão para tirar');
   await a.act('gurmimgd', '[data-i="0"]'); await a.w(200);
   check(await a.evaluate(() => ui.gu.ads[0].imgd === '' && /^data:image/.test(ui.gu.ads[0].img)), 'tirar a imagem do computador mantém a imagem principal');
   await a.locator('input[data-gufiled="0"]').setInputFiles(img); await a.w(1500);
@@ -69,7 +69,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   const js = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); closeSheet(); ui.jobs = null; acts.jobopen(); await W(50); const r = {}; acts.jobadd(); await W(30); r.f = document.querySelectorAll('[data-jb^="0."]').length; Object.assign(ui.jobs[0], { t: 'Vendedor', d: 'Atención en el salón de ventas', wa: '0981999888' }); acts.jobsave(); await W(50); r.saved = (pub.jobs || []).length === 1 && pub.jobs[0].t === 'Vendedor' && pub.jobs[0].wa === '0981999888'; applyBoth(p => { delete p.jobs }); return r; });
   check(js.f >= 9 && js.saved, 'painel do negócio: publicar vaga (formulário completo e salva no catálogo)'); info(JSON.stringify({ ads: (d.gads || []).length, util: (d.gutil || []).length, at: d.gadsAt }));
   check((d.gads || []).length === 1 && d.gads[0].u === 'https://example.com/promo' && d.gads[0].to === '2026-12-31' && d.gads[0].on === true, 'banner salvo com link, data e ativo');
-  check(/^data:image\/jpeg/.test(d.gads[0].imgd || '') && d.gads[0].own === true, 'banner salvo com a imagem para computador e a marca "banner da Guía"');
+  check(/^data:image\/(jpeg|webp)/.test(d.gads[0].imgd || '') && d.gads[0].own === true, 'banner salvo com a imagem para computador e a marca "banner da Guía"');
   check((d.gutil || []).length === n0 + 1 && d.gutil[0].tel === '061 000 000' && d.gutil[n0].c === 'ocio', 'lugares salvos com telefone e tipo');
   check((d.clientes || []).length === 1, 'os clientes da vitrine continuam lá');
 
@@ -83,6 +83,13 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(await a.evaluate(n => ui.gu.ads.length === 1 && ui.gu.util.length === n, n0 + 1), 'reabre com o que foi salvo');
   await a.act('gurm', '[data-k="ads"][data-i="0"]'); await a.act('gusave'); await a.w(2000);
   d = await doc(); check((d.gads || []).length === 0 && (d.gutil || []).length === n0 + 1, 'remover o banner tira só o banner');
+  sec('E2. Banners pesados: o painel recomprime em WebP para caber');
+  const big = await a.evaluate(async () => { const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); const d = x.createImageData(w, h); for (let i = 0; i < d.data.length; i += 4) { d.data[i] = Math.random() * 255; d.data[i + 1] = (i / 4 % w) / w * 255; d.data[i + 2] = 120; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL('image/jpeg', .95); };
+    const im = mk(800, 340), imd = mk(960, 240); ui.gu.ads = [0, 1, 2].map(k => ({ id: 'bg' + k, t: 'Banner ' + k, s: '', u: 'https://example.com/', img: im, imgd: imd, from: '', to: '', on: true, own: true }));
+    const before = JSON.stringify(guClean(ui.gu).ads).length; await acts.gusave(); await new Promise(f => setTimeout(f, 2500)); return { before, after: JSON.stringify(guClean(ui.gu).ads).length, webp: ui.gu.ads.every(x => /^data:image\/webp/.test(x.img) && /^data:image\/webp/.test(x.imgd)) }; });
+  info(JSON.stringify(big)); d = await doc();
+  check(big.before > 880000 && big.after < big.before && big.webp && (d.gads || []).length === 3 && d.gads.every(x => /^data:image\/webp/.test(x.imgd)), 'banners acima do limite são recomprimidos em WebP e salvos (3 banners com imagem do computador)');
+  await a.evaluate(async () => { ui.gu.ads = []; await acts.gusave(); }); await a.w(1500);
   sec('F. Profissionais em destaque');
   await a.act('guadd', '[data-k="pros"]'); await a.w(300);
   await a.locator('input[data-guprofile="0"]').setInputFiles(img); await a.w(1500);
