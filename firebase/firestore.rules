@@ -58,6 +58,48 @@ service cloud.firestore {
         && !('lim' in request.resource.data) && !('site' in request.resource.data);
     }
 
+    // ===== Guía de Santa Rita: contas próprias (v15) =====
+    // Ficha da conta (igreja, ONG, escola, clube, negócio sem Vitrix). O dono edita a própria; só aparece na Guía depois
+    // que a Guía aprova (st = 'ok', campo que só o admin muda). E-mail confirmado é obrigatório.
+    function verified() { return signedIn() && request.auth.token.email_verified == true; }
+    function fichaOk(d) {
+      return d.keys().hasOnly(['tipo', 'g', 'n', 'd', 'wa', 'tel', 'a', 'map', 'hrs', 'ig', 'web', 'lg', 'ph', 'ev', 'jobs', 'email', 'at', 'st', 'plan', 'nota'])
+        && d.tipo in ['iglesia', 'ong', 'escuela', 'club', 'animales', 'negocio', 'profesional', 'otro']
+        && d.n is string && d.n.size() >= 2 && d.n.size() <= 80
+        && strOk(d, 'g', 12) && strOk(d, 'd', 600) && strOk(d, 'wa', 20) && strOk(d, 'tel', 30) && strOk(d, 'a', 120)
+        && strOk(d, 'map', 300) && strOk(d, 'hrs', 200) && strOk(d, 'ig', 120) && strOk(d, 'web', 200)
+        && strOk(d, 'lg', 90000) && strOk(d, 'ph', 160000) && strOk(d, 'at', 30) && strOk(d, 'email', 120)
+        && (!('ev' in d) || (d.ev is list && d.ev.size() <= 10))
+        && (!('jobs' in d) || (d.jobs is list && d.jobs.size() <= 10));
+    }
+    match /gfichas/{uid} {
+      allow read: if resource.data.st == 'ok' || (signedIn() && request.auth.uid == uid) || isAdmin();
+      allow create: if verified() && request.auth.uid == uid && fichaOk(request.resource.data)
+        && request.resource.data.st == 'pend' && !('plan' in request.resource.data) && !('nota' in request.resource.data);
+      allow update: if isAdmin() || (verified() && request.auth.uid == uid && fichaOk(request.resource.data)
+        && same('st') && same('plan') && same('nota'));
+      allow delete: if isAdmin() || (signedIn() && request.auth.uid == uid);
+    }
+    // Opiniões do público: uma por pessoa por negócio (id = negócio_uid), com e-mail confirmado; só aparecem depois de aprovadas.
+    match /gresenas/{rid} {
+      allow read: if resource.data.st == 'ok' || (signedIn() && request.auth.uid == resource.data.uid) || isAdmin();
+      allow create: if verified() && rid == request.resource.data.t + '_' + request.auth.uid
+        && request.resource.data.keys().hasOnly(['t', 'uid', 'n', 'r', 'x', 'at', 'st'])
+        && request.resource.data.uid == request.auth.uid && request.resource.data.st == 'pend'
+        && request.resource.data.t is string && request.resource.data.t.size() >= 2 && request.resource.data.t.size() <= 80
+        && request.resource.data.r is int && request.resource.data.r >= 1 && request.resource.data.r <= 5
+        && request.resource.data.x is string && request.resource.data.x.size() <= 400
+        && request.resource.data.n is string && request.resource.data.n.size() >= 2 && request.resource.data.n.size() <= 40
+        && request.resource.data.at is string && request.resource.data.at.size() <= 30;
+      allow update: if isAdmin() || (verified() && request.auth.uid == resource.data.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['r', 'x', 'n', 'at', 'st'])
+        && request.resource.data.st == 'pend'
+        && request.resource.data.r is int && request.resource.data.r >= 1 && request.resource.data.r <= 5
+        && request.resource.data.x is string && request.resource.data.x.size() <= 400
+        && request.resource.data.n is string && request.resource.data.n.size() >= 2 && request.resource.data.n.size() <= 40);
+      allow delete: if isAdmin() || (signedIn() && request.auth.uid == resource.data.uid);
+    }
+
     // conteúdo do site araujotechsistemas.com (editado no admin): leitura pública
     match /platform/sitio { allow read: if true; allow write: if isAdmin(); }
     match /platform/{doc} { allow read, write: if isAdmin(); }

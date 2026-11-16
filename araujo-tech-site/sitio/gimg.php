@@ -7,6 +7,18 @@ $dd = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['d'] ?? '')); // d = logo 
 if ($i === '' && $pp !== '') $i = 'p' . $pp;
 if ($i === '' && $nn !== '') $i = 'n' . $nn;
 $cc = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['c'] ?? '')); // c = foto de clasificado
+$ff = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['f'] ?? '')); // f = logo/foto de uma conta própria aprovada (gfichas)
+if ($ff !== '' && $i === '') {
+  require __DIR__ . '/prods_lib.php'; require __DIR__ . '/guia_lib.php';
+  $k = (($_GET['k'] ?? '') === 'ph') ? 'ph' : 'lg'; $want = '/sitio/gimg.php?f=' . $ff . '&k=' . $k . '&v=';
+  foreach (guia_acc()['fichas'] as $x) {
+    if ($x['uid'] !== $ff || strpos((string)$x[$k], $want) !== 0) continue;
+    $h = substr((string)$x[$k], strlen($want)); $g = glob(sys_get_temp_dir() . '/at_gfimg_' . $ff . '_' . $k . '_' . $h . '.*');
+    if (!$g) break; $ext = pathinfo($g[0], PATHINFO_EXTENSION);
+    header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $ext); header('Cache-Control: public, max-age=86400'); header('Content-Length: ' . filesize($g[0])); readfile($g[0]); exit;
+  }
+  http_response_code(404); exit;
+}
 $dk = (($_GET['k'] ?? '') === 'ph') ? 'ph' : 'lg'; // ficha simples: logo (lg) ou foto do local (ph)
 if ($i === '' && $dd !== '') $i = 'd' . $dd;
 if ($i === '' && $cc !== '') $i = 'c' . $cc;

@@ -20,6 +20,81 @@ function guia_doc() {
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
+
+// ===== Contas próprias (gfichas) e opiniões do público (gresenas) =====
+// Só entra o que a Guía aprovou (st = 'ok'). As fotos das fichas ficam em cache no servidor (gimg.php?f=).
+function guia_fv($v) {
+  if (!is_array($v)) return null;
+  if (array_key_exists('stringValue', $v)) return $v['stringValue'];
+  if (array_key_exists('booleanValue', $v)) return $v['booleanValue'];
+  if (array_key_exists('integerValue', $v)) return (int)$v['integerValue'];
+  if (array_key_exists('doubleValue', $v)) return (float)$v['doubleValue'];
+  if (isset($v['mapValue'])) { $o = []; foreach (($v['mapValue']['fields'] ?? []) as $k => $x) $o[$k] = guia_fv($x); return $o; }
+  if (isset($v['arrayValue'])) return array_map('guia_fv', $v['arrayValue']['values'] ?? []);
+  return null;
+}
+function guia_fsq($col, $limit) { // documentos aprovados de uma coleção (consulta pública: as regras só deixam ler st == 'ok')
+  $base = getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com'; // GUIA_FS_BASE só nos testes (emulador)
+  $url = $base . '/v1/projects/araujotech-catalogos/databases/(default)/documents:runQuery?key=' . AT_KEY;
+  $body = json_encode(['structuredQuery' => ['from' => [['collectionId' => $col]], 'where' => ['fieldFilter' => ['field' => ['fieldPath' => 'st'], 'op' => 'EQUAL', 'value' => ['stringValue' => 'ok']]], 'limit' => $limit]]);
+  if (!function_exists('curl_init')) return null;
+  $c = curl_init($url); curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_POSTFIELDS => $body, CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_TIMEOUT => 12, CURLOPT_CONNECTTIMEOUT => 4]);
+  $r = curl_exec($c); $code = curl_getinfo($c, CURLINFO_HTTP_CODE);
+  if ($r === false || $code !== 200) return null;
+  $out = [];
+  foreach ((array)json_decode($r, true) as $row) {
+    if (empty($row['document']['name'])) continue;
+    $o = []; foreach (($row['document']['fields'] ?? []) as $k => $x) $o[$k] = guia_fv($x);
+    $o['_id'] = basename($row['document']['name']); $out[] = $o;
+  }
+  return $out;
+}
+function guia_acc() {
+  $cache = sys_get_temp_dir() . '/at_gacc1.json';
+  if (is_file($cache) && time() - filemtime($cache) < 300) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
+  $fi = guia_fsq('gfichas', 400); $re = guia_fsq('gresenas', 2000);
+  if ($fi === null || $re === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) { @touch($cache); return $d; } } $e = ['fichas' => [], 'rv' => []]; @file_put_contents($cache, json_encode($e)); return $e; } // falhou: tenta de novo só daqui a 5 minutos
+  $day = (new DateTime('now', new DateTimeZone('America/Asuncion')))->format('Y-m-d');
+  $https = function ($u) { $u = trim((string)$u); return preg_match('#^https://[^\s"\'<>]+$#i', $u) ? $u : ''; };
+  $fichas = [];
+  foreach ($fi as $x) {
+    $uid = preg_replace('/[^a-z0-9]/i', '', (string)$x['_id']); $n = trim((string)($x['n'] ?? ''));
+    if ($uid === '' || mb_strlen($n) < 2) continue;
+    $img = [];
+    foreach (['lg', 'ph'] as $k) {
+      if (!preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#s', (string)($x[$k] ?? ''), $m)) continue;
+      $h = substr(md5((string)$x[$k]), 0, 10); $f = sys_get_temp_dir() . '/at_gfimg_' . $uid . '_' . $k . '_' . $h . '.' . $m[1];
+      if (!is_file($f)) { $bin = base64_decode($m[2]); if ($bin) @file_put_contents($f, $bin); }
+      if (is_file($f)) $img[$k] = '/sitio/gimg.php?f=' . $uid . '&k=' . $k . '&v=' . $h;
+    }
+    $ev = [];
+    foreach (array_slice((array)($x['ev'] ?? []), 0, 10) as $e) {
+      if (!is_array($e) || mb_strlen(trim((string)($e['t'] ?? ''))) < 3 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($e['d'] ?? '')) || $e['d'] < $day) continue;
+      $ev[] = ['t' => mb_substr(trim((string)$e['t']), 0, 80), 'd' => (string)$e['d'], 'h' => preg_match('/^\d{1,2}:\d{2}$/', (string)($e['h'] ?? '')) ? (string)$e['h'] : '', 'l' => mb_substr(trim((string)($e['l'] ?? '')), 0, 80)];
+    }
+    $fichas[] = ['uid' => $uid, 'tipo' => (string)($x['tipo'] ?? 'otro'), 'g' => (string)($x['g'] ?? ''), 'n' => mb_substr($n, 0, 80), 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 600),
+      'wa' => preg_replace('/\D/', '', (string)($x['wa'] ?? '')), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 120),
+      'map' => $https($x['map'] ?? ''), 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 200), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'web' => $https($x['web'] ?? ''),
+      'lg' => $img['lg'] ?? '', 'ph' => $img['ph'] ?? '', 'ev' => $ev, 'jobs' => array_slice(array_values(array_filter((array)($x['jobs'] ?? []), 'is_array')), 0, 10)];
+  }
+  // opiniões aprovadas: nota média e as 3 mais recentes com texto, por ficha/negócio
+  $by = [];
+  foreach ($re as $x) {
+    $t = preg_replace('/[^a-z0-9]/i', '', (string)($x['t'] ?? '')); $r = (int)($x['r'] ?? 0);
+    if ($t === '' || $r < 1 || $r > 5) continue;
+    $by[$t][] = ['n' => mb_substr(explode(' ', trim((string)($x['n'] ?? '')))[0], 0, 30), 'r' => $r, 'x' => mb_substr(trim((string)($x['x'] ?? '')), 0, 400), 'at' => substr((string)($x['at'] ?? ''), 0, 10)];
+  }
+  $rv = [];
+  foreach ($by as $t => $l) {
+    usort($l, function ($a, $b) { return strcmp($b['at'], $a['at']); });
+    $sum = 0; foreach ($l as $y) $sum += $y['r'];
+    $rv[$t] = ['a' => round($sum / count($l), 1), 'n' => count($l), 'x' => array_slice(array_values(array_filter($l, function ($y) { return $y['x'] !== ''; })), 0, 3)];
+  }
+  $d = ['fichas' => $fichas, 'rv' => $rv];
+  @file_put_contents($cache, json_encode($d));
+  return $d;
+}
+const GUIA_FU = ['iglesia' => 'igl', 'escuela' => 'edu', 'ong' => 'com', 'club' => 'dep', 'animales' => 'ani']; // fichas gratuitas da comunidade → página pública da categoria
 // horário por dia de uma ficha simples (mesmo formato do catálogo: 7 dias, domingo = 0)
 function guia_dy($dy) {
   if (!is_array($dy) || count($dy) !== 7) return null;
@@ -80,6 +155,11 @@ function guia_pub() {
     $u = (string)($x['u'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $u)) $u = '';
     $ev[] = ['t' => (string)$x['t'], 'k' => in_array($x['k'] ?? '', ['rel', 'dep', 'cul', 'com', 'neg', 'inf', 'otr'], true) ? $x['k'] : 'otr', 'd' => (string)$x['d'], 'h' => (string)($x['h'] ?? ''), 'l' => (string)($x['l'] ?? ''), 'u' => $u];
   }
+  $acc = guia_acc(); $fu = [];
+  foreach ($acc['fichas'] as $x) {
+    foreach ($x['ev'] as $e) $ev[] = ['t' => $e['t'], 'k' => $x['tipo'] === 'iglesia' ? 'rel' : ($x['tipo'] === 'club' ? 'dep' : 'com'), 'd' => $e['d'], 'h' => $e['h'], 'l' => $e['l'] !== '' ? $e['l'] : $x['n'], 'u' => ''];
+    if (isset(GUIA_FU[$x['tipo']])) $fu[] = ['id' => 'f' . $x['uid'], 'c' => GUIA_FU[$x['tipo']], 'n' => $x['n'], 'a' => $x['a'], 'tel' => $x['tel'], 'h' => $x['hrs'], 'map' => $x['map'], 'd' => $x['d'], 'wa' => $x['wa'], 'ig' => $x['ig'], 'web' => $x['web'], 'lg' => $x['lg'], 'ph' => $x['ph']];
+  }
   usort($ev, function ($a, $b) { return strcmp($a['d'] . $a['h'], $b['d'] . $b['h']); });
   // negócios sem catálogo (ficha simples cadastrada no Panel Araújo Tech)
   $dir = [];
@@ -91,6 +171,10 @@ function guia_pub() {
     $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'td' => !empty($x['td']), 'dy' => guia_dy($x['dy'] ?? null), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : '', 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&k=ph&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
     if (count($dir) >= 300) break;
   }
+  foreach ($acc['fichas'] as $x) { // negócios e profissionais com conta própria (aprovados pela Guía depois do pagamento)
+    if (isset(GUIA_FU[$x['tipo']])) continue;
+    $dir[] = ['id' => 'f' . $x['uid'], 'n' => $x['n'], 'g' => in_array($x['g'], ['food', 'shop', 'health', 'home', 'car', 'serv'], true) ? $x['g'] : 'serv', 'd' => mb_substr(preg_split('/\R/', $x['d'])[0], 0, 60), 'tel' => $x['tel'], 'wa' => $x['wa'], 'a' => $x['a'], 'map' => $x['map'], 'hrs' => mb_substr($x['hrs'], 0, 80), 'ig' => $x['ig'], 'td' => false, 'dy' => null, 'mt' => 'menu', 'mu' => '', 'web' => $x['web'], 'tu' => [], 'lg' => $x['lg'], 'ph' => $x['ph'], 'acc' => 1];
+  }
   $clas = []; // clasificados e inmuebles publicados pela Guía (só os ativos e dentro da data)
   foreach (array_slice((array)($d['gclas'] ?? []), 0, 15) as $x) {
     if (!is_array($x) || empty($x['on'])) continue; $u = (string)($x['until'] ?? ''); $wa = preg_replace('/\D/', '', (string)($x['wa'] ?? '')); $t = trim((string)($x['t'] ?? ''));
@@ -101,7 +185,7 @@ function guia_pub() {
   $so = (array)($d['gsoc'] ?? []); $soc = []; // redes da Guía (rodapé), configuradas no painel
   $w = preg_replace('/\D/', '', (string)($so['wa'] ?? '')); if (strlen($w) >= 8) $soc['wa'] = $w;
   foreach (['fb', 'ig', 'yt', 'tt'] as $k) { $u = trim((string)($so[$k] ?? '')); if (preg_match('#^https://[^\s"\'<>]+$#i', $u)) $soc[$k] = $u; }
-  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
+  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
@@ -171,6 +255,7 @@ function guia_jobs($all = false) {
     foreach (array_slice((array)($s['cfg']['jobs'] ?? []), 0, 20) as $x) { $j = $one($x, ['n' => $c['name'], 'id' => $c['id'], 'logo' => $c['logo']], $c['id']); if ($j) $out[] = $j; }
   }
   foreach (array_slice((array)($doc['gjobs'] ?? []), 0, 100) as $x) { $j = $one($x, ['n' => mb_substr(trim((string)($x['co'] ?? '')), 0, 80), 'id' => '', 'logo' => ''], 'g'); if ($j && $j['co']['n'] !== '') $out[] = $j; }
+  foreach (guia_acc()['fichas'] as $f) foreach ($f['jobs'] as $x) { $j = $one($x, ['n' => $f['n'], 'id' => '', 'logo' => $f['lg']], 'f' . $f['uid']); if ($j) $out[] = $j; }
   usort($out, function ($a, $b) { return strcmp($a['until'], $b['until']); });
   @file_put_contents($cache, json_encode($out));
   return $out;

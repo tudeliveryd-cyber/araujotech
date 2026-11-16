@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mi cuenta | Guía de Santa Rita</title>
+<meta name="description" content="Creá la ficha de tu iglesia, ONG, escuela, club o negocio en la Guía de Santa Rita, y opiná sobre los lugares de la ciudad.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/img/guia/favicon.png?v=1"><meta name="theme-color" content="#FFFFFF">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--purple:#8A12D6;--deep:#4A0A80;--night:#24093F;--lilac:#F3ECFB;--ink:#1A1222;--muted:#5F566B;--line:#E4DAF0;--yellow:#FFC21A;--ok:#16A34A;--warn:#8A6200;--bad:#B91C1C;--display:"Red Hat Display",system-ui,sans-serif;--text:"Red Hat Text",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}body{font-family:var(--text);color:var(--ink);background:#FBF8FE;line-height:1.5}a{color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+.hdr{background:rgba(255,255,255,.97);border-bottom:1px solid #ECE6F3;position:sticky;top:0;z-index:60}
+.nav{display:flex;align-items:center;gap:12px;height:64px}.nav .sp{flex:1}
+.bk{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-weight:700;font-size:14px;padding:7px 12px 7px 8px;border-radius:999px;border:1px solid var(--line);background:#F4F0F9;color:var(--deep)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}.lang button{font:inherit;font-size:13px;font-weight:700;border:0;background:none;color:var(--muted);padding:6px 10px;cursor:pointer}.lang button[aria-pressed=true]{background:var(--deep);color:#fff}
+.nav img{height:38px;width:auto;display:block}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(28px,5vw,38px);line-height:1.08;margin:30px 0 6px;letter-spacing:-.3px}
+.lead{color:var(--muted);font-size:16.5px;max-width:600px}
+.box{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;margin:20px 0;box-shadow:0 20px 44px -34px rgba(36,9,63,.5)}
+.box h2{font-family:var(--display);font-weight:900;font-size:21px;line-height:1.2;display:flex;align-items:center;gap:9px}
+.box h2 svg{color:var(--purple);flex:none}.box>p{color:var(--muted);margin-top:4px}
+.tabs{display:flex;gap:6px;background:var(--lilac);border-radius:14px;padding:5px;margin-bottom:6px}.tabs button{flex:1;font:inherit;font-weight:700;font-size:15px;border:0;border-radius:10px;padding:10px;background:none;color:var(--deep);cursor:pointer}.tabs button[aria-selected=true]{background:#fff;box-shadow:0 2px 8px -4px rgba(36,9,63,.4)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fld{margin-top:14px}.fld>label,.fld>span.l{display:block;font-weight:700;font-size:14px;margin-bottom:6px}.fld label i,.fld span.l i{font-style:normal;font-weight:500;color:var(--muted)}
+.inp{width:100%;font:inherit;font-size:16px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink)}.inp:focus{outline:2px solid var(--purple);outline-offset:1px;border-color:transparent}
+textarea.inp{min-height:96px;resize:vertical}
+.hint{font-size:13px;color:var(--muted);margin-top:5px}
+.btn{display:inline-flex;justify-content:center;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:15px;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--deep);cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--deep);border-color:var(--deep);color:#fff}.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}.btn.wa{background:#15803D;border-color:#15803D;color:#fff}
+.btn.sm{font-size:13.5px;padding:8px 11px;border-radius:10px}.btn.dng{color:var(--bad);border-color:#F3C9C9}
+.btn:disabled{opacity:.55;cursor:default}.btn.full{width:100%;margin-top:18px;padding:14px}
+.lnk{background:none;border:0;font:inherit;font-weight:700;color:var(--deep);text-decoration:underline;cursor:pointer;padding:0}
+.msg{border-radius:12px;padding:12px 14px;font-size:14.5px;margin-top:14px;display:flex;gap:10px;align-items:flex-start}.msg svg{flex:none;margin-top:2px}
+.msg.e{background:#FEF2F2;color:var(--bad)}.msg.o{background:#ECFDF3;color:#166534}.msg.i{background:var(--lilac);color:var(--deep)}.msg.w{background:#FFF4CC;color:#4A3500}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:4px 10px;border-radius:999px}.st i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.st.pend{background:#FFF4CC;color:var(--warn)}.st.ok{background:#ECFDF3;color:#166534}.st.off{background:#F1EEF4;color:var(--muted)}
+.tps{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.tps label{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;font-size:14px}.tps input{margin-top:4px;accent-color:var(--purple)}.tps b{display:block;font-size:14.5px}.tps small{color:var(--muted);font-size:12.5px;line-height:1.35;display:block}.tps label:has(input:checked){border-color:var(--purple);box-shadow:0 0 0 1px var(--purple) inset;background:#FCF9FF}
+.upl{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.thumb{width:84px;height:84px;border-radius:14px;border:1px dashed var(--line);background:var(--lilac);display:grid;place-items:center;overflow:hidden;color:var(--purple)}.thumb.w{width:140px;height:96px}.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.filebtn{position:relative;overflow:hidden}.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.it{border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px;background:#FDFBFF}.it .hd{display:flex;align-items:center;gap:8px}.it .hd b{flex:1;min-width:0}
+.sec{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}.sec>h3{font-family:var(--display);font-weight:900;font-size:17px;display:flex;align-items:center;gap:8px}.sec>h3 .sp{flex:1}
+.stars{display:flex;gap:6px}.stars button{border:0;background:none;padding:2px;cursor:pointer;color:#D9CFE6}.stars button.on{color:#E8A400}.stars svg{width:36px;height:36px}
+.rv{border-top:1px solid var(--line);padding:12px 0}.rv:first-child{border-top:0}.rv .hd{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.rv p{color:var(--muted);font-size:14.5px;margin-top:4px;white-space:pre-line}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.who{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted);flex-wrap:wrap}.who b{color:var(--ink)}
+.adm .it .meta{font-size:13.5px;color:var(--muted);margin-top:4px;word-break:break-word}
+.filt{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}.filt button{font:inherit;font-size:13.5px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--deep);border-radius:999px;padding:6px 12px;cursor:pointer}.filt button[aria-pressed=true]{background:var(--deep);color:#fff;border-color:var(--deep)}
+.ld{color:var(--muted);padding:20px 0;text-align:center}
+.foot{margin:10px 0 40px;font-size:13.5px;color:var(--muted);text-align:center}
+@media (max-width:560px){.wrap{padding:0 16px}.g2,.tps{grid-template-columns:1fr}.box{padding:18px}.bk span{display:none}.bk{padding:7px}}
+</style></head>
+<body>
+<header class="hdr"><div class="wrap nav"><a class="bk" href="https://guiadesantarita.com/" id="back"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span data-t="back">Volver a la Guía</span></a><span class="sp"></span><span class="lang" role="group" aria-label="Idioma"><button type="button" data-l="es">ES</button><button type="button" data-l="pt">PT</button></span><a href="https://guiadesantarita.com/" aria-label="Guía de Santa Rita"><img src="/img/guia/guia-logo.webp" alt="Guía de Santa Rita" width="79" height="38"></a></div></header>
+<main class="wrap">
+<h1 id="ttl"></h1><p class="lead" id="lead"></p>
+<div id="app"><p class="ld" id="ld">…</p></div>
+<p class="foot" id="foot"></p>
+</main>
+<footer id="gft"></footer><script src="/guia/rodape.js" defer></script>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,sendEmailVerification,sendPasswordResetEmail,signOut,reload} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,collection,query,where,getDocs} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const FB_CFG={apiKey:"AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U",authDomain:"araujotech-catalogos.firebaseapp.com",projectId:"araujotech-catalogos",storageBucket:"araujotech-catalogos.firebasestorage.app",messagingSenderId:"501170505971",appId:"1:501170505971:web:fd3a1c1578b3e1b93bcf86"};
+const app=initializeApp(FB_CFG),auth=getAuth(app),db=getFirestore(app);
+const ADMIN='admin@araujotechsistemas.com',GUIA_WA='595982086171';
+const P=new URLSearchParams(location.search);
+const OP=/^[a-z0-9]{2,60}$/i.test(P.get('opinar')||'')?P.get('opinar'):'';const OPN=(P.get('n')||'').slice(0,80);
+const FREE=['iglesia','ong','escuela','club','animales'];
+const TX={es:{
+ back:'Volver a la Guía',ttl:'Mi cuenta en la Guía',lead:'Creá y editá la ficha de tu iglesia, ONG, escuela, club o negocio. Cada ficha se revisa antes de aparecer en la Guía.',
+ ttl_op:'Opinar',lead_op:'Contá cómo te fue. Tu opinión aparece en la Guía después de que la revisamos.',
+ in:'Entrar',up:'Crear cuenta',email:'Correo electrónico',pass:'Contraseña',pass2:'Mínimo 6 caracteres',forgot:'Olvidé mi contraseña',
+ reset_h:'Recuperar contraseña',reset_p:'Te mandamos un enlace a tu correo para crear una contraseña nueva.',reset_b:'Enviar enlace',reset_ok:'Listo. Revisá tu correo (también la carpeta de spam).',cancel:'Volver',
+ up_p:'Usá un correo que revisás: te mandamos un enlace para confirmarlo.',in_p:'Con tu correo y tu contraseña.',
+ ver_h:'Confirmá tu correo',ver_p:'Te mandamos un enlace a {e}. Abrilo y después tocá "Ya confirmé". Mirá también la carpeta de spam.',ver_done:'Ya confirmé',ver_again:'Reenviar el correo',ver_sent:'Correo reenviado.',ver_not:'Todavía no figura confirmado. Abrí el enlace del correo y probá de nuevo.',
+ out:'Salir',as:'Entraste como',
+ f_h:'Mi ficha',f_new:'Todavía no tenés ficha. Completá los datos y enviala para revisión.',
+ st_pend:'En revisión',st_ok:'Publicada en la Guía',st_off:'Pausada por la Guía',
+ st_pend_p:'Recibimos tu ficha. La revisamos y te avisamos por WhatsApp o correo.',st_ok_p:'Tu ficha está en la Guía. Los cambios que guardes se ven en unos minutos.',st_off_p:'Tu ficha no se muestra por ahora. Escribinos si tenés dudas.',
+ tipo:'¿Qué vas a publicar?',T:{iglesia:['Iglesia','Gratis'],ong:['ONG o comunidad','Gratis'],escuela:['Escuela o colegio','Gratis'],club:['Club o deporte','Gratis'],animales:['Animales y adopción','Gratis'],negocio:['Negocio','Ficha paga: Gs 200.000 al mes'],profesional:['Profesional','Ficha paga: Gs 200.000 al mes'],otro:['Otro','Lo revisamos y te contamos']},
+ paid:'Las fichas de negocios y profesionales son pagas (Gs 200.000 al mes). Al enviarla, te escribimos por WhatsApp para el pago; aparece en la Guía después de confirmado.',free:'Gratis para iglesias, ONGs, escuelas, clubes y grupos de animales. La revisamos antes de publicarla.',
+ g:'Rubro',G:{food:'Comida y bebidas',shop:'Tiendas y moda',health:'Salud y belleza',home:'Hogar y construcción',car:'Autos, motos y náutica',serv:'Servicios y otros'},
+ n:'Nombre',d:'Descripción',d_h:'Qué hacen, horarios de culto o actividades, a quién atienden.',wa:'WhatsApp',wa_h:'Con código de país, ej.: 595 983 123456',tel:'Teléfono fijo',a:'Dirección',map:'Enlace de Google Maps',map_h:'Abrí el lugar en Google Maps, tocá Compartir y pegá el enlace.',hrs:'Horarios',hrs_h:'Ej.: Lun a vie 8:00–17:00 · Cultos dom 19:00',ig:'Instagram',ig_h:'Solo el usuario, sin @',web:'Sitio web o Facebook',
+ lg:'Logo',ph:'Foto del lugar',pick:'Elegir imagen',rm:'Quitar',
+ ev_h:'Eventos',ev_p:'Aparecen en la agenda de la Guía hasta la fecha del evento.',ev_add:'Agregar evento',ev_t:'Nombre del evento',ev_d:'Fecha',ev_hh:'Hora',ev_l:'Lugar',
+ jb_h:'Vacantes de empleo',jb_p:'Aparecen en Empleos de la Guía hasta la fecha final.',jb_add:'Agregar vacante',jb_t:'Puesto',jb_d:'Descripción y requisitos',jb_sal:'Salario (opcional)',jb_wa:'WhatsApp para postular',jb_u:'Publicar hasta',
+ save:'Guardar ficha',send:'Enviar para revisión',saving:'Guardando…',saved:'Ficha guardada.',del:'Borrar mi ficha',del_q:'¿Borrar tu ficha de la Guía? No se puede deshacer.',deleted:'Ficha borrada.',
+ notify:'Avisar a la Guía por WhatsApp',notify_m:'Hola, envié la ficha "{n}" ({t}) en la Guía de Santa Rita para revisión.',
+ e_n:'Escribí el nombre (mínimo 2 letras).',e_ct:'Poné un WhatsApp o un teléfono para que te contacten.',e_url:'El enlace tiene que empezar con https://',e_ev:'Revisá los eventos: nombre y fecha (de hoy en adelante).',e_jb:'Revisá las vacantes: puesto, descripción (mín. 10 letras), WhatsApp y fecha.',e_big:'Las imágenes quedaron muy pesadas. Probá con otras.',e_save:'No se pudo guardar. Revisá la conexión y probá de nuevo.',
+ my_rv:'Mis opiniones',my_rv0:'Todavía no opinaste sobre ningún lugar.',rv_on:'Opinión sobre',
+ op_h:'Tu opinión sobre {n}',op_r:'Tu nota',op_x:'Contá tu experiencia',op_x_h:'Hasta 400 letras. Sin datos personales ni insultos.',op_nm:'Tu nombre (se muestra solo el primero)',op_send:'Enviar opinión',op_ok:'¡Gracias! Tu opinión se publica después de revisarla.',op_e:'Elegí de 1 a 5 estrellas y escribí tu nombre.',op_del:'Borrar mi opinión',op_go:'Ver mi ficha',op_edit:'Ya opinaste sobre este lugar. Podés cambiar tu opinión (vuelve a revisión).',
+ auth_e:{'auth/invalid-email':'El correo no es válido.','auth/user-not-found':'Correo o contraseña incorrectos.','auth/wrong-password':'Correo o contraseña incorrectos.','auth/invalid-credential':'Correo o contraseña incorrectos.','auth/email-already-in-use':'Ya existe una cuenta con ese correo. Entrá con tu contraseña.','auth/weak-password':'La contraseña necesita al menos 6 caracteres.','auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.','auth/network-request-failed':'Sin conexión. Probá de nuevo.'},auth_x:'No se pudo completar. Probá de nuevo.',
+ foot:'Tus datos se usan solo para tu ficha en la Guía. Términos: guiadesantarita.com/terminos',
+ adm_h:'Moderación de la Guía',adm_p:'Cuentas propias y opiniones del público. Nada aparece en la Guía sin tu aprobación.',adm_f:'Fichas',adm_r:'Opiniones',all:'Todas',ok:'Aprobar',off:'Pausar',pend:'Volver a revisión',rm2:'Borrar',plan:'Plan',plan_free:'Gratis',plan_paid:'Pago',nota:'Nota interna',save2:'Guardar',adm_none:'No hay nada aquí.',adm_q:'¿Borrar? No se puede deshacer.',adm_det:'Ver datos',hide:'Ocultar',contact:'WhatsApp',mail:'Correo',adm_done:'Guardado.',paid_flag:'Paga: confirmá el pago antes de aprobar'
+},pt:{
+ back:'Voltar ao Guia',ttl:'Minha conta no Guia',lead:'Crie e edite a ficha da sua igreja, ONG, escola, clube ou negócio. Cada ficha é revisada antes de aparecer no Guia.',
+ ttl_op:'Avaliar',lead_op:'Conte como foi. Sua opinião aparece no Guia depois que revisamos.',
+ in:'Entrar',up:'Criar conta',email:'E-mail',pass:'Senha',pass2:'Mínimo 6 caracteres',forgot:'Esqueci minha senha',
+ reset_h:'Recuperar senha',reset_p:'Mandamos um link para o seu e-mail para criar uma senha nova.',reset_b:'Enviar link',reset_ok:'Pronto. Confira seu e-mail (também o spam).',cancel:'Voltar',
+ up_p:'Use um e-mail que você confere: mandamos um link para confirmar.',in_p:'Com seu e-mail e sua senha.',
+ ver_h:'Confirme seu e-mail',ver_p:'Mandamos um link para {e}. Abra e depois toque em "Já confirmei". Confira também o spam.',ver_done:'Já confirmei',ver_again:'Reenviar o e-mail',ver_sent:'E-mail reenviado.',ver_not:'Ainda não aparece confirmado. Abra o link do e-mail e tente de novo.',
+ out:'Sair',as:'Você entrou como',
+ f_h:'Minha ficha',f_new:'Você ainda não tem ficha. Preencha os dados e envie para revisão.',
+ st_pend:'Em revisão',st_ok:'Publicada no Guia',st_off:'Pausada pelo Guia',
+ st_pend_p:'Recebemos sua ficha. Vamos revisar e avisamos pelo WhatsApp ou e-mail.',st_ok_p:'Sua ficha está no Guia. As mudanças que você salvar aparecem em alguns minutos.',st_off_p:'Sua ficha não aparece por enquanto. Fale com a gente se tiver dúvidas.',
+ tipo:'O que você vai publicar?',T:{iglesia:['Igreja','Grátis'],ong:['ONG ou comunidade','Grátis'],escuela:['Escola ou colégio','Grátis'],club:['Clube ou esporte','Grátis'],animales:['Animais e adoção','Grátis'],negocio:['Negócio','Ficha paga: Gs 200.000 por mês'],profesional:['Profissional','Ficha paga: Gs 200.000 por mês'],otro:['Outro','Revisamos e te contamos']},
+ paid:'As fichas de negócios e profissionais são pagas (Gs 200.000 por mês). Ao enviar, chamamos você no WhatsApp para o pagamento; ela aparece no Guia depois de confirmado.',free:'Grátis para igrejas, ONGs, escolas, clubes e grupos de animais. Revisamos antes de publicar.',
+ g:'Ramo',G:{food:'Comida e bebidas',shop:'Lojas e moda',health:'Saúde e beleza',home:'Casa e construção',car:'Carros, motos e náutica',serv:'Serviços e outros'},
+ n:'Nome',d:'Descrição',d_h:'O que fazem, horários de culto ou atividades, quem atendem.',wa:'WhatsApp',wa_h:'Com código do país, ex.: 595 983 123456',tel:'Telefone fixo',a:'Endereço',map:'Link do Google Maps',map_h:'Abra o lugar no Google Maps, toque em Compartilhar e cole o link.',hrs:'Horários',hrs_h:'Ex.: Seg a sex 8:00–17:00 · Cultos dom 19:00',ig:'Instagram',ig_h:'Só o usuário, sem @',web:'Site ou Facebook',
+ lg:'Logo',ph:'Foto do local',pick:'Escolher imagem',rm:'Tirar',
+ ev_h:'Eventos',ev_p:'Aparecem na agenda do Guia até a data do evento.',ev_add:'Adicionar evento',ev_t:'Nome do evento',ev_d:'Data',ev_hh:'Hora',ev_l:'Local',
+ jb_h:'Vagas de emprego',jb_p:'Aparecem em Empregos do Guia até a data final.',jb_add:'Adicionar vaga',jb_t:'Cargo',jb_d:'Descrição e requisitos',jb_sal:'Salário (opcional)',jb_wa:'WhatsApp para se candidatar',jb_u:'Publicar até',
+ save:'Salvar ficha',send:'Enviar para revisão',saving:'Salvando…',saved:'Ficha salva.',del:'Apagar minha ficha',del_q:'Apagar sua ficha do Guia? Não dá para desfazer.',deleted:'Ficha apagada.',
+ notify:'Avisar o Guia pelo WhatsApp',notify_m:'Olá, enviei a ficha "{n}" ({t}) no Guia de Santa Rita para revisão.',
+ e_n:'Escreva o nome (mínimo 2 letras).',e_ct:'Coloque um WhatsApp ou telefone para contato.',e_url:'O link precisa começar com https://',e_ev:'Confira os eventos: nome e data (de hoje em diante).',e_jb:'Confira as vagas: cargo, descrição (mín. 10 letras), WhatsApp e data.',e_big:'As imagens ficaram muito pesadas. Tente outras.',e_save:'Não foi possível salvar. Confira a conexão e tente de novo.',
+ my_rv:'Minhas opiniões',my_rv0:'Você ainda não avaliou nenhum lugar.',rv_on:'Opinião sobre',
+ op_h:'Sua opinião sobre {n}',op_r:'Sua nota',op_x:'Conte sua experiência',op_x_h:'Até 400 letras. Sem dados pessoais nem ofensas.',op_nm:'Seu nome (só o primeiro aparece)',op_send:'Enviar opinião',op_ok:'Obrigado! Sua opinião é publicada depois da revisão.',op_e:'Escolha de 1 a 5 estrelas e escreva seu nome.',op_del:'Apagar minha opinião',op_go:'Ver minha ficha',op_edit:'Você já avaliou este lugar. Pode mudar sua opinião (volta para revisão).',
+ auth_e:{'auth/invalid-email':'O e-mail não é válido.','auth/user-not-found':'E-mail ou senha incorretos.','auth/wrong-password':'E-mail ou senha incorretos.','auth/invalid-credential':'E-mail ou senha incorretos.','auth/email-already-in-use':'Já existe uma conta com esse e-mail. Entre com sua senha.','auth/weak-password':'A senha precisa de pelo menos 6 caracteres.','auth/too-many-requests':'Muitas tentativas. Espere alguns minutos.','auth/network-request-failed':'Sem conexão. Tente de novo.'},auth_x:'Não foi possível concluir. Tente de novo.',
+ foot:'Seus dados são usados só para a sua ficha no Guia. Termos: guiadesantarita.com/terminos',
+ adm_h:'Moderação do Guia',adm_p:'Contas próprias e opiniões do público. Nada aparece no Guia sem a sua aprovação.',adm_f:'Fichas',adm_r:'Opiniões',all:'Todas',ok:'Aprovar',off:'Pausar',pend:'Voltar para revisão',rm2:'Apagar',plan:'Plano',plan_free:'Grátis',plan_paid:'Pago',nota:'Nota interna',save2:'Salvar',adm_none:'Nada aqui.',adm_q:'Apagar? Não dá para desfazer.',adm_det:'Ver dados',hide:'Ocultar',contact:'WhatsApp',mail:'E-mail',adm_done:'Salvo.',paid_flag:'Paga: confirme o pagamento antes de aprovar'
+}};
+let L=(()=>{const q=P.get('l');if(q==='pt'||q==='es')return q;try{const s=localStorage.getItem('gsr_cta_l');if(s==='pt'||s==='es')return s}catch(e){}return /^pt/i.test(navigator.language||'')?'pt':'es'})();
+const t=()=>TX[L];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+const SV={store:'<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9v11h16V9"/><path d="M10 20v-5h4v5"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',ok:'<path d="M20 6 9 17l-5-5"/>',alert:'<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',plus:'<path d="M12 5v14M5 12h14"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',job:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',shield:'<path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6z"/>',wa:'<path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1 1 8 19.4z"/><path d="M9 8.5c0 3.3 3.2 6.5 6.5 6.5l1-1.5-2-1-1 1c-1.2-.5-2.5-1.8-3-3l1-1-1-2z"/>',out:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>'};
+const ic=(k,s=18)=>`<svg aria-hidden="true" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${SV[k]||''}</svg>`;
+const starI=`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${SV.star}</svg>`;
+const msg=(k,x)=>`<div class="msg ${k}" role="${k==='e'?'alert':'status'}">${ic(k==='e'?'alert':k==='o'?'ok':'info')}<span>${x}</span></div>`;
+const today=()=>{const d=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Asuncion'}));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const addDays=n=>{const d=new Date(today()+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+const rid=()=>Math.random().toString(36).slice(2,10);
+const httpsOk=u=>!u||/^https:\/\/[^\s"'<>]+$/i.test(u);
+const app$=document.getElementById('app');
+let U=null,VIEW='in',FICHA=null,FE=null,NOTE='',MY_RV=null,ADM=null,AF='pend',AR='pend',NAMES=null,BUSY=false;
+function chrome(){document.documentElement.lang=L;document.querySelectorAll('[data-t]').forEach(e=>{e.textContent=t()[e.dataset.t]});document.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.l===L)));
+ const isOp=OP&&!(U&&U.email===ADMIN);document.getElementById('ttl').textContent=U&&U.email===ADMIN&&U.emailVerified!==undefined&&VIEW==='adm'?t().adm_h:isOp?t().ttl_op:t().ttl;document.getElementById('lead').textContent=VIEW==='adm'?t().adm_p:isOp?t().lead_op:t().lead;document.getElementById('foot').textContent=t().foot;document.title=(isOp?t().ttl_op:t().ttl)+' | Guía de Santa Rita'}
+const authErr=e=>t().auth_e[e&&e.code]||t().auth_x;
+const contUrl=()=>'https://araujotechsistemas.com/cuenta/'+(OP?'?opinar='+encodeURIComponent(OP)+'&n='+encodeURIComponent(OPN):'');
+async function sendVer(u){try{await sendEmailVerification(u,{url:contUrl()})}catch(e){if(/continue-uri|unauthorized/i.test(e.code||''))await sendEmailVerification(u);else throw e}}
+/* ===== entrar / criar conta ===== */
+function authView(){const T=t();
+ if(VIEW==='rs')return `<div class="box"><h2>${ic('mail',22)}${T.reset_h}</h2><p>${T.reset_p}</p><form id="frs"><div class="fld"><label for="re">${T.email}</label><input class="inp" id="re" type="email" autocomplete="email" required></div><div id="am">${NOTE}</div><button class="btn pri full" type="submit">${T.reset_b}</button></form><p style="margin-top:14px;text-align:center"><button class="lnk" type="button" data-v="in">${T.cancel}</button></p></div>`;
+ const up=VIEW==='up';
+ return `<div class="box"><div class="tabs" role="tablist"><button type="button" role="tab" data-v="in" aria-selected="${!up}">${T.in}</button><button type="button" role="tab" data-v="up" aria-selected="${up}">${T.up}</button></div><p>${up?T.up_p:T.in_p}</p><form id="fau"><div class="fld"><label for="ae">${T.email}</label><input class="inp" id="ae" type="email" autocomplete="email" required></div><div class="fld"><label for="ap">${T.pass} ${up?`<i>(${T.pass2})</i>`:''}</label><input class="inp" id="ap" type="password" minlength="6" autocomplete="${up?'new-password':'current-password'}" required></div><div id="am">${NOTE}</div><button class="btn pri full" type="submit">${up?T.up:T.in}</button></form>${up?'':`<p style="margin-top:14px;text-align:center"><button class="lnk" type="button" data-v="rs">${T.forgot}</button></p>`}</div>`}
+function verView(){const T=t();return `<div class="box"><h2>${ic('mail',22)}${T.ver_h}</h2><p>${T.ver_p.replace('{e}','<b>'+esc(U.email)+'</b>')}</p><div id="am">${NOTE}</div><div class="row"><button class="btn pri" type="button" data-a="verdone">${ic('ok')}${T.ver_done}</button><button class="btn" type="button" data-a="veragain">${T.ver_again}</button><button class="btn" type="button" data-a="out">${ic('out')}${T.out}</button></div></div>`}
+const whoBar=()=>`<div class="who">${ic('user')}<span>${t().as} <b>${esc(U.email)}</b></span><button class="lnk" type="button" data-a="out">${t().out}</button></div>`;
+/* ===== ficha ===== */
+function blankFicha(){return {tipo:'iglesia',g:'serv',n:'',d:'',wa:'',tel:'',a:'',map:'',hrs:'',ig:'',web:'',lg:'',ph:'',ev:[],jobs:[]}}
+function fichaView(){const T=t(),f=FE,st=FICHA&&FICHA.st;
+ const stb=st?`<p style="margin-top:8px"><span class="st ${esc(st)}"><i></i>${T['st_'+st]||st}</span></p><p style="margin-top:6px">${T['st_'+st+'_p']||''}</p>`:`<p>${T.f_new}</p>`;
+ const tps=Object.keys(T.T).map(k=>`<label><input type="radio" name="tipo" value="${k}" ${f.tipo===k?'checked':''}><span><b>${T.T[k][0]}</b><small>${T.T[k][1]}</small></span></label>`).join('');
+ const fld=(k,lab,o={})=>`<div class="fld"><label for="f_${k}">${lab}${o.h?'':''}</label>${o.ta?`<textarea class="inp" id="f_${k}" data-f="${k}" maxlength="${o.max||600}">${esc(f[k])}</textarea>`:`<input class="inp" id="f_${k}" data-f="${k}" value="${esc(f[k])}" maxlength="${o.max||120}" ${o.type?`type="${o.type}"`:''} ${o.im?`inputmode="${o.im}"`:''}>`}${o.h?`<p class="hint">${o.h}</p>`:''}</div>`;
+ const img=(k,lab,w)=>`<div class="fld"><span class="l">${lab}</span><div class="upl"><span class="thumb${w?' w':''}">${f[k]?`<img src="${esc(f[k])}" alt="">`:ic('img',22)}</span><label class="btn sm filebtn">${ic('img',16)}${T.pick}<input type="file" accept="image/*" data-img="${k}"></label>${f[k]?`<button class="btn sm" type="button" data-a="imgrm" data-k="${k}">${T.rm}</button>`:''}</div></div>`;
+ const paid=!FREE.includes(f.tipo);
+ const evs=f.ev.map((e,i)=>`<div class="it"><div class="hd"><b>${esc(e.t||T.ev_add)}</b><button class="btn sm dng" type="button" data-a="evrm" data-i="${i}">${ic('trash',15)}</button></div><div class="fld"><label for="ev_t${i}">${T.ev_t}</label><input class="inp" id="ev_t${i}" data-ev="${i}.t" value="${esc(e.t)}" maxlength="80"></div><div class="g2"><div class="fld"><label for="ev_d${i}">${T.ev_d}</label><input class="inp" id="ev_d${i}" type="date" data-ev="${i}.d" value="${esc(e.d)}" min="${today()}"></div><div class="fld"><label for="ev_h${i}">${T.ev_hh}</label><input class="inp" id="ev_h${i}" type="time" data-ev="${i}.h" value="${esc(e.h)}"></div></div><div class="fld"><label for="ev_l${i}">${T.ev_l}</label><input class="inp" id="ev_l${i}" data-ev="${i}.l" value="${esc(e.l)}" maxlength="80"></div></div>`).join('');
+ const jbs=f.jobs.map((j,i)=>`<div class="it"><div class="hd"><b>${esc(j.t||T.jb_add)}</b><button class="btn sm dng" type="button" data-a="jbrm" data-i="${i}">${ic('trash',15)}</button></div><div class="fld"><label for="jb_t${i}">${T.jb_t}</label><input class="inp" id="jb_t${i}" data-jb="${i}.t" value="${esc(j.t)}" maxlength="70"></div><div class="fld"><label for="jb_d${i}">${T.jb_d}</label><textarea class="inp" id="jb_d${i}" data-jb="${i}.d" maxlength="700">${esc(j.d)}</textarea></div><div class="g2"><div class="fld"><label for="jb_s${i}">${T.jb_sal}</label><input class="inp" id="jb_s${i}" data-jb="${i}.sal" value="${esc(j.sal)}" maxlength="40"></div><div class="fld"><label for="jb_w${i}">${T.jb_wa}</label><input class="inp" id="jb_w${i}" data-jb="${i}.wa" value="${esc(j.wa)}" inputmode="tel" maxlength="20"></div></div><div class="fld"><label for="jb_u${i}">${T.jb_u}</label><input class="inp" id="jb_u${i}" type="date" data-jb="${i}.until" value="${esc(j.until)}" min="${today()}" max="${addDays(90)}"></div></div>`).join('');
+ return `<div class="box">${whoBar()}<h2 style="margin-top:14px">${ic('store',22)}${T.f_h}</h2>${stb}
+ <form id="ffi" novalidate><div class="fld"><span class="l">${T.tipo}</span><div class="tps">${tps}</div></div>${msg(paid?'w':'i',paid?T.paid:T.free)}
+ ${paid?`<div class="fld"><label for="f_g">${T.g}</label><select class="inp" id="f_g" data-f="g">${Object.keys(T.G).map(k=>`<option value="${k}" ${f.g===k?'selected':''}>${T.G[k]}</option>`).join('')}</select></div>`:''}
+ ${fld('n',T.n,{max:80})}${fld('d',T.d,{ta:1,max:600,h:T.d_h})}
+ <div class="g2">${fld('wa',T.wa,{im:'tel',max:20,h:T.wa_h})}${fld('tel',T.tel,{im:'tel',max:30})}</div>
+ ${fld('a',T.a,{max:120})}${fld('map',T.map,{type:'url',max:300,h:T.map_h})}${fld('hrs',T.hrs,{max:200,h:T.hrs_h})}
+ <div class="g2">${fld('ig',T.ig,{max:60,h:T.ig_h})}${fld('web',T.web,{type:'url',max:200})}</div>
+ <div class="g2">${img('lg',T.lg)}${img('ph',T.ph,1)}</div>
+ <div class="sec"><h3>${ic('cal')}${T.ev_h}<span class="sp"></span>${f.ev.length<10?`<button class="btn sm" type="button" data-a="evadd">${ic('plus',15)}${T.ev_add}</button>`:''}</h3><p class="hint">${T.ev_p}</p>${evs}</div>
+ <div class="sec"><h3>${ic('job')}${T.jb_h}<span class="sp"></span>${f.jobs.length<10?`<button class="btn sm" type="button" data-a="jbadd">${ic('plus',15)}${T.jb_add}</button>`:''}</h3><p class="hint">${T.jb_p}</p>${jbs}</div>
+ <div id="am">${NOTE}</div><button class="btn ok full" type="submit" ${BUSY?'disabled':''}>${BUSY?T.saving:FICHA?T.save:T.send}</button></form>
+ ${FICHA?`<p style="margin-top:14px;text-align:center"><button class="lnk" type="button" data-a="fdel" style="color:var(--bad)">${T.del}</button></p>`:''}</div>${myRvView()}`}
+function myRvView(){const T=t();if(!MY_RV)return '';return `<div class="box"><h2>${ic('star',22)}${T.my_rv}</h2>${MY_RV.length?MY_RV.map(r=>`<div class="rv"><div class="hd"><span class="st ${esc(r.st)}"><i></i>${T['st_'+r.st]||r.st}</span><b>${'★'.repeat(r.r)}${'☆'.repeat(5-r.r)}</b><small style="color:var(--muted)">${esc(r.at.slice(0,10))}</small></div>${r.x?`<p>${esc(r.x)}</p>`:''}<div class="row"><a class="btn sm" href="?opinar=${encodeURIComponent(r.t)}">${ic('star',15)}${T.rv_on} ${esc(r.t)}</a><button class="btn sm dng" type="button" data-a="rvdel" data-id="${esc(r.id)}">${ic('trash',15)}${T.op_del}</button></div></div>`).join(''):`<p>${T.my_rv0}</p>`}</div>`}
+/* ===== opinião ===== */
+let RV=null,RVE={r:0,x:'',n:''};
+function opView(){const T=t(),nm=OPN||OP;
+ return `<div class="box">${whoBar()}<h2 style="margin-top:14px">${ic('star',22)}${esc(T.op_h.replace('{n}',nm))}</h2>${RV?msg('i',T.op_edit+(RV.st?` <span class="st ${esc(RV.st)}"><i></i>${T['st_'+RV.st]||''}</span>`:'')):''}
+ <form id="fop" novalidate><div class="fld"><span class="l">${T.op_r}</span><div class="stars" role="radiogroup" aria-label="${T.op_r}">${[1,2,3,4,5].map(i=>`<button type="button" role="radio" aria-checked="${RVE.r===i}" aria-label="${i}" data-r="${i}" class="${i<=RVE.r?'on':''}">${starI}</button>`).join('')}</div></div>
+ <div class="fld"><label for="op_x">${T.op_x}</label><textarea class="inp" id="op_x" maxlength="400">${esc(RVE.x)}</textarea><p class="hint">${T.op_x_h}</p></div>
+ <div class="fld"><label for="op_n">${T.op_nm}</label><input class="inp" id="op_n" maxlength="40" value="${esc(RVE.n)}" autocomplete="given-name"></div>
+ <div id="am">${NOTE}</div><button class="btn ok full" type="submit" ${BUSY?'disabled':''}>${BUSY?T.saving:T.op_send}</button></form>
+ <div class="row" style="justify-content:center;margin-top:14px">${RV?`<button class="btn sm dng" type="button" data-a="rvdel" data-id="${esc(OP+'_'+U.uid)}">${ic('trash',15)}${T.op_del}</button>`:''}<a class="btn sm" href="./">${ic('store',15)}${T.op_go}</a></div></div>`}
+/* ===== moderação (só admin) ===== */
+function admView(){const T=t();if(!ADM)return `<div class="box">${whoBar()}<p class="ld">…</p></div>`;
+ const nm=id=>NAMES&&NAMES[id]?NAMES[id]:id;
+ const cnt=(l,s)=>l.filter(x=>(x.st||'pend')===s).length;
+ const fl=ADM.f.filter(x=>AF==='all'||(x.st||'pend')===AF),rl=ADM.r.filter(x=>AR==='all'||(x.st||'pend')===AR);
+ const fil=(k,cur,l)=>`<div class="filt">${['pend','ok','off','all'].map(s=>`<button type="button" data-${k}="${s}" aria-pressed="${cur===s}">${s==='all'?T.all:T['st_'+s]} ${s==='all'?l.length:cnt(l,s)}</button>`).join('')}</div>`;
+ const fi=x=>{const paid=!FREE.includes(x.tipo),wa=String(x.wa||'').replace(/\D/g,'');return `<div class="it" data-uid="${esc(x.id)}"><div class="hd">${x.lg?`<span class="thumb" style="width:44px;height:44px;border-radius:10px"><img src="${esc(x.lg)}" alt=""></span>`:''}<b>${esc(x.n)}<br><small style="font-weight:500;color:var(--muted)">${esc((T.T[x.tipo]||[x.tipo])[0])}${paid&&x.g?' · '+esc(T.G[x.g]||x.g):''}</small></b><span class="st ${esc(x.st||'pend')}"><i></i>${T['st_'+(x.st||'pend')]}</span></div>
+  ${paid&&(x.st||'pend')==='pend'?msg('w',T.paid_flag):''}
+  <p class="meta">${esc(x.email||'')}${x.at?' · '+esc(String(x.at).slice(0,10)):''}${(x.ev||[]).length?' · '+x.ev.length+' '+T.ev_h.toLowerCase():''}${(x.jobs||[]).length?' · '+x.jobs.length+' '+T.jb_h.toLowerCase():''}</p>
+  <details style="margin-top:6px"><summary style="cursor:pointer;font-weight:700;color:var(--deep);font-size:14px">${T.adm_det}</summary><p class="meta" style="white-space:pre-line">${esc([x.d,x.a,x.hrs,x.tel&&('Tel '+x.tel),x.wa&&('WA '+x.wa),x.ig&&('@'+x.ig),x.web,x.map].filter(Boolean).join('\n'))}</p>${x.ph?`<img src="${esc(x.ph)}" alt="" style="max-width:100%;border-radius:12px;margin-top:8px">`:''}${(x.ev||[]).map(e=>`<p class="meta">${ic('cal',14)} ${esc(e.d)} ${esc(e.h||'')} · ${esc(e.t)}</p>`).join('')}${(x.jobs||[]).map(j=>`<p class="meta">${ic('job',14)} ${esc(j.t)} · ${esc(j.until)}</p>`).join('')}</details>
+  <div class="g2"><div class="fld"><label for="pl_${esc(x.id)}">${T.plan}</label><select class="inp" id="pl_${esc(x.id)}" data-plan>${['','free','paid'].map(p=>`<option value="${p}" ${(x.plan||'')===p?'selected':''}>${p===''?'—':p==='free'?T.plan_free:T.plan_paid}</option>`).join('')}</select></div><div class="fld"><label for="nt_${esc(x.id)}">${T.nota}</label><input class="inp" id="nt_${esc(x.id)}" data-nota value="${esc(x.nota||'')}" maxlength="200"></div></div>
+  <div class="row">${(x.st||'pend')!=='ok'?`<button class="btn sm ok" type="button" data-fst="ok">${ic('ok',15)}${T.ok}</button>`:''}${(x.st||'pend')!=='off'?`<button class="btn sm" type="button" data-fst="off">${T.off}</button>`:''}${(x.st||'pend')!=='pend'?`<button class="btn sm" type="button" data-fst="pend">${T.pend}</button>`:''}<button class="btn sm" type="button" data-fst="">${T.save2}</button>${wa?`<a class="btn sm wa" href="https://wa.me/${wa}" target="_blank" rel="noopener">${ic('wa',15)}${T.contact}</a>`:''}${x.email?`<a class="btn sm" href="mailto:${esc(x.email)}">${ic('mail',15)}${T.mail}</a>`:''}<button class="btn sm dng" type="button" data-fdel>${ic('trash',15)}${T.rm2}</button></div></div>`};
+ const ri=x=>`<div class="it" data-rid="${esc(x.id)}"><div class="hd"><b>${esc(nm(x.t))}<br><small style="font-weight:500;color:var(--muted)">${esc(x.n)} · ${esc(String(x.at||'').slice(0,10))}</small></b><span class="st ${esc(x.st||'pend')}"><i></i>${T['st_'+(x.st||'pend')]}</span></div><p style="margin-top:6px"><b style="color:#B07800">${'★'.repeat(x.r)}${'☆'.repeat(5-x.r)}</b></p>${x.x?`<p class="meta" style="white-space:pre-line;color:var(--ink)">${esc(x.x)}</p>`:''}<div class="row">${x.st!=='ok'?`<button class="btn sm ok" type="button" data-rst="ok">${ic('ok',15)}${T.ok}</button>`:''}${x.st!=='off'?`<button class="btn sm" type="button" data-rst="off">${T.hide}</button>`:''}<button class="btn sm dng" type="button" data-rdel>${ic('trash',15)}${T.rm2}</button></div></div>`;
+ return `<div class="box">${whoBar()}<div id="am">${NOTE}</div></div><div class="box adm"><h2>${ic('store',22)}${T.adm_f}</h2>${fil('af',AF,ADM.f)}${fl.length?fl.map(fi).join(''):`<p class="ld">${T.adm_none}</p>`}</div><div class="box adm"><h2>${ic('star',22)}${T.adm_r}</h2>${fil('ar',AR,ADM.r)}${rl.length?rl.map(ri).join(''):`<p class="ld">${T.adm_none}</p>`}</div>`}
+async function loadAdm(){try{const [a,b]=await Promise.all([getDocs(collection(db,'gfichas')),getDocs(collection(db,'gresenas'))]);
+  ADM={f:a.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>String(y.at||'').localeCompare(String(x.at||''))),r:b.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>String(y.at||'').localeCompare(String(x.at||'')))};
+  NAMES=NAMES||{};ADM.f.forEach(x=>{NAMES['f'+x.id]=x.n});
+  if(!NAMES.__g){NAMES.__g=1;fetch('/sitio/guia.php?g=1').then(r=>r.ok?r.json():null).then(j=>{if(!j)return;(j.dir||[]).forEach(x=>{if(x&&x.id&&!NAMES[x.id])NAMES[x.id]=x.n});(j.fu||[]).forEach(x=>{if(x&&x.id&&!NAMES[x.id])NAMES[x.id]=x.n});render()}).catch(()=>{})}
+ }catch(e){ADM={f:[],r:[]};NOTE=msg('e',t().e_save)}render()}
+/* ===== desenho ===== */
+function render(){chrome();
+ if(U===undefined){app$.innerHTML='<p class="ld">…</p>';return}
+ if(!U){app$.innerHTML=authView();return}
+ if(!U.emailVerified){app$.innerHTML=verView();return}
+ if(VIEW==='adm'){app$.innerHTML=admView();return}
+ if(OP){app$.innerHTML=opView();return}
+ if(!FE){app$.innerHTML='<p class="ld">…</p>';return}
+ app$.innerHTML=fichaView()}
+async function loadMine(){
+ try{const s=await getDoc(doc(db,'gfichas',U.uid));FICHA=s.exists()?s.data():null}catch(e){FICHA=null}
+ FE=Object.assign(blankFicha(),FICHA?JSON.parse(JSON.stringify(FICHA)):{});['ev','jobs'].forEach(k=>{if(!Array.isArray(FE[k]))FE[k]=[]});
+ try{const q=await getDocs(query(collection(db,'gresenas'),where('uid','==',U.uid)));MY_RV=q.docs.map(d=>({id:d.id,...d.data()}))}catch(e){MY_RV=[]}
+ render()}
+async function loadOp(){try{const s=await getDoc(doc(db,'gresenas',OP+'_'+U.uid));RV=s.exists()?s.data():null}catch(e){RV=null}
+ RVE=RV?{r:RV.r,x:RV.x||'',n:RV.n||''}:{r:0,x:'',n:(U.displayName||'').split(' ')[0]||''};render()}
+function afterLogin(){NOTE='';if(!U||!U.emailVerified){render();return}
+ if(U.email===ADMIN&&!OP){VIEW='adm';render();loadAdm();return}
+ VIEW='me';if(OP){render();loadOp()}else{render();loadMine()}}
+onAuthStateChanged(auth,u=>{U=u||null;FICHA=null;FE=null;MY_RV=null;ADM=null;RV=null;if(!U){if(VIEW!=='up'&&VIEW!=='rs')VIEW='in';render();return}afterLogin()});
+U=undefined;render();
+/* ===== imagens: reduz no próprio celular antes de salvar ===== */
+function shrink(file,max,q){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),w=Math.max(1,Math.round(im.naturalWidth*k)),h=Math.max(1,Math.round(im.naturalHeight*k));const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',q))};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};im.src=u})}
+/* ===== eventos da página ===== */
+function setNote(k,x){NOTE=x?msg(k,x):'';const a=document.getElementById('am');if(a)a.innerHTML=NOTE}
+document.querySelectorAll('[data-l]').forEach(b=>b.addEventListener('click',()=>{L=b.dataset.l;try{localStorage.setItem('gsr_cta_l',L)}catch(e){}render()}));
+app$.addEventListener('input',e=>{const el=e.target;
+ if(el.dataset.f&&FE){FE[el.dataset.f]=el.value;return}
+ if(el.dataset.ev&&FE){const [i,k]=el.dataset.ev.split('.');FE.ev[+i][k]=el.value;return}
+ if(el.dataset.jb&&FE){const [i,k]=el.dataset.jb.split('.');FE.jobs[+i][k]=el.value;return}
+ if(el.id==='op_x')RVE.x=el.value;if(el.id==='op_n')RVE.n=el.value});
+app$.addEventListener('change',async e=>{const el=e.target;
+ if(el.name==='tipo'&&FE){FE.tipo=el.value;render();return}
+ if(el.dataset.f==='g'&&FE){FE.g=el.value;return}
+ if(el.dataset.img&&el.files&&el.files[0]&&FE){const k=el.dataset.img;try{FE[k]=await shrink(el.files[0],k==='lg'?240:900,k==='lg'?.82:.72);if(FE[k].length>(k==='lg'?88000:158000))FE[k]=await shrink(el.files[0],k==='lg'?160:640,.62)}catch(x){}render()}});
+app$.addEventListener('click',async e=>{const b=e.target.closest('button,[data-v]');if(!b)return;const T=t();
+ if(b.dataset.v){VIEW=b.dataset.v;NOTE='';render();return}
+ if(b.dataset.r&&b.closest('.stars')){RVE.r=+b.dataset.r;render();return}
+ const a=b.dataset.a;
+ if(a==='out'){await signOut(auth);VIEW='in';return}
+ if(a==='verdone'){try{await reload(U);U=auth.currentUser;if(U.emailVerified){await U.getIdToken(true);afterLogin()}else setNote('e',T.ver_not)}catch(x){setNote('e',authErr(x))}return}
+ if(a==='veragain'){try{await sendVer(U);setNote('o',T.ver_sent)}catch(x){setNote('e',authErr(x))}return}
+ if(a==='imgrm'){FE[b.dataset.k]='';render();return}
+ if(a==='evadd'){FE.ev.push({t:'',d:'',h:'',l:''});render();return}
+ if(a==='evrm'){FE.ev.splice(+b.dataset.i,1);render();return}
+ if(a==='jbadd'){FE.jobs.push({id:rid(),t:'',d:'',sal:'',wa:FE.wa||'',until:addDays(30),on:true,a:'otr',k:'full',n:1});render();return}
+ if(a==='jbrm'){FE.jobs.splice(+b.dataset.i,1);render();return}
+ if(a==='fdel'){if(!confirm(T.del_q))return;try{await deleteDoc(doc(db,'gfichas',U.uid));FICHA=null;FE=blankFicha();NOTE=msg('o',T.deleted);render()}catch(x){setNote('e',T.e_save)}return}
+ if(a==='rvdel'){try{await deleteDoc(doc(db,'gresenas',b.dataset.id));if(OP&&b.dataset.id===OP+'_'+U.uid){RV=null;RVE={r:0,x:'',n:RVE.n};NOTE='';render()}else{MY_RV=(MY_RV||[]).filter(r=>r.id!==b.dataset.id);render()}}catch(x){setNote('e',T.e_save)}return}
+ if(b.dataset.af){AF=b.dataset.af;render();return}if(b.dataset.ar){AR=b.dataset.ar;render();return}
+ const it=b.closest('[data-uid]');
+ if(it&&(b.dataset.fst!=null||b.hasAttribute('data-fdel'))){const id=it.dataset.uid,x=ADM.f.find(y=>y.id===id);if(!x)return;
+  try{if(b.hasAttribute('data-fdel')){if(!confirm(T.adm_q))return;await deleteDoc(doc(db,'gfichas',id));ADM.f=ADM.f.filter(y=>y.id!==id)}
+   else{const up={plan:it.querySelector('[data-plan]').value,nota:it.querySelector('[data-nota]').value.trim().slice(0,200)};if(b.dataset.fst)up.st=b.dataset.fst;await updateDoc(doc(db,'gfichas',id),up);Object.assign(x,up)}
+   NOTE=msg('o',T.adm_done);render()}catch(y){setNote('e',T.e_save)}return}
+ const ri=b.closest('[data-rid]');
+ if(ri&&(b.dataset.rst||b.hasAttribute('data-rdel'))){const id=ri.dataset.rid,x=ADM.r.find(y=>y.id===id);if(!x)return;
+  try{if(b.hasAttribute('data-rdel')){if(!confirm(T.adm_q))return;await deleteDoc(doc(db,'gresenas',id));ADM.r=ADM.r.filter(y=>y.id!==id)}else{await updateDoc(doc(db,'gresenas',id),{st:b.dataset.rst});x.st=b.dataset.rst}
+   NOTE=msg('o',T.adm_done);render()}catch(y){setNote('e',T.e_save)}return}
+});
+app$.addEventListener('submit',async e=>{e.preventDefault();const T=t(),f=e.target;
+ if(f.id==='fau'){const em=f.querySelector('#ae').value.trim(),pw=f.querySelector('#ap').value;NOTE='';
+  try{if(VIEW==='up'){const c=await createUserWithEmailAndPassword(auth,em,pw);await sendVer(c.user)}else await signInWithEmailAndPassword(auth,em,pw)}catch(x){setNote('e',authErr(x))}return}
+ if(f.id==='frs'){try{await sendPasswordResetEmail(auth,f.querySelector('#re').value.trim());setNote('o',T.reset_ok)}catch(x){setNote('e',x&&x.code==='auth/user-not-found'?T.reset_ok:authErr(x))}return}
+ if(f.id==='ffi'){const x=FE,d=today();
+  const clean={tipo:x.tipo,n:x.n.trim().slice(0,80),d:x.d.trim().slice(0,600),wa:x.wa.replace(/[^\d+]/g,'').slice(0,20),tel:x.tel.trim().slice(0,30),a:x.a.trim().slice(0,120),map:x.map.trim().slice(0,300),hrs:x.hrs.trim().slice(0,200),ig:x.ig.replace(/^@/,'').replace(/[^\w.]/g,'').slice(0,60),web:x.web.trim().slice(0,200),lg:x.lg||'',ph:x.ph||'',
+   ev:x.ev.map(v=>({t:String(v.t||'').trim().slice(0,80),d:v.d||'',h:v.h||'',l:String(v.l||'').trim().slice(0,80)})),
+   jobs:x.jobs.map(j=>({id:j.id||rid(),t:String(j.t||'').trim().slice(0,70),d:String(j.d||'').trim().slice(0,700),sal:String(j.sal||'').trim().slice(0,40),wa:String(j.wa||'').replace(/\D/g,'').slice(0,15),until:j.until||'',on:true,a:'otr',k:'full',n:1})),
+   email:String(U.email||'').slice(0,120),at:new Date().toISOString()};
+  if(!FREE.includes(clean.tipo))clean.g=x.g||'serv';
+  if(clean.n.length<2)return setNote('e',T.e_n);
+  if(clean.wa.replace(/\D/g,'').length<8&&clean.tel.replace(/\D/g,'').length<6)return setNote('e',T.e_ct);
+  if(!httpsOk(clean.map)||!httpsOk(clean.web))return setNote('e',T.e_url);
+  if(clean.ev.some(v=>v.t.length<3||!/^\d{4}-\d{2}-\d{2}$/.test(v.d)||v.d<d))return setNote('e',T.e_ev);
+  if(clean.jobs.some(j=>j.t.length<3||j.d.length<10||j.wa.length<8||!/^\d{4}-\d{2}-\d{2}$/.test(j.until)||j.until<d||j.until>addDays(90)))return setNote('e',T.e_jb);
+  if(clean.lg.length>90000||clean.ph.length>160000)return setNote('e',T.e_big);
+  const first=!FICHA;
+  if(first)clean.st='pend';else{clean.st=FICHA.st;if('plan' in FICHA)clean.plan=FICHA.plan;if('nota' in FICHA)clean.nota=FICHA.nota}
+  BUSY=true;render();
+  try{await setDoc(doc(db,'gfichas',U.uid),clean);FICHA=clean;BUSY=false;
+   const wm=T.notify_m.replace('{n}',clean.n).replace('{t}',T.T[clean.tipo][0]);
+   NOTE=msg('o',T.saved)+(first?`<div class="row"><a class="btn wa" href="https://wa.me/${GUIA_WA}?text=${encodeURIComponent(wm)}" target="_blank" rel="noopener">${ic('wa')}${T.notify}</a></div>`:'');render()}
+  catch(y){BUSY=false;NOTE=msg('e',T.e_save);render()}return}
+ if(f.id==='fop'){const n=RVE.n.trim().slice(0,40),x=RVE.x.trim().slice(0,400);
+  if(RVE.r<1||n.length<2)return setNote('e',T.op_e);
+  const data={t:OP,uid:U.uid,n,r:RVE.r,x,at:new Date().toISOString(),st:'pend'};BUSY=true;render();
+  try{await setDoc(doc(db,'gresenas',OP+'_'+U.uid),data);RV=data;BUSY=false;NOTE=msg('o',T.op_ok);render()}catch(y){BUSY=false;NOTE=msg('e',T.e_save);render()}return}
+});
+</script>
+</body></html>
