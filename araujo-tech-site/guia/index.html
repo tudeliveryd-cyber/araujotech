@@ -238,7 +238,7 @@ body{background:#fff}
 section[id],#main,#gmw{scroll-margin-top:76px}
 footer{text-align:left;background:var(--bg2);border-top:1px solid var(--line2);padding:34px 0 30px}
 .ftg{display:grid;grid-template-columns:1fr;gap:22px}.ftg>div{display:flex;flex-direction:column;gap:8px}.ftg b{font-size:14px;color:var(--ink)}.ftg a{color:var(--muted);font-weight:500}.ftg a:hover{color:var(--deep)}
-.ftb img{height:38px;width:auto}.ftb p{margin-top:6px;max-width:320px}
+.ftb img{height:38px;width:auto;align-self:flex-start;object-fit:contain}.ftb p{margin-top:6px;max-width:320px}
 @media (min-width:700px){.ftg{grid-template-columns:2fr 1fr 1fr}}
 footer .allies{justify-content:flex-start;padding:24px 0 14px;border-bottom:1px solid var(--line2);margin-bottom:14px}
 .ftl{font-size:13px}.ftl a{color:var(--deep)}
@@ -368,13 +368,12 @@ footer .allies{justify-content:flex-start;padding:24px 0 14px;border-bottom:1px 
  <div id="top2"></div>
  <div id="list"><p class="empty" data-t="loading"></p></div>
  <section class="cta"><div><h2 data-t="cta_h"></h2><p data-t="cta_p"></p></div><a href="/guia/negocios/" data-t="cta_b"></a></section>
- <div class="allies"><span data-t="by"></span><img src="/img/vitrix/vitrix-nombre.png" alt="Vitrix"><img src="/img/tu-delivery.png" alt="Tu Delivery"></div>
 </main>
 <footer><div class="wrap">
  <div class="ftg">
   <div class="ftb"><img src="/img/guia/guia-logo.webp" alt="Guía de Santa Rita" width="83" height="40"><p data-t="ft_desc">Negocios, servicios e información útil de Santa Rita, Alto Paraná, en español y portugués.</p></div>
   <div><b data-t="ft_exp">Explorar</b><a href="#negocios" data-go="all" data-t="nv_neg">Negocios</a><a href="#comer" data-go="comer" data-t="nv_com">Qué comer</a><a href="#util" data-go="util" data-t="f_util">Santa Rita útil</a><a href="/guia/llegar/" data-t="ft_new">Recién llegado</a></div>
-  <div><b data-t="ft_biz">Para negocios</b><a href="/guia/negocios/" data-t="what">Para negocios</a><a href="/guia/sobre/" data-t="ft_about">Sobre la Guía</a><a href="https://wa.me/595982086171" target="_blank" rel="noopener" data-t="ft_contact">Contacto</a></div>
+  <div><b data-t="ft_biz">Para negocios</b><a href="/guia/negocios/" data-t="nv_ad">Anunciá tu negocio</a><a href="/guia/sobre/" data-t="ft_about">Sobre la Guía</a><a href="https://wa.me/595982086171" target="_blank" rel="noopener" data-t="ft_contact">Contacto</a></div>
  </div>
  <div class="allies"><span data-t="by"></span><img src="/img/vitrix/vitrix-nombre.png" alt="Vitrix"><img src="/img/tu-delivery.png" alt="Tu Delivery"></div>
  <p class="ftl"><b data-t="ft_g">Guía de Santa Rita</b> · Santa Rita, Alto Paraná, Paraguay · <a href="/guia/terminos/" data-t="ft_terms">Términos y privacidad</a><br><span data-t="ft_dev">Desarrollado por</span> <a href="https://araujotechsistemas.com/">Araújo Tech Sistemas</a></p>
