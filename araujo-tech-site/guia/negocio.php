@@ -55,7 +55,7 @@ $mapQ = $hasGeo ? $lat . ',' . $lng : trim($name . ', ' . ($addr ?: ($city ?: 'S
 $mapUrl = 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($mapQ);
 $wa = preg_replace('/\D/', '', (string)($st['whatsapp'] ?? '')); if ($wa && $wa[0] === '0') $wa = '595' . substr($wa, 1); elseif ($wa && strpos($wa, '595') !== 0 && strlen($wa) <= 10) $wa = '595' . $wa;
 $waUrl = $wa ? 'https://wa.me/' . $wa . '?text=' . rawurlencode('Hola ' . $name . ', te encontré en la Guía de Santa Rita') : '';
-$url = 'https://araujotechsistemas.com/guia/' . $id;
+$url = 'https://guiadesantarita.com/' . $id;
 $desc = ($slogan ?: ($seg ?: 'Negocio')) . ' en ' . ($city ?: 'Santa Rita') . '. Mirá el catálogo, horarios y ubicación, y pedí por WhatsApp.';
 $img = $cover ? 'https://araujotechsistemas.com' . $cover : ($logo ?: 'https://araujotechsistemas.com/img/vitrix/og.jpg');
 // dados estruturados

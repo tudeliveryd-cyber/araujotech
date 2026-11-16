@@ -13,7 +13,7 @@ try {
     $e = function ($x) { return htmlspecialchars((string)$x, ENT_QUOTES, 'UTF-8'); };
     $li = ''; $ld = [];
     foreach ($cl as $i => $c) {
-      $u = 'https://araujotechsistemas.com/guia/' . $c['id'];
+      $u = 'https://guiadesantarita.com/' . $c['id'];
       $li .= '<li><a href="/guia/' . $e($c['id']) . '">' . $e($c['name']) . '</a>' . ($c['segEs'] || $c['city'] ? ' · ' . $e(trim($c['segEs'] . ($c['city'] ? ' · ' . $c['city'] : ''), ' ·')) : '') . '</li>';
       $ld[] = ['@type' => 'ListItem', 'position' => $i + 1, 'url' => $u, 'name' => $c['name']];
     }
@@ -26,6 +26,6 @@ try {
 // domínio próprio guiadesantarita.com: app instalado com escopo na raiz e endereços curtos para o Google
 if (strtolower(preg_replace('/^www\./', '', (string)($_SERVER['HTTP_HOST'] ?? ''))) === 'guiadesantarita.com') {
   $html = str_replace('href="/guia/manifest.webmanifest"', 'href="/manifest.webmanifest"', $html);
-  $html = str_replace(['https://araujotechsistemas.com/guia/', 'href="/guia/'], ['https://guiadesantarita.com/', 'href="/'], $html);
+  $html = str_replace(['https://guiadesantarita.com/', 'href="/guia/'], ['https://guiadesantarita.com/', 'href="/'], $html);
 }
 echo $html;

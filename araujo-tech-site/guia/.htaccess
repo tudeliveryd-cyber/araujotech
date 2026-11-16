@@ -1,8 +1,22 @@
-# Guía Vitrix: a página principal passa pelo index.php (lista pronta para o Google) e cada negócio tem a sua página: /guia/<negocio>
+# Guía de Santa Rita: o endereço oficial é guiadesantarita.com. Quem abre o caminho antigo /guia/... (no site da Araújo
+# ou no próprio domínio novo) vai para o endereço curto. Só pedidos feitos direto pelo visitante (THE_REQUEST com /guia):
+# as reescritas internas do domínio novo (/ -> /guia/index.php, /<negócio> -> /guia/negocio.php) não passam por aqui.
 DirectoryIndex index.php index.html
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /guia/
+RewriteCond %{THE_REQUEST} \s/guia/?(index\.(php|html))?(\?\S*)?\s [NC]
+RewriteRule ^(index\.(php|html))?$ https://guiadesantarita.com/ [R=301,L]
+RewriteCond %{THE_REQUEST} \s/guia/ [NC]
+RewriteRule ^(negocios|llegar|terminos|sobre)(/(index\.html)?)?$ https://guiadesantarita.com/$1/ [R=301,L]
+RewriteCond %{THE_REQUEST} \s/guia/ [NC]
+RewriteRule ^aparecer/?$ https://guiadesantarita.com/negocios/ [R=301,L]
+RewriteCond %{HTTP_HOST} araujotechsistemas\.com$ [NC]
+RewriteRule ^cartel\.php$ https://guiadesantarita.com/guia/cartel.php [R=302,L]
+RewriteCond %{THE_REQUEST} \s/guia/ [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^([a-z0-9][a-z0-9-]{1,60})/?$ https://guiadesantarita.com/$1 [R=301,L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^([a-z0-9][a-z0-9-]{1,60})/?$ negocio.php?id=$1 [L,QSA]
