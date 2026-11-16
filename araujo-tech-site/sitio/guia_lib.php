@@ -4,7 +4,7 @@
 function guia_doc() {
   $cache = sys_get_temp_dir() . '/at_guia7.json';
   if (is_file($cache) && time() - filemtime($cache) < 180) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gadsAt');
+  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gatl&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -16,7 +16,7 @@ function guia_doc() {
     if (isset($v['arrayValue'])) return array_map($val, $v['arrayValue']['values'] ?? []);
     return null;
   };
-  $d = ['gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
+  $d = ['gatl' => $val($f['gatl'] ?? null) ?: [], 'gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
@@ -165,7 +165,7 @@ function guia_pub() {
   $acc = guia_acc(); $fu = [];
   foreach ($acc['fichas'] as $x) {
     foreach ($x['ev'] as $e) $ev[] = ['id' => substr(md5($e['t'] . '|' . $e['d'] . '|' . $e['h']), 0, 10), 't' => $e['t'], 'k' => $x['tipo'] === 'iglesia' ? 'rel' : ($x['tipo'] === 'club' ? 'dep' : 'com'), 'd' => $e['d'], 'h' => $e['h'], 'l' => $e['l'] !== '' ? $e['l'] : $x['n'], 'u' => ''];
-    if (isset(GUIA_FU[$x['tipo']])) $fu[] = ['id' => 'f' . $x['uid'], 'c' => GUIA_FU[$x['tipo']], 'n' => $x['n'], 'a' => $x['a'], 'tel' => $x['tel'], 'h' => $x['hrs'], 'map' => $x['map'], 'd' => $x['d'], 'wa' => $x['wa'], 'ig' => $x['ig'], 'web' => $x['web'], 'lg' => $x['lg'], 'ph' => $x['ph']];
+    if (isset(GUIA_FU[$x['tipo']])) $fu[] = ['id' => 'f' . $x['uid'], 'c' => ($x['tipo'] === 'escuela' && in_array($x['g'], ['gua', 'escpub', 'escpri', 'unipub', 'unipri', 'inst'], true)) ? $x['g'] : GUIA_FU[$x['tipo']], 'n' => $x['n'], 'a' => $x['a'], 'tel' => $x['tel'], 'h' => $x['hrs'], 'map' => $x['map'], 'd' => $x['d'], 'wa' => $x['wa'], 'ig' => $x['ig'], 'web' => $x['web'], 'lg' => $x['lg'], 'ph' => $x['ph']];
   }
   usort($ev, function ($a, $b) { return strcmp($a['d'] . $a['h'], $b['d'] . $b['h']); });
   // negócios sem catálogo (ficha simples cadastrada no Panel Araújo Tech)
@@ -193,7 +193,10 @@ function guia_pub() {
   $so = (array)($d['gsoc'] ?? []); $soc = []; // redes da Guía (rodapé), configuradas no painel
   $w = preg_replace('/\D/', '', (string)($so['wa'] ?? '')); if (strlen($w) >= 8) $soc['wa'] = $w;
   foreach (['fb', 'ig', 'yt', 'tt'] as $k) { $u = trim((string)($so[$k] ?? '')); if (preg_match('#^https://[^\s"\'<>]+$#i', $u)) $soc[$k] = $u; }
-  return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
+  $atl = []; // accesos da portada, na ordem do painel
+  foreach (array_slice((array)($d['gatl'] ?? []), 0, 16) as $x) { if (!is_array($x)) continue; $k = (string)($x['k'] ?? ''); if (!in_array($k, ['all', 'gas', 'del', 'em', 'sal', 'far', 'igl', 'edu', 'tra', 'ev', 'job', 'mas', 'q', 'p'], true)) continue;
+    $atl[] = ['k' => $k, 'es' => mb_substr(trim((string)($x['es'] ?? '')), 0, 24), 'pt' => mb_substr(trim((string)($x['pt'] ?? '')), 0, 24), 'ic' => preg_replace('/[^a-z]/', '', (string)($x['ic'] ?? '')), 'q' => mb_substr(trim((string)($x['q'] ?? '')), 0, 60)]; }
+  return ['atl' => $atl, 'ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10)];
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.

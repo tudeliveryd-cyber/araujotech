@@ -267,6 +267,14 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   const hv = await h.evaluate(o => { G.nov = o.nov; G.clas = o.clas; G.ev = o.ev; JOBS = o.jobs; CAT = 'home'; document.getElementById('q').value = ''; render(); const n = [...document.querySelectorAll('.nov .nv-c')].map(a => a.getAttribute('href')); document.getElementById('q').value = 'perro'; CAT = 'all'; render(); const r = [...document.querySelectorAll('.nov-q .nv-c b')].map(b => b.textContent); return { n, r }; }, pub);
   check(hv.n.length >= 2 && hv.n.some(u => /\/guia\/vacante\/g\./.test(u)), 'tela inicial mostra "Lo nuevo en la Guía" com links próprios');
   check(hv.r.includes('Perro perdido'), 'buscar "perro" encontra o aviso');
+  const ed = await h.evaluate(() => { G.util = [{ c: 'escpub', n: 'Colegio Nacional Santa Rita', o: 1 }, { c: 'escpri', n: 'Colegio Privado Alfa', o: 1 }, { c: 'unipub', n: 'Universidad Nacional (filial)', o: 1 }, { c: 'gua', n: 'Jardín Pequeños Pasos', o: 1 }, { c: 'salud', n: 'Hospital', o: 1 }];
+    G.atl = [{ k: 'q', es: 'Corredores de seguros', pt: '', ic: 'seg', q: 'seguro corredor' }, { k: 'p', es: 'Universidades públicas', ic: 'uni', q: 'unipub' }, { k: 'all', es: '', pt: '', ic: 'all', q: '' }];
+    CAT = 'home'; document.getElementById('q').value = ''; SPV = ''; render(); const at = [...document.querySelectorAll('#atl [data-a]')].map(b => b.textContent.trim());
+    SPV = 'edu'; CAT = 'all'; render(); const hs = [...document.querySelectorAll('.spv .uh')].map(x => x.textContent.trim()); return { at, hs }; });
+  check(ed.at.join('|') === 'Corredores de seguros|Universidades públicas|Negocios', 'portada usa os accesos do painel, na ordem: ' + ed.at.join(', '));
+  check(['Guarderías y jardines', 'Escuelas y colegios públicos', 'Colegios privados', 'Universidades públicas'].every(x => ed.hs.includes(x)), 'Educación separada: guarderías, colégios públicos e privados, universidades');
+  await h.evaluate(() => { CAT = 'home'; SPV = ''; render(); }); await h.click('#atl [data-a="p"]'); await h.w(400);
+  check(await h.evaluate(() => SPV === 'unipub' && /Universidad Nacional/.test(document.getElementById('list').textContent)), 'acesso "Universidades públicas" abre só as universidades públicas');
   check(h.errs.length === 0, 'Guía sem erros de JavaScript', h.errs.join(' | '));
   await L.done();
 })().catch(async e => { console.error(e); L.bad('erro: ' + e.message); await L.done(); });

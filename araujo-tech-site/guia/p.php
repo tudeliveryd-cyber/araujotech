@@ -46,7 +46,7 @@ if (!$x) {
     $btns = '<a class="btn pri" href="' . $e('https://wa.me/' . $wa($x['wa']) . '?text=' . rawurlencode('Hola, vi tu aviso "' . $x['t'] . '" en la Guía de Santa Rita y quiero más información.')) . '" target="_blank" rel="noopener">Consultar por WhatsApp</a>';
     $ld = ''; $kind = $CK[$x['k']] ?? 'Aviso';
   } elseif ($k === 'lugar') {
-    $PC = ['gob' => 'Gobierno y trámites', 'doc' => 'Documentos', 'salud' => 'Salud', 'far' => 'Farmacia', 'seg' => 'Seguridad', 'ocio' => 'Plazas y recreación', 'trans' => 'Transporte', 'serv' => 'Servicios públicos', 'edu' => 'Educación', 'igl' => 'Iglesia', 'com' => 'Comunidad y ONGs', 'dep' => 'Deportes y clubes', 'ani' => 'Animales y adopción', 'fin' => 'Bancos y finanzas'];
+    $PC = ['gob' => 'Gobierno y trámites', 'doc' => 'Documentos', 'salud' => 'Salud', 'far' => 'Farmacia', 'seg' => 'Seguridad', 'ocio' => 'Plazas y recreación', 'trans' => 'Transporte', 'serv' => 'Servicios públicos', 'edu' => 'Educación', 'gua' => 'Guardería y jardín', 'escpub' => 'Escuela o colegio público', 'escpri' => 'Colegio privado', 'unipub' => 'Universidad pública', 'unipri' => 'Universidad privada', 'inst' => 'Instituto, cursos e idiomas', 'igl' => 'Iglesia', 'com' => 'Comunidad y ONGs', 'dep' => 'Deportes y clubes', 'ani' => 'Animales y adopción', 'fin' => 'Bancos y finanzas'];
     $kind = $PC[$x['c']] ?? 'Lugar público';
     $x['t'] = $x['n'];
     $title = $x['n'] . ' — Santa Rita';
@@ -57,7 +57,7 @@ if (!$x) {
     $tel = preg_replace('/[^\d+]/', '', (string)$x['tel']);
     $btns = '<a class="btn pri" style="background:var(--deep);border-color:var(--deep)" href="' . $e($mq) . '" target="_blank" rel="noopener">Cómo llegar</a>' . ($tel ? '<a class="btn" href="tel:' . $e($tel) . '">Llamar ' . $e($x['tel']) . '</a>' : '') . (($x['wa'] ?? '') ? '<a class="btn" href="' . $e('https://wa.me/' . $wa($x['wa'])) . '" target="_blank" rel="noopener">WhatsApp</a>' : '');
     $ll = null; if (preg_match('/[?&](?:q|query)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/', (string)$x['map'], $m) || preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', (string)$x['map'], $m)) $ll = [(float)$m[1], (float)$m[2]];
-    $ld = json_encode(array_filter(['@context' => 'https://schema.org', '@type' => ['igl' => 'Church', 'edu' => 'School', 'salud' => 'Hospital', 'far' => 'Pharmacy', 'fin' => 'BankOrCreditUnion', 'ocio' => 'Park', 'trans' => 'BusStation', 'seg' => 'PoliceStation', 'gob' => 'GovernmentOffice'][$x['c']] ?? 'Place', 'name' => $x['n'], 'telephone' => $x['tel'] ?: null,
+    $ld = json_encode(array_filter(['@context' => 'https://schema.org', '@type' => ['igl' => 'Church', 'edu' => 'School', 'gua' => 'Preschool', 'escpub' => 'School', 'escpri' => 'School', 'unipub' => 'CollegeOrUniversity', 'unipri' => 'CollegeOrUniversity', 'inst' => 'EducationalOrganization', 'salud' => 'Hospital', 'far' => 'Pharmacy', 'fin' => 'BankOrCreditUnion', 'ocio' => 'Park', 'trans' => 'BusStation', 'seg' => 'PoliceStation', 'gob' => 'GovernmentOffice'][$x['c']] ?? 'Place', 'name' => $x['n'], 'telephone' => $x['tel'] ?: null,
       'address' => ['@type' => 'PostalAddress', 'streetAddress' => $x['a'] ?: null, 'addressLocality' => 'Santa Rita', 'addressRegion' => 'Alto Paraná', 'addressCountry' => 'PY'], 'geo' => $ll ? ['@type' => 'GeoCoordinates', 'latitude' => $ll[0], 'longitude' => $ll[1]] : null, 'hasMap' => $mq]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if (($x['ph'] ?? '') !== '') $img = 'https://araujotechsistemas.com' . $x['ph'];
   } else {

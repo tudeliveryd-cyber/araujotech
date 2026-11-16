@@ -50,6 +50,16 @@ const { sec, check, info } = L;
   const ri = await a.evaluate(async () => { for (let i = 0; i < 40 && !document.querySelector('.sheet[data-k="cgrepimg"] img'); i++) await new Promise(r => setTimeout(r, 250)); const im = document.querySelector('.sheet[data-k="cgrepimg"] img'); if (!im) return 'sem img'; try { await im.decode(); } catch (e) {} return im.naturalWidth + 'x' + im.naturalHeight; });
   check(ri === '1080x1350', 'imagem de resultados 1080×1350 para mandar ao cliente (' + ri + ')');
   await a.evaluate(() => closeSheet()); await a.click('.cg-nav button[data-k="home"]'); await a.w(300);
+  await a.click('.cg-nav button[data-k="cfg"]'); await a.w(1200);
+  check(await a.locator('.cg-atl li').count() === 12, 'Configuración: accesos da portada (12 originais)');
+  await a.click('[data-act="cgatladd"]'); await a.w(300);
+  const na = await a.locator(".cg-atl li").count() - 1;
+  await a.fill(`[data-atl="${na}.es"]`, 'Corredores de seguros'); await a.fill(`[data-atl="${na}.q"]`, 'seguro corredor'); await a.selectOption(`select[data-atl="${na}.ic"]`, 'seg');
+  for (let i = na; i > 0; i--) { await a.click(`[data-act="cgatlmv"][data-k="${i}"][data-d="-1"]`); await a.w(120); }
+  await a.click('[data-act="cgatlsave"]'); await a.w(2000);
+  const sit = L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json) || {};
+  check(sit.gatl && sit.gatl.length === 13 && sit.gatl[0].k === 'q' && sit.gatl[0].es === 'Corredores de seguros' && sit.gatl[0].q === 'seguro corredor' && sit.gatl[0].ic === 'seg' && sit.gatl[1].k === 'all', 'acesso novo salvo em primeiro lugar (posição escolhida)');
+  await a.click('.cg-nav button[data-k="home"]'); await a.w(300);
   sec('B. Navegação por todos os módulos');
   for (const k of ['cli', 'sis', 'pla', 'sub', 'fin', 'dom', 'sup', 'rep', 'usr', 'sec', 'cfg', 'home']) {
     await a.click(`.cg-nav button[data-k="${k}"]`); await a.w(300);
