@@ -238,6 +238,20 @@ vd=2000-01-01
 vr=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents:commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data "{\"writes\":[{\"update\":{\"name\":\"projects/araujotech-catalogos/databases/(default)/documents/shops/fogao-mineiro/visitas/$vd\",\"fields\":{}},\"updateMask\":{\"fieldPaths\":[]},\"updateTransforms\":[{\"fieldPath\":\"n\",\"increment\":{\"integerValue\":\"1\"}}]}]}" 2>/dev/null || true)
 vx=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents:commit?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data "{\"writes\":[{\"update\":{\"name\":\"projects/araujotech-catalogos/databases/(default)/documents/shops/fogao-mineiro/visitas/$vd\",\"fields\":{}},\"updateMask\":{\"fieldPaths\":[]},\"updateTransforms\":[{\"fieldPath\":\"n\",\"increment\":{\"integerValue\":\"50\"}}]}]}" 2>/dev/null || true)
 if [ "$vr" = "200" ] && [ "$vx" != "200" ]; then ok "regras v14 no ar: visita soma 1 e não aceita +50"; elif [ "$vr" = "403" ]; then echo "AVISO | regras v14 ainda não publicadas (visitas ao catálogo ainda não contam)"; else bad "regras v14: +1 -> $vr, +50 -> $vx"; fi
+# regras v15 (contas próprias e opiniões da Guía): a consulta pública do que foi aprovado funciona; ler tudo e escrever sem login, não
+fq() { curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents:runQuery?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data "$1" 2>/dev/null || true; }
+fa=$(fq '{"structuredQuery":{"from":[{"collectionId":"gfichas"}],"where":{"fieldFilter":{"field":{"fieldPath":"st"},"op":"EQUAL","value":{"stringValue":"ok"}}},"limit":1}}')
+fr=$(fq '{"structuredQuery":{"from":[{"collectionId":"gresenas"}],"where":{"fieldFilter":{"field":{"fieldPath":"st"},"op":"EQUAL","value":{"stringValue":"ok"}}},"limit":1}}')
+fx=$(fq '{"structuredQuery":{"from":[{"collectionId":"gfichas"}],"limit":1}}')
+fw=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -X PATCH -H 'Content-Type: application/json' "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/gfichas/teste-sem-login?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" --data '{"fields":{"n":{"stringValue":"x"}}}' 2>/dev/null || true)
+if [ "$fa" = "200" ] && [ "$fr" = "200" ] && [ "$fx" = "403" ] && [ "$fw" = "403" ]; then ok "regras v15 no ar: fichas e opiniões aprovadas são públicas; o resto e escrita sem login, não"; elif [ "$fa" = "403" ]; then echo "AVISO | regras v15 ainda não publicadas (contas próprias e opiniões)"; else bad "regras v15: aprovadas $fa/$fr, tudo $fx, escrita sem login $fw"; fi
+gp=$(curl -sS --max-time 30 "https://guiadesantarita.com/sitio/guia.php?g=1" 2>/dev/null | python3 -c 'import sys,json
+try:
+  d=json.load(sys.stdin);print("ok" if isinstance(d.get("fu"),list) and isinstance(d.get("rv"),dict) else "")
+except Exception: print("")' 2>/dev/null || true)
+if [ "$gp" = "ok" ]; then ok "Guía publica fichas próprias e notas (fu, rv)"; else bad "Guía: guia.php?g=1 sem fu/rv"; fi
+cu=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' "https://araujotechsistemas.com/cuenta/" 2>/dev/null || true)
+if [ "$cu" = "200" ]; then ok "página Mi cuenta no ar (/cuenta/)"; else bad "/cuenta/ -> $cu"; fi
 # vídeo do produto: o servidor responde, recusa envio sem login e aceita a origem do painel
 vp=$(curl -sS --max-time 20 "https://teste.araujotechsistemas.com/video.php?op=ping" 2>/dev/null || true)
 if echo "$vp" | grep -q '"ok":true' && echo "$vp" | grep -q '"curl":true' && echo "$vp" | grep -q '"w":true'; then ok "video.php -> no ar ($vp)"; else bad "video.php -> resposta inesperada: $vp"; fi
