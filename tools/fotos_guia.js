@@ -12,6 +12,7 @@ const fs = require('fs');
     p.on('pageerror', e => errs.push(e.message));
     // prévia: a página inicial vem do repositório (mudanças ainda não publicadas); dados e imagens continuam os do ar
     if (process.env.LOCAL) await p.route(u => u.href === base + '/' || u.href === base + '/?' , r => r.fulfill({ body: fs.readFileSync('araujo-tech-site/guia/index.html'), contentType: 'text/html; charset=utf-8' }));
+    if (process.env.LOCAL) await p.route(u => u.href.startsWith(base + '/img/'), r => { const f = 'araujo-tech-site' + new URL(r.request().url()).pathname; if (fs.existsSync(f)) return r.fulfill({ body: fs.readFileSync(f) }); return r.continue(); });
     for (const u of pages) {
       await p.goto(base + u, { waitUntil: 'networkidle', timeout: 60000 }).catch(() => {});
       await p.waitForTimeout(2500);
