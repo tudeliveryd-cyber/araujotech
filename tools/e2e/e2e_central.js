@@ -32,8 +32,17 @@ const { sec, check, info } = L;
   check(geo.length === 3 && geo[0] === 'Santa Rita, Paraguay=60%' && /Brasil=10%/.test(geo[2]), 'de onde entram: lugares com porcentagem (' + geo.join(' · ') + ')');
   check(await a.locator('.cg-gu [data-act="gusite"]').count() === 1 && await a.locator('.cg-gu [data-act="cggur"]').count() === 1, 'botões Ver detalles e Actualizar na Guía');
   const md = await a.evaluate(() => { const e = document.querySelector('.cg-mod'); return e ? e.innerText : ''; });
-  check(/1 para revisar/.test(md) && /publicaciones sin cuenta/.test(md) && await a.locator('.cg-mod a[href*="/cuenta/"]').count() === 1, 'aviso de publicações esperando revisão na visão geral');
+  check(/1 para revisar/.test(md) && /Cajero/.test(md), 'aviso de publicações esperando revisão na visão geral');
   check(/Últimos 7 días: 7 visitas/.test(await a.txt('.cg-gu')), 'resumo da semana com as visitas dos últimos 7 dias');
+  check(await a.locator('.cg-mi', { hasText: 'Cajero' }).count() === 1, 'a publicação aparece na própria Central, com Aprobar e Rechazar');
+  await a.click('.cg-mi [data-act="cgsubok"]'); await a.w(3000);
+  const st1 = L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json) || {};
+  check((st1.gjobs || []).some(j => j.t === 'Cajero' && j.co === 'Empresa X' && j.on) && ((await L.fsReq(P, 'GET', 'gsub?pageSize=20', 'owner')).json.documents || []).length === 0 && !(await a.evaluate(() => !!document.querySelector('.cg-mod'))), 'aprovar pela Central publica a vaga e tira da fila');
+  await a.route('**/sitio/guia.php?jobs=1*', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ jobs: [{ id: 'g:1', t: 'Cajera', co: { n: 'Super Sol' }, k: 'part', until: day(9) }, { id: 'g:2', t: 'Repartidor con moto', co: { n: 'Tu Delivery' }, k: 'full', until: day(20) }] }) }));
+  await a.click('[data-act="cgflyer"]'); await a.w(2500);
+  const fl = await a.evaluate(() => { const sh = document.querySelector('.sheet[data-k="cgflyer"]'); const im = sh && sh.querySelector('img'); const dl = sh && sh.querySelector('a[download]'); return { ok: !!(im && im.naturalWidth === 1080 && im.naturalHeight === 1920), dl: dl && dl.getAttribute('download') }; });
+  check(fl.ok && /^vacantes-santa-rita-\d{4}-\d{2}-\d{2}\.png$/.test(fl.dl || ''), 'flyer de vagas 1080×1920 gerado com as vagas reais e botão de baixar');
+  await a.evaluate(() => closeSheet());
   sec('B. Navegação por todos os módulos');
   for (const k of ['cli', 'sis', 'pla', 'sub', 'fin', 'dom', 'sup', 'rep', 'usr', 'sec', 'cfg', 'home']) {
     await a.click(`.cg-nav button[data-k="${k}"]`); await a.w(300);
