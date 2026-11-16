@@ -324,6 +324,13 @@ footer .allies{justify-content:flex-start;padding:24px 0 14px;border-bottom:1px 
 @media (min-width:900px) and (max-width:1199px){.tagl{display:none}}
 .rc-cv{aspect-ratio:auto;height:132px;padding-top:30px}
 .dst .sl-dt button{background:#DCCFEC}.dst .sl-dt button.on,.dst .sl-dt button[aria-current]{background:var(--purple)}
+
+/* foto da igreja de Santa Rita à direita da faixa principal, sumindo no roxo */
+.hero{position:relative;overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;top:0;bottom:0;right:0;width:62%;background:url(/img/guia/hero-igreja.webp) center 28%/cover no-repeat;z-index:-2}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#4A0A80 0%,#55109A 40%,rgba(85,16,154,.72) 60%,rgba(85,16,154,.28) 100%)}
+@media (min-width:900px){.hero::before{width:46%;background-position:center 32%}.hero::after{background:linear-gradient(90deg,#4A0A80 0%,#55109A 52%,rgba(85,16,154,.6) 66%,rgba(85,16,154,.08) 100%)}}
+@media (max-width:899px){.hero::after{background:linear-gradient(90deg,#4A0A80 0%,#55109A 48%,rgba(85,16,154,.78) 68%,rgba(85,16,154,.45) 100%)}}
 </style></head>
 <body>
 <div class="tbar"><div class="wrap"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Santa Rita – Alto Paraná, PY</span><span class="tb-r"><span id="tbw"></span><span id="tbd"></span></span></div></div>
