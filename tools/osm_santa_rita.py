@@ -1,17 +1,17 @@
 # Lugares públicos de Santa Rita (Alto Paraná) no OpenStreetMap (dados abertos, © colaboradores do OpenStreetMap, ODbL).
 # Só leitura: gera dados/osm-santa-rita.json para revisão antes de entrar na Guía.
 import json, urllib.request, urllib.parse, os
-Q = """[out:json][timeout:60];
-(nwr(-26.0,-55.3,-25.6,-54.9)["amenity"~"^(pharmacy|hospital|clinic|doctors|dentist|police|fire_station|bus_station|townhall|school|university|bank|post_office|fuel)$"];
- nwr(-26.0,-55.3,-25.6,-54.9)["healthcare"];
- nwr(-26.0,-55.3,-25.6,-54.9)["amenity"~"^(place_of_worship|library|social_facility|community_centre|veterinary|atm|bureau_de_change|kindergarten|college|marketplace|courthouse)$"];
- nwr(-26.0,-55.3,-25.6,-54.9)["leisure"~"^(park|sports_centre|stadium|pitch)$"]["name"];
- nwr(-26.0,-55.3,-25.6,-54.9)["tourism"~"^(hotel|motel|guest_house|attraction|museum)$"];);
+Q = """[out:json][timeout:120];
+(nwr(-25.87,-55.15,-25.73,-55.03)["amenity"~"^(pharmacy|hospital|clinic|doctors|dentist|police|fire_station|bus_station|townhall|school|university|bank|post_office|fuel)$"];
+ nwr(-25.87,-55.15,-25.73,-55.03)["healthcare"];
+ nwr(-25.87,-55.15,-25.73,-55.03)["amenity"~"^(place_of_worship|library|social_facility|community_centre|veterinary|atm|bureau_de_change|kindergarten|college|marketplace|courthouse)$"];
+ nwr(-25.87,-55.15,-25.73,-55.03)["leisure"~"^(park|sports_centre|stadium|pitch)$"]["name"];
+ nwr(-25.87,-55.15,-25.73,-55.03)["tourism"~"^(hotel|motel|guest_house|attraction|museum)$"];);
 out center tags;"""
 os.makedirs('dados', exist_ok=True)
 for url in ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter']:
     try:
-        r = urllib.request.urlopen(urllib.request.Request(url, data=urllib.parse.urlencode({'data': Q}).encode(), headers={'User-Agent': 'GuiaSantaRita/1.0'}), timeout=90)
+        r = urllib.request.urlopen(urllib.request.Request(url, data=urllib.parse.urlencode({'data': Q}).encode(), headers={'User-Agent': 'GuiaSantaRita/1.0'}), timeout=150)
         d = json.load(r); break
     except Exception as e:
         print('falhou', url, e); d = None
