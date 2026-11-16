@@ -6,6 +6,7 @@ $nn = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['n'] ?? '')); // n = foto 
 $dd = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['d'] ?? '')); // d = logo de negócio sem catálogo (aliado Tu Delivery)
 if ($i === '' && $pp !== '') $i = 'p' . $pp;
 if ($i === '' && $nn !== '') $i = 'n' . $nn;
+$dk = (($_GET['k'] ?? '') === 'ph') ? 'ph' : 'lg'; // ficha simples: logo (lg) ou foto do local (ph)
 if ($i === '' && $dd !== '') $i = 'd' . $dd;
 if ($i === '') { http_response_code(404); exit; }
 require __DIR__ . '/prods_lib.php';
@@ -16,9 +17,9 @@ $bin = null;
 $doc = guia_doc();
 $list = $pp !== '' ? (array)($doc['gpro'] ?? []) : (array)($doc['gads'] ?? []); $want = $pp !== '' ? $pp : $i; $fld = $pp !== '' ? 'ph' : 'img'; $src = '';
 if ($pp === '' && $nn !== '' && $i === 'n' . $nn) { $list = (array)(($doc['gnews'] ?? [])['man'] ?? []); $want = $nn; $fld = 'ph'; }
-if ($pp === '' && $nn === '' && $dd !== '' && $i === 'd' . $dd) { $list = (array)($doc['gdir'] ?? []); $want = $dd; $fld = 'lg'; }
+if ($pp === '' && $nn === '' && $dd !== '' && $i === 'd' . $dd) { $list = (array)($doc['gdir'] ?? []); $want = $dd; $fld = $dk; }
 foreach ($list as $x) { if (is_array($x) && ($x['id'] ?? '') === $want) { $src = (string)($x[$fld] ?? ''); break; } }
 if (!preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#s', $src, $m)) { http_response_code(404); exit; }
-$f = sys_get_temp_dir() . '/at_gimg_' . $i . '_' . substr(md5($src), 0, 12) . '.img';
+$f = sys_get_temp_dir() . '/at_gimg_' . $i . ($fld === 'ph' && $dd !== '' ? 'ph' : '') . '_' . substr(md5($src), 0, 12) . '.img';
 if (!is_file($f)) { $bin = base64_decode($m[2]); if (!$bin) { http_response_code(404); exit; } @file_put_contents($f, $bin); }
 header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $m[1]); header('Cache-Control: public, max-age=86400'); header('Content-Length: ' . filesize($f)); readfile($f);
