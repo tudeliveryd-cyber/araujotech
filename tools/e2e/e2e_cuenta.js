@@ -259,6 +259,9 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   check(/Se perdió: Perro perdido/.test(pa) && /og:image" content="https:\/\/araujotechsistemas\.com\/sitio\/gimg\.php\?c=/.test(pa), 'página do aviso com a foto na prévia do WhatsApp');
   check(/Culto de jóvenes/.test(page('evento', ev.id)) && /"@type":"Event"/.test(page('evento', ev.id)), 'página do evento (Google: Event)');
   check(/ya no está disponible/.test(page('aviso', 'naoexiste1')), 'publicação vencida ou apagada: página avisa e manda para a Guía');
+  const lug = JSON.parse(phpq("require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(guia_lugares());")).find(l => l.n === 'Refugio Patitas');
+  const pl = lug && page('lugar', lug.slug);
+  check(lug && lug.slug === 'refugio-patitas-ani' && /Refugio Patitas — Santa Rita/.test(pl) && /Cómo llegar/.test(pl) && /"@type":"Place"/.test(pl), 'página própria do lugar público (/lugar/refugio-patitas-ani)');
   const H = await L.open({ w: 390 }); const h = H.p;
   await h.goto('https://araujotechsistemas.com/guia/'); await h.w(2500);
   const hv = await h.evaluate(o => { G.nov = o.nov; G.clas = o.clas; G.ev = o.ev; JOBS = o.jobs; CAT = 'home'; document.getElementById('q').value = ''; render(); const n = [...document.querySelectorAll('.nov .nv-c')].map(a => a.getAttribute('href')); document.getElementById('q').value = 'perro'; CAT = 'all'; render(); const r = [...document.querySelectorAll('.nov-q .nv-c b')].map(b => b.textContent); return { n, r }; }, pub);

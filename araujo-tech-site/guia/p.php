@@ -7,8 +7,8 @@ header('Cache-Control: public, max-age=300');
 require __DIR__ . '/../sitio/prods_lib.php';
 require __DIR__ . '/../sitio/guia_lib.php';
 $k = (string)($_GET['k'] ?? ''); $rid = (string)($_GET['id'] ?? '');
-$id = str_replace('.', ':', $rid);
-$x = (in_array($k, ['vacante', 'aviso', 'evento'], true) && preg_match('/^[A-Za-z0-9:_-]{2,90}$/', $id)) ? guia_item($k, $id) : null;
+$id = $k === 'lugar' ? $rid : str_replace('.', ':', $rid);
+$x = (in_array($k, ['vacante', 'aviso', 'evento', 'lugar'], true) && preg_match('/^[A-Za-z0-9:_-]{2,90}$/', $id)) ? guia_item($k, $id) : null;
 $e = function ($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); };
 $host = preg_match('/(^|\.)guiadesantarita\.com$/i', (string)($_SERVER['HTTP_HOST'] ?? '')) ? 'https://guiadesantarita.com' : 'https://araujotechsistemas.com/guia';
 $G = $host . '/';
@@ -45,6 +45,21 @@ if (!$x) {
     if ($x['ph'] !== '') $img = 'https://araujotechsistemas.com' . $x['ph'];
     $btns = '<a class="btn pri" href="' . $e('https://wa.me/' . $wa($x['wa']) . '?text=' . rawurlencode('Hola, vi tu aviso "' . $x['t'] . '" en la Guía de Santa Rita y quiero más información.')) . '" target="_blank" rel="noopener">Consultar por WhatsApp</a>';
     $ld = ''; $kind = $CK[$x['k']] ?? 'Aviso';
+  } elseif ($k === 'lugar') {
+    $PC = ['gob' => 'Gobierno y trámites', 'doc' => 'Documentos', 'salud' => 'Salud', 'far' => 'Farmacia', 'seg' => 'Seguridad', 'ocio' => 'Plazas y recreación', 'trans' => 'Transporte', 'serv' => 'Servicios públicos', 'edu' => 'Educación', 'igl' => 'Iglesia', 'com' => 'Comunidad y ONGs', 'dep' => 'Deportes y clubes', 'ani' => 'Animales y adopción', 'fin' => 'Bancos y finanzas'];
+    $kind = $PC[$x['c']] ?? 'Lugar público';
+    $x['t'] = $x['n'];
+    $title = $x['n'] . ' — Santa Rita';
+    $desc = trim($kind . ' en Santa Rita, Alto Paraná.' . ($x['a'] ? ' ' . $x['a'] . '.' : '') . ($x['h'] ? ' Horario: ' . $x['h'] . '.' : '') . ($x['tel'] ? ' Tel. ' . $x['tel'] . '.' : ''));
+    $tags = array_filter([$kind, $x['a'], $x['h']]);
+    $body = (string)($x['d'] ?? '');
+    $mq = preg_match('#^https://#', (string)$x['map']) ? $x['map'] : 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($x['n'] . ($x['a'] ? ' ' . $x['a'] : '') . ' Santa Rita, Alto Paraná, Paraguay');
+    $tel = preg_replace('/[^\d+]/', '', (string)$x['tel']);
+    $btns = '<a class="btn pri" style="background:var(--deep);border-color:var(--deep)" href="' . $e($mq) . '" target="_blank" rel="noopener">Cómo llegar</a>' . ($tel ? '<a class="btn" href="tel:' . $e($tel) . '">Llamar ' . $e($x['tel']) . '</a>' : '') . (($x['wa'] ?? '') ? '<a class="btn" href="' . $e('https://wa.me/' . $wa($x['wa'])) . '" target="_blank" rel="noopener">WhatsApp</a>' : '');
+    $ll = null; if (preg_match('/[?&](?:q|query)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/', (string)$x['map'], $m) || preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', (string)$x['map'], $m)) $ll = [(float)$m[1], (float)$m[2]];
+    $ld = json_encode(array_filter(['@context' => 'https://schema.org', '@type' => ['igl' => 'Church', 'edu' => 'School', 'salud' => 'Hospital', 'far' => 'Pharmacy', 'fin' => 'BankOrCreditUnion', 'ocio' => 'Park', 'trans' => 'BusStation', 'seg' => 'PoliceStation', 'gob' => 'GovernmentOffice'][$x['c']] ?? 'Place', 'name' => $x['n'], 'telephone' => $x['tel'] ?: null,
+      'address' => ['@type' => 'PostalAddress', 'streetAddress' => $x['a'] ?: null, 'addressLocality' => 'Santa Rita', 'addressRegion' => 'Alto Paraná', 'addressCountry' => 'PY'], 'geo' => $ll ? ['@type' => 'GeoCoordinates', 'latitude' => $ll[0], 'longitude' => $ll[1]] : null, 'hasMap' => $mq]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (($x['ph'] ?? '') !== '') $img = 'https://araujotechsistemas.com' . $x['ph'];
   } else {
     $title = $x['t'];
     $desc = trim($fd($x['d']) . ($x['h'] ? ' · ' . $x['h'] : '') . ($x['l'] ? ' · ' . $x['l'] : '')) . ' — Agenda de Santa Rita.';
@@ -55,7 +70,7 @@ if (!$x) {
     $kind = 'Agenda de Santa Rita';
   }
 }
-$back = $k === 'vacante' ? $G . '#empleos' : ($k === 'aviso' ? $G . '#clasificados' : $G . '#agenda');
+$back = $k === 'vacante' ? $G . '#empleos' : ($k === 'aviso' ? $G . '#clasificados' : ($k === 'lugar' ? $G . '#util' : $G . '#agenda'));
 ?><!doctype html>
 <html lang="es"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -95,13 +110,13 @@ h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,5vw,36px);lin
 <?php if (!$x): ?>
 <div class="box empty"><h1>Esta publicación ya no está disponible</h1><p>Venció o fue retirada por quien la publicó.</p><div class="act" style="justify-content:center"><a class="btn pri" style="background:var(--deep);border-color:var(--deep)" href="<?= $e($G) ?>">Ver lo que hay hoy en la Guía</a></div></div>
 <?php else: ?>
-<article class="box"><?php if ($k === 'aviso' && $x['ph'] !== ''): ?><img class="ph" src="<?= $e($x['ph']) ?>" alt=""><?php endif; ?><div class="in">
+<article class="box"><?php if (($k === 'aviso' || $k === 'lugar') && ($x['ph'] ?? '') !== ''): ?><img class="ph" src="<?= $e($x['ph']) ?>" alt=""><?php endif; ?><div class="in">
 <p class="kd"><?= $e($kind) ?></p><h1><?= $e($x['t']) ?></h1>
 <?php if ($k === 'vacante' && ($x['co']['n'] ?? '') !== ''): ?><p class="co"><?= $e($x['co']['n']) ?></p><?php endif; ?>
 <?php if ($tags): ?><div class="tg"><?php foreach ($tags as $t): ?><span><?= $e($t) ?></span><?php endforeach; ?></div><?php endif; ?>
 <?php if ($body !== ''): ?><p class="tx"><?= $e($body) ?></p><?php endif; ?>
 <div class="act"><?= $btns ?><button class="btn" type="button" id="sh">Compartir</button><a class="btn" href="<?= $e($back) ?>">Ver más en la Guía</a></div>
-<p class="nt"><?= $k === 'vacante' ? 'La Guía no garantiza la contratación: el contacto es directo con quien publica.' : ($k === 'aviso' ? 'Nunca pagues por adelantado sin ver el producto o el inmueble.' : 'Confirmá horario y lugar con los organizadores.') ?></p>
+<p class="nt"><?= $k === 'vacante' ? 'La Guía no garantiza la contratación: el contacto es directo con quien publica.' : ($k === 'aviso' ? 'Nunca pagues por adelantado sin ver el producto o el inmueble.' : ($k === 'lugar' ? 'Datos de fuentes públicas' . (($x['src'] ?? '') ? ' (' . $e($x['src']) . ')' : '') . '. ¿Ves algo mal? Escribinos por WhatsApp al 0982 086 171.' : 'Confirmá horario y lugar con los organizadores.')) ?></p>
 </div></article>
 <?php endif; ?>
 </main>

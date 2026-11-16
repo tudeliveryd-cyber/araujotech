@@ -335,9 +335,28 @@ function guia_nov() {
 }
 // uma vaga, um aviso ou um evento pelo id (página própria /vacante/<id>, /aviso/<id>, /evento/<id>)
 function guia_item($k, $id) {
+  if ($k === 'lugar') { foreach (guia_lugares() as $l) if ($l['slug'] === $id) return $l; return null; }
   if ($k === 'vacante') { foreach (guia_jobs(false) as $j) if ($j['id'] === $id) return $j; return null; }
   $p = guia_pub();
   if ($k === 'aviso') { foreach ($p['clas'] as $c) if ($c['id'] === $id) return $c; return null; }
   if ($k === 'evento') { foreach ($p['ev'] as $e) if (($e['id'] ?? '') === $id) return $e; return null; }
+  if ($k === 'lugar') { foreach (guia_lugares() as $l) if ($l['slug'] === $id) return $l; return null; }
   return null;
+}
+// endereço curto de um lugar público: "hospital-distrital-de-santa-rita-salud" (mesma regra do index.html)
+function guia_slug($n, $c) {
+  $t = class_exists('Normalizer') ? Normalizer::normalize((string)$n, Normalizer::FORM_D) : (string)$n;
+  $t = preg_replace('/\p{Mn}+/u', '', $t); $t = mb_strtolower($t);
+  $t = trim(preg_replace('/[^a-z0-9]+/', '-', $t), '-');
+  return substr($t, 0, 70) . '-' . preg_replace('/[^a-z]/', '', (string)$c);
+}
+// lugares públicos com página própria: os do painel (ou a lista de lugares-publicos.json) e as fichas grátis da comunidade
+function guia_lugares() {
+  $p = guia_pub(); $o = [];
+  $base = is_array($p['util'] ?? null) && $p['util'] ? $p['util'] : [];
+  if (!$base) { $j = json_decode((string)@file_get_contents(__DIR__ . '/../guia/lugares-publicos.json'), true); foreach ((array)($j['items'] ?? []) as $x) if (is_array($x) && !empty($x['n'])) $base[] = ['c' => (string)($x['c'] ?? ''), 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => (string)($x['tel'] ?? ''), 'h' => (string)($x['h'] ?? ''), 'map' => (string)($x['map'] ?? ''), 'd' => '', 'src' => (string)($x['src'] ?? '')]; }
+  foreach ($base as $x) $o[] = $x + ['d' => '', 'wa' => '', 'web' => '', 'ig' => '', 'ph' => '', 'lg' => ''];
+  foreach ((array)($p['fu'] ?? []) as $x) $o[] = $x + ['h' => '', 'src' => ''];
+  foreach ($o as &$x) $x['slug'] = guia_slug($x['n'], $x['c']); unset($x);
+  return $o;
 }
