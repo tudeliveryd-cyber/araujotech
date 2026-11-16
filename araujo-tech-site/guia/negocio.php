@@ -125,9 +125,13 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 .cta{max-width:760px;margin-left:auto;margin-right:auto}}
 @media (max-width:420px){.hrs div{font-size:13.5px;padding:7px 8px}.hrs span:last-child{white-space:nowrap}}
 @media (max-width:600px){.lg{width:82px;height:82px;border-radius:20px}.btn{flex:1 1 auto;justify-content:center}.bk span{display:none}.bk{padding:7px}}
+.hdr{background:rgba(255,255,255,.97)!important;color:var(--ink,#1A1222)!important;border-bottom:1px solid #ECE6F3;position:sticky;top:0;z-index:60}
+.hdr .bk{color:var(--deep,#4A0A80)!important;border-color:#E4DAF0!important;background:#F4F0F9!important}
+.hdr .lang{border-color:#E4DAF0!important;color:#5F566B!important}.hdr .lang button{color:#5F566B}.hdr .lang button.on,.hdr .lang button[aria-pressed=true]{background:var(--deep,#4A0A80)!important;color:#fff!important}
+.hdr .shb{border-color:#E4DAF0!important;color:var(--deep,#4A0A80)!important}
 </style></head>
 <body>
-<header class="hdr"><div class="wrap nav"><a class="bk" href="/guia/" aria-label="Volver a la Guía"><?= $ic($I['back'], 18) ?><span>Volver a la Guía</span></a><span class="sp"></span><a class="gsr" href="/guia/" aria-label="Guía de Santa Rita" style="display:flex;align-items:center;gap:10px;text-decoration:none"><img class="gsl" src="/img/guia/guia-logo-blanco.webp" alt="Guía de Santa Rita" width="83" height="40" style="height:40px;width:auto;display:block"></a></div></header>
+<header class="hdr"><div class="wrap nav"><a class="bk" href="/guia/" aria-label="Volver a la Guía"><?= $ic($I['back'], 18) ?><span>Volver a la Guía</span></a><span class="sp"></span><a class="gsr" href="/guia/" aria-label="Guía de Santa Rita" style="display:flex;align-items:center;gap:10px;text-decoration:none"><img class="gsl" src="/img/guia/guia-logo.webp" alt="Guía de Santa Rita" width="83" height="40" style="height:40px;width:auto;display:block"></a></div></header>
 <section class="hero"><?php if ($cover): ?><img class="cv" src="<?= $e($cover) ?>" alt="" onerror="this.remove()"><?php endif; ?>
 <div class="wrap">
 <span class="lg"><?php if ($logo): ?><img src="<?= $e($logo) ?>" alt="Logo de <?= $e($name) ?>"><?php else: ?><b><?= $e($ini($name)) ?></b><?php endif; ?></span>
@@ -160,7 +164,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <p style="margin-top:10px"><a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?><span data-pt="Abrir no Google Maps">Abrir en Google Maps</span></a></p></div></section>
 <section class="cta"><div><b data-pt="Mais negócios de Santa Rita">Más negocios de Santa Rita</b><p data-pt="Ofertas, farmácia de plantão, ônibus e tudo o que é útil na cidade.">Ofertas, farmacia de turno, ómnibus y todo lo útil de la ciudad.</p></div><a href="/guia/" data-pt="Abrir a Guia de Santa Rita">Abrir la Guía de Santa Rita</a></section>
 </main>
-<footer><div class="wrap"><span data-pt="Guia de Santa Rita · Uma iniciativa de">Guía de Santa Rita · Una iniciativa de</span> <a href="/">Araújo Tech Sistemas</a> <span data-pt="e">y</span> Tu Delivery</div></footer>
+<footer id="gft"></footer><script src="/guia/rodape.js" defer></script>
 <script>try{if(localStorage.getItem('at_lang')==='pt'){document.documentElement.lang='pt';document.querySelectorAll('[data-pt]').forEach(function(e){e.textContent=e.getAttribute('data-pt')})}}catch(e){}</script>
 <script>
 var HU=(location.hostname.endsWith('guiadesantarita.com')?'https://araujotechsistemas.com':'')+'/sitio/guia_hit.php';/* os números ficam todos no servidor principal */

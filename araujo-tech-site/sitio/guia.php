@@ -85,6 +85,7 @@ if (isset($_GET['hoy'])) { // 'Hoy en Santa Rita': clima (MET Norway) e câmbio 
   header('Cache-Control: public, max-age=600'); echo json_encode(['w' => $w, 'fx' => $fx]); exit;
 }
 if (isset($_GET['news'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_news(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }
+if (isset($_GET['soc'])) { require_once __DIR__ . '/guia_lib.php'; $p = guia_pub(); header('Cache-Control: public, max-age=900'); echo json_encode(['soc' => $p['soc'] ?? (object)[]], JSON_UNESCAPED_SLASHES); exit; } // só as redes da Guía (rodapé das páginas internas)
 if (isset($_GET['g'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_pub(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; } // banners pagos e lugares públicos
 $out = [];
 $ids = array_slice(array_unique(array_filter(explode(',', (string)($_GET['ids'] ?? '')))), 0, 60);
