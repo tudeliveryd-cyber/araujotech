@@ -190,7 +190,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   await gq.setViewportSize({ width: 1366, height: 700 }); await gq.w(500);
   const wd = await gq.evaluate(async () => { G.ads = [{ id: 'k2', t: 'Wide', img: '/img/guia/tu-delivery.jpg', imgd: '/img/guia/vitrix-planes.jpg', u: '' }]; SL.sig = ''; slRender(); await new Promise(f => setTimeout(f, 600)); const d = document.querySelector('#sl .sd.wd'); if (!d) return null; const im = d.querySelector('.fgw img'), fg = d.querySelector(':scope>img.fg'); return { w: innerWidth, shown: getComputedStyle(d.querySelector('.fgw')).display, fit: getComputedStyle(im).objectFit, src: im.currentSrc, fg: getComputedStyle(fg).display, ow: im.offsetWidth, sw: d.offsetWidth }; });
   info(JSON.stringify(wd));
-  check(wd && wd.shown === 'block' && wd.fit === 'cover' && /vitrix-planes/.test(wd.src) && wd.fg === 'none' && wd.ow === wd.sw, 'no computador o banner usa a imagem larga e enche a faixa toda');
+  check(wd && wd.shown === 'block' && wd.fit === 'contain' && /vitrix-planes/.test(wd.src) && wd.fg === 'none' && wd.ow === wd.sw, 'no computador o banner usa a imagem larga e aparece inteira, na faixa de 1920 × 480');
   await gq.setViewportSize({ width: 390, height: 800 }); await gq.w(500);
   const wm = await gq.evaluate(() => { const d = document.querySelector('#sl .sd.wd'); return { fgw: getComputedStyle(d.querySelector('.fgw')).display, fg: getComputedStyle(d.querySelector(':scope>img.fg')).display }; });
   check(wm.fgw === 'none' && wm.fg === 'block', 'no celular o mesmo banner continua com a imagem de 1920 × 820');
