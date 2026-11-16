@@ -14,6 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 tools/osm_santa_rita.py
+      - run: python3 tools/mec_santa_rita.py || true
       - name: Guardar no ramo dados
         run: |
           cd dados
