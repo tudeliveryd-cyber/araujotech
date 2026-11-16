@@ -72,10 +72,17 @@ function guia_acc() {
       if (!is_array($e) || mb_strlen(trim((string)($e['t'] ?? ''))) < 3 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($e['d'] ?? '')) || $e['d'] < $day) continue;
       $ev[] = ['t' => mb_substr(trim((string)$e['t']), 0, 80), 'd' => (string)$e['d'], 'h' => preg_match('/^\d{1,2}:\d{2}$/', (string)($e['h'] ?? '')) ? (string)$e['h'] : '', 'l' => mb_substr(trim((string)($e['l'] ?? '')), 0, 80)];
     }
+    $cla = []; // avisos grátis da conta (perdidos e encontrados, venda, aluguel, serviços): só dentro da data
+    foreach (array_slice((array)($x['cla'] ?? []), 0, 5) as $i => $c) {
+      if (!is_array($c)) continue; $u = (string)($c['until'] ?? ''); $wa = preg_replace('/\D/', '', (string)($c['wa'] ?? '')); $t = trim((string)($c['t'] ?? ''));
+      if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $u) || $u < $day || strlen($wa) < 8 || mb_strlen($t) < 3) continue;
+      $cla[] = ['id' => 'f' . $uid . 'x' . $i, 'k' => in_array($c['k'] ?? '', ['per', 'inm', 'veh', 'var', 'ser'], true) ? $c['k'] : 'var', 'op' => in_array($c['op'] ?? '', ['venta', 'alq', 'perd', 'enc', 'na'], true) ? $c['op'] : 'na',
+        't' => mb_substr($t, 0, 80), 'pr' => mb_substr(trim((string)($c['pr'] ?? '')), 0, 40), 'z' => mb_substr(trim((string)($c['z'] ?? '')), 0, 60), 'd' => mb_substr(trim((string)($c['d'] ?? '')), 0, 400), 'wa' => $wa, 'until' => $u, 'ph' => ''];
+    }
     $fichas[] = ['uid' => $uid, 'tipo' => (string)($x['tipo'] ?? 'otro'), 'g' => (string)($x['g'] ?? ''), 'n' => mb_substr($n, 0, 80), 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 600),
       'wa' => preg_replace('/\D/', '', (string)($x['wa'] ?? '')), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 120),
       'map' => $https($x['map'] ?? ''), 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 200), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'web' => $https($x['web'] ?? ''),
-      'lg' => $img['lg'] ?? '', 'ph' => $img['ph'] ?? '', 'ev' => $ev, 'jobs' => array_slice(array_values(array_filter((array)($x['jobs'] ?? []), 'is_array')), 0, 10)];
+      'lg' => $img['lg'] ?? '', 'ph' => $img['ph'] ?? '', 'ev' => $ev, 'jobs' => array_slice(array_values(array_filter((array)($x['jobs'] ?? []), 'is_array')), 0, 10), 'cla' => $cla];
   }
   // opiniões aprovadas: nota média e as 3 mais recentes com texto, por ficha/negócio
   $by = [];
@@ -172,7 +179,7 @@ function guia_pub() {
     if (count($dir) >= 300) break;
   }
   foreach ($acc['fichas'] as $x) { // negócios e profissionais com conta própria (aprovados pela Guía depois do pagamento)
-    if (isset(GUIA_FU[$x['tipo']])) continue;
+    if (isset(GUIA_FU[$x['tipo']]) || $x['tipo'] === 'avisos') continue; // 'avisos': conta grátis só de vagas e avisos, sem ficha no diretório
     $dir[] = ['id' => 'f' . $x['uid'], 'n' => $x['n'], 'g' => in_array($x['g'], ['food', 'shop', 'health', 'home', 'car', 'serv'], true) ? $x['g'] : 'serv', 'd' => mb_substr(preg_split('/\R/', $x['d'])[0], 0, 60), 'tel' => $x['tel'], 'wa' => $x['wa'], 'a' => $x['a'], 'map' => $x['map'], 'hrs' => mb_substr($x['hrs'], 0, 80), 'ig' => $x['ig'], 'td' => false, 'dy' => null, 'mt' => 'menu', 'mu' => '', 'web' => $x['web'], 'tu' => [], 'lg' => $x['lg'], 'ph' => $x['ph'], 'acc' => 1];
   }
   $clas = []; // clasificados e inmuebles publicados pela Guía (só os ativos e dentro da data)
@@ -180,8 +187,9 @@ function guia_pub() {
     if (!is_array($x) || empty($x['on'])) continue; $u = (string)($x['until'] ?? ''); $wa = preg_replace('/\D/', '', (string)($x['wa'] ?? '')); $t = trim((string)($x['t'] ?? ''));
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $u) || $u < $day || strlen($wa) < 8 || mb_strlen($t) < 3) continue;
     $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
-    $clas[] = ['id' => $id, 'k' => in_array($x['k'] ?? '', ['inm', 'veh', 'var', 'ser'], true) ? $x['k'] : 'var', 'op' => in_array($x['op'] ?? '', ['venta', 'alq', 'na'], true) ? $x['op'] : 'na', 't' => mb_substr($t, 0, 80), 'pr' => mb_substr(trim((string)($x['pr'] ?? '')), 0, 40), 'z' => mb_substr(trim((string)($x['z'] ?? '')), 0, 60), 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 500), 'wa' => $wa, 'until' => $u, 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?c=' . $id . '&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
+    $clas[] = ['id' => $id, 'k' => in_array($x['k'] ?? '', ['per', 'inm', 'veh', 'var', 'ser'], true) ? $x['k'] : 'var', 'op' => in_array($x['op'] ?? '', ['venta', 'alq', 'perd', 'enc', 'na'], true) ? $x['op'] : 'na', 't' => mb_substr($t, 0, 80), 'pr' => mb_substr(trim((string)($x['pr'] ?? '')), 0, 40), 'z' => mb_substr(trim((string)($x['z'] ?? '')), 0, 60), 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 500), 'wa' => $wa, 'until' => $u, 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?c=' . $id . '&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
   }
+  foreach ($acc['fichas'] as $x) foreach ($x['cla'] ?? [] as $c) { $clas[] = $c; if (count($clas) >= 60) break 2; } // avisos das contas grátis
   $so = (array)($d['gsoc'] ?? []); $soc = []; // redes da Guía (rodapé), configuradas no painel
   $w = preg_replace('/\D/', '', (string)($so['wa'] ?? '')); if (strlen($w) >= 8) $soc['wa'] = $w;
   foreach (['fb', 'ig', 'yt', 'tt'] as $k) { $u = trim((string)($so[$k] ?? '')); if (preg_match('#^https://[^\s"\'<>]+$#i', $u)) $soc[$k] = $u; }
