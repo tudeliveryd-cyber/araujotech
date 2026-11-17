@@ -104,6 +104,9 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
     const c = cfgOf(await shopDoc()); const p = (c.products || []).find(x => x.n && x.n.es === 'Gaseosa lata E2E') || {}; const g = (p.g || [])[0] || {};
     check(p.n && p.n.pt === 'Refrigerante lata E2E' && p.d && p.d.es === 'Elegí el sabor' && p.d.pt === 'Escolha o sabor', 'importar: nome e descrição em espanhol e português', JSON.stringify(p).slice(0, 220));
     check(g.type === 'one' && g.req === true && (g.o || []).length === 3 && g.o[1].n.es === 'Fanta Naranja' && g.o[1].n.pt === 'Fanta Laranja' && g.o[2].p === 2000, 'importar: opção Sabor obrigatória, escolher 1, nos dois idiomas e com acréscimo', JSON.stringify(g).slice(0, 300));
+    await o.goto(HOST + '/painel/'); await o.w(3000);
+    if (await o.locator('#lg_user').count()) { await o.fill('#lg_user', shop.user); await o.fill('#lg_pass', 'DonoNovo#77'); await o.press('#lg_pass', 'Enter'); await o.w(6000); }
+    check(await o.locator('[data-act=tab]').count() > 0, 'painel abre de novo depois de importar produtos com opciones', (await o.txt()).slice(0, 200) + '|' + o.errs.join('|'));
   });
   if (STOP === 'C') return L.done();
 

@@ -18,3 +18,8 @@ jobs:
           curl -sS "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/shops/$L?mask.fieldPaths=site&mask.fieldPaths=status" ; echo
           for i in 1 2 3; do curl -sS -o /tmp/s.html -w "sitio %{http_code} %{time_total}s %{size_download}B\n" "https://araujotechsistemas.com/sitio/index.php?s=$L"; grep -c 'property="og:title"' /tmp/s.html || true; done
           curl -sS "https://$L.araujotechsistemas.com/" | grep -o '<title>[^<]*' | head -1
+          K=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U
+          curl -sS "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/shops/$L?key=$K" -o shop.json; echo "doc da loja: $(wc -c < shop.json) bytes"
+          python3 -c "import json;f=json.load(open('shop.json')).get('fields',{});print('campos',{k:len(json.dumps(v)) for k,v in f.items()})"
+          curl -sS "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/shops/$L/media?pageSize=300&key=$K" -o media.json; echo "media: $(wc -c < media.json) bytes"
+          python3 -c "import json;d=json.load(open('media.json')).get('documents',[]);l=sorted([(len(json.dumps(x)),x['name'].split('/')[-1],x.get('updateTime','')) for x in d],reverse=True);print(len(d),'docs; total',sum(a for a,_,_ in l));[print(a,b,c) for a,b,c in l[:15]]"
