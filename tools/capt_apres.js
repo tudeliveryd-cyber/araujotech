@@ -18,6 +18,7 @@ const out = (n, f) => { const b64 = fs.readFileSync(f).toString('base64'); for (
     await go(m, '/'); await shot(m, 'm-home');
     await to(m, '#hoy', 70); await shot(m, 'm-hoy');
     await to(m, '.sch', 70); await shot(m, 'm-chega');
+    await to(m, '#aliados', 70); await shot(m, 'm-aliados');
     await go(m, '/#feriados'); await shot(m, 'm-feriados');
     await go(m, '/#alquileres'); await shot(m, 'm-alquileres');
     await go(m, '/fogao-mineiro'); await shot(m, 'm-negocio');
