@@ -1,0 +1,20 @@
+name: Diagnóstico do site no subdomínio
+
+# Só leitura: mostra o campo site da loja e o tempo do site padrão.
+on:
+  workflow_dispatch:
+    inputs:
+      loja:
+        description: 'Loja'
+        default: 'fogao-mineiro'
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - run: |
+          L="${{ inputs.loja }}"
+          curl -sS "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/shops/$L?mask.fieldPaths=site&mask.fieldPaths=status" ; echo
+          for i in 1 2 3; do curl -sS -o /tmp/s.html -w "sitio %{http_code} %{time_total}s %{size_download}B\n" "https://araujotechsistemas.com/sitio/index.php?s=$L"; grep -c 'property="og:title"' /tmp/s.html || true; done
+          curl -sS "https://$L.araujotechsistemas.com/" | grep -o '<title>[^<]*' | head -1
