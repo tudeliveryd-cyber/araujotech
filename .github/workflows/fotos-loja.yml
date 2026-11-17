@@ -10,6 +10,9 @@ on:
       host:
         description: 'Subdomínio do catálogo'
         default: 'fogaomineiro'
+      lista:
+        description: 'Só conferir as fotos da lista (sim/não)'
+        default: 'não'
 
 jobs:
   fotos:
@@ -22,3 +25,4 @@ jobs:
         env:
           LOJA: ${{ inputs.loja }}
           HOST: ${{ inputs.host }}
+          SO_LISTA: ${{ inputs.lista == 'sim' && '1' || '' }}
