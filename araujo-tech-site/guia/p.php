@@ -105,7 +105,7 @@ $back = $k === 'vacante' ? $G . '#empleos' : ($k === 'aviso' ? $G . '#clasificad
 <meta name="description" content="<?= $e($desc) ?>">
 <?php if ($x): ?><link rel="canonical" href="<?= $e($self) ?>"><?php else: ?><meta name="robots" content="noindex"><?php endif; ?>
 <meta property="og:type" content="website"><meta property="og:site_name" content="Guía de Santa Rita"><meta property="og:title" content="<?= $e($title) ?>"><meta property="og:description" content="<?= $e($desc) ?>"><meta property="og:image" content="<?= $e($img) ?>"><meta property="og:url" content="<?= $e($self) ?>"><meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/img/guia/favicon.png?v=1"><meta name="theme-color" content="#24093F">
+<link rel="icon" href="/img/guia/favicon.png?v=2"><meta name="theme-color" content="#24093F">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
 <?php if ($ld): ?><script type="application/ld+json"><?= $ld ?></script><?php endif; ?>
