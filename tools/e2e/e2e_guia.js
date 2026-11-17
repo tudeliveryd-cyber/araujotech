@@ -35,6 +35,8 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(!(await doc()).gads, 'link inválido no banner não deixa salvar');
   await a.fill('[data-gu="ads.0.u"]', 'https://example.com/promo'); await a.fill('[data-gu="ads.0.to"]', '2026-12-31');
   check(await a.locator('.gu-ad .pill.gu-ok').count() === 1, 'o banner aparece como "En el aire"');
+  check(await a.locator('select[data-gu="soc.slo"]').count() === 1 && await a.locator('select[data-gu="soc.slt"]').count() === 1, 'painel: ordem dos banners (ao acaso ou da lista) e tempo de troca do slider');
+  await a.locator('select[data-gu="soc.slo"]').selectOption('list'); await a.locator('select[data-gu="soc.slt"]').selectOption('8');
 
   sec('C. Lugares públicos');
   await a.act('guseed'); await a.w(300);
@@ -53,6 +55,8 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   await a.act('gusave'); await a.w(2500);
   let d = await doc();
   check(d.gsoc && d.gsoc.ig === 'https://instagram.com/guiadesantarita' && d.gsoc.wa === '0982086171', 'redes da Guía salvas no painel (Instagram e WhatsApp)');
+  await a.evaluate(() => { ui.gu.soc.slo = 'list'; ui.gu.soc.slt = 8; }); await a.act('gusave'); await a.w(2500); d = await doc();
+  check(d.gsoc && d.gsoc.slo === 'list' && d.gsoc.slt === 8 && d.gsoc.ig === 'https://instagram.com/guiadesantarita', 'slider: ordem da lista e troca a cada 8 s salvas junto com as redes');
   const jc = await a.evaluate(() => { const ok = jbClean([{ t: 'Cajero', d: 'Atención al cliente en caja', wa: '0981 123 456', until: jbDay(10), on: true }]); const bad1 = jbClean([{ t: 'X', d: 'corto', wa: '1', until: jbDay(10), on: true }]); const bad2 = jbClean([{ t: 'Cajero', d: 'Atención al cliente en caja', wa: '0981123456', until: jbDay(200), on: true }]); const off = jbClean([{ t: '', d: '', wa: '', until: '', on: false }]); return { ok: !ok.bad && ok.out[0].wa === '0981123456', bad1: bad1.bad, bad2: bad2.bad, off: !off.bad }; });
   check(jc.ok && jc.bad1 && jc.bad2 && jc.off, 'vaga: valida cargo, descrição, WhatsApp e data (até 90 dias); vaga pausada não trava');
   await a.act('gujobadd'); await a.evaluate(() => { const j = ui.gu.jobs[ui.gu.jobs.length - 1]; Object.assign(j, { co: 'Panadería Teste', t: 'Ayudante de cocina', d: 'Ayudar en la cocina y limpieza', wa: '0981000111', until: jbDay(15), on: true }); });
@@ -342,6 +346,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     r.tel = [...document.querySelectorAll('.ic-tel a[href^="tel:"]')].map(a => a.getAttribute('href'));
     r.pb = (document.querySelector('.pbn') || {}).getAttribute ? document.querySelector('.pbn').getAttribute('href') : '';
     r.vfOk = (LIST || []).length ? !!document.querySelector('#destacados .vf, #aliados .vf') || !document.querySelector('#destacados, #aliados') : true; r.vfFn = typeof vfB === 'function' && /verificado/.test(vfB()) && !/\bvf\b/.test(dirCard({ id: 'd-x', name: 'Sin selo', _dir: 1, segEs: '', td: false, acc: false })) && /class="vf"/.test(dirCard({ id: 'd-y', name: 'Aliado', _dir: 1, segEs: '', td: true }));
+    { const A0 = G.ads, S0 = G.soc; G.ads = [{ id: 'z1', img: '/img/guia/tu-delivery.jpg' }, { id: 'z2', img: '/img/guia/tu-delivery.jpg' }, { id: 'z3', img: '/img/guia/tu-delivery.jpg' }]; G.soc = Object.assign({}, S0, { slo: 'list' }); SL.ord = {}; r.ord = slItems().filter(x => x.k === 'ad').map(x => x.a.id).join(','); G.ads = A0; G.soc = S0; SL.sig = ''; slRender(); }
     r.hq = [...document.querySelectorAll('.hq a:not([hidden])')].length; r.h1 = (document.querySelector('h1') || {}).textContent || '';
     document.querySelector('#bnav [data-b=find]').click(); await W(450); r.find = document.activeElement && document.activeElement.id === 'q';
     document.getElementById('hacc').click(); await W(30); r.acc = !document.getElementById('more').hidden; document.getElementById('more').hidden = true;
@@ -349,6 +354,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     return r; });
   info(JSON.stringify(v2));
   check(v2.cat && v2.info.includes('ic-ev') && v2.info.includes('ic-tel') && v2.tel[0] === 'tel:911', 'início novo: Categorías principales e a linha com eventos e teléfonos útiles (911 para ligar)');
+  check(v2.ord === 'z1,z2,z3', 'slider na ordem da lista quando o painel pede (' + v2.ord + ')');
   check(v2.vfOk && v2.vfFn, 'selo verificado: clientes Vitrix e aliados Tu Delivery têm; ficha simples sem relação não tem');
   check(v2.pb === '/guia/negocios/' && v2.hq >= 3 && /Santa Rita/.test(v2.h1), 'início novo: atalhos da busca, cartão Publicá tu negocio e o título da página (h1)');
   check(v2.find && v2.acc && v2.home, 'Buscar (barra de baixo) foca a busca, Mi cuenta (topo) abre o menu e Inicio (topo) volta ao começo');

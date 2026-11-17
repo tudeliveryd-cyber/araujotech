@@ -130,6 +130,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 .hdr .lang{border-color:#E4DAF0!important;color:#5F566B!important}.hdr .lang button{color:#5F566B}.hdr .lang button.on,.hdr .lang button[aria-pressed=true]{background:var(--deep,#4A0A80)!important;color:#fff!important}
 .hdr .shb{border-color:#E4DAF0!important;color:var(--deep,#4A0A80)!important}
 .vf{display:inline-flex;vertical-align:middle;margin-left:8px;color:#C9A3FF}.vf svg{display:block}
+.rep{text-align:center;margin:18px auto 0;font-size:14px}.rep a{color:var(--muted,#5F566B);text-decoration:underline;text-underline-offset:3px}
 </style></head>
 <body>
 <header class="hdr"><div class="wrap nav"><a class="bk" href="/guia/" aria-label="Volver a la Guía"><?= $ic($I['back'], 18) ?><span>Volver a la Guía</span></a><span class="sp"></span><a class="gsr" href="/guia/" aria-label="Guía de Santa Rita" style="display:flex;align-items:center;gap:10px;text-decoration:none"><img class="gsl" src="/img/guia/guia-logo.webp" alt="Guía de Santa Rita" width="83" height="40" style="height:40px;width:auto;display:block"></a></div></header>
@@ -163,6 +164,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <section class="sec"><h2><?= $ic($I['pin'], 22) ?><span data-pt="Localização">Ubicación</span></h2><div class="box"><p><?= $e($addr ?: ($city ?: 'Santa Rita') . ', Alto Paraná') ?></p>
 <iframe class="map" title="Mapa de <?= $e($name) ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=<?= rawurlencode($mapQ) ?>&amp;z=<?= $hasGeo ? 16 : 15 ?>&amp;output=embed"></iframe>
 <p style="margin-top:10px"><a class="btn" href="<?= $e($mapUrl) ?>" target="_blank" rel="noopener"><?= $ic($I['pin']) ?><span data-pt="Abrir no Google Maps">Abrir en Google Maps</span></a></p></div></section>
+<p class="rep"><a href="<?= $e('https://wa.me/595982086171?text=' . rawurlencode('Hola, en la Guía de Santa Rita hay un dato incorrecto de ' . $name . ' (' . $url . '): ')) ?>" target="_blank" rel="noopener nofollow" data-pt="Algum dado errado? Avise a Guia">¿Algún dato incorrecto? Avisale a la Guía</a></p>
 <section class="cta"><div><b data-pt="Mais negócios de Santa Rita">Más negocios de Santa Rita</b><p data-pt="Ofertas, farmácia de plantão, ônibus e tudo o que é útil na cidade.">Ofertas, farmacia de turno, ómnibus y todo lo útil de la ciudad.</p></div><a href="/guia/" data-pt="Abrir a Guia de Santa Rita">Abrir la Guía de Santa Rita</a></section>
 </main>
 <footer id="gft"></footer><script src="/guia/rodape.js" defer></script>
