@@ -124,6 +124,13 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   await c.locator('[data-rid] [data-rst="ok"]').first().click(); await c.w(1500);
   const f2 = L.unfields((await L.fsReq(P, 'GET', 'gfichas/' + mine.id, 'owner')).json), r2 = L.unfields((await L.fsReq(P, 'GET', 'gresenas/' + rv.id, 'owner')).json);
   check(f2.st === 'ok' && r2.st === 'ok', 'aprovar marca a ficha e a opinião como publicadas');
+  { const C2 = await L.open(); const c2 = C2.p; let sent = null;
+    await c2.route('**/sitio/guia_stats.php', async r => { sent = JSON.parse(r.request().postData() || '{}'); await r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, mes: 4, ant: 1 }) }); });
+    await c2.goto('https://araujotechsistemas.com/cuenta/'); await c2.w(2000); await c2.fill('#ae', 'nueva@iglesia.py'); await c2.fill('#ap', 'Senha#456'); await c2.click('#fau button[type=submit]'); await c2.w(3500);
+    const tx = (await c2.evaluate(() => { const e = document.getElementById('fst'); return e && !e.hidden ? e.textContent.replace(/\s+/g, ' ') : '' }));
+    info(JSON.stringify({ tx, sent: sent && { ficha: sent.ficha, tok: !!sent.t } }));
+    check(/Toques en tu ficha/.test(tx) && /4\s*este mes/.test(tx) && /1\s*el mes pasado/.test(tx) && sent && sent.ficha === 1 && !!sent.t, 'ficha publicada: o dono vê "Toques en tu ficha" (este mês e o anterior), pedido com o login dele');
+    check(c2.errs.length === 0, 'sem erros de JavaScript (toques na ficha)', c2.errs.join(' | ')); }
   check(c.errs.length === 0, 'página sem erros de JavaScript', c.errs.join(' | '));
 
   sec('G. Servidor: guia_lib.php publica só o aprovado');
@@ -144,6 +151,22 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   check(!out.rv.fokneg1, 'opinião em revisão não conta na nota');
   const bin = cp.execFileSync('php', ['-r', "$_GET = ['f' => '" + mine.id + "', 'k' => 'lg', 'v' => '" + fu.lg.split('v=')[1] + "']; include 'gimg.php';"], { cwd: path.join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: tmp, GUIA_FS_BASE: 'http://127.0.0.1:8080' }) });
   check(bin.length > 50 && bin[0] === 0xFF && bin[1] === 0xD8, 'gimg.php?f= entrega o logo (JPEG)');
+
+  sec('G2. Toques na própria ficha (guia_stats.php com ficha=1)');
+  { const dr = fs.mkdtempSync(path.join(os.tmpdir(), 'gst-')); fs.mkdirSync(path.join(dr, 'datos'));
+    for (const f of ['guia_stats.php', 'prods_lib.php']) fs.copyFileSync(path.join(L.DIRS.site, 'sitio', f), path.join(dr, f));
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Asuncion' })); const ym = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    fs.writeFileSync(path.join(dr, 'datos', 'hits-' + ym(now) + '.json'), JSON.stringify({ v: 9, c: { ['d-f' + a.uid.toLowerCase()]: 7, ['d-f' + b.uid.toLowerCase()]: 50, fogaomineiro: 99 } }));
+    fs.writeFileSync(path.join(dr, 'datos', 'hits-' + ym(prev) + '.json'), JSON.stringify({ v: 3, c: { ['d-f' + a.uid.toLowerCase()]: 3 } }));
+    const srv = cp.spawn('php', ['-S', '127.0.0.1:8097', '-t', dr], { env: Object.assign({}, process.env, { GUIA_ID_BASE: AU + '/identitytoolkit.googleapis.com' }), stdio: 'ignore' });
+    await new Promise(f => setTimeout(f, 700));
+    const post = async body => { try { const r = await fetch('http://127.0.0.1:8097/guia_stats.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); return await r.json(); } catch (e) { return { err: String(e) }; } };
+    const mineSt = await post({ t: a.tok, ficha: 1 }), other = await post({ t: b.tok, ficha: 1 }), bad = await post({ t: 'xyz', ficha: 1 }), all = await post({ t: a.tok }), shop = await post({ t: a.tok, shop: 'fogaomineiro' });
+    srv.kill(); info(JSON.stringify({ mineSt, other, bad, all, shop }));
+    check(mineSt.ok && mineSt.mes === 7 && mineSt.ant === 3 && Object.keys(mineSt).sort().join() === 'ant,mes,ok', 'dono da ficha vê só os toques da própria ficha (este mês e o anterior), nada mais');
+    check(other.ok && other.mes === 50 && other.ant === 0, 'outra conta vê os números dela, não os da primeira');
+    check(!bad.ok && !all.ok && !shop.ok, 'sem login válido não vê nada; conta da Guía não vê os números gerais nem os de uma loja Vitrix'); }
 
   sec('H. Guía: nota, Opinar e entrada para criar conta');
   const G = await L.open(); const g = G.p;

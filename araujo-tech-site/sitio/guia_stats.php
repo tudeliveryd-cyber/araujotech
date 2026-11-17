@@ -8,11 +8,22 @@ require __DIR__ . '/prods_lib.php';
 $in = json_decode((string)file_get_contents('php://input'), true) ?: []; $tk = (string)($in['t'] ?? ''); $shop = strtolower((string)($in['shop'] ?? ''));
 if ($shop !== '' && !preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $shop)) { echo '{"ok":false}'; exit; }
 if ($tk === '' || strlen($tk) > 4000) { echo '{"ok":false}'; exit; }
-$c = curl_init('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' . AT_KEY);
+$c = curl_init((getenv('GUIA_ID_BASE') ?: 'https://identitytoolkit.googleapis.com') . '/v1/accounts:lookup?key=' . AT_KEY); // GUIA_ID_BASE só nos testes (emulador)
 curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8, CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode(['idToken' => $tk]), CURLOPT_HTTPHEADER => ['Content-Type: application/json']]);
 $r = json_decode((string)curl_exec($c), true);
 $mail = strtolower((string)($r['users'][0]['email'] ?? ''));
 $admin = $mail === 'admin@araujotechsistemas.com';
+// ficha própria (conta da Guía, /cuenta/): só os toques da ficha de quem está logado. O id vem do login verificado, não do pedido.
+if (!empty($in['ficha'])) {
+  $uid = (string)($r['users'][0]['localId'] ?? '');
+  if (!preg_match('/^[A-Za-z0-9]{6,64}$/', $uid)) { echo '{"ok":false}'; exit; }
+  $key = 'd-f' . strtolower($uid); $tz = new DateTimeZone('America/Asuncion'); $now = new DateTime('now', $tz); $res = ['ok' => true, 'mes' => 0, 'ant' => 0];
+  foreach (['mes' => $now->format('Y-m'), 'ant' => (clone $now)->modify('first day of last month')->format('Y-m')] as $k => $m) {
+    $d = json_decode((string)@file_get_contents(__DIR__ . '/datos/hits-' . $m . '.json'), true);
+    if (is_array($d)) $res[$k] = (int)($d['c'][$key] ?? 0);
+  }
+  echo json_encode($res); exit;
+}
 if (!$admin) { // dono do local: só os números da própria loja (confere em shopUsers/<uid> com o login dele)
   $uid = (string)($r['users'][0]['localId'] ?? '');
   if ($shop === '' || !preg_match('/^[A-Za-z0-9]{6,64}$/', $uid)) { echo '{"ok":false}'; exit; }
