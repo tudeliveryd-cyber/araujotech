@@ -10,6 +10,9 @@ on:
       host:
         description: 'Subdomínio do catálogo'
         default: 'fogaomineiro'
+      cartel:
+        description: 'Só gerar o cartel com QR (sim/não)'
+        default: 'não'
       lista:
         description: 'Só conferir as fotos da lista (sim/não)'
         default: 'não'
@@ -25,4 +28,5 @@ jobs:
         env:
           LOJA: ${{ inputs.loja }}
           HOST: ${{ inputs.host }}
+          POSTER: ${{ inputs.cartel == 'sim' && '1' || '' }}
           SO_LISTA: ${{ inputs.lista == 'sim' && '1' || '' }}
