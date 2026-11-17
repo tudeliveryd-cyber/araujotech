@@ -58,6 +58,7 @@ jobs:
           cp -r $S/guia $S/img $D/
           for f in guia.php guia_lib.php prods_lib.php gimg.php pimg.php img.php; do cp $S/sitio/$f $D/sitio/; done
           cp $S/clientes.js $S/nao-encontrado.html $D/
+          cp $S/guia/google*.html $D/ 2>/dev/null || true # verificação do Google Search Console (na raiz do domínio)
           # Nada de contagens, painel ou dados aqui: isso fica só no servidor principal.
           find $D -type f | wc -l; du -sh $D
       - name: Certificado do servidor FTP
@@ -97,7 +98,7 @@ jobs:
         if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
         run: |
           sleep 5; ok=1
-          for u in / /negocios/ /sobre/ /terminos/ /manifest.webmanifest /sitemap.xml /guia/qr.js /img/guia/favicon.png; do
+          for u in / /googled512b2ecce5b9097.html /negocios/ /sobre/ /terminos/ /manifest.webmanifest /sitemap.xml /guia/qr.js /img/guia/favicon.png; do
             c=$(curl -s -o /dev/null -w '%{http_code}' "https://guiadesantarita.com$u"); echo "$c $u"; [ "$c" = 200 ] || ok=0
           done
           curl -s https://guiadesantarita.com/ | grep -q 'Guía de Santa Rita' && echo "página da Guía OK" || { echo "a página inicial não é a Guía"; ok=0; }
