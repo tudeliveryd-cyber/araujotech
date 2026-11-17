@@ -508,6 +508,22 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(Q.ferCard && Q.ferView && /^\d{4}-\d{2}-\d{2}:/.test(Q.next), 'portada: fila de informação (clima, câmbio, eventos) sem repetir o bloco Hoy; o link de feriados abre a lista com os próximos 14');
   check(Q.alqBtn && Q.alq.join('|') === 'Casa en alquiler|Terreno en venta', 'Alquileres e inmuebles: só imóveis e aluguéis, aluguéis primeiro (o perro perdido não entra)');
   check(Q.cup && /GUIA10/.test(Q.cup) && /10% de descuento/.test(Q.cup) && /Pedido mínimo/.test(Q.cup) && /Cupones y ofertas/.test(Q.ofsH || ''), 'cupom marcado pelo negócio aparece em "Cupones y ofertas"', String(Q.cup));
+  sec('R. Busca: buscas recentes e busca sem resultado');
+  const norm = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const RB = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const r = {};
+    localStorage.setItem('at_ghist', JSON.stringify(['pizza', 'farmacia'])); const q = document.getElementById('q'); q.value = ''; CAT = 'home'; SPV = ''; render(); await W(50);
+    r.hist = [...document.querySelectorAll('#sug [data-tq]')].map(b => b.textContent).slice(0, 2).join('|'); r.histLbl = /Tus búsquedas/.test(document.getElementById('sug').textContent);
+    const nm = ((LIST || []).find(c => norm(c.name).replace(/[^a-z ]/g, '').length >= 7) || {}).name || ''; r.nm = nm;
+    const bad = nm.slice(0, 3) + nm.slice(4); q.value = bad; CAT = 'all'; render(); await W(50);
+    r.empty = !!document.querySelector('#list .nores'); const d = document.querySelector('#list .dym [data-dq]'); r.dym = d ? d.textContent : '';
+    r.cats = document.querySelectorAll('#list .nr-c [data-dc]').length; r.wa = /wa\.me\/595982086171/.test((document.querySelector('#list .nr-wa') || {}).href || '');
+    if (d) { d.click(); await W(80); r.after = q.value; r.found = !document.querySelector('#list .nores'); }
+    const c = document.querySelector('#list .nr-c [data-dc]'); q.value = 'zzzzqqq'; CAT = 'all'; render(); await W(40); const c2 = document.querySelector('#list .nr-c [data-dc]'); const k = c2 && c2.dataset.dc; if (c2) { c2.click(); await W(60); } r.cat = CAT === k && q.value === '';
+    localStorage.removeItem('at_ghist'); q.value = ''; CAT = 'home'; render(); return r; });
+  info(JSON.stringify(RB));
+  check(RB.hist === 'pizza|farmacia' && RB.histLbl, 'buscador: as últimas buscas deste aparelho aparecem embaixo da caixa ("Tus búsquedas")');
+  check(RB.empty && RB.dym && norm(RB.dym) === norm(RB.nm) && RB.found, 'busca com erro de digitação: "¿Quisiste decir…?" com o nome real, e o clique encontra o negócio', JSON.stringify(RB));
+  check(RB.cats > 0 && RB.wa && RB.cat, 'busca sem resultado: oferece as categorias (com negócios) e o WhatsApp da Guía; categoria abre a lista');
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
