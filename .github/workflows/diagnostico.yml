@@ -70,7 +70,7 @@ jobs:
         if: ${{ inputs.apresentacao == 'sim' }}
         env:
           GLANG: ${{ inputs.idioma }}
-        run: node tools/capt_apres.js
+        run: node tools/capt_apres.js && node tools/diag_tiles.js
       - name: Velocidade da Guía
         if: ${{ inputs.guia == 'sim' }}
         run: node tools/diag_guia.js
