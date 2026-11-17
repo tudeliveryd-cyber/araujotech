@@ -742,6 +742,23 @@ body.home .sch-g a.sch-c .sch-t small{color:#EADCFC}
 }
 /* computador: "Probá" centralizado embaixo da busca */
 @media (min-width:900px){body .hero .sug{justify-content:center;margin-left:auto;margin-right:auto}}
+/* celular: faixa roxa embaixo do slider (busca + Probá + atalhos), sugestões todas visíveis; cartões de informação da mesma altura */
+@media (max-width:899px){
+ body.home .hero{background:linear-gradient(180deg,#5A12A6 0%,#4A0A80 100%)!important;margin:0!important;border-radius:0!important;padding:18px 0 20px!important}
+ body.home .hero .srch{box-shadow:none}
+ body.home .hero .sug{flex-wrap:wrap!important;overflow:visible!important;justify-content:center!important;margin:12px 0 0!important;padding:0!important;gap:7px}
+ body.home .hero .sug>span{color:#E3D3FA!important;width:auto}
+ body.home .hero .sug button{background:rgba(255,255,255,.12)!important;color:#fff!important;border:1px solid rgba(255,255,255,.26)!important;padding:6px 12px}
+ body.home .infr{align-items:stretch!important}
+ body.home .infr>.ic-c{height:auto}
+ body.home .hero .sug{gap:6px}
+ body.home .ic-w .ic-wb{margin:auto 0}
+ body.home .ic-w .ic-wb>b{font-size:42px}
+ body.home .ic-ev .ic-e{margin:auto 0}
+ body.home .ic-tel li:nth-child(n+4){display:none}
+ body.home .ic-tel .ic-more{margin-top:auto}
+ body.home .hero .sug button{padding:5px 10px!important;font-size:13px}
+}
 .ic-src{font-size:12.5px;color:var(--muted);margin:-18px 0 30px;text-align:left}
 @media (max-width:899px){.ic-src{margin:-14px 0 22px}}
 </style></head>
