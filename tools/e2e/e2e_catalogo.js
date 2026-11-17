@@ -89,6 +89,12 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
     check(c.store && c.store.bairros[0].fee === 7000 && c.store.bairros[1].fee === 12000, 'Firebase: taxas por bairro gravadas', JSON.stringify(c.store && c.store.bairros.slice(0, 2)));
     const hasMedia = Object.keys(d).some(k => /^media/i.test(k)) || /data:image|"img":"m:/.test(d.cfg || '');
     check(hasMedia || !!pr.img, 'Firebase: foto do produto gravada', 'campos: ' + Object.keys(d).join(',') + ' img=' + String(pr.img).slice(0, 40));
+    if (!(await o.locator('#cpg_0').count())) { info('plano do local de teste sem cupons: libera só nesta página para testar a opção'); await o.evaluate(() => { if (LIM && Array.isArray(LIM.off)) LIM.off = LIM.off.filter(x => x !== 'coupons'); render(); }); await o.w(500); }
+    if (await o.locator('#cpg_0').count()) {
+      await o.locator('#cpo_0').check(); await o.locator('#cpg_0').check(); await o.w(3500);
+      const cg = (cfgOf(await shopDoc()).store.coupons || [])[0] || {};
+      check(cg.g === true && cg.on === true, 'cupom: opção "En la Guía" gravada no catálogo (aparece em Cupones y ofertas da Guía)', JSON.stringify(cg));
+    } else info('cupons: plano do local de teste sem cupons (card bloqueado), opção "En la Guía" não testada aqui');
   });
   if (STOP === 'C') return L.done();
 

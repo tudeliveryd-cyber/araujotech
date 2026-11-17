@@ -27,7 +27,18 @@ if (isset($_GET['ofs'])) { // ofertas de hoje: produtos em promoção (com foto)
       $n++;
     }
   }
-  usort($o, function ($a, $b) { return ($b['pm'] <=> $a['pm']); });
+  // cupons que o próprio negócio marcou "Mostrar en la Guía" no painel (só ativos; um por negócio)
+  foreach (array_slice(array_unique(array_filter(explode(',', (string)$_GET['ofs']))), 0, 40) as $id) {
+    if (!preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $id)) continue; $sh = at_shop_cfg($id);
+    if (!$sh || ($sh['status'] ?? '') === 'suspenso' || !empty($sh['cfg']['store']['paused'])) continue;
+    foreach ((array)($sh['cfg']['store']['coupons'] ?? []) as $c) {
+      if (!is_array($c) || empty($c['on']) || empty($c['g']) || !preg_match('/^[A-Z0-9]{2,24}$/', (string)($c['code'] ?? ''))) continue;
+      $ty = in_array($c['type'] ?? '', ['pct', 'fixed', 'frete'], true) ? $c['type'] : 'pct';
+      $o[] = ['s' => $id, 'cup' => ['code' => $c['code'], 'type' => $ty, 'value' => max(0, +($c['value'] ?? 0)), 'min' => max(0, +($c['min'] ?? 0))], 'pm' => true, 'cur' => (($sh['cfg']['store']['cur'] ?? '') === 'USD') ? 'USD' : 'PYG'];
+      break;
+    }
+  }
+  usort($o, function ($a, $b) { return (isset($b['cup']) <=> isset($a['cup'])) ?: ($b['pm'] <=> $a['pm']); });
   echo json_encode(array_slice($o, 0, 16), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit;
 }
 if (isset($_GET['top'])) { // 'Lo más buscado': as buscas da Guía com resultado, deste mês e do anterior (só as que se repetem)
@@ -82,6 +93,10 @@ if (isset($_GET['hoy'])) { // 'Hoy en Santa Rita': clima (MET Norway) e câmbio 
     $u = (int)($j['time_last_update_unix'] ?? 0);
     return ['usd' => (int)(round($pyg / 10) * 10), 'brl' => (int)round($pyg / $brl), 'd' => (new DateTime('@' . ($u > 1600000000 ? $u : time())))->setTimezone($tz)->format('Y-m-d')];
   });
+  // cotização oficial do BCP (tools/cot_bcp.py via workflow, publicada em /sitio/cot.json): tem preferência sobre a internacional
+  $bcp = json_decode((string)@file_get_contents(__DIR__ . '/cot.json'), true);
+  if (is_array($bcp) && is_numeric($bcp['usd'] ?? null) && is_numeric($bcp['brl'] ?? null) && $bcp['usd'] > 3000 && $bcp['usd'] < 30000 && $bcp['brl'] > 300 && $bcp['brl'] < 5000 && preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($bcp['fecha'] ?? '')) && strtotime($bcp['fecha']) > time() - 5 * 86400)
+    $fx = ['usd' => (int)round($bcp['usd']), 'brl' => (int)round($bcp['brl']), 'd' => $bcp['fecha'], 'src' => 'bcp'];
   header('Cache-Control: public, max-age=600'); echo json_encode(['w' => $w, 'fx' => $fx]); exit;
 }
 if (isset($_GET['news'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_news(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }
