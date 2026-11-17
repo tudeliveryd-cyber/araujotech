@@ -6,7 +6,7 @@ const { chromium } = require('playwright'); const fs = require('fs');
   const a = s.indexOf('/* flyer do horário'), b = s.indexOf('/* flyer de vagas');
   if (a < 0 || b < 0) throw new Error('cgMeal não encontrado');
   const code = s.slice(a, b);
-  const br = await chromium.launch(); const p = await br.newPage();
+  const br = await chromium.launch(); const p = await br.newPage({ bypassCSP: true });
   await p.goto('https://guiadesantarita.com/', { waitUntil: 'domcontentloaded' });
   await p.addScriptTag({ content: `window.ui={};window.lang='${process.env.GLANG === 'pt' ? 'pt' : 'es'}';window.toast=m=>{window.__err=m};window.esc=s=>String(s==null?'':s);window.t=k=>k;window.ic=()=>'';
 window.isoDay=t=>new Date(t).toISOString().slice(0,10);window.openSheet=h=>{window.__h=h};
