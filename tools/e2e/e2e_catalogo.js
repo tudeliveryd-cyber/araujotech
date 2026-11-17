@@ -96,6 +96,15 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
       check(cg.g === true && cg.on === true, 'cupom: opção "En la Guía" gravada no catálogo (aparece em Cupones y ofertas da Guía)', JSON.stringify(cg));
     } else info('cupons: plano do local de teste sem cupons (card bloqueado), opção "En la Guía" não testada aqui');
   });
+  await step('importar planilha com nombre PT e opciones', async () => {
+    await tab(o, 'products'); await o.act('impopen'); await o.w(800);
+    const tx = 'Nombre;Nombre PT;Precio;Categoría;Descripción;Descripción PT;Opciones;Opciones PT\nGaseosa lata E2E;Refrigerante lata E2E;12000;Bebidas E2E;Elegí el sabor;Escolha o sabor;Sabor: Coca-Cola, Fanta Naranja, Fanta Uva +2000;Sabor: Coca-Cola, Fanta Laranja, Fanta Uva +2000';
+    await o.locator('#imp_txt').fill(tx); await o.locator('#imp_txt').dispatchEvent('input'); await o.w(800);
+    await o.act('impgo'); await o.w(3500);
+    const c = cfgOf(await shopDoc()); const p = (c.products || []).find(x => x.n && x.n.es === 'Gaseosa lata E2E') || {}; const g = (p.g || [])[0] || {};
+    check(p.n && p.n.pt === 'Refrigerante lata E2E' && p.d && p.d.es === 'Elegí el sabor' && p.d.pt === 'Escolha o sabor', 'importar: nome e descrição em espanhol e português', JSON.stringify(p).slice(0, 220));
+    check(g.type === 'one' && g.req === true && (g.o || []).length === 3 && g.o[1].n.es === 'Fanta Naranja' && g.o[1].n.pt === 'Fanta Laranja' && g.o[2].p === 2000, 'importar: opção Sabor obrigatória, escolher 1, nos dois idiomas e com acréscimo', JSON.stringify(g).slice(0, 300));
+  });
   if (STOP === 'C') return L.done();
 
   sec('D. Cliente anônimo: catálogo e pedido real');
