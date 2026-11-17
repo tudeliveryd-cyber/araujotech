@@ -402,7 +402,7 @@ body.cgm{background:var(--cg-bg)}
  .cg-af{max-width:none;width:100%}
 }
 
-.cg-geo{margin-top:14px}.cg-geo h4{margin:0 0 8px;font-size:14px}.cg-geo ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}.cg-geo li{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,2fr) 44px 44px;align-items:center;gap:10px;font-size:13.5px}.cg-geo li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cg-geo li i{display:block;height:8px;border-radius:4px;background:var(--cg-line);position:relative;overflow:hidden}.cg-geo li i::after{content:'';position:absolute;inset:0 auto 0 0;width:var(--w);background:var(--cg-acc,#6D28D9);border-radius:4px}.cg-geo li b{text-align:right;font-variant-numeric:tabular-nums}.cg-geo li small{text-align:right;color:var(--cg-mut);font-variant-numeric:tabular-nums}.cg-geo li.mut span{color:var(--cg-mut)}
+.cg-geo{margin-top:14px}.cg-top li{grid-template-columns:minmax(0,1.6fr) minmax(50px,1.6fr) 40px}.cg-geo h4{margin:0 0 8px;font-size:14px}.cg-geo ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}.cg-geo li{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(60px,2fr) 44px 44px;align-items:center;gap:10px;font-size:13.5px}.cg-geo li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cg-geo li i{display:block;height:8px;border-radius:4px;background:var(--cg-line);position:relative;overflow:hidden}.cg-geo li i::after{content:'';position:absolute;inset:0 auto 0 0;width:var(--w);background:var(--cg-acc,#6D28D9);border-radius:4px}.cg-geo li b{text-align:right;font-variant-numeric:tabular-nums}.cg-geo li small{text-align:right;color:var(--cg-mut);font-variant-numeric:tabular-nums}.cg-geo li.mut span{color:var(--cg-mut)}
 @media (max-width:640px){.cg-geo li{grid-template-columns:minmax(0,1fr) 60px 40px}.cg-geo li small{display:none}}
 
 .cg-mod{border-color:rgba(245,180,0,.6);background:rgba(245,180,0,.12)}.cg-wk{margin-top:12px;font-size:13.5px;display:grid;gap:4px}.cg-wk p{margin:0}.cg-wk .up{color:#15803D;font-weight:700}.cg-wk .dn{color:#B91C1C;font-weight:700}
@@ -4813,14 +4813,23 @@ async function cgSubApprove(id){const m=ui.cgMod;const x=m&&(m.l||[]).find(y=>y.
  await CLOUD.api.delSub(id);m.l=m.l.filter(y=>y.id!==id);m.s=Math.max(0,m.s-1);cgLog(ct('mod_log_ok'),x.t);cgSaveG();toast(warn||ct('mod_done'),!!warn);render()}
 
 function cgWeek(j){const vd=j.vd||{},d0=new Date();let a=0,b=0;for(let i=0;i<14;i++){const k=isoDay(d0.getTime()-i*864e5),n=+vd[k]||0;if(i<7)a+=n;else b+=n}
- const pc=b?Math.round((a-b)*100/b):null,q=Object.entries(j.q||{}).sort((x,y)=>y[1]-x[1]).slice(0,6);
+ const pc=b?Math.round((a-b)*100/b):null,q=cgQMerge(j.q).slice(0,6);
  return `<div class="cg-wk"><p><b>${esc(ct('wk_h'))}:</b> ${a} ${esc(ct('wk_v'))}${pc===null?'':` <span class="${pc>=0?'up':'dn'}">(${pc>=0?'+':''}${pc}% ${esc(ct('wk_vs'))})</span>`}</p>${q.length?`<p><b>${esc(ct('wk_q'))}:</b> ${q.map(([k,n])=>esc(k)+' ('+n+')').join(' · ')}</p>`:''}</div>`}
 function cgGuia(){cgGuLoad();const j=ui.cgGu;const head=`<div class="cg-ph"><h3>${esc(ct('gu_h'))}</h3><div class="cg-sc"><button type="button" class="btn sm" data-act="cgmeal" data-k="">${esc(lang==='pt'?'Flyer do horário':'Flyer del horario')}</button><button type="button" class="btn sm" data-act="cgflyer">${esc(ct('fl_b'))}</button><button type="button" class="btn sm" data-act="cggur">${esc(ct('gu_r'))}</button><button type="button" class="btn sm pri" data-act="gusite">${esc(ct('gu_more'))}</button></div></div>`;
  if(j===null||j===undefined)return `<section class="cg-p cg-gu">${head}<p class="cg-empty">${esc(ct('gu_ld'))}</p></section>`;
  if(j===false)return `<section class="cg-p cg-gu">${head}<p class="cg-empty">${esc(ct('gu_err'))}</p></section>`;
  const sum=o=>Object.values(o||{}).reduce((a,b)=>a+(+b||0),0),td=isoDay(Date.now()),n=x=>Number(x||0).toLocaleString('es-PY');
  const k=[[n((j.vd||{})[td]),ct('gu_td')],[n(j.v),ct('gu_v')],[n(sum(j.c)),ct('gu_c')],[n(sum(j.s)),ct('gu_s')],[n((j.p||{}).conoce),ct('gu_cn')]];
- return `<section class="cg-p cg-gu">${head}<div class="cg-kpis">${k.map(([v,l])=>`<div class="cg-k"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>${cgWeek(j)}${cgGeo(j.geo)}<p class="cg-meta" style="margin:10px 0 0">${esc(ct('gu_nt'))}</p></section>`}
+ return `<section class="cg-p cg-gu">${head}<div class="cg-kpis">${k.map(([v,l])=>`<div class="cg-k"><b>${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>${cgTop(j.c)}${cgWeek(j)}${cgGeo(j.geo)}<p class="cg-meta" style="margin:10px 0 0">${esc(ct('gu_nt'))}</p></section>`}
+/* buscas: quem digita devagar gera 'alm', 'almuer', 'almuerzo'; junta cada começo na palavra completa */
+function cgQMerge(q){const e=Object.entries(q||{}).map(([k,n])=>[String(k).replace(/-/g,' '),+n||0]).sort((a,b)=>b[0].length-a[0].length),o=[];
+ e.forEach(([k,n])=>{const t=o.find(x=>x[0].startsWith(k));if(t)t[1]+=n;else o.push([k,n])});return o.sort((a,b)=>b[1]-a[1])}
+/* negócios mais tocados: nomes pela lista de lojas e pelos negócios da Guía */
+function cgDirLoad(){if(ui.cgDir!==undefined)return;ui.cgDir=null;fetch('/sitio/guia.php?g=1&v='+Date.now()).then(r=>r.ok?r.json():null).then(j=>{const m={};((j&&j.dir)||[]).forEach(x=>{if(x&&x.id&&x.n)m[x.id]=x.n});ui.cgDir=m}).catch(()=>{ui.cgDir={}}).then(()=>{if(document.body.classList.contains('cgm')&&!document.querySelector('.sheet'))render()})}
+function cgTop(c){const l=Object.entries(c||{}).filter(([,n])=>+n>0).sort((a,b)=>b[1]-a[1]);const h=`<h4>${esc(lang==='pt'?'Negócios mais tocados':'Negocios más tocados')}</h4>`;
+ if(!l.length)return '';cgDirLoad();const D=ui.cgDir||{},nm=id=>{const s=(PL.shops||[]).find(x=>x.id===id);return s&&s.name?s.name:D[id]||(ui.cgDir===null?'…':id)};
+ const tot=l.reduce((a,[,n])=>a+ +n,0),top=l.slice(0,ui.cgTopAll?60:8);
+ return `<div class="cg-geo cg-top">${h}<ul>${top.map(([k,n])=>`<li><span>${esc(nm(k))}</span><i style="--w:${Math.max(2,Math.round(n*100/l[0][1]))}%"></i><b>${n}</b></li>`).join('')}</ul>${l.length>8?`<button type="button" class="btn sm cg-more" style="margin-top:8px" data-act="cgtopall">${esc(ui.cgTopAll?(lang==='pt'?'Ver menos':'Ver menos'):(lang==='pt'?`Ver os ${l.length}`:`Ver los ${l.length}`))}</button>`:''}<p class="cg-meta">${esc(lang==='pt'?'Toques em WhatsApp, ligar, mapa, catálogo ou site de cada negócio, neste mês e no anterior.':'Toques en WhatsApp, llamar, mapa, catálogo o sitio de cada negocio, este mes y el anterior.')}</p></div>`}
 function cgGeoName(l){const [p,cc]=String(l).split('|');let cn=cc;try{cn=new Intl.DisplayNames([lang==='pt'?'pt':'es'],{type:'region'}).of(cc)||cc}catch(e){}return p?p+', '+cn:cn}
 function cgGeo(g){const l=Object.entries(g||{}).filter(([k])=>k&&k.includes('|')).sort((a,b)=>b[1]-a[1]);if(!l.length)return `<p class="cg-meta" style="margin:12px 0 0">${esc(ct('gu_geo0'))}</p>`;
  const tot=l.reduce((a,[,n])=>a+n,0),top=l.slice(0,8),rest=tot-top.reduce((a,[,n])=>a+n,0);
@@ -4950,6 +4959,7 @@ const CG_ACTS={
  cgflyer:()=>cgFlyer(),
  cgmeal:el=>cgMeal(el.dataset.k),
  cgmealn:()=>cgMeal(ui.cgMealK,1),
+ cgtopall:()=>{ui.cgTopAll=!ui.cgTopAll;render()},
  cgrepimg:el=>cgRepImg(el.dataset.sid),
  cgatladd:()=>{(ui.cgAtl||(ui.cgAtl=cgAtlDef())).push({k:'q',es:'',pt:'',ic:'tag',q:''});render()},
  cgatlrm:el=>{ui.cgAtl.splice(+el.dataset.k,1);render()},
