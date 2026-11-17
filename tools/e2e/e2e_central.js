@@ -93,6 +93,8 @@ const { sec, check, info } = L;
   check(await a.evaluate(n => [...document.querySelectorAll('#cgRes button b')].some(b => b.textContent.includes(n)), nm), 'busca acha o cliente "' + nm + '"');
   await a.click('#cgRes button[data-k="cli"]'); await a.w(500);
   check(await a.evaluate(() => !!document.querySelector('.sheet[data-k="cgficha"]')), 'resultado abre a ficha do cliente');
+  const lk = await a.evaluate(() => [...document.querySelectorAll('.sheet[data-k="cgficha"] .cg-links a')].map(x => x.getAttribute('href')));
+  check(lk.length === 2 && lk.some(h => /araujotechsistemas.com\/painel\/\?loja=/.test(h)), 'ficha do cliente tem Ver catálogo e Panel del local (' + lk.join(' · ') + ')');
   await a.evaluate(() => closeSheet());
 
   sec('D. Registrar pagamento (com confirmação) e atividade');
