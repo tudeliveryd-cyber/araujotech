@@ -735,6 +735,11 @@ body.home .sch-g a.sch-c .sch-t small{color:#EADCFC}
 .nr-c{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}.nr-c button{font:inherit;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-radius:999px;border:1px solid var(--line2,#E4DAF0);background:#fff;color:var(--ink);cursor:pointer}.nr-c button svg{width:18px;height:18px;color:var(--purple)}.nr-c button:hover{border-color:var(--purple)}
 .nr-wa{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--deep);padding:8px 0}.nr-wa svg{width:18px;height:18px;color:#1A9E4B}
 :root[data-theme=dark] .nr-c button{background:transparent;color:var(--ink)}
+/* tablet em pé: a fila de informação vira grade de 2 (no celular continua deslizando) */
+@media (min-width:641px) and (max-width:899px){
+ .infr{display:grid;grid-template-columns:1fr 1fr;overflow:visible;margin:18px 0 22px;padding:0;align-items:stretch}
+ .ic-c{flex:none}
+}
 .ic-src{font-size:12.5px;color:var(--muted);margin:-18px 0 30px;text-align:left}
 @media (max-width:899px){.ic-src{margin:-14px 0 22px}}
 </style></head>
