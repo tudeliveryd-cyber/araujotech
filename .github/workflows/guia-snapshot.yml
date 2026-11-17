@@ -1,0 +1,13 @@
+name: Cópia pública da Guía (para prévia do design)
+
+# Só leitura: baixa os dados públicos e as imagens da Guía e imprime no log.
+on:
+  workflow_dispatch:
+
+jobs:
+  snap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/guia_snapshot.py
