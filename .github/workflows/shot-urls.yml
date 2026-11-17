@@ -1,0 +1,24 @@
+name: Fotos de páginas públicas
+
+# Só leitura: fotografa as páginas pedidas no celular e no computador.
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: 'Endereços separados por espaço'
+        default: 'https://guiadesantarita.com/'
+      full:
+        description: 'Página inteira (1) ou só a tela (0)'
+        default: '0'
+
+jobs:
+  shot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i playwright@1.47.2 && npx playwright install --with-deps chromium
+      - run: node tools/shot_urls.js
+        env:
+          URLS: ${{ inputs.urls }}
+          FULL: ${{ inputs.full }}
