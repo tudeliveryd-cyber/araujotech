@@ -485,7 +485,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     G.util = [{ c: 'salud', n: 'Hospital Teste' }, { c: 'tcli', n: 'Clínica Teste' }, { c: 'escpri', n: 'Colegio Privado Teste' }, { c: 'xmus', n: 'Museo Teste' }];
     G.dir = [{ id: 'f1', n: 'Ferretería El Tornillo', g: fk, sub: 'tind', d: 'Herramientas', wa: '0981 000 111' }, { id: 'f2', n: 'Ferretería Barrio', g: fk, d: 'Clavos', wa: '0981 000 222' }];
     applyCat(); CAT = 'home'; SPV = ''; render(); await W(100);
-    const r = {}; r.pub = [...document.querySelectorAll('.tg.pub .tile b')].map(b => b.textContent);
+    const r = {}; r.pub = [...document.querySelectorAll('.tg.pub .tile[data-pk] b')].map(b => b.textContent);
     SPV = 'salud'; CAT = 'all'; render(); await W(50); r.salud = [...document.querySelectorAll('.spv .uh')].map(h => h.textContent).filter(t => /Hospitales|Clínicas/.test(t));
     SPV = 'xmus'; CAT = 'all'; render(); await W(50); r.mus = !!document.querySelector('.spv') && /Museo Teste/.test(document.querySelector('.spv').textContent);
     SPV = ''; CAT = fk; render(); await W(50); const sec = document.querySelector('.grp.c-' + fk); r.neg = sec ? sec.querySelector('h2').textContent : null; r.negSub = sec ? [...sec.querySelectorAll('.uh')].map(h => h.textContent) : [];
@@ -532,6 +532,16 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(RB.hist === 'pizza|farmacia' && RB.histLbl, 'buscador: as últimas buscas deste aparelho aparecem embaixo da caixa ("Tus búsquedas")');
   check(RB.empty && RB.dym && norm(RB.dym) === norm(RB.nm) && RB.found, 'busca com erro de digitação: "¿Quisiste decir…?" com o nome real, e o clique encontra o negócio', JSON.stringify(RB));
   check(RB.cats > 0 && RB.wa && RB.cat, 'busca sem resultado: oferece as categorias (com negócios) e o WhatsApp da Guía; categoria abre a lista');
+  sec('S. Agenda com os próximos feriados e o aniversário; fileiras completas em "¿Qué estás buscando?"');
+  const AG = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const r = {}; G.ev = []; CAT = 'home'; SPV = ''; document.getElementById('q').value = ''; render(); await W(80);
+    const fn = ferNext(); r.n = fn.length; r.aniv = fn.some(e => /Aniversario de Santa Rita \(\d+ años/.test(e.t) && /-01-16$/.test(e.d)); r.sorted = fn.every((e, i) => !i || fn[i - 1].d <= e.d);
+    const lim = new Date(Date.now() + 121 * 864e5).toISOString().slice(0, 10); r.inWin = fn.every(e => e.d <= lim);
+    const tg = [...document.querySelectorAll('#todas .tg')]; r.rows = tg.map(g => g.querySelectorAll('.tile').length); r.fill = [...document.querySelectorAll('#todas [data-a="open"],#todas [data-a="near"],#todas [data-a="ag"],#todas [data-sp="alq"],#todas [data-sp="fer"],#todas [data-a="em"]')].length;
+    const al = document.querySelector('#todas [data-sp="alq"]'); if (al) { al.click(); await W(80); r.alq = !!document.getElementById('alquileres'); }
+    CAT = 'home'; render(); return r; });
+  info(JSON.stringify(AG));
+  check(AG.n >= 3 && AG.n <= 6 && AG.aniv && AG.sorted && AG.inWin, 'agenda: até 6 próximas datas oficiais (inclui o aniversário de Santa Rita em 16/01), em ordem, nos próximos 4 meses');
+  check(AG.rows.length >= 2 && AG.rows.every(n => n % 4 === 0) && AG.fill >= 3 && AG.alq, 'fileiras de 4 completas só com atalhos que funcionam (abertos agora, perto de mim, agenda, aluguéis, publicar, emergências/feriados)', JSON.stringify(AG.rows));
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
