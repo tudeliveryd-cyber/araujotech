@@ -16,6 +16,10 @@ const out = (n, f) => { const b64 = fs.readFileSync(f).toString('base64'); for (
     await to(d, '.tiles', 20); await shot(d, 'd-tiles');
     await go(d, '/fogao-mineiro'); await shot(d, 'd-negocio');
     await go(m, '/'); await shot(m, 'm-home');
+    await to(m, '#hoy', 70); await shot(m, 'm-hoy');
+    await to(m, '.sch', 70); await shot(m, 'm-chega');
+    await go(m, '/#feriados'); await shot(m, 'm-feriados');
+    await go(m, '/#alquileres'); await shot(m, 'm-alquileres');
     await go(m, '/fogao-mineiro'); await shot(m, 'm-negocio');
     await m.evaluate(() => window.scrollTo(0, 520)); await m.waitForTimeout(800); await shot(m, 'm-negocio2');
     await go(m, '/'); const t = m.locator('[data-c]').filter({ hasText: /Gastronom|Comida/ }).first(); if (await t.count()) { await t.click(); await m.waitForTimeout(1800); await shot(m, 'm-cat'); }
