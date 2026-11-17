@@ -197,13 +197,13 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   gq.on('request', r => { const u = r.url(); if (/guia_hit\.php\?t=k/.test(u)) ks.push(u); });
   await gq.goto('https://araujotechsistemas.com/guia/'); await gq.w(3000);
   await gq.evaluate(() => { G.ads = [{ id: 'k1', t: 'Banner teste', img: '/img/guia/tu-delivery.jpg', u: 'https://example.com/' }]; SL.sig = ''; slRender(); }); await gq.w(500);
-  await gq.evaluate(() => { const el = document.getElementById('sl'); const d = el.querySelectorAll('.sd')[SL.i]; d.addEventListener('click', e => e.preventDefault(), { once: true }); d.click(); }); await gq.w(800);
+  await gq.evaluate(() => { const el = document.getElementById('sl'); const d = el.querySelector('.sd.ad-s'); d.addEventListener('click', e => e.preventDefault(), { once: true }); d.click(); }); await gq.w(800);
   info(JSON.stringify(ks));
   check(ks.length === 1 && /id=a-k1/.test(ks[0]), 'tocar um banner do slider conta um toque com o mesmo id das aparições');
   await gq.setViewportSize({ width: 1366, height: 700 }); await gq.w(500);
   const wd = await gq.evaluate(async () => { G.ads = [{ id: 'k2', t: 'Wide', img: '/img/guia/tu-delivery.jpg', imgd: '/img/guia/vitrix-planes.jpg', u: '' }]; SL.sig = ''; slRender(); await new Promise(f => setTimeout(f, 600)); const d = document.querySelector('#sl .sd.wd'); if (!d) return null; const im = d.querySelector('.fgw img'), fg = d.querySelector(':scope>img.fg'); return { w: innerWidth, shown: getComputedStyle(d.querySelector('.fgw')).display, fit: getComputedStyle(im).objectFit, src: im.currentSrc, fg: getComputedStyle(fg).display, ow: im.offsetWidth, sw: d.offsetWidth }; });
   info(JSON.stringify(wd));
-  const fill = await gq.evaluate(async () => { const out = []; for (const imgd of ['/img/guia/vitrix-planes.jpg', '']) { G.ads = [{ id: 'k9' + out.length, t: 'X', img: '/img/guia/tu-delivery.jpg', imgd, u: '' }]; SL.sig = ''; slRender(); await new Promise(f => setTimeout(f, 900)); const sl = document.getElementById('sl').getBoundingClientRect(); const d = document.querySelector('#sl .sd'); const im = d.querySelector('.fgw img') && getComputedStyle(d.querySelector('.fgw')).display !== 'none' ? d.querySelector('.fgw img') : d.querySelector(':scope>img.fg'); const nr = im.naturalWidth / im.naturalHeight; out.push({ sw: Math.round(sl.width), sh: Math.round(sl.height), r: +(sl.width / sl.height).toFixed(2), nr: +nr.toFixed(2) }); } return out; });
+  const fill = await gq.evaluate(async () => { const out = []; for (const imgd of ['/img/guia/vitrix-planes.jpg', '']) { G.ads = [{ id: 'k9' + out.length, t: 'X', img: '/img/guia/tu-delivery.jpg', imgd, u: '' }]; SL.sig = ''; slRender(); slGo(1); await new Promise(f => setTimeout(f, 900)); const sl = document.getElementById('sl').getBoundingClientRect(); const d = document.querySelector('#sl .sd.ad-s'); const im = d.querySelector('.fgw img') && getComputedStyle(d.querySelector('.fgw')).display !== 'none' ? d.querySelector('.fgw img') : d.querySelector(':scope>img.fg'); const nr = im.naturalWidth / im.naturalHeight; out.push({ sw: Math.round(sl.width), sh: Math.round(sl.height), r: +(sl.width / sl.height).toFixed(2), nr: +nr.toFixed(2) }); } return out; });
   info(JSON.stringify(fill));
   check(fill.every(x => Math.abs(x.r - x.nr) < 0.03), 'no computador a faixa toma o formato da arte: banner completo e sem sobras nas laterais');
   await gq.evaluate(async () => { G.ads = [{ id: 'k2', t: 'Wide', img: '/img/guia/tu-delivery.jpg', imgd: '/img/guia/vitrix-planes.jpg', u: '' }]; SL.sig = ''; slRender(); await new Promise(f => setTimeout(f, 600)); });
@@ -211,6 +211,8 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   await gq.setViewportSize({ width: 390, height: 800 }); await gq.w(500);
   const wm = await gq.evaluate(() => { const d = document.querySelector('#sl .sd.wd'); return { fgw: getComputedStyle(d.querySelector('.fgw')).display, fg: getComputedStyle(d.querySelector(':scope>img.fg')).display }; });
   check(wm.fgw === 'none' && wm.fg === 'block', 'no celular o mesmo banner continua com a imagem de 1920 × 820');
+  const hs = await gq.evaluate(() => { const f = document.querySelector('#sl .sd'); return { first: !!f && f.classList.contains('hs'), t: f ? f.textContent : '', bt: !!(f && f.querySelector('.hs-bt[data-go=cats]')) }; });
+  check(hs.first && /Santa Rita/.test(hs.t) && hs.bt, 'primeiro slide é o da Guía (Descubrí Santa Rita) com o botão Explorá ahora');
   check(!gq.errs.length, 'Guía sem erros de JavaScript', gq.errs.join(' | '));
   check(await gq.evaluate(() => typeof HOUSE_ON !== 'undefined' && !HOUSE_ON), 'banners da casa (Tu Delivery, Vitrix, Araújo Tech) fora do slider');
   sec('N. Aliado Tu Delivery (ficha simples com logo, Instagram e selos)');
@@ -333,7 +335,21 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(nav.atlErr.length === 0, 'todos os acessos rápidos (Transporte, Eventos, Gastronomía, Salud, Farmacias, Emergencias, Delivery) respondem sem erro');
   check(nav.moreOpen && nav.util, 'barra de baixo: "Más" abre o menu e "Santa Rita útil" abre a central completa');
   check(nav.map && nav.mnav, 'barra de baixo abre o mapa; menu do topo leva aos negócios');
-  check(nav.labels.join('|') === 'Inicio|Categorías|Mapa|Agenda|Mi cuenta', 'barra de baixo com Inicio, Categorías, Mapa, Agenda e Mi cuenta');
+  check(nav.labels.join('|') === 'Inicio|Buscar|Mapa|Agenda|Mi cuenta', 'barra de baixo com Inicio, Buscar, Mapa, Agenda e Mi cuenta');
+  const v2 = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms)); goHome(); render(); await W(30);
+    r.cat = !!document.querySelector('#cats .atl [data-a]') && /Categor/.test((document.querySelector('#cats h2') || {}).textContent || '');
+    r.info = [...document.querySelectorAll('.infr .ic-c')].map(x => x.className.replace('ic-c ', ''));
+    r.tel = [...document.querySelectorAll('.ic-tel a[href^="tel:"]')].map(a => a.getAttribute('href'));
+    r.pb = (document.querySelector('.pbn') || {}).getAttribute ? document.querySelector('.pbn').getAttribute('href') : '';
+    r.hq = [...document.querySelectorAll('.hq a:not([hidden])')].length; r.h1 = (document.querySelector('h1') || {}).textContent || '';
+    document.querySelector('#bnav [data-b=find]').click(); await W(450); r.find = document.activeElement && document.activeElement.id === 'q';
+    document.getElementById('hacc').click(); await W(30); r.acc = !document.getElementById('more').hidden; document.getElementById('more').hidden = true;
+    CAT = 'all'; render(); document.querySelector('.mnav [data-go=home]').click(); await W(30); r.home = CAT === 'home';
+    return r; });
+  info(JSON.stringify(v2));
+  check(v2.cat && v2.info.includes('ic-ev') && v2.info.includes('ic-tel') && v2.tel[0] === 'tel:911', 'início novo: Categorías principales e a linha com eventos e teléfonos útiles (911 para ligar)');
+  check(v2.pb === '/guia/negocios/' && v2.hq >= 3 && /Santa Rita/.test(v2.h1), 'início novo: atalhos da busca, cartão Publicá tu negocio e o título da página (h1)');
+  check(v2.find && v2.acc && v2.home, 'Buscar (barra de baixo) foca a busca, Mi cuenta (topo) abre o menu e Inicio (topo) volta ao começo');
   const v4 = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms)); const G0 = G.util, S0 = G.soc;
     goHome(); render(); document.querySelector('#atl [data-a="far"]').click(); await W(40);
     r.far = (document.querySelector('.spv h2') || {}).textContent || ''; r.farPub = [...document.querySelectorAll('.spv .pc b')].map(b => b.textContent); r.farMap = (document.querySelector('.spv-map') || {}).href || '';
@@ -358,7 +374,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     r.ap = [...document.querySelectorAll('.jb a.pri')].map(a => a.getAttribute('href'))[0] || '';
     document.querySelector('[data-ja="coc"]').click(); await W(20); r.f = [...document.querySelectorAll('.jb-t b')].map(b => b.textContent);
     goHome(); render(); for (const k of ['igl', 'edu']) { document.querySelector('#atl [data-a="' + k + '"]').click(); await W(30); r[k] = (document.querySelector('.spv h2') || {}).textContent || ''; r[k + 'n'] = document.querySelectorAll('.spv .pc').length; goHome(); render(); }
-    r.pub = document.querySelectorAll('#cats [data-pk]').length; document.querySelector('#cats [data-pk="fin"]').click(); await W(30); r.fin = document.querySelectorAll('.spv .pc').length; r.sug = !!document.querySelector('.spv .sug2 a[href*="wa.me"]');
+    r.pub = document.querySelectorAll('#todas [data-pk]').length; document.querySelector('#todas [data-pk="fin"]').click(); await W(30); r.fin = document.querySelectorAll('.spv .pc').length; r.sug = !!document.querySelector('.spv .sug2 a[href*="wa.me"]');
     const C0 = G.clas; G.clas = [{ id: 'c1', k: 'inm', op: 'alq', t: 'Casa en alquiler', pr: 'Gs. 2.500.000', z: 'Centro', d: '3 dormitorios', wa: '595981000444', until: day(20), ph: '' }, { id: 'c2', k: 'veh', op: 'venta', t: 'Moto 150cc', pr: 'Gs. 9.000.000', z: '', d: '', wa: '595981000555', until: day(20), ph: '' }]; goHome(); render(); go('cla'); await W(30);
     r.cl = document.querySelectorAll('.cl').length; r.clwa = (document.querySelector('.cl a.pri') || {}).href || ''; const cb = document.querySelector('[data-clk="veh"]'); if (cb) { cb.click(); await W(20); } r.clf = [...document.querySelectorAll('.cl-b > b')].map(b => b.textContent); G.clas = C0; CLF = '';
     const E0 = G.ev; G.ev = [{ t: 'Culto de jóvenes', k: 'rel', d: day(3), h: '19:30', l: 'Iglesia', u: '' }, { t: 'Torneo de futsal', k: 'dep', d: day(4), h: '', l: 'Polideportivo', u: '' }]; goHome(); render(); await W(20);
@@ -377,7 +393,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     goHome(); render(); await W(30);
     r.fd = [...document.querySelectorAll('#destacados .fc-t b')].map(b => b.textContent); r.tags = [...document.querySelectorAll('#destacados .fc-tg')].map(t => t.textContent);
     r.wa = [...document.querySelectorAll('#destacados .fc-wa')].map(a => a.getAttribute('href')); r.rt = (document.querySelector('#destacados em') || {}).textContent || '';
-    r.rc = [...document.querySelectorAll('#aliados .fc-t b')].map(b => b.textContent); r.rcwa = document.querySelectorAll('#aliados .fc-wa').length; r.rcph = [...document.querySelectorAll('#aliados .fc-cv > img')].map(i => i.getAttribute('src')); r.rclink = [...document.querySelectorAll('#aliados a.fc-a')].map(x => x.getAttribute('href')); r.vxlink = [...document.querySelectorAll('#destacados a.fc-a')].map(x => x.getAttribute('href')); r.sug = document.querySelectorAll('#sug [data-tq]').length; r.side = !!document.querySelector('.side .sc.ad');
+    r.rc = [...document.querySelectorAll('#aliados .fc-t b')].map(b => b.textContent); r.rcwa = document.querySelectorAll('#aliados .fc-wa').length; r.rcph = [...document.querySelectorAll('#aliados .fc-cv > img')].map(i => i.getAttribute('src')); r.rclink = [...document.querySelectorAll('#aliados a.fc-a')].map(x => x.getAttribute('href')); r.vxlink = [...document.querySelectorAll('#destacados a.fc-a')].map(x => x.getAttribute('href')); r.sug = document.querySelectorAll('#sug [data-tq]').length; r.side = !!document.querySelector('a.pbn[href="/guia/negocios/"]');
     document.getElementById('q').value = 'ropa'; document.getElementById('qgo').click(); await W(30); r.search = CAT === 'all' && [...document.querySelectorAll('#list .card h3')].some(h => /Pre X|Com X/.test(h.textContent));
     LIST = L0; G.dir = G0; INFO = Object.assign(INFO, I0); delete INFO.vipx; goHome(); render(); return r; });
   info(JSON.stringify(v3));
@@ -385,7 +401,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(v3.wa.length === 1 && /wa\.me\/595981000000/.test(v3.wa[0]) && /4,8/.test(v3.rt), 'destacado com WhatsApp do catálogo e nota real (só quando existem)');
   check(v3.rc.join('|') === 'Aliado Foto|Aliado Uno' && v3.rcwa === 1 && v3.rcph[0] === '/sitio/gimg.php?d=td2&k=ph&v=abc123', 'Recomendados Aliado Tu Delivery: só clientes Tu Delivery, com WhatsApp; os com foto do local primeiro');
   check(v3.rclink.length === 1 && /wa\.me/.test(v3.rclink[0]) && v3.vxlink.every(h => !/wa\.me/.test(h)) && v3.vxlink.length === 2, 'aliado: tocar no card abre o WhatsApp; cliente Vitrix: abre a página dele na Guía');
-  check(v3.sug >= 3 && v3.side, 'busca com sugestões tocáveis e coluna com "Anunciá tu negocio"');
+  check(v3.sug >= 3 && v3.side, 'busca com sugestões tocáveis e cartão "Publicá tu negocio"');
   check(v3.search, 'botão Buscar mostra os resultados');
   check(simp.busShort && simp.busFull, 'Santa Rita útil resumido no início e abre o resto ao tocar');
   check(/Desayuno, almuerzo, merienda y cena/.test(simp.tidy), 'rubro escrito com espaços/maiúsculas aparece arrumado');
