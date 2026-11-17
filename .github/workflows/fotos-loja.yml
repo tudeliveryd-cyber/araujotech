@@ -1,0 +1,24 @@
+name: Fotos de uma loja (para flyers)
+
+# Só leitura: lista os produtos e imprime o logo e as fotos no log.
+on:
+  workflow_dispatch:
+    inputs:
+      loja:
+        description: 'Loja'
+        default: 'fogao-mineiro'
+      host:
+        description: 'Subdomínio do catálogo'
+        default: 'fogaomineiro'
+
+jobs:
+  fotos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i playwright@1.47.2 && npx playwright install --with-deps chromium
+      - run: node tools/fotos_loja.js
+        env:
+          LOJA: ${{ inputs.loja }}
+          HOST: ${{ inputs.host }}
