@@ -341,6 +341,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     r.info = [...document.querySelectorAll('.infr .ic-c')].map(x => x.className.replace('ic-c ', ''));
     r.tel = [...document.querySelectorAll('.ic-tel a[href^="tel:"]')].map(a => a.getAttribute('href'));
     r.pb = (document.querySelector('.pbn') || {}).getAttribute ? document.querySelector('.pbn').getAttribute('href') : '';
+    r.vfOk = (LIST || []).length ? !!document.querySelector('#destacados .vf, #aliados .vf') || !document.querySelector('#destacados, #aliados') : true; r.vfFn = typeof vfB === 'function' && /verificado/.test(vfB()) && !/\bvf\b/.test(dirCard({ id: 'd-x', name: 'Sin selo', _dir: 1, segEs: '', td: false, acc: false })) && /class="vf"/.test(dirCard({ id: 'd-y', name: 'Aliado', _dir: 1, segEs: '', td: true }));
     r.hq = [...document.querySelectorAll('.hq a:not([hidden])')].length; r.h1 = (document.querySelector('h1') || {}).textContent || '';
     document.querySelector('#bnav [data-b=find]').click(); await W(450); r.find = document.activeElement && document.activeElement.id === 'q';
     document.getElementById('hacc').click(); await W(30); r.acc = !document.getElementById('more').hidden; document.getElementById('more').hidden = true;
@@ -348,6 +349,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     return r; });
   info(JSON.stringify(v2));
   check(v2.cat && v2.info.includes('ic-ev') && v2.info.includes('ic-tel') && v2.tel[0] === 'tel:911', 'início novo: Categorías principales e a linha com eventos e teléfonos útiles (911 para ligar)');
+  check(v2.vfOk && v2.vfFn, 'selo verificado: clientes Vitrix e aliados Tu Delivery têm; ficha simples sem relação não tem');
   check(v2.pb === '/guia/negocios/' && v2.hq >= 3 && /Santa Rita/.test(v2.h1), 'início novo: atalhos da busca, cartão Publicá tu negocio e o título da página (h1)');
   check(v2.find && v2.acc && v2.home, 'Buscar (barra de baixo) foca a busca, Mi cuenta (topo) abre o menu e Inicio (topo) volta ao começo');
   const v4 = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms)); const G0 = G.util, S0 = G.soc;

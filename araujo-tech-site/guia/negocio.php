@@ -129,13 +129,14 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 .hdr .bk{color:var(--deep,#4A0A80)!important;border-color:#E4DAF0!important;background:#F4F0F9!important}
 .hdr .lang{border-color:#E4DAF0!important;color:#5F566B!important}.hdr .lang button{color:#5F566B}.hdr .lang button.on,.hdr .lang button[aria-pressed=true]{background:var(--deep,#4A0A80)!important;color:#fff!important}
 .hdr .shb{border-color:#E4DAF0!important;color:var(--deep,#4A0A80)!important}
+.vf{display:inline-flex;vertical-align:middle;margin-left:8px;color:#C9A3FF}.vf svg{display:block}
 </style></head>
 <body>
 <header class="hdr"><div class="wrap nav"><a class="bk" href="/guia/" aria-label="Volver a la Guía"><?= $ic($I['back'], 18) ?><span>Volver a la Guía</span></a><span class="sp"></span><a class="gsr" href="/guia/" aria-label="Guía de Santa Rita" style="display:flex;align-items:center;gap:10px;text-decoration:none"><img class="gsl" src="/img/guia/guia-logo.webp" alt="Guía de Santa Rita" width="83" height="40" style="height:40px;width:auto;display:block"></a></div></header>
 <section class="hero"><?php if ($cover): ?><img class="cv" src="<?= $e($cover) ?>" alt="" onerror="this.remove()"><?php endif; ?>
 <div class="wrap">
 <span class="lg"><?php if ($logo): ?><img src="<?= $e($logo) ?>" alt="Logo de <?= $e($name) ?>"><?php else: ?><b><?= $e($ini($name)) ?></b><?php endif; ?></span>
-<div class="ht"><h1><?= $e($name) ?></h1><p><?= $e(implode(' · ', array_filter([$slogan ?: $seg, $city]))) ?></p>
+<div class="ht"><h1><?= $e($name) ?><span class="vf" title="Negocio verificado: la Guía confirmó los datos con el dueño" aria-label="Negocio verificado"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 1.5l2.6 1.9 3.2-.1 1 3 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3-3.2-.1L12 22.5l-2.6-1.9-3.2.1-1-3-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3 3.2.1z"/><path d="m8 12.2 2.7 2.7L16.2 9.4" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></h1><p><?= $e(implode(' · ', array_filter([$slogan ?: $seg, $city]))) ?></p>
 <div class="bdg"><?php if ($rv): ?><span class="bd rt" title="<?= $e($rv['n']) ?> opiniones"><?= $ic($I['star'], 13) ?><?= $e($nota) ?> <small>(<?= (int)$rv['n'] ?>)</small></span><?php endif; ?><?php if ($c['dest']): ?><span class="bd st"><?= $ic($I['seal'], 13) ?><span data-pt="Recomendado">Recomendado</span></span><?php endif; ?><?php if ($open): ?><span class="bd <?= $open['on'] ? 'on' : 'off' ?>"><span data-pt="<?= $open['on'] ? 'Aberto agora' . (!empty($open['until']) ? ' · até as ' . $e($open['until']) : '') : 'Fechado agora' ?>"><?= $open['on'] ? 'Abierto ahora' . (!empty($open['until']) ? ' · hasta las ' . $e($open['until']) : '') : 'Cerrado ahora' ?></span></span><?php endif; ?><?php if (!empty($st['delivery'])): ?><span class="bd dl"><?= $ic($I['bike'], 13) ?>Delivery</span><?php endif; ?><?php if (!empty($st['pickup'])): ?><span class="bd dl"><?= $ic($I['store'], 13) ?><span data-pt="Retirada">Retiro</span></span><?php endif; ?></div></div>
 </div></section>
 <main class="wrap">
