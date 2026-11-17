@@ -4758,11 +4758,11 @@ async function cgMeal(k,next){k=CG_TU[k]?k:cgTuNow();ui.cgMealK=k;if(!next)ui.cg
   const rr=(X,Y,w,h,r)=>{x.beginPath();x.roundRect?x.roundRect(X,Y,w,h,r):x.rect(X,Y,w,h)};
   const top=st?120:70;if(gl){const lw=st?300:260,lh=lw*gl.naturalHeight/gl.naturalWidth;x.drawImage(gl,72,top,lw,lh)}
   let y=top+(st?250:200);x.fillStyle='#FFC21A';x.font=font('800',st?44:38);x.fillText(T[L2][0],72,y);y+=st?110:92;
-  x.fillStyle='#fff';x.font=font('900',st?104:88);x.fillText(T[L2][1],72,y);y+=st?70:58;
+  x.fillStyle='#fff';let tz=st?104:88;x.font=font('900',tz);while(x.measureText(T[L2][1]).width>W-144&&tz>56){tz-=4;x.font=font('900',tz)}x.fillText(T[L2][1],72,y);y+=st?70:58;
   x.fillStyle='#E9DCFB';x.font=font('500',st?36:32);x.fillText(lang==='pt'?'Peça nestes lugares de Santa Rita:':'Pedí en estos lugares de Santa Rita:',72,y);y+=st?60:44;
-  const cols=2,gap=24,cw=(W-144-gap)/cols,rows=Math.ceil(pick.length/cols),areaH=(st?1520:1080)-y,ch=Math.min(st?300:250,Math.floor((areaH-gap*(rows-1))/rows));
-  pick.forEach((b,i)=>{const cx=72+(i%cols)*(cw+gap),cy=y+Math.floor(i/cols)*(ch+gap);x.fillStyle='#fff';rr(cx,cy,cw,ch,28);x.fill();
-   const ls=Math.min(ch-(st?90:80),st?150:120),lx=cx+(cw-ls)/2,ly=cy+18;const im=logos[i];
+  const cols=2,gap=24,cw=(W-144-gap)/cols,rows=Math.ceil(pick.length/cols),areaH=(st?1520:1080)-y,ch=Math.min(st?(rows<=2?400:300):(rows<=2?330:250),Math.floor((areaH-gap*(rows-1))/rows)),big=rows<=2;y+=Math.max(0,Math.floor((areaH-(rows*ch+gap*(rows-1)))/2));
+  pick.forEach((b,i)=>{const cx=(pick.length%2&&i===pick.length-1)?(W-cw)/2:72+(i%cols)*(cw+gap),cy=y+Math.floor(i/cols)*(ch+gap);x.fillStyle='#fff';rr(cx,cy,cw,ch,28);x.fill();
+   const ls=Math.min(ch-(st?90:80),st?(big?230:150):(big?190:120)),lx=cx+(cw-ls)/2,ly=cy+18;const im=logos[i];
    x.save();rr(lx,ly,ls,ls,24);x.clip();if(im){const s=Math.max(ls/im.naturalWidth,ls/im.naturalHeight),w=im.naturalWidth*s,h=im.naturalHeight*s;x.drawImage(im,lx+(ls-w)/2,ly+(ls-h)/2,w,h)}else{x.fillStyle='#EDE3FB';x.fillRect(lx,ly,ls,ls);x.fillStyle='#4A0A80';x.font=font('900',ls*.42);x.textAlign='center';x.fillText(b.n.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase(),lx+ls/2,ly+ls*.64);x.textAlign='left'}x.restore();
    x.fillStyle='#24093F';x.textAlign='center';let fs=st?36:32;x.font=font('800',fs);while(x.measureText(b.n).width>cw-30&&fs>22){fs-=2;x.font=font('800',fs)}let nm=b.n;while(x.measureText(nm).width>cw-30&&nm.length>4)nm=nm.slice(0,-2);if(nm!==b.n)nm=nm.trim()+'…';x.fillText(nm,cx+cw/2,cy+ch-(st?30:22));x.textAlign='left'});
   const fy=st?1590:1120;x.fillStyle='#FFC21A';const bw=W-144;rr(72,fy,bw,st?118:96,st?59:48);x.fill();x.fillStyle='#24093F';x.textAlign='center';x.font=font('900',st?54:46);x.fillText('guiadesantarita.com',W/2,fy+(st?78:64));
