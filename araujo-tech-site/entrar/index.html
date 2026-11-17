@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Entrar a mi panel | Vitrix</title>
+<meta name="description" content="Elegí tu negocio para entrar al panel de Vitrix: catálogo, horarios y pedidos.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/img/guia/favicon.png?v=1"><meta name="theme-color" content="#FFFFFF">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--purple:#8A12D6;--deep:#4A0A80;--lilac:#F3ECFB;--ink:#1A1222;--muted:#5F566B;--line:#E4DAF0;--bad:#B91C1C;--display:"Red Hat Display",system-ui,sans-serif;--text:"Red Hat Text",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0}body{font-family:var(--text);color:var(--ink);background:#FBF8FE;line-height:1.5}
+.wrap{max-width:620px;margin:0 auto;padding:0 16px 48px}
+.hdr{background:#fff;border-bottom:1px solid #ECE6F3}.nav{max-width:620px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:12px;height:62px}.nav .sp{flex:1}
+.bk{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-weight:700;font-size:14px;padding:7px 12px 7px 8px;border-radius:999px;border:1px solid var(--line);background:#F4F0F9;color:var(--deep)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}.lang button{font:inherit;font-size:13px;font-weight:700;border:0;background:none;color:var(--muted);padding:7px 12px;cursor:pointer}.lang button[aria-pressed=true]{background:var(--deep);color:#fff}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(28px,6vw,36px);line-height:1.1;margin:28px 0 6px}
+.lead{color:var(--muted);font-size:16px}
+.box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:20px}
+.box h2{font-family:var(--display);font-weight:900;font-size:19px;margin-bottom:10px}
+.inp{width:100%;font:inherit;font-size:16px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--ink)}.inp:focus{outline:2px solid var(--purple);outline-offset:1px}
+.list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.it{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;background:#fff}.it:hover,.it:focus-visible{border-color:var(--purple);outline:none}
+.lg{width:48px;height:48px;border-radius:12px;flex:none;overflow:hidden;display:grid;place-items:center;background:var(--lilac);color:var(--deep);font-family:var(--display);font-weight:900;border:1px solid var(--line)}.lg img{width:100%;height:100%;object-fit:cover}
+.it b{display:block;font-size:16px;line-height:1.2}.it small{color:var(--muted);font-size:13px}.it svg{margin-left:auto;color:var(--purple);flex:none}
+.hint{font-size:14px;color:var(--muted);margin-top:10px}
+.row{display:flex;gap:8px;margin-top:10px}.btn{font:inherit;font-weight:700;font-size:15px;padding:12px 16px;border-radius:12px;border:1px solid var(--deep);background:var(--deep);color:#fff;cursor:pointer;white-space:nowrap}
+.err{color:var(--bad);font-size:14px;margin-top:8px;display:none}
+.wa{display:inline-block;margin-top:6px;font-weight:700;color:var(--deep)}
+</style></head><body>
+<header class="hdr"><div class="nav"><a class="bk" href="https://guiadesantarita.com/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-t="back">Guía</span></a><span class="sp"></span><div class="lang"><button type="button" data-l="es">ES</button><button type="button" data-l="pt">PT</button></div></div></header>
+<main class="wrap">
+<h1 data-t="h">Entrar a mi panel</h1>
+<p class="lead" data-t="lead">Elegí tu negocio. Después entrás con el usuario y la contraseña que te dimos.</p>
+<section class="box">
+<h2 data-t="find">Buscá tu negocio</h2>
+<input class="inp" id="q" type="search" autocomplete="off" data-ph="ph" placeholder="Nombre del negocio">
+<div class="list" id="list"></div>
+<p class="hint" id="empty" style="display:none" data-t="none">No encontramos ese nombre en la lista.</p>
+</section>
+<section class="box">
+<h2 data-t="link_h">¿Tenés el link de tu catálogo?</h2>
+<p class="hint" style="margin-top:0" data-t="link_p">Pegalo acá, por ejemplo minegocio.araujotechsistemas.com</p>
+<div class="row"><input class="inp" id="u" type="text" inputmode="url" autocapitalize="off" autocomplete="off" placeholder="minegocio.araujotechsistemas.com"><button class="btn" id="go" type="button" data-t="go">Entrar</button></div>
+<p class="err" id="err" data-t="bad">Ese link no es de un catálogo Vitrix.</p>
+</section>
+<p class="hint" style="margin-top:22px"><span data-t="help">¿No sabés tu link o tu contraseña?</span><br><a class="wa" href="https://wa.me/595982086171" target="_blank" rel="noopener" data-t="wa">Escribinos por WhatsApp: 0982 086 171</a></p>
+</main>
+<script src="/clientes.js"></script>
+<script>
+(function(){
+const TX={es:{back:'Guía',h:'Entrar a mi panel',lead:'Elegí tu negocio. Después entrás con el usuario y la contraseña que te dimos.',find:'Buscá tu negocio',ph:'Nombre del negocio',none:'No encontramos ese nombre en la lista.',link_h:'¿Tenés el link de tu catálogo?',link_p:'Pegalo acá, por ejemplo minegocio.araujotechsistemas.com',go:'Entrar',bad:'Ese link no es de un catálogo Vitrix.',help:'¿No sabés tu link o tu contraseña?',wa:'Escribinos por WhatsApp: 0982 086 171',load:'Cargando negocios…'},
+pt:{back:'Guia',h:'Entrar no meu painel',lead:'Escolha o seu negócio. Depois entre com o usuário e a senha que passamos.',find:'Procure o seu negócio',ph:'Nome do negócio',none:'Não encontramos esse nome na lista.',link_h:'Tem o link do seu catálogo?',link_p:'Cole aqui, por exemplo meunegocio.araujotechsistemas.com',go:'Entrar',bad:'Esse link não é de um catálogo Vitrix.',help:'Não sabe o seu link ou a sua senha?',wa:'Fale com a gente no WhatsApp: 0982 086 171',load:'Carregando negócios…'}};
+let L='es';try{L=new URLSearchParams(location.search).get('l')==='pt'||localStorage.getItem('guia_lang')==='pt'?'pt':'es'}catch(e){}
+const $=s=>document.querySelector(s),esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+/* link do painel a partir do link do catálogo: nome.araujotechsistemas.com/ → /painel/ ; fogaomineiro.araujotechsistemas.com/loja/ → /loja/painel/ */
+function panelUrl(u){u=String(u||'').trim();if(!u)return '';if(!/^https?:\/\//i.test(u))u='https://'+u;let x;try{x=new URL(u)}catch(e){return ''}
+ if(!/(^|\.)araujotechsistemas\.com$/i.test(x.hostname))return '';const sg=x.pathname.split('/').filter(Boolean).filter(p=>p!=='painel'&&!/\.html?$/.test(p));
+ if(x.hostname.toLowerCase()==='araujotechsistemas.com'||x.hostname.toLowerCase()==='www.araujotechsistemas.com')return '';
+ return 'https://'+x.hostname.toLowerCase()+'/'+(sg[0]?encodeURIComponent(sg[0])+'/':'')+'painel/'}
+let LIST=[];
+const arrow='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+function draw(){const q=norm($('#q').value),l=LIST.filter(c=>!q||norm(c.name).includes(q));
+ $('#list').innerHTML=l.map(c=>{const ini=String(c.name).split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase();const seg=L==='pt'?(c.segPt||c.segEs):(c.segEs||c.segPt);
+  return `<a class="it" href="${esc(c.p)}"><span class="lg">${c.logo&&/^https:\/\//.test(c.logo)?`<img src="${esc(c.logo)}" alt="" loading="lazy">`:esc(ini)}</span><span><b>${esc(c.name)}</b>${seg?`<small>${esc(seg)}</small>`:''}</span>${arrow}</a>`}).join('');
+ $('#empty').style.display=LIST.length&&!l.length?'':'none'}
+function lang(){document.documentElement.lang=L;const T=TX[L];document.querySelectorAll('[data-t]').forEach(e=>{e.textContent=T[e.dataset.t]});$('#q').placeholder=T.ph;document.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===L));if(!LIST.length&&!window.__ld)$('#list').innerHTML=`<p class="hint">${T.load}</p>`;else draw()}
+document.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{L=b.dataset.l;lang()});
+$('#q').oninput=draw;
+const go=()=>{const p=panelUrl($('#u').value);$('#err').style.display=p?'none':'block';if(p)location.href=p};
+$('#go').onclick=go;$('#u').onkeydown=e=>{if(e.key==='Enter')go()};
+lang();
+if(window.AT_CLIENTES)AT_CLIENTES.load(l=>{window.__ld=1;LIST=(l||[]).filter(c=>c.sys==='catalogo').map(c=>Object.assign({},c,{p:panelUrl(c.url)})).filter(c=>c.p).sort((a,b)=>a.name.localeCompare(b.name));if(!LIST.length)$('#list').innerHTML='';draw()});
+})();
+</script>
+</body></html>

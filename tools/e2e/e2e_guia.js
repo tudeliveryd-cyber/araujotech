@@ -340,7 +340,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     goHome(); render(); document.querySelector('#atl [data-a="sal"]').click(); await W(40); r.sal = (document.querySelector('.spv h2') || {}).textContent || ''; r.salPub = [...document.querySelectorAll('.spv .pc b')].map(b => b.textContent);
     G.util = [{ c: 'salud', n: 'Hospital Distrital Santa Rita', a: 'Centro', tel: '0673 220000', h: '', map: '' }, { c: 'far', n: 'Farmavida Centro', a: '', tel: '', h: '', map: '' }]; render(); await W(20);
     r.dedup = [...document.querySelectorAll('.spv .pc b')].map(b => b.textContent);
-    goHome(); document.querySelector('#bnav [data-b="more"]').click(); await W(30); r.accTitle = document.getElementById('more-h').textContent; r.biz = !!document.querySelector('#more .acc-biz[href*="painel"]');
+    goHome(); document.querySelector('#bnav [data-b="more"]').click(); await W(30); r.accTitle = document.getElementById('more-h').textContent; r.biz = !!document.querySelector('#more .acc-biz[href*="/entrar/"]');
     document.getElementById('dkt').click(); await W(20); r.dark = document.documentElement.dataset.theme === 'dark'; document.getElementById('dkt').click(); await W(20); r.light = document.documentElement.dataset.theme !== 'dark';
     histAdd('pizza'); accFill(); r.hist = [...document.querySelectorAll('#sh-hist [data-hq]')].map(b => b.textContent); document.getElementById('more').hidden = true;
     G.soc = { wa: '595982086171', ig: 'https://instagram.com/guiadesantarita', fb: 'javascript:alert(1)' }; goHome(); render(); r.soc = [...document.querySelectorAll('#ftsoc a')].map(a => a.className);
