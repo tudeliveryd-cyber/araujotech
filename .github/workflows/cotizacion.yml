@@ -1,0 +1,32 @@
+name: Guía - cotización del día (BCP)
+
+# Busca a cotização de referência do Banco Central del Paraguay (dólar, real, peso argentino) e publica /sitio/cot.json
+# no site da Araújo Tech e na Guía. Só dado público. Se o BCP não responder, mantém o arquivo anterior.
+on:
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: 'Só mostrar o que o BCP devolve (sim/não)'
+        default: 'não'
+  schedule:
+    - cron: '23 11,15,19 * * 1-5'
+
+jobs:
+  cot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ver a página do BCP
+        if: ${{ inputs.probe == 'sim' }}
+        run: |
+          for u in "https://www.bcp.gov.py/webapps/web/cotizacion/monedas" "https://www.bcp.gov.py/webapps/web/cotizacion/referencial-fluctuante" "https://www.bcp.gov.py/webapps/web/cotizacion/monedas-mensual"; do
+            echo "=== $u"; curl -sSL --max-time 30 -A "Mozilla/5.0" "$u" -o p.html -w "HTTP %{http_code} %{size_download}\n" || true
+            python3 - <<'P'
+          import re
+          s=open('p.html',encoding='utf-8',errors='replace').read()
+          s=re.sub(r'<script.*?</script>|<style.*?</style>','',s,flags=re.S)
+          for k in ['Dólar','DOLAR','USD','Real','BRL','Peso','ARS','Fecha','fecha']:
+            for m in list(re.finditer(k,s))[:3]:
+              print(k,'::',re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' | ',s[max(0,m.start()-200):m.start()+400]))[:500])
+          P
+          done
