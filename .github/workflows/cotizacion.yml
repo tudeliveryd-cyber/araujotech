@@ -1,32 +1,33 @@
 name: Guía - cotización del día (BCP)
 
 # Busca a cotização de referência do Banco Central del Paraguay (dólar, real, peso argentino) e publica /sitio/cot.json
-# no site da Araújo Tech e na Guía. Só dado público. Se o BCP não responder, mantém o arquivo anterior.
+# na Guía (guiadesantarita.com). Só dado público. Se o BCP não responder ou a leitura falhar, não envia nada (fica o anterior).
 on:
   workflow_dispatch:
-    inputs:
-      probe:
-        description: 'Só mostrar o que o BCP devolve (sim/não)'
-        default: 'não'
   schedule:
-    - cron: '23 11,15,19 * * 1-5'
+    - cron: '23 11,14,17,20 * * 1-5'
+    - cron: '23 12 * * 6'
 
 jobs:
   cot:
     runs-on: ubuntu-latest
+    env:
+      GUIA_FTP_SERVER: ${{ secrets.GUIA_FTP_SERVER }}
+      GUIA_FTP_USERNAME: ${{ secrets.GUIA_FTP_USERNAME }}
+      GUIA_FTP_PASSWORD: ${{ secrets.GUIA_FTP_PASSWORD }}
+      GUIA_FTP_FINGERPRINT: ${{ secrets.GUIA_FTP_FINGERPRINT }}
     steps:
       - uses: actions/checkout@v4
-      - name: Ver a página do BCP
-        if: ${{ inputs.probe == 'sim' }}
+      - name: Ler a cotização do BCP
         run: |
-          for u in "https://www.bcp.gov.py/webapps/web/cotizacion/monedas" "https://www.bcp.gov.py/webapps/web/cotizacion/referencial-fluctuante" "https://www.bcp.gov.py/webapps/web/cotizacion/monedas-mensual"; do
-            echo "=== $u"; curl -sSL --max-time 30 -A "Mozilla/5.0" "$u" -o p.html -w "HTTP %{http_code} %{size_download}\n" || true
-            python3 - <<'P'
-          import re
-          s=open('p.html',encoding='utf-8',errors='replace').read()
-          s=re.sub(r'<script.*?</script>|<style.*?</style>','',s,flags=re.S)
-          for k in ['Dólar','DOLAR','USD','Real','BRL','Peso','ARS','Fecha','fecha']:
-            for m in list(re.finditer(k,s))[:3]:
-              print(k,'::',re.sub(r'\s+',' ',re.sub(r'<[^>]+>',' | ',s[max(0,m.start()-200):m.start()+400]))[:500])
-          P
-          done
+          curl -sSL --retry 3 --max-time 40 -A "Mozilla/5.0" "https://www.bcp.gov.py/webapps/web/cotizacion/monedas" -o bcp.html
+          python3 tools/cot_bcp.py bcp.html out/sitio/cot.json
+          cat out/sitio/cot.json
+      - name: Enviar para guiadesantarita.com
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          export LFTP_PASSWORD="$GUIA_FTP_PASSWORD"; SRV="${GUIA_FTP_SERVER:-ftp.guiadesantarita.com}"
+          PIN=""; [ -n "$GUIA_FTP_FINGERPRINT" ] && PIN="set ssl:verify-certificate/$GUIA_FTP_FINGERPRINT no;"
+          lftp -e "set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate yes; set ssl:verify-certificate/CC:40:F0:6A:08:0C:63:04:01:05:A9:20:7B:23:53:CA:60:35:A7:05 no; $PIN set ftp:passive-mode true; set net:max-retries 3; set net:timeout 30; open --env-password -u $GUIA_FTP_USERNAME ftp://$SRV; put -O sitio out/sitio/cot.json; bye"
+          sleep 3; curl -s "https://guiadesantarita.com/sitio/cot.json"; echo
