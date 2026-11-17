@@ -16,6 +16,14 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(await a.locator('[data-act="gusite"]').count() > 0, 'o painel tem o cartão Guía Vitrix com Administrar');
   await a.act('gusite'); await a.w(2000);
   check(await a.evaluate(() => !!ui.gu && ui.gu.ads.length === 0 && ui.gu.util.length === 0), 'abre vazio (sem banners e sem lugares)');
+  { const GG = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const sh = document.querySelector('.sheet[data-k="gu"]'); const r = {};
+      r.tabs = [...sh.querySelectorAll('.gg-bar [data-gg]')].map(b => b.dataset.gg).join(','); r.n = sh.querySelectorAll('.card').length; r.tagged = sh.querySelectorAll('.card[data-gg]').length; r.other = sh.querySelectorAll('.card[data-gg="other"]').length;
+      sh.querySelector('.gg-bar [data-gg="pub"]').click(); await W(50); r.pub = [...sh.querySelectorAll('.card[data-gg]')].filter(c => !c.hidden).map(c => c.dataset.gg).join(',');
+      guSheet(); await W(50); const sh2 = document.querySelector('.sheet[data-k="gu"]'); r.keep = (sh2.querySelector('.gg-bar [aria-selected="true"]') || {}).dataset.gg; r.bars = sh2.querySelectorAll('.gg-bar').length;
+      sh2.querySelector('.gg-bar [data-gg="all"]').click(); await W(50); r.all = [...sh2.querySelectorAll('.card[data-gg]')].filter(c => !c.hidden).length; return r; });
+    info(JSON.stringify(GG));
+    check(GG.tabs === 'all,res,pub,com,ciu,con' && GG.tagged === GG.n && GG.other === 0 && GG.n >= 15, 'painel da Guía organizado por áreas (Resumen, Publicidad, Comercial, Ciudad, Contenido); todos os cartões continuam lá');
+    check(GG.pub === 'pub' && GG.keep === 'pub' && GG.bars === 1 && GG.all === GG.n, 'filtrar por área mostra só aquela área, continua ao redesenhar, e "Todo" mostra tudo de novo'); }
 
   sec('B. Banner pago com imagem, link e datas');
   await a.act('guadd', '[data-k="ads"]'); await a.w(300);
