@@ -60,7 +60,13 @@ function cat_meta($html, $s, $host) {
 function cat_site_html($slug) {
   $cache = sys_get_temp_dir() . '/at_subsite_' . md5($slug) . '.html';
   if (is_file($cache) && time() - filemtime($cache) < 300) return (string)@file_get_contents($cache);
-  $html = (string)cat_http('https://araujotechsistemas.com/sitio/index.php?s=' . rawurlencode($slug));
+  $r = cat_http('https://araujotechsistemas.com/sitio/index.php?s=' . rawurlencode($slug));
+  if ($r === null) $r = cat_http('https://araujotechsistemas.com/sitio/index.php?s=' . rawurlencode($slug)); // demorou ou falhou: tenta mais uma vez
+  if ($r === null) { // ainda falhou: usa a última cópia boa (mesmo velha) e não guarda o erro por 5 minutos
+    $old = is_file($cache) ? (string)@file_get_contents($cache) : '';
+    return strpos($old, 'property="og:title"') !== false ? $old : '';
+  }
+  $html = (string)$r;
   if (strpos($html, 'property="og:title"') === false) $html = '';            // não existe site com esse nome
   else {
     $url = 'https://' . $slug . '.araujotechsistemas.com/';
