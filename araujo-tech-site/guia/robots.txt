@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
+Disallow: /revision/
 Sitemap: https://guiadesantarita.com/sitemap.xml

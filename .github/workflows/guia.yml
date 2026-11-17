@@ -5,6 +5,10 @@ name: Publicar Guía de Santa Rita
 # Precisa dos secrets GUIA_FTP_USERNAME e GUIA_FTP_PASSWORD (conta FTP criada no cPanel de guiadesantarita.com).
 # GUIA_FTP_SERVER é opcional (se faltar, usa ftp.guiadesantarita.com).
 # GUIA_FTP_FINGERPRINT é opcional: a impressão SHA1 do certificado do servidor, se ele não bater com o nome.
+#
+# VERSÃO DE REVISÃO: cada push publica só a página de revisão em https://guiadesantarita.com/revision/
+# (noindex, não conta visitas nem cliques). O site de verdade só muda quando alguém roda este workflow
+# à mão com destino=producao, depois que a revisão foi aprovada.
 on:
   push:
     branches: [main]
@@ -21,6 +25,10 @@ on:
       - 'tools/guia_htaccess.txt'
       - '.github/workflows/guia.yml'
   workflow_dispatch:
+    inputs:
+      destino:
+        description: 'revision (só a página de revisão) ou producao (o site de verdade, depois de aprovado)'
+        default: 'revision'
 
 concurrency:
   group: guia-deploy
@@ -34,6 +42,7 @@ jobs:
       GUIA_FTP_USERNAME: ${{ secrets.GUIA_FTP_USERNAME }}
       GUIA_FTP_PASSWORD: ${{ secrets.GUIA_FTP_PASSWORD }}
       GUIA_FTP_FINGERPRINT: ${{ secrets.GUIA_FTP_FINGERPRINT }}
+      DESTINO: ${{ inputs.destino || 'revision' }}
     steps:
       - name: Aguardando os dados do FTP da Guía
         if: env.GUIA_FTP_USERNAME == '' || env.GUIA_FTP_PASSWORD == ''
@@ -61,6 +70,20 @@ jobs:
           cp $S/guia/google*.html $D/ 2>/dev/null || true # verificação do Google Search Console (na raiz do domínio)
           # Nada de contagens, painel ou dados aqui: isso fica só no servidor principal.
           find $D -type f | wc -l; du -sh $D
+          # Página de revisão: a mesma portada, sem indexar, sem contar visitas, com o aviso "Versión de revisión".
+          R=rev/revision; rm -rf rev; mkdir -p $R
+          python3 - $S/guia/index.html $R/index.html <<'PY'
+          import sys
+          s=open(sys.argv[1],encoding='utf8').read()
+          assert s.count('<head>')==1 and s.count('</body>')==1
+          s=s.replace('<head>','<head><meta name="robots" content="noindex,nofollow"><script>window.GSR_REV=1</script>',1)
+          bar=('<div id="gsr-rev" role="status" style="position:fixed;left:50%;transform:translateX(-50%);top:8px;z-index:99999;'
+               'background:#FFC21A;color:#24093F;font:700 13px/1.2 system-ui,sans-serif;padding:7px 14px;border-radius:999px;'
+               'box-shadow:0 4px 14px -6px rgba(0,0,0,.4);pointer-events:none">Versión de revisión · todavía no publicada</div>')
+          s=s.replace('</body>',bar+'</body>',1)
+          open(sys.argv[2],'w',encoding='utf8').write(s)
+          PY
+          echo "Destino: $DESTINO"
       - name: Certificado do servidor FTP
         if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
         run: |
@@ -76,9 +99,14 @@ jobs:
           L="set ftp:ssl-force true; set ftp:ssl-protect-data true; set ssl:verify-certificate yes; set ssl:verify-certificate/CC:40:F0:6A:08:0C:63:04:01:05:A9:20:7B:23:53:CA:60:35:A7:05 no; $PIN set ftp:passive-mode true; set net:max-retries 3; set net:timeout 30; open --env-password -u $GUIA_FTP_USERNAME ftp://$SRV"
           echo "L=$L" >> $GITHUB_ENV
           # Sem --delete: nada que já está no servidor é apagado.
-          lftp -e "$L; mirror --reverse --verbose --only-newer --parallel=3 ./out/ ./; bye"
+          lftp -e "$L; mirror --reverse --verbose --parallel=1 ./rev/ ./; bye"
+          if [ "$DESTINO" = producao ]; then
+            lftp -e "$L; mirror --reverse --verbose --only-newer --parallel=3 ./out/ ./; bye"
+          else
+            echo "Só a revisão foi publicada. O site de verdade continua como estava."
+          fi
       - name: Regras de endereço (.htaccess)
-        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
+        if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != '' && env.DESTINO == 'producao'
         run: |
           export LFTP_PASSWORD="$GUIA_FTP_PASSWORD"
           rm -f ht_old
@@ -98,6 +126,8 @@ jobs:
         if: env.GUIA_FTP_USERNAME != '' && env.GUIA_FTP_PASSWORD != ''
         run: |
           sleep 5; ok=1
+          c=$(curl -s -o /tmp/rev.html -w '%{http_code}' "https://guiadesantarita.com/revision/"); echo "$c /revision/"
+          [ "$c" = 200 ] && grep -q 'Versión de revisión' /tmp/rev.html && grep -q 'noindex' /tmp/rev.html && echo "revisão OK" || { echo "a revisão não respondeu"; ok=0; }
           for u in / /googled512b2ecce5b9097.html /negocios/ /sobre/ /terminos/ /manifest.webmanifest /sitemap.xml /guia/qr.js /img/guia/favicon.png; do
             c=$(curl -s -o /dev/null -w '%{http_code}' "https://guiadesantarita.com$u"); echo "$c $u"; [ "$c" = 200 ] || ok=0
           done

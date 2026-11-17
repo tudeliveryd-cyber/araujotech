@@ -945,7 +945,7 @@ function evHTML(){const t=TX[L],all=(G.ev||[]).concat(ferNext().map(x=>Object.as
 /* números da Guía para o painel (sem dados de quem visita) */
 /* domínio próprio guiadesantarita.com: endereços curtos (/negocio em vez de /guia/negocio) */
 const GB=/(^|\.)guiadesantarita\.com$/.test(location.hostname)?'/':'/guia/';if(GB==='/')document.querySelectorAll('a[href^="/guia/"]').forEach(a=>{const h=a.getAttribute('href');if(!/\.(png|jpe?g|webmanifest)$/.test(h))a.setAttribute('href',h.replace(/^\/guia\//,'/'))});
-const HS=new Set();const hit=(k,id)=>{try{if(navigator.webdriver)return;const key=k+(id||'');if(k!=='c'&&HS.has(key))return;HS.add(key);const u=(location.hostname.endsWith('guiadesantarita.com')?'https://araujotechsistemas.com':'')+'/sitio/guia_hit.php?t='+k+(id?'&id='+encodeURIComponent(id):'');if(navigator.sendBeacon)navigator.sendBeacon(u);else fetch(u,{method:'POST',keepalive:true})}catch(e){}};
+const HS=new Set();const hit=(k,id)=>{try{if(navigator.webdriver||window.GSR_REV)return;const key=k+(id||'');if(k!=='c'&&HS.has(key))return;HS.add(key);const u=(location.hostname.endsWith('guiadesantarita.com')?'https://araujotechsistemas.com':'')+'/sitio/guia_hit.php?t='+k+(id?'&id='+encodeURIComponent(id):'');if(navigator.sendBeacon)navigator.sendBeacon(u);else fetch(u,{method:'POST',keepalive:true})}catch(e){}};
 const BD={cde:{es:'Ciudad del Este',pt:'Ciudad del Este'},asu:{es:'Asunción',pt:'Assunção'},enc:{es:'Encarnación',pt:'Encarnación'}};let BUSD=null;
 /* ônibus conferidos em fontes públicas (14/11/2026): Terminal de Asunción (eba.asuncion.gov.py/itinerarios) e ventanita.com.py (Terminal de Encarnación, NSE "pasa x Santa Rita") */
 const BUSK=[
