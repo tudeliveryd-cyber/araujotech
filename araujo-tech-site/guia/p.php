@@ -21,7 +21,7 @@ $EK = ['rel' => 'Religioso', 'dep' => 'Deportivo', 'cul' => 'Cultural', 'com' =>
 $MES = ['', 'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 $fd = function ($d) use ($MES) { return preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', (string)$d, $m) ? (int)$m[3] . ' ' . $MES[(int)$m[2]] . ' ' . $m[1] : ''; };
 $wa = function ($n) { $n = preg_replace('/\D/', '', (string)$n); if ($n !== '' && $n[0] === '0') $n = '595' . substr($n, 1); elseif ($n !== '' && strpos($n, '595') !== 0 && strlen($n) <= 10) $n = '595' . $n; return $n; };
-$img = 'https://araujotechsistemas.com/img/guia/og-guia.jpg?v=2';
+$img = 'https://araujotechsistemas.com/img/guia/og-guia.jpg?v=3';
 if (!$x) {
   http_response_code(410);
   $title = 'Esta publicación ya no está disponible'; $desc = 'Venció o fue retirada. Mirá lo que hay hoy en la Guía de Santa Rita.'; $tags = []; $body = ''; $btns = ''; $ld = '';
