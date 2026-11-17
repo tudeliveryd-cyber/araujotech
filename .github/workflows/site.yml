@@ -102,7 +102,7 @@ jobs:
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
           RewriteRule ^(negocios|llegar|conoce|terminos|sobre)/?$ /guia/$1/ [L]
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
-          RewriteRule ^(vacante|aviso|evento|lugar)/([A-Za-z0-9._-]{2,90})/?$ /guia/p.php?k=$1&id=$2 [L,QSA]
+          RewriteRule ^(vacante|aviso|evento|lugar|negocio)/([A-Za-z0-9._-]{2,90})/?$ /guia/p.php?k=$1&id=$2 [L,QSA]
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
           RewriteRule ^(icon-(180|192|512)\.png|robots\.txt)$ /guia/$1 [L]
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
@@ -119,7 +119,7 @@ jobs:
           RewriteRule ^gu(i|í|%C3%AD)a/?$ /guia/ [R=301,NC,L]
           # páginas próprias de vaga, aviso e evento da Guía no domínio principal
           RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
-          RewriteRule ^guia/(vacante|aviso|evento|lugar)/([A-Za-z0-9._-]{2,90})/?$ /guia/p.php?k=$1&id=$2 [L,QSA]
+          RewriteRule ^guia/(vacante|aviso|evento|lugar|negocio)/([A-Za-z0-9._-]{2,90})/?$ /guia/p.php?k=$1&id=$2 [L,QSA]
           # catálogo pelo domínio principal (o iPhone dá "Misdirected Request" ao trocar para o subdomínio)
           RewriteCond %{HTTP_HOST} ^(www\.)?araujotechsistemas\.com$ [NC]
           RewriteRule ^loja/([a-z0-9][a-z0-9-]+)$ /loja/$1/ [R=301,L]

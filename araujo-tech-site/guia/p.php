@@ -1,14 +1,15 @@
 <?php
 @ini_set('display_errors', '0'); error_reporting(0);
-// Página própria de uma vaga, um aviso ou um evento da Guía: /vacante/<id>, /aviso/<id>, /evento/<id>.
+// Página própria de uma vaga, um aviso, um evento, um lugar público ou um negócio sem catálogo da Guía:
+// /vacante/<id>, /aviso/<id>, /evento/<id>, /lugar/<nome>, /negocio/<nome>.
 // Serve para compartilhar no WhatsApp com prévia (título e foto) e para o Google (JobPosting / Event).
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: public, max-age=300');
 require __DIR__ . '/../sitio/prods_lib.php';
 require __DIR__ . '/../sitio/guia_lib.php';
 $k = (string)($_GET['k'] ?? ''); $rid = (string)($_GET['id'] ?? '');
-$id = $k === 'lugar' ? $rid : str_replace('.', ':', $rid);
-$x = (in_array($k, ['vacante', 'aviso', 'evento', 'lugar'], true) && preg_match('/^[A-Za-z0-9:_-]{2,90}$/', $id)) ? guia_item($k, $id) : null;
+$id = ($k === 'lugar' || $k === 'negocio') ? $rid : str_replace('.', ':', $rid);
+$x = (in_array($k, ['vacante', 'aviso', 'evento', 'lugar', 'negocio'], true) && preg_match('/^[A-Za-z0-9:_-]{2,90}$/', $id)) ? guia_item($k, $id) : null;
 $e = function ($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); };
 $host = preg_match('/(^|\.)guiadesantarita\.com$/i', (string)($_SERVER['HTTP_HOST'] ?? '')) ? 'https://guiadesantarita.com' : 'https://araujotechsistemas.com/guia';
 $G = $host . '/';
@@ -45,6 +46,31 @@ if (!$x) {
     if ($x['ph'] !== '') $img = 'https://araujotechsistemas.com' . $x['ph'];
     $btns = '<a class="btn pri" href="' . $e('https://wa.me/' . $wa($x['wa']) . '?text=' . rawurlencode('Hola, vi tu aviso "' . $x['t'] . '" en la Guía de Santa Rita y quiero más información.')) . '" target="_blank" rel="noopener">Consultar por WhatsApp</a>';
     $ld = ''; $kind = $CK[$x['k']] ?? 'Aviso';
+  } elseif ($k === 'negocio') {
+    $NG = ['food' => 'Comida y bebidas', 'shop' => 'Tiendas y moda', 'health' => 'Salud y belleza', 'home' => 'Hogar y construcción', 'car' => 'Autos, motos y náutica', 'serv' => 'Servicios'];
+    foreach (guia_cat(guia_doc()['gcat'] ?? [])['neg'] as $cg) { if ($cg['n']['es'] !== '') $NG[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '' && $ct['k'] === ($x['sub'] ?? '')) $NG['_sub'] = $ct['n']['es']; }
+    $kind = $NG['_sub'] ?? ($NG[$x['g']] ?? 'Negocio');
+    $x['t'] = $x['n'];
+    $title = $x['n'] . ' — Santa Rita';
+    $DN = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; $hrsL = [];
+    if (is_array($x['dy'] ?? null)) foreach ([1, 2, 3, 4, 5, 6, 0] as $di) { $dd = $x['dy'][$di] ?? null; if (!is_array($dd)) continue; $rg = []; foreach (['a', 'b'] as $kk) if (!empty($dd['on']) && !empty($dd[$kk][0]) && !empty($dd[$kk][1])) $rg[] = $dd[$kk][0] . '–' . $dd[$kk][1]; $hrsL[] = [$DN[$di], $rg ? implode(' · ', $rg) : 'Cerrado', $di, $rg]; }
+    $desc = mb_substr(trim(($x['d'] ? $x['d'] . '. ' : '') . $kind . ' en Santa Rita, Alto Paraná.' . ($x['a'] ? ' ' . $x['a'] . '.' : '') . ($x['hrs'] ? ' Horario: ' . $x['hrs'] . '.' : '')), 0, 160);
+    $tags = array_filter([!empty($x['td']) ? 'Aliado Tu Delivery' : '', $x['hrs'], $x['a']]);
+    $body = (string)($x['d'] ?? '');
+    $mq = preg_match('#^https://#', (string)$x['map']) ? $x['map'] : 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($x['n'] . ($x['a'] ? ' ' . $x['a'] : '') . ' Santa Rita, Alto Paraná, Paraguay');
+    $tel = preg_replace('/[^\d+]/', '', (string)$x['tel']); $wn = $x['wa'] ? $wa($x['wa']) : '';
+    $wmsg = !empty($x['td']) ? 'Hola, quiero hacer un pedido. Te encontré en la Guía de Santa Rita.' : 'Hola, te encontré en la Guía de Santa Rita y quiero más información.';
+    $ico = function ($p) { return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p . '</svg>'; };
+    $btns = ($wn ? '<a class="btn pri" href="' . $e('https://wa.me/' . $wn . '?text=' . rawurlencode($wmsg)) . '" target="_blank" rel="noopener">' . $ico('<path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/>') . (!empty($x['td']) ? 'Pedir por WhatsApp' : 'WhatsApp') . '</a>' : '')
+      . ($tel ? '<a class="btn" href="tel:' . $e($tel) . '">' . $ico('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>') . 'Llamar</a>' : '')
+      . '<a class="btn" href="' . $e($mq) . '" target="_blank" rel="noopener">' . $ico('<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>') . 'Cómo llegar</a>'
+      . ($x['mu'] ? '<a class="btn" href="' . $e($x['mu']) . '" target="_blank" rel="noopener">' . $ico('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h6M8 11h6"/>') . (($x['mt'] ?? '') === 'cat' ? 'Ver catálogo' : 'Ver menú') . '</a>' : '')
+      . (($x['ig'] ?? '') ? '<a class="btn" href="' . $e('https://instagram.com/' . $x['ig']) . '" target="_blank" rel="noopener">' . $ico('<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8"/>') . 'Instagram</a>' : '')
+      . (preg_match('#^https://#', (string)($x['web'] ?? '')) ? '<a class="btn" href="' . $e($x['web']) . '" target="_blank" rel="noopener">Sitio web</a>' : '');
+    $oh = []; foreach ($hrsL as $h) foreach ($h[3] as $r) { [$o, $c] = explode('–', $r); $oh[] = ['@type' => 'OpeningHoursSpecification', 'dayOfWeek' => 'https://schema.org/' . ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][$h[2]], 'opens' => $o, 'closes' => $c]; }
+    $ld = json_encode(array_filter(['@context' => 'https://schema.org', '@type' => $x['g'] === 'food' ? 'FoodEstablishment' : 'LocalBusiness', 'name' => $x['n'], 'description' => $x['d'] ?: null, 'url' => $self, 'telephone' => $x['tel'] ?: ($wn ? '+' . $wn : null), 'image' => ($x['ph'] ?? '') ? 'https://guiadesantarita.com' . $x['ph'] : ((($x['lg'] ?? '') !== '') ? 'https://guiadesantarita.com' . $x['lg'] : null),
+      'address' => ['@type' => 'PostalAddress', 'streetAddress' => $x['a'] ?: null, 'addressLocality' => 'Santa Rita', 'addressRegion' => 'Alto Paraná', 'addressCountry' => 'PY'], 'hasMap' => $mq, 'openingHoursSpecification' => $oh ?: null, 'sameAs' => ($x['ig'] ?? '') ? ['https://instagram.com/' . $x['ig']] : null]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (($x['ph'] ?? '') !== '') $img = 'https://guiadesantarita.com' . $x['ph']; elseif (($x['lg'] ?? '') !== '') $img = 'https://guiadesantarita.com' . $x['lg'];
   } elseif ($k === 'lugar') {
     $PC = ['gob' => 'Gobierno y trámites', 'doc' => 'Documentos', 'salud' => 'Salud', 'far' => 'Farmacia', 'seg' => 'Seguridad', 'ocio' => 'Plazas y recreación', 'trans' => 'Transporte', 'serv' => 'Servicios públicos', 'edu' => 'Educación', 'gua' => 'Guardería y jardín', 'escpub' => 'Escuela o colegio público', 'escpri' => 'Colegio privado', 'unipub' => 'Universidad pública', 'unipri' => 'Universidad privada', 'inst' => 'Instituto, cursos e idiomas', 'igl' => 'Iglesia', 'com' => 'Comunidad y ONGs', 'dep' => 'Deportes y clubes', 'ani' => 'Animales y adopción', 'fin' => 'Bancos y finanzas'];
     foreach (guia_cat(guia_doc()['gcat'] ?? [])['pub'] as $cg) { if (!$cg['tabs'] && $cg['n']['es'] !== '') $PC[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '') $PC[$ct['k']] = $ct['n']['es']; } // nomes das pastas e abas do painel
@@ -71,7 +97,7 @@ if (!$x) {
     $kind = 'Agenda de Santa Rita';
   }
 }
-$back = $k === 'vacante' ? $G . '#empleos' : ($k === 'aviso' ? $G . '#clasificados' : ($k === 'lugar' ? $G . '#util' : $G . '#agenda'));
+$back = $k === 'vacante' ? $G . '#empleos' : ($k === 'aviso' ? $G . '#clasificados' : ($k === 'lugar' ? $G . '#util' : ($k === 'negocio' ? $G . '#negocios' : $G . '#agenda')));
 ?><!doctype html>
 <html lang="es"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -100,6 +126,12 @@ h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,5vw,36px);lin
 .act{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:700;font-size:15px;text-decoration:none;border-radius:14px;padding:12px 16px;border:1px solid var(--line);background:#fff;color:var(--deep);cursor:pointer}
 .btn.pri{background:#1FA855;border-color:#1FA855;color:#fff}
+.nlg{width:72px;height:72px;border-radius:18px;object-fit:cover;border:1px solid var(--line);background:#fff;display:block;margin-bottom:12px}
+.box .ph+.in .nlg{margin-top:-58px;position:relative;box-shadow:0 0 0 4px #fff}
+.sh2{font-family:var(--display);font-weight:900;font-size:19px;margin-top:22px}
+.hrs{list-style:none;padding:0;margin:10px 0 0;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.hrs li{display:flex;justify-content:space-between;gap:12px;padding:9px 14px;border-top:1px solid #F0EAF7;font-size:15px}.hrs li:first-child{border-top:0}
+.hrs li b{font-weight:600;color:var(--muted);text-align:right}.hrs li.hoy{background:var(--lilac)}.hrs li.hoy b{color:var(--deep);font-weight:800}
 .nt{margin-top:16px;font-size:13.5px;color:var(--muted)}
 .empty{text-align:center;padding:34px 22px}.empty h1{font-size:26px}.empty p{margin-top:10px;color:var(--muted)}
 .btn:focus-visible,.bk:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
@@ -111,13 +143,15 @@ h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,5vw,36px);lin
 <?php if (!$x): ?>
 <div class="box empty"><h1>Esta publicación ya no está disponible</h1><p>Venció o fue retirada por quien la publicó.</p><div class="act" style="justify-content:center"><a class="btn pri" style="background:var(--deep);border-color:var(--deep)" href="<?= $e($G) ?>">Ver lo que hay hoy en la Guía</a></div></div>
 <?php else: ?>
-<article class="box"><?php if (($k === 'aviso' || $k === 'lugar') && ($x['ph'] ?? '') !== ''): ?><img class="ph" src="<?= $e($x['ph']) ?>" alt=""><?php endif; ?><div class="in">
+<article class="box"><?php if (($k === 'aviso' || $k === 'lugar' || $k === 'negocio') && ($x['ph'] ?? '') !== ''): ?><img class="ph" src="<?= $e($x['ph']) ?>" alt="<?= $e($k === 'negocio' ? 'Foto de ' . $x['n'] : '') ?>"><?php endif; ?><div class="in">
+<?php if ($k === 'negocio' && ($x['lg'] ?? '') !== ''): ?><img class="nlg" src="<?= $e($x['lg']) ?>" alt="Logo de <?= $e($x['n']) ?>" width="72" height="72"><?php endif; ?>
 <p class="kd"><?= $e($kind) ?></p><h1><?= $e($x['t']) ?></h1>
 <?php if ($k === 'vacante' && ($x['co']['n'] ?? '') !== ''): ?><p class="co"><?= $e($x['co']['n']) ?></p><?php endif; ?>
 <?php if ($tags): ?><div class="tg"><?php foreach ($tags as $t): ?><span><?= $e($t) ?></span><?php endforeach; ?></div><?php endif; ?>
 <?php if ($body !== ''): ?><p class="tx"><?= $e($body) ?></p><?php endif; ?>
+<?php if ($k === 'negocio' && !empty($hrsL)): ?><h2 class="sh2">Horarios</h2><ul class="hrs"><?php foreach ($hrsL as $h): ?><li<?= $h[2] === (int)(new DateTime('now', new DateTimeZone('America/Asuncion')))->format('w') ? ' class="hoy"' : '' ?>><span><?= $e($h[0]) ?></span><b><?= $e($h[1]) ?></b></li><?php endforeach; ?></ul><?php endif; ?>
 <div class="act"><?= $btns ?><button class="btn" type="button" id="sh">Compartir</button><a class="btn" href="<?= $e($back) ?>">Ver más en la Guía</a></div>
-<p class="nt"><?= $k === 'vacante' ? 'La Guía no garantiza la contratación: el contacto es directo con quien publica.' : ($k === 'aviso' ? 'Nunca pagues por adelantado sin ver el producto o el inmueble.' : ($k === 'lugar' ? 'Datos de fuentes públicas' . (($x['src'] ?? '') ? ' (' . $e($x['src']) . ')' : '') . '. ¿Ves algo mal? Escribinos por WhatsApp al 0982 086 171.' : 'Confirmá horario y lugar con los organizadores.')) ?></p>
+<p class="nt"><?= $k === 'vacante' ? 'La Guía no garantiza la contratación: el contacto es directo con quien publica.' : ($k === 'aviso' ? 'Nunca pagues por adelantado sin ver el producto o el inmueble.' : ($k === 'negocio' ? '¿Es tu negocio? Para actualizar los datos o tener tu catálogo con pedidos, escribinos por WhatsApp al 0982 086 171.' : ($k === 'lugar' ? 'Datos de fuentes públicas' . (($x['src'] ?? '') ? ' (' . $e($x['src']) . ')' : '') . '. ¿Ves algo mal? Escribinos por WhatsApp al 0982 086 171.' : 'Confirmá horario y lugar con los organizadores.'))) ?></p>
 </div></article>
 <?php endif; ?>
 </main>

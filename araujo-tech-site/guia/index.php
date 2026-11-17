@@ -17,9 +17,12 @@ try {
       $li .= '<li><a href="/guia/' . $e($c['id']) . '">' . $e($c['name']) . '</a>' . ($c['segEs'] || $c['city'] ? ' · ' . $e(trim($c['segEs'] . ($c['city'] ? ' · ' . $c['city'] : ''), ' ·')) : '') . '</li>';
       $ld[] = ['@type' => 'ListItem', 'position' => $i + 1, 'url' => $u, 'name' => $c['name']];
     }
+    try { foreach (guia_pub()['dir'] as $x) if (!empty($x['sl'])) { $li .= '<li><a href="/guia/negocio/' . $e($x['sl']) . '">' . $e($x['n']) . '</a>' . ($x['d'] ? ' · ' . $e($x['d']) : '') . '</li>'; $ld[] = ['@type' => 'ListItem', 'position' => count($ld) + 1, 'url' => 'https://guiadesantarita.com/negocio/' . $x['sl'], 'name' => $x['n']]; } } catch (Throwable $e2) {}
     $seo = '<nav class="seo-l" aria-label="Negocios de la Guía"><p class="empty" data-t="loading"></p><ul>' . $li . '</ul></nav>';
     $html = str_replace('<div id="list"><p class="empty" data-t="loading"></p></div>', '<div id="list">' . $seo . '</div>', $html);
     $j = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => 'Guía de Santa Rita · Negocios', 'itemListElement' => $ld];
+    $ws = ['@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => 'Guía de Santa Rita', 'url' => 'https://guiadesantarita.com/', 'inLanguage' => ['es', 'pt'], 'publisher' => ['@type' => 'Organization', 'name' => 'Guía de Santa Rita', 'url' => 'https://guiadesantarita.com/', 'logo' => 'https://guiadesantarita.com/guia/icon-512.png']];
+    $html = str_replace('</head>', '<script type="application/ld+json">' . str_replace('</', '<\/', json_encode($ws, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) . "</script>\n</head>", $html);
     $html = str_replace('</head>', '<script type="application/ld+json">' . str_replace('</', '<\/', json_encode($j, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) . "</script>\n<style>.seo-l ul{list-style:none;padding:0;margin:0 0 30px;display:grid;gap:8px;font-size:15px;color:var(--muted)}.seo-l a{color:var(--deep);font-weight:700}</style>\n</head>", $html);
   }
 } catch (Throwable $e) {}

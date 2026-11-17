@@ -212,6 +212,9 @@ function guia_pub() {
   $atl = []; // accesos da portada, na ordem do painel
   foreach (array_slice((array)($d['gatl'] ?? []), 0, 16) as $x) { if (!is_array($x)) continue; $k = (string)($x['k'] ?? ''); if (!in_array($k, ['all', 'gas', 'del', 'em', 'sal', 'far', 'igl', 'edu', 'tra', 'ev', 'job', 'mas', 'q', 'p'], true)) continue;
     $atl[] = ['k' => $k, 'es' => mb_substr(trim((string)($x['es'] ?? '')), 0, 24), 'pt' => mb_substr(trim((string)($x['pt'] ?? '')), 0, 24), 'ic' => preg_replace('/[^a-z]/', '', (string)($x['ic'] ?? '')), 'q' => mb_substr(trim((string)($x['q'] ?? '')), 0, 60)]; }
+  // endereço próprio de cada negócio sem catálogo: /negocio/<nome> (único; se repetir, leva o começo do id)
+  $seen = [];
+  foreach ($dir as $i => $x) { $sl = guia_nslug($x['n']); if ($sl === '') $sl = 'negocio'; if (isset($seen[$sl])) $sl .= '-' . strtolower(substr($x['id'], 0, 5)); $seen[$sl] = 1; $dir[$i]['sl'] = $sl; }
   return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10), 'cat' => $cat, 'atl' => $atl];
 }
 
@@ -355,12 +358,19 @@ function guia_nov() {
 // uma vaga, um aviso ou um evento pelo id (página própria /vacante/<id>, /aviso/<id>, /evento/<id>)
 function guia_item($k, $id) {
   if ($k === 'lugar') { foreach (guia_lugares() as $l) if ($l['slug'] === $id) return $l; return null; }
+  if ($k === 'negocio') { foreach (guia_pub()['dir'] as $x) if (($x['sl'] ?? '') === $id) return $x; return null; }
   if ($k === 'vacante') { foreach (guia_jobs(false) as $j) if ($j['id'] === $id) return $j; return null; }
   $p = guia_pub();
   if ($k === 'aviso') { foreach ($p['clas'] as $c) if ($c['id'] === $id) return $c; return null; }
   if ($k === 'evento') { foreach ($p['ev'] as $e) if (($e['id'] ?? '') === $id) return $e; return null; }
   if ($k === 'lugar') { foreach (guia_lugares() as $l) if ($l['slug'] === $id) return $l; return null; }
   return null;
+}
+// endereço de um negócio da Guía sem catálogo: "boi-de-ouro" (mesma regra para a página e para os links)
+function guia_nslug($n) {
+  $t = class_exists('Normalizer') ? Normalizer::normalize((string)$n, Normalizer::FORM_D) : (string)$n;
+  $t = preg_replace('/\p{Mn}+/u', '', $t); $t = mb_strtolower($t);
+  return substr(trim(preg_replace('/[^a-z0-9]+/', '-', $t), '-'), 0, 70);
 }
 // endereço curto de um lugar público: "hospital-distrital-de-santa-rita-salud" (mesma regra do index.html)
 function guia_slug($n, $c) {
