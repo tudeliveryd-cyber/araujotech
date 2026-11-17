@@ -651,6 +651,63 @@ footer .ft-cols a,footer .ft-bt a{padding-top:7px;padding-bottom:7px}
 .vf{display:inline-flex;vertical-align:-3px;margin-left:5px;color:var(--purple);flex:none}.vf svg{width:17px;height:17px;display:block}.fc-t b .vf svg{width:15px;height:15px}
 :root[data-theme=dark] .vf{color:#B57BFF}
 @media (prefers-reduced-motion:reduce){.hs-bt,.pbn-b{transition:none}}
+
+/* ===== Início v3 (17/11 tarde): composição editorial das seções de baixo ===== */
+/* títulos: todos no mesmo padrão do topo (alinhados à esquerda, marca roxa embaixo) */
+body.home #list :is(.grp,.util,.evs,.nws,.ofs,.hoy,.nov,.sch)>h2,body.home #atl .tiles>h2{display:flex;align-items:center;justify-content:flex-start;gap:10px;text-align:left;font-family:var(--display);font-weight:900;font-size:clamp(21px,2.2vw,27px);line-height:1.15;color:var(--night);margin:0 0 18px;padding-bottom:10px;position:relative}
+body.home #list :is(.grp,.util,.evs,.nws,.ofs,.hoy,.nov,.sch)>h2::after,body.home #atl .tiles>h2::after{content:"";position:absolute;left:0;bottom:0;width:44px;height:4px;border-radius:4px;background:var(--purple)}
+body.home #list :is(.grp,.util,.evs,.nws,.ofs,.hoy,.nov,.sch)>h2 svg,body.home #atl .tiles>h2 svg{width:24px;height:24px;color:var(--purple);flex:none}
+body.home #list>section,body.home #list :is(.sch,.nov,.hoy-g,.util,.evs){max-width:none}
+body.home #list :is(.util,.evs,.nws,.ofs,.nov)>p,body.home #list .util .uh{text-align:left;margin-left:0}
+/* faixa "¿Qué estás buscando?": fundo lilás de ponta a ponta, cartões brancos */
+body.home #atl .tiles{background:#F6F1FD;box-shadow:0 0 0 100vmax #F6F1FD;clip-path:inset(0 -100vmax);padding:40px 0 44px;margin:10px 0 40px}
+body.home #atl .tiles .uh{justify-content:flex-start;text-align:left;margin:26px 0 12px;font-size:13px;letter-spacing:.06em;color:var(--deep)}
+body.home #atl .tiles .tg{max-width:none}
+body.home #atl .tiles .tile{background:#fff;border-color:#E9DFF6}
+body.home #atl .tiles .tile:hover{border-color:var(--purple);transform:translateY(-2px)}
+/* para quem chega: Conocé Santa Rita com a foto da cidade */
+body.home .sch{margin:0 0 40px}
+body.home .sch-g a.sch-c{position:relative;overflow:hidden;color:#fff;border:0;background:#3A0A6B;isolation:isolate}
+body.home .sch-g a.sch-c::before{content:"";position:absolute;inset:0;z-index:-2;background:url(/img/guia/hero-santa-rita-m.webp?v=1) center 40%/cover no-repeat}
+body.home .sch-g a.sch-c::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(36,9,63,.88) 0%,rgba(74,10,128,.62) 60%,rgba(74,10,128,.25) 100%)}
+body.home .sch-g a.sch-c .sch-i{background:rgba(255,255,255,.16);color:#fff}
+body.home .sch-g a.sch-c .sch-t small{color:#EADCFC}
+/* qué comer ahora: grade alinhada, sem cartão sobrando no meio */
+@media (min-width:900px){
+ body.home .qrow{justify-content:flex-start}
+ body.home .qca .qtu{justify-content:flex-start}
+ body.home .qca>.muted,body.home .qca>p{text-align:left}
+}
+/* computador: aproveita a largura */
+@media (min-width:900px){
+ body.home .sch-g{grid-template-columns:1.25fr 1fr 1fr}
+ body.home .sch-g a,body.home .sch-g .sch-a{min-height:132px;padding:22px 22px}
+ body.home .sch-g a.sch-c{grid-row:auto}
+ body.home .sch-t b{font-size:18px}
+ body.home #list .ugrid.emg{grid-template-columns:repeat(4,minmax(0,1fr))}
+ body.home #list .nov-l{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+ body.home .cta{padding:36px 40px;border-radius:24px;background:linear-gradient(110deg,#24093F 0%,#4A0A80 55%,#6A12B8 100%)}
+}
+/* celular */
+@media (max-width:899px){
+ body.home #atl .tiles{padding:28px 0 30px;margin:6px 0 30px}
+ body.home .sch-g a.sch-c{min-height:120px}
+}
+:root[data-theme=dark] body.home #atl .tiles{background:#170E22;box-shadow:0 0 0 100vmax #170E22}
+:root[data-theme=dark] body.home #list :is(.grp,.util,.evs,.nws,.ofs,.hoy,.nov,.sch)>h2,:root[data-theme=dark] body.home #atl .tiles>h2{color:var(--ink)}
+
+@media (min-width:900px){
+ body.home #list{max-width:none}
+ body.home #atl .tiles .tg{grid-template-columns:repeat(4,minmax(0,1fr));justify-content:stretch;max-width:none;margin:0}
+ body.home #atl .tiles .tile{min-height:76px}
+}
+@media (min-width:900px){
+ body.home .qca .qtu{margin-left:0}
+ body.home .qrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+ body.home .qrow .qc{flex:none;min-width:0}
+}
+.ic-src{font-size:12.5px;color:var(--muted);margin:-18px 0 30px;text-align:left}
+@media (max-width:899px){.ic-src{margin:-14px 0 22px}}
 </style></head>
 <body>
 <div class="tbar"><div class="wrap"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Santa Rita – Alto Paraná, PY</span><span class="tb-r"><span id="tbw"></span><span id="tbd"></span></span></div></div>
@@ -817,7 +874,7 @@ function postsHTML(q){const t=TX[L],n=norm(q).trim();if(n.length<3)return '';if(
  return `<section class="nov nov-q"><h2>${ic('star')}${t.ps_h}</h2><div class="nov-l">${l.map(x=>`<a class="nv-c" href="${esc(x.u)}">${x.ph?`<img src="${esc(x.ph)}" alt="" loading="lazy">`:`<span class="nv-i">${ic(x.i)}</span>`}<small>${esc(x.k)}</small><b>${esc(x.t)}</b>${x.s?`<span>${esc(x.s)}</span>`:''}</a>`).join('')}</div></section>`}
 function novHTML(){const t=TX[L],l=(G.nov||[]).slice(0,8);if(!l.length)return '';
  return `<section class="nov" aria-labelledby="novH"><h2 id="novH">${ic('star')}${t.nv_h}</h2><div class="nov-l">${l.map(x=>{const J=x.k==='job',kind=J?t.nv_job:(t.CK[x.s]||t.cl_one)+(x.op&&t.COP[x.op]?' · '+t.COP[x.op]:'');return `<a class="nv-c" href="${esc(itemU(J?'vacante':'aviso',x.id))}">${x.ph?`<img src="${esc(x.ph)}" alt="" loading="lazy">`:`<span class="nv-i">${ic(J?'job':'tag')}</span>`}<small>${esc(kind)}</small><b>${esc(x.t)}</b>${J&&x.s?`<span>${esc(x.s)}</span>`:''}</a>`}).join('')}</div><p class="nov-a"><a href="#empleos" data-go="job">${t.nv_all_j}</a> · <a href="#clasificados" data-go="cla">${t.nv_all_c}</a></p></section>`}
-function chegaHTML(){const t=TX[L];return `<section class="sch" aria-labelledby="schH"><h2 id="schH">${t.ch_h}</h2><div class="sch-g"><a href="${GB}conoce/"><span class="sch-i">${ic('map')}</span><span class="sch-t"><b>${t.cn_h}</b><small>${t.cn_p}</small></span>${ic('arrow')}</a><a class="sch-d" href="${GB}llegar/"><span class="sch-i">${ic('pin')}</span><span class="sch-t"><b>${t.ch_m}</b><small>${t.ch_p}</small></span>${ic('arrow')}</a><button type="button" class="sch-a" data-spv="alq"><span class="sch-i">${ic('home')}</span><span class="sch-t"><b>${t.al_h}</b><small>${(G.clas||[]).filter(x=>x.op==='alq'||x.k==='inm').length||''} ${(G.clas||[]).some(x=>x.op==='alq'||x.k==='inm')?'':t.al_pub}</small></span>${ic('arrow')}</button></div></section>`}
+function chegaHTML(){const t=TX[L];return `<section class="sch" aria-labelledby="schH"><h2 id="schH">${t.ch_h}</h2><div class="sch-g"><a class="sch-c" href="${GB}conoce/"><span class="sch-i">${ic('map')}</span><span class="sch-t"><b>${t.cn_h}</b><small>${t.cn_p}</small></span>${ic('arrow')}</a><a class="sch-d" href="${GB}llegar/"><span class="sch-i">${ic('pin')}</span><span class="sch-t"><b>${t.ch_m}</b><small>${t.ch_p}</small></span>${ic('arrow')}</a><button type="button" class="sch-a" data-spv="alq"><span class="sch-i">${ic('home')}</span><span class="sch-t"><b>${t.al_h}</b><small>${(G.clas||[]).filter(x=>x.op==='alq'||x.k==='inm').length||''} ${(G.clas||[]).some(x=>x.op==='alq'||x.k==='inm')?'':t.al_pub}</small></span>${ic('arrow')}</button></div></section>`}
 function conoceHTML(){const t=TX[L];return `<a class="lgr lgr2" href="${GB}conoce/"><span class="lgr-i">${ic('map')}</span><span class="lgr-t"><b>${t.cn_h}</b><small>${t.cn_p}</small></span><span class="lgr-b">${t.cn_b}${ic('arrow')}</span></a>`}
 function llegarHTML(){const t=TX[L];return `<a class="lgr" href="${GB}llegar/"><span class="lgr-i">${ic('pin')}</span><span class="lgr-t"><b>${t.lg_h}</b><small>${t.lg_p}</small></span><span class="lgr-b">${t.lg_b}${ic('arrow')}</span></a>`}
 /* início: clima e câmbio de referência (vêm do servidor; se a fonte falhar, o bloco não aparece) */
@@ -1028,11 +1085,12 @@ function catHTML(){const t=TX[L];return `<section class="hsec cath" id="cats"><d
 /* linha de informações: clima, cotação, próximo evento e telefones (só o que existe; nada inventado) */
 function infoHTML(){const t=TX[L],h=HOY||{},w=h.w,fx=h.fx,k=w?wKind(w.c):null,n=v=>Math.round(+v).toLocaleString('es-PY');
  const ev=(G.ev||[]).concat(ferNext()).filter(e=>e&&e.d&&e.t).sort((a,b)=>String(a.d+(a.h||'')).localeCompare(String(b.d+(b.h||''))))[0],ed=ev?new Date(ev.d+'T12:00:00'):null;
- const cl=w?`<a class="ic-c ic-w" href="#hoy" data-go="hoy"><span class="ic-h">${ic(k[0])}${t.in_cl}</span><span class="ic-wb"><b>${+w.t}°C</b><span>${k[1]?esc(t.W[k[1]]):''}<small>${t.in_mx} ${+w.max}°C · ${t.in_mn} ${+w.min}°C</small></span></span></a>`:'';
- const cx=fx&&fx.usd?`<a class="ic-c ic-fx" href="#hoy" data-go="hoy"><span class="ic-h">${ic('bank')}${t.in_fx}</span><span class="ic-r"><span>${t.in_usd}</span><b>Gs. ${n(fx.usd)}</b></span>${fx.brl?`<span class="ic-r"><span>${t.in_brl}</span><b>Gs. ${n(fx.brl)}</b></span>`:''}<small class="ic-n">${t.hoy_fx}</small></a>`:'';
+ const cl=w?`<div class="ic-c ic-w"><span class="ic-h">${ic(k[0])}${t.in_cl}</span><span class="ic-wb"><b>${+w.t}°C</b><span>${k[1]?esc(t.W[k[1]]):''}<small>${t.in_mx} ${+w.max}°C · ${t.in_mn} ${+w.min}°C</small></span></span></div>`:'';
+ const cx=fx&&fx.usd?`<div class="ic-c ic-fx"><span class="ic-h">${ic('bank')}${t.in_fx}</span><span class="ic-r"><span>${t.in_usd}</span><b>Gs. ${n(fx.usd)}</b></span>${fx.brl?`<span class="ic-r"><span>${t.in_brl}</span><b>Gs. ${n(fx.brl)}</b></span>`:''}<small class="ic-n">${t.hoy_fx}</small></div>`:'';
  const ce=`<a class="ic-c ic-ev" href="#agenda" data-go="agenda"><span class="ic-h">${ic('cal')}${t.in_ev}</span>${ev?`<span class="ic-e"><span class="ic-d"><small>${MES[L][ed.getMonth()]}</small><b>${ed.getDate()}</b></span><span><b>${esc(ev.t)}</b><small>${esc(DSEM[L][ed.getDay()])}${ev.h?' · '+esc(ev.h):''}</small></span></span>`:`<span class="ic-e0">${t.in_ev0}</span>`}</a>`;
  const ct=`<div class="ic-c ic-tel"><span class="ic-h">${ic('phone')}${t.in_tel}</span><ul>${EMER.slice(0,4).map(e=>`<li><a href="tel:${e[0]}"><span>${esc(e[1][L].split(' · ')[0].split(' (')[0])}</span><b>${esc(e[3]||e[0])}</b></a></li>`).join('')}</ul><button type="button" class="ic-more" data-go="util">${t.in_tel_all}${ic('arrow')}</button></div>`;
- return `<section class="infr" aria-label="${esc(t.hoy_h)}">${cl}${cx}${ce}${ct}</section>`}
+ const src=(w||fx)?`<p class="ic-src">${fx&&fx.src==='bcp'?t.hoy_srcb:t.hoy_src}${w&&w.at?' · '+t.hoy_at+' '+esc(w.at):''}</p>`:'';
+ return `<div id="hoy"><section class="infr" aria-label="${esc(t.hoy_h)}">${cl}${cx}${ce}${ct}</section>${src}</div>`}
 function pubBanner(){const t=TX[L];return `<a class="pbn" href="/guia/negocios/"><span class="pbn-i">${ic('mega')}</span><span class="pbn-t"><b>${t.pb_h}</b><small>${t.pb_p}</small></span><span class="pbn-b">${t.pb_b}${ic('arrow')}</span></a>`}
 function atlHTML(){const t=TX[L];const D={all:t.a_all,gas:t.a_gas,del:t.a_del,em:t.a_em,sal:t.a_sal,far:t.a_far,igl:t.a_igl,edu:t.a_edu,tra:t.a_tra,ev:t.a_ev,job:t.a_job,mas:t.a_mas};
  const C=Array.isArray(G.atl)&&G.atl.length?G.atl.filter(x=>x&&(D[x.k]||((x.k==='q'||x.k==='p')&&x.q))):null;const A=C?C.map(x=>[x.k,(L==='pt'?(x.pt||x.es):(x.es||x.pt))||D[x.k]||'',x.ic&&AI[x.ic]?x.ic:(AI[x.k]?x.k:'mas'),x.q||'']):[['all',t.a_all],['gas',t.a_gas],['del',t.a_del],['em',t.a_em],['sal',t.a_sal],['far',t.a_far],['igl',t.a_igl],['edu',t.a_edu],['tra',t.a_tra],['ev',t.a_ev],['job',t.a_job],['mas',t.a_mas]].map(([k,n])=>[k,n,k,'']);
@@ -1115,7 +1173,7 @@ function render(){texts();const el=document.getElementById('list'),ch=document.g
  document.getElementById('top2').innerHTML=(NEAR||NEARERR?nearHTML():'');document.getElementById('sug').innerHTML=sugHTML();document.getElementById('atl').innerHTML=HOME?catHTML()+infoHTML()+fdHTML()+rcHTML()+pubBanner()+tilesHTML(base,nPro).replace('<section class="tiles"','<section class="tiles" id="todas"').replace(/<\/section>$/,pubTiles()+'</section>'):'';{const hasOf=!!OFS.length&&!!LIST&&OFS.some(o=>LIST.some(c=>c.id===o.s)),hasNw=!!(NEWS&&NEWS.items&&NEWS.items.length);document.querySelectorAll('[data-go=ofertas]').forEach(a=>a.hidden=!hasOf);document.querySelectorAll('.mnav [data-go=noticias]').forEach(a=>a.hidden=!hasNw);document.querySelectorAll('.mnav a').forEach(a=>{if(a.dataset.go==='home'){if(HOME)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')}})}tbar();document.body.classList.toggle('home',HOME);document.body.classList.toggle('spvm',!!SPV&&!HOME&&!q);bnSet(HOME?(MAPON?'map':'home'):(MAPON?'map':''));ofsAuto();
  const back=`<p class="bkh"><button type="button" data-c="home">${ic('arrow')}${TX[L].home_b}</button></p>`;
  if(SPV&&!HOME&&!q){el.innerHTML=(SPV==='job'?jobsHTML():SPV==='cla'?clasHTML():SPV==='alq'?clasHTML('alq'):SPV==='fer'?ferHTML():spvHTML())+back;slRender();el.querySelectorAll('.lg img').forEach(i=>{i.onerror=()=>{const b=document.createElement('b');b.textContent=i.dataset.ini;i.replaceWith(b)}});return}
- el.innerHTML=HOME?chegaHTML()+novHTML()+qcaHTML()+turnoHTML()+ofsHTML()+hoyHTML()+newHTML()+openHTML()+evHTML()+newsHTML()+utilHTML(''):(show.length||tdHTML||prHTML?(FLAT?`<section class="grp"><h2>${ic('grid')}${esc(q?TX[L].res_h:TX[L].all_h)}</h2><div class="grid">${show.reduce((o,[,l])=>o.concat(l),[]).sort((a,b)=>(b.dest?1:0)-(a.dest?1:0)||(a._dir?1:0)-(b._dir?1:0)).map(card).join('')}${tdOn?tdCard():''}</div></section>`+prHTML:show.map(([g,l])=>`<section class="grp c-${g[0]}"><h2>${icG(g[0])}${esc(g[2][L])}</h2>${grpBody(g[0],l)}</section>`).join('')+prHTML+tdHTML):`<p class="empty">${q?TX[L].nores:TX[L].none}</p>`)+(q?postsHTML(q):'')+back+(q?utilHTML(q):'');slRender();
+ el.innerHTML=HOME?chegaHTML()+novHTML()+qcaHTML()+turnoHTML()+ofsHTML()+newHTML()+openHTML()+evHTML()+newsHTML()+utilHTML(''):(show.length||tdHTML||prHTML?(FLAT?`<section class="grp"><h2>${ic('grid')}${esc(q?TX[L].res_h:TX[L].all_h)}</h2><div class="grid">${show.reduce((o,[,l])=>o.concat(l),[]).sort((a,b)=>(b.dest?1:0)-(a.dest?1:0)||(a._dir?1:0)-(b._dir?1:0)).map(card).join('')}${tdOn?tdCard():''}</div></section>`+prHTML:show.map(([g,l])=>`<section class="grp c-${g[0]}"><h2>${icG(g[0])}${esc(g[2][L])}</h2>${grpBody(g[0],l)}</section>`).join('')+prHTML+tdHTML):`<p class="empty">${q?TX[L].nores:TX[L].none}</p>`)+(q?postsHTML(q):'')+back+(q?utilHTML(q):'');slRender();
  el.querySelectorAll('.pro .ph img').forEach(i=>{i.onerror=()=>{const b=document.createElement('b');b.textContent=i.dataset.ini;i.replaceWith(b)}});el.querySelectorAll('.lg img').forEach(i=>{i.onerror=()=>{const b=document.createElement('b');b.textContent=i.dataset.ini;i.replaceWith(b)}});if(HJ){const e=document.getElementById(HJ);if(e){HJ='';setTimeout(()=>{try{e.scrollIntoView({block:'start'})}catch(x){}},60)}}}
 document.getElementById('atl').addEventListener('click',e=>{const a=e.target.closest('[data-a]');if(a){let k=a.dataset.a;
  if(k==='q'&&a.dataset.q){document.getElementById('q').value=a.dataset.q;SPV='';CAT='all';render();goTo('main');return}if(k==='p'&&a.dataset.q&&(PCAT[a.dataset.q]||a.dataset.q==='edu')){SPV=a.dataset.q;document.getElementById('q').value='';CAT='all';render();goTo('main');return}

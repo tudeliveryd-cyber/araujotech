@@ -492,11 +492,11 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   const Q = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const r = {};
     G.cat = {}; applyCat(); HOY = { fx: { usd: 6242, brl: 1085, d: '2026-11-16', src: 'bcp' } }; CAT = 'home'; SPV = ''; document.getElementById('q').value = ''; render(); await W(80);
     const hoy = document.getElementById('hoy'); r.bcp = !!hoy && /Banco Central del Paraguay/.test(hoy.textContent) && /6\.242/.test(hoy.textContent);
-    r.ferCard = !!document.querySelector('#hoy .hoy-fr');
+    r.ferCard = !!document.querySelector('#hoy .ic-ev') && !document.querySelector('section.hoy');
     const f27 = ferList(2027); r.santa = f27.filter(f => f.k === 'jsa' || f.k === 'vsa').map(f => f.d).join(',');
     r.n27 = f27.length; r.mov = f27.filter(f => f.m).map(f => f.k).join(',');
     const nx = ferUp(3); r.next = nx.map(f => f.d + ':' + f.k).join(' ');
-    document.querySelector('#hoy .hoy-fr').click(); await W(80); r.ferView = !!document.getElementById('feriados') && document.querySelectorAll('#feriados .fr-r').length === 14;
+    document.querySelector('[data-go="fer"]').click(); await W(80); r.ferView = !!document.getElementById('feriados') && document.querySelectorAll('#feriados .fr-r').length === 14;
     G.clas = [{ id: 'c1', k: 'inm', op: 'alq', t: 'Casa en alquiler', wa: '595981000000' }, { id: 'c2', k: 'inm', op: 'venta', t: 'Terreno en venta', wa: '595981000000' }, { id: 'c3', k: 'per', op: 'perd', t: 'Perro perdido', wa: '595981000000' }];
     CAT = 'home'; SPV = ''; render(); await W(50); const ab = document.querySelector('.sch-a'); r.alqBtn = !!ab;
     ab.click(); await W(80); const al = document.getElementById('alquileres'); r.alq = al ? [...al.querySelectorAll('article.cl b')].map(b => b.textContent) : [];
@@ -505,7 +505,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   info(JSON.stringify(Q));
   check(Q.bcp, 'cotação: mostra o valor do Banco Central del Paraguay, com a fonte');
   check(Q.santa === '2027-03-25,2027-03-26' && Q.n27 === 13 && Q.mov === 'her,paz,jur,boq', 'feriados 2027: Semana Santa 25 e 26/03, 13 feriados, 4 móveis (Héroes, Paz del Chaco, Jura, Boquerón)');
-  check(Q.ferCard && Q.ferView && /^\d{4}-\d{2}-\d{2}:/.test(Q.next), 'cartão "Próximo feriado" na portada abre a lista com os próximos 14 feriados');
+  check(Q.ferCard && Q.ferView && /^\d{4}-\d{2}-\d{2}:/.test(Q.next), 'portada: fila de informação (clima, câmbio, eventos) sem repetir o bloco Hoy; o link de feriados abre a lista com os próximos 14');
   check(Q.alqBtn && Q.alq.join('|') === 'Casa en alquiler|Terreno en venta', 'Alquileres e inmuebles: só imóveis e aluguéis, aluguéis primeiro (o perro perdido não entra)');
   check(Q.cup && /GUIA10/.test(Q.cup) && /10% de descuento/.test(Q.cup) && /Pedido mínimo/.test(Q.cup) && /Cupones y ofertas/.test(Q.ofsH || ''), 'cupom marcado pelo negócio aparece em "Cupones y ofertas"', String(Q.cup));
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
