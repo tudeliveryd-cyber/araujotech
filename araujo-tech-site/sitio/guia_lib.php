@@ -138,7 +138,7 @@ function guia_pub() {
     if (!empty($x['to']) && $x['to'] < $day) continue;
     $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
     $u = (string)($x['u'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $u)) $u = '';
-    $ads[] = ['id' => $id, 't' => (string)($x['t'] ?? ''), 's' => (string)($x['s'] ?? ''), 'u' => $u, 'img' => '/sitio/gimg.php?i=' . $id . '&v=' . substr(md5((string)$x['img']), 0, 8), 'imgd' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['imgd'] ?? '')) ? '/sitio/gimg.php?i=' . $id . '&k=d&v=' . substr(md5((string)$x['imgd']), 0, 8) : '', 'own' => empty($x['own']) ? 0 : 1];
+    $ads[] = ['id' => $id, 't' => (string)($x['t'] ?? ''), 's' => (string)($x['s'] ?? ''), 'u' => $u, 'img' => '/sitio/gimg.php?i=' . $id . '&v=' . substr(md5((string)$x['img']), 0, 8), 'imgd' => preg_match('#^(data:image/(jpeg|png|webp);base64,|gimg:)#', (string)($x['imgd'] ?? '')) ? '/sitio/gimg.php?i=' . $id . '&k=d&v=' . substr(md5((string)$x['imgd']), 0, 8) : '', 'own' => empty($x['own']) ? 0 : 1];
   }
   $util = null;
   if (is_array($d['gutil'] ?? null)) {

@@ -71,7 +71,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   const js = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); closeSheet(); ui.jobs = null; acts.jobopen(); await W(50); const r = {}; acts.jobadd(); await W(30); r.f = document.querySelectorAll('[data-jb^="0."]').length; Object.assign(ui.jobs[0], { t: 'Vendedor', d: 'Atención en el salón de ventas', wa: '0981999888' }); acts.jobsave(); await W(50); r.saved = (pub.jobs || []).length === 1 && pub.jobs[0].t === 'Vendedor' && pub.jobs[0].wa === '0981999888'; applyBoth(p => { delete p.jobs }); return r; });
   check(js.f >= 9 && js.saved, 'painel do negócio: publicar vaga (formulário completo e salva no catálogo)'); info(JSON.stringify({ ads: (d.gads || []).length, util: (d.gutil || []).length, at: d.gadsAt }));
   check((d.gads || []).length === 1 && d.gads[0].u === 'https://example.com/promo' && d.gads[0].to === '2026-12-31' && d.gads[0].on === true, 'banner salvo com link, data e ativo');
-  check(/^data:image\/(jpeg|webp)/.test(d.gads[0].imgd || '') && d.gads[0].own === true, 'banner salvo com a imagem para computador e a marca "banner da Guía"');
+  check(/^(data:image\/(jpeg|webp)|gimg:)/.test(d.gads[0].imgd || '') && d.gads[0].own === true, 'banner salvo com a imagem para computador e a marca "banner da Guía"');
   check((d.gutil || []).length === n0 + 1 && d.gutil[0].tel === '061 000 000' && d.gutil[n0].c === 'ocio', 'lugares salvos com telefone e tipo');
   check((d.clientes || []).length === 1, 'os clientes da vitrine continuam lá');
 
@@ -88,9 +88,13 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   sec('E2. Banners pesados: o painel recomprime em WebP para caber');
   const big = await a.evaluate(async () => { const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); const d = x.createImageData(w, h); for (let i = 0; i < d.data.length; i += 4) { d.data[i] = Math.random() * 255; d.data[i + 1] = (i / 4 % w) / w * 255; d.data[i + 2] = 120; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c.toDataURL('image/jpeg', .95); };
     const im = mk(800, 340), imd = mk(960, 240); ui.gu.ads = [0, 1, 2].map(k => ({ id: 'bg' + k, t: 'Banner ' + k, s: '', u: 'https://example.com/', img: im, imgd: imd, from: '', to: '', on: true, own: true }));
-    const before = JSON.stringify(guClean(ui.gu).ads).length; await acts.gusave(); await new Promise(f => setTimeout(f, 2500)); return { before, after: JSON.stringify(guClean(ui.gu).ads).length, webp: ui.gu.ads.every(x => /^data:image\/webp/.test(x.img) && /^data:image\/webp/.test(x.imgd)) }; });
+    const before = JSON.stringify(guClean(ui.gu).ads).length; await acts.gusave(); await new Promise(f => setTimeout(f, 3000)); let sub = -1; try { sub = (await CLOUD.api.listGimg()).length; } catch (e) {} return { before, after: JSON.stringify(guClean(ui.gu).ads).length, sub, refs: ui.gu.ads.every(x => /^gimg:/.test(x.img) && /^gimg:/.test(x.imgd)), prev: [...document.querySelectorAll('.gu-img img')].every(i => /^data:image/.test(i.getAttribute('src'))), webp: ui.gu.ads.every(x => /^data:image\/webp/.test(x.img) && /^data:image\/webp/.test(x.imgd)) }; });
   info(JSON.stringify(big)); d = await doc();
-  check(big.before > 880000 && big.after < big.before && big.webp && (d.gads || []).length === 3 && d.gads.every(x => /^data:image\/webp/.test(x.imgd)), 'banners acima do limite são recomprimidos em WebP e salvos (3 banners com imagem do computador)');
+  if (big.refs) {
+    check((d.gads || []).length === 3 && d.gads.every(x => /^gimg:[A-Za-z0-9_]+:[a-f0-9]+$/.test(x.img) && /^gimg:/.test(x.imgd)) && big.sub === 6 && big.after < 2000 && big.prev, 'regras v19: cada imagem de banner fica num documento próprio (6 imagens), o gads leva só a referência e a prévia continua aparecendo');
+    const cl = await a.evaluate(async () => { ui.gu.ads = ui.gu.ads.slice(0, 1); await acts.gusave(); await new Promise(f => setTimeout(f, 2500)); return (await CLOUD.api.listGimg()).length; });
+    check(cl === 2, 'tirar banners apaga as imagens guardadas deles (sobram 2 do banner que ficou)');
+  } else check(big.before > 880000 && big.after < big.before && big.webp && (d.gads || []).length === 3 && d.gads.every(x => /^data:image\/webp/.test(x.imgd)), 'sem a regra nova: banners acima do limite são recomprimidos em WebP e salvos (3 banners com imagem do computador)');
   await a.evaluate(async () => { ui.gu.ads = []; await acts.gusave(); }); await a.w(1500);
   sec('F. Profissionais em destaque');
   await a.act('guadd', '[data-k="pros"]'); await a.w(300);

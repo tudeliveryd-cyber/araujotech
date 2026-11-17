@@ -86,6 +86,7 @@ jobs:
           echo "######## PERÍODO DE PRUEBA GRATIS · regras v13"; tools/e2e/run.sh e2e_prueba.js firestore-v13.rules || F=1
           echo "######## SITE PADRÃO ACOMPANHA O WHATSAPP DO CATÁLOGO · regras v13"; tools/e2e/run.sh e2e_sitesync.js firestore-v13.rules || F=1
           echo "######## GUÍA VITRIX: BANNERS PAGOS E LUGARES PÚBLICOS · regras v13"; tools/e2e/run.sh e2e_guia.js firestore-v13.rules || F=1
+          echo "######## GUÍA: PASTAS E BANNERS GUARDADOS À PARTE · regras v19"; tools/e2e/run.sh e2e_guia.js firestore-v19.rules || F=1
           echo "######## HORÁRIOS: SEGUNDA-FEIRA COPIA PARA OS OUTROS DIAS · regras v13"; tools/e2e/run.sh e2e_horario.js firestore-v13.rules || F=1
           echo "######## PROBÁ: RUBRO ESCRITO E DEMO DE AUTOS"; tools/e2e/run.sh e2e_proba_autos.js firestore-v13.rules || F=1
           echo "######## MOEDA DO LOCAL (Gs. / US$) · regras v13"; tools/e2e/run.sh e2e_moeda.js firestore-v13.rules || F=1

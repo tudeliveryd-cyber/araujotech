@@ -35,6 +35,16 @@ if ($pp === '' && $nn === '' && $dd !== '' && $i === 'd' . $dd) { $list = (array
 if ($pp === '' && $nn === '' && $dd === '' && $cc !== '' && $i === 'c' . $cc) { $list = (array)($doc['gclas'] ?? []); $want = $cc; $fld = 'ph'; }
 $wd = ($pp === '' && $nn === '' && $dd === '' && $cc === '' && (($_GET['k'] ?? '') === 'd')); if ($wd) $fld = 'imgd'; // imagem larga do banner, só para computador
 foreach ($list as $x) { if (is_array($x) && ($x['id'] ?? '') === $want) { $src = (string)($x[$fld] ?? ''); break; } }
+// banner guardado à parte (platform/sitio/gimg/<id>): o gads só tem "gimg:<id>:<versão>"; busca a imagem uma vez e guarda em cache
+if (preg_match('#^gimg:([A-Za-z0-9_]{1,60}):([a-f0-9]{1,16})$#', $src, $gm)) {
+  $gc = sys_get_temp_dir() . '/at_gimgx_' . $gm[1] . '_' . $gm[2] . '.txt';
+  if (is_file($gc)) $src = (string)@file_get_contents($gc);
+  else {
+    $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio/gimg/' . $gm[1] . '?key=' . AT_KEY);
+    $src = $r === null ? '' : (string)((json_decode($r, true)['fields']['d']['stringValue'] ?? ''));
+    if (preg_match('#^data:image/(jpeg|png|webp);base64,#', $src)) @file_put_contents($gc, $src);
+  }
+}
 if (!preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#s', $src, $m)) { http_response_code(404); exit; }
 $f = sys_get_temp_dir() . '/at_gimg_' . $i . ($fld === 'ph' && $dd !== '' ? 'ph' : '') . ($wd ? 'd' : '') . '_' . substr(md5($src), 0, 12) . '.img';
 if (!is_file($f)) { $bin = base64_decode($m[2]); if (!$bin) { http_response_code(404); exit; } @file_put_contents($f, $bin); }
