@@ -31,5 +31,6 @@ window.cgMeal=cgMeal;` });
       const m = (r.tx || '').match(/de (\d+)/); if (!m || +m[1] <= 6) break;
     }
   }
+  for (const f of fs.readdirSync('flyers')) { const b = fs.readFileSync('flyers/' + f).toString('base64'); for (let i = 0; i < b.length; i += 60000) console.log('IMG64 ' + f + ' ' + b.slice(i, i + 60000)); }
   await br.close();
 })().catch(e => { console.error(e); process.exit(1); });
