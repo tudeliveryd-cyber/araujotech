@@ -572,6 +572,20 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   info(JSON.stringify(SB));
   check(SB.chips === 'Todos|Mecánicas|Autoeléctricas' && SB.ele && SB.all && SB.q, 'dentro da categoria, as abas viram botões (Todos, Mecánicas, Autoeléctricas) e cada uma abre só os seus; buscar "mecanica" acha as mecânicas');
   check(HL.tile && HL.last === 'mas' && HL.sug && HL.click, 'aba Heladerías com negócios vira atalho em Categorías principales (antes de Más) e sugestão da busca');
+  sec('U. Página da Tu Delivery');
+  { const T = await L.open({ w: 390, mob: true }); const tp = T.p; await tp.goto('https://araujotechsistemas.com/guia/tu-delivery/'); await tp.w(2000);
+    const r1 = await tp.evaluate(() => ({ h1: document.querySelector('h1').innerText.replace(/\s+/g, ' '), wa: document.getElementById('wa1').href, pt: [...document.querySelectorAll('[data-l=pt]')].some(e => e.offsetParent) }));
+    await tp.click('#fj button[type=submit]'); await tp.w(200); const err = await tp.evaluate(() => getComputedStyle(document.getElementById('fe')).display !== 'none' && !(window.__opened || []).length);
+    await tp.fill('#fj [name=n]', 'Juan Pérez'); await tp.fill('#fj [name=w]', '0981 222 333'); await tp.fill('#fj [name=b]', 'Centro');
+    await tp.evaluate(() => { document.querySelector('#fj input[name=m][value=si]').click(); document.querySelector('#fj input[name=d][value=noc]').click(); });
+    await tp.click('#fj button[type=submit]'); await tp.w(300); const op = await tp.evaluate(() => (window.__opened || []).slice(-1)[0] || '');
+    await tp.click('.lang [data-lang=pt]'); await tp.w(200); const r2 = await tp.evaluate(() => ({ h1: document.querySelector('h1').innerText.replace(/\s+/g, ' '), es: [...document.querySelectorAll('[data-l=es]')].some(e => e.offsetParent) }));
+    await tp.evaluate(() => { try { localStorage.removeItem('at_lang') } catch (e) {} });
+    const dec = decodeURIComponent(op); info(JSON.stringify({ r1, r2, err, dec: dec.slice(0, 160) }));
+    check(/Tu pedido, en la puerta de tu casa/.test(r1.h1) && /wa\.me\/595982086171\?text=/.test(r1.wa) && !r1.pt, 'página da Tu Delivery abre em espanhol, com o WhatsApp 0982 086 171 e mensagem pronta');
+    check(err && /wa\.me\/595982086171/.test(op) && /Quiero trabajar como repartidor/.test(dec) && /Juan Pérez/.test(dec) && /Moto propia: Sí/.test(dec) && /Noche/.test(dec), 'formulário de repartidor: sem nome/WhatsApp avisa; completo, abre o WhatsApp da Tu Delivery com os dados');
+    check(/Seu pedido, na porta da sua casa/.test(r2.h1) && !r2.es, 'botão PT troca toda a página para português');
+    check(!T.p.errs.length, 'página da Tu Delivery sem erros de JavaScript', T.p.errs.join(' | ')); }
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });

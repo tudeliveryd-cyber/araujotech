@@ -11,6 +11,7 @@ echo "<url><loc>https://guiadesantarita.com/sobre/</loc><lastmod>$d</lastmod><ch
 echo "<url><loc>https://guiadesantarita.com/negocios/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>\n";
 echo "<url><loc>https://guiadesantarita.com/llegar/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>\n";
 echo "<url><loc>https://guiadesantarita.com/conoce/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>\n";
+echo "<url><loc>https://guiadesantarita.com/tu-delivery/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>\n";
 echo "<url><loc>https://guiadesantarita.com/terminos/</loc><lastmod>$d</lastmod><changefreq>yearly</changefreq><priority>0.3</priority></url>\n";
 foreach (guia_clients() as $c) echo '<url><loc>https://guiadesantarita.com/' . htmlspecialchars($c['id'], ENT_XML1) . "</loc><lastmod>$d</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>\n";
 try { foreach (guia_pub()['dir'] as $x) if (!empty($x['sl'])) echo '<url><loc>https://guiadesantarita.com/negocio/' . htmlspecialchars($x['sl'], ENT_XML1) . "</loc><lastmod>$d</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>\n"; } catch (Throwable $e) {}

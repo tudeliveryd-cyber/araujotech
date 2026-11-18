@@ -88,7 +88,7 @@ jobs:
           RewriteRule ^guia/?$ / [R=301,L]
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
           RewriteCond %{ENV:REDIRECT_STATUS} ^$
-          RewriteRule ^guia/(negocios|llegar|conoce|terminos|sobre)/?$ /$1/ [R=301,L]
+          RewriteRule ^guia/(negocios|llegar|conoce|terminos|sobre|tu-delivery)/?$ /$1/ [R=301,L]
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
           RewriteCond %{ENV:REDIRECT_STATUS} ^$
           RewriteRule ^guia/aparecer/?$ /negocios/ [R=301,L]
@@ -100,7 +100,7 @@ jobs:
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
           RewriteRule ^$ /guia/index.php [L]
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
-          RewriteRule ^(negocios|llegar|conoce|terminos|sobre)/?$ /guia/$1/ [L]
+          RewriteRule ^(negocios|llegar|conoce|terminos|sobre|tu-delivery)/?$ /guia/$1/ [L]
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
           RewriteRule ^(vacante|aviso|evento|lugar|negocio)/([A-Za-z0-9._-]{2,90})/?$ /guia/p.php?k=$1&id=$2 [L,QSA]
           RewriteCond %{HTTP_HOST} ^guiadesantarita\.com$ [NC]
