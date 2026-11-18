@@ -219,6 +219,7 @@ function guia_pub() {
   foreach (['fb', 'ig', 'yt', 'tt'] as $k) { $u = trim((string)($so[$k] ?? '')); if (preg_match('#^https://[^\s"\'<>]+$#i', $u)) $soc[$k] = $u; }
   if (($so['slo'] ?? '') === 'list') $soc['slo'] = 'list'; // slider: na ordem do painel (senão alterna ao acaso)
   if (in_array((int)($so['slt'] ?? 0), [4, 6, 8, 10], true)) $soc['slt'] = (int)$so['slt']; // segundos entre um banner e outro
+  $tv = array_values(array_filter((array)($so['tdv'] ?? []), function ($x) { return is_string($x) && preg_match('/^[a-z0-9][a-z0-9-]{1,60}$/', $x); })); if ($tv) $soc['tdv'] = array_slice($tv, 0, 60); // clientes Vitrix que também são aliados Tu Delivery
   $atl = []; // accesos da portada, na ordem do painel
   foreach (array_slice((array)($d['gatl'] ?? []), 0, 16) as $x) { if (!is_array($x)) continue; $k = (string)($x['k'] ?? ''); if (!in_array($k, ['all', 'gas', 'del', 'em', 'sal', 'far', 'igl', 'edu', 'tra', 'ev', 'job', 'mas', 'q', 'p'], true)) continue;
     $atl[] = ['k' => $k, 'es' => mb_substr(trim((string)($x['es'] ?? '')), 0, 24), 'pt' => mb_substr(trim((string)($x['pt'] ?? '')), 0, 24), 'ic' => preg_replace('/[^a-z]/', '', (string)($x['ic'] ?? '')), 'q' => mb_substr(trim((string)($x['q'] ?? '')), 0, 60)]; }

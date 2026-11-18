@@ -80,7 +80,7 @@ section.s{padding:72px 0 0}
 .ali .lg img{width:100%;height:100%;object-fit:cover}
 .ali b{font-size:15px;line-height:1.2;color:var(--ink)}.ali small{color:var(--muted);font-size:13px;line-height:1.3}
 .ali .go{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13.5px;color:#fff;background:var(--wa);padding:7px 12px;border-radius:999px}
-.ali .go svg{width:15px;height:15px}
+.ali .go svg{width:15px;height:15px}.ali .go.vx{background:var(--td)}
 .al-more{margin-top:18px}.al-more a{color:var(--brand);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
 .al-load{color:var(--muted);margin-top:24px}
 /* tarifa e negocios */
@@ -262,6 +262,7 @@ form.f{background:#fff;color:var(--ink);border-radius:24px;padding:28px;display:
 </div></section>
 </main>
 
+<script src="/clientes.js?v=3"></script>
 <script>
 (function(){
 var WA='595982086171',h=document.documentElement;
@@ -279,9 +280,10 @@ var AL=null;function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,funct
 function ini(n){return String(n).split(/\s+/).slice(0,2).map(function(w){return w[0]||''}).join('').toUpperCase()}
 function drawAl(){var el=document.getElementById('al');if(!AL)return;if(!AL.length){el.innerHTML='';return}
  var txt=L==='pt'?'Olá! Vi seu negócio no Guia de Santa Rita e quero fazer um pedido.':'¡Hola! Vi tu negocio en la Guía de Santa Rita y quiero hacer un pedido.',go=L==='pt'?'Pedir':'Pedir';
- el.innerHTML=AL.map(function(c){var w=String(c.wa||'').replace(/\D/g,'');if(w&&w.length<=10)w='595'+w.replace(/^0/,'');var href=w?'https://wa.me/'+w+'?text='+encodeURIComponent(txt):'/guia/';
-  return '<a class="ali" href="'+esc(href)+'"'+(w?' target="_blank" rel="noopener"':'')+'><span class="lg">'+(c.lg?'<img src="'+esc(c.lg)+'" alt="" loading="lazy">':esc(ini(c.n)))+'</span><b>'+esc(c.n)+'</b>'+(c.d?'<small>'+esc(c.d)+'</small>':'')+(w?'<span class="go"><svg class="i" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4A8.5 8.5 0 1 1 8 19.6z"/></svg>'+go+'</span>':'')+'</a>'}).join('')}
-fetch('/sitio/guia.php?g=1').then(function(r){return r.ok?r.json():null}).then(function(j){AL=((j&&j.dir)||[]).filter(function(x){return x&&x.td&&x.n}).sort(function(a,b){return (b.lg?1:0)-(a.lg?1:0)});drawAl();drawMap()}).catch(function(){AL=[];drawAl()});
+ el.innerHTML=AL.map(function(c){var w=c.v?'':String(c.wa||'').replace(/\D/g,'');if(w&&w.length<=10)w='595'+w.replace(/^0/,'');var href=c.v?c.v:(w?'https://wa.me/'+w+'?text='+encodeURIComponent(txt):'/guia/');
+  return '<a class="ali" href="'+esc(href)+'"'+(w?' target="_blank" rel="noopener"':'')+'><span class="lg">'+(c.lg?'<img src="'+esc(c.lg)+'" alt="" loading="lazy">':esc(ini(c.n)))+'</span><b>'+esc(c.n)+'</b>'+(c.d?'<small>'+esc(c.d)+'</small>':'')+(c.v?'<span class="go vx">'+(L==='pt'?'Ver catálogo':'Ver catálogo')+'</span>':w?'<span class="go"><svg class="i" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4A8.5 8.5 0 1 1 8 19.6z"/></svg>'+go+'</span>':'')+'</a>'}).join('')}
+var VX=[];fetch('/sitio/guia.php?g=1').then(function(r){return r.ok?r.json():null}).then(function(j){var tv=((j&&j.soc&&j.soc.tdv)||[]);AL=((j&&j.dir)||[]).filter(function(x){return x&&x.td&&x.n}).sort(function(a,b){return (b.lg?1:0)-(a.lg?1:0)});drawAl();drawMap();
+ if(tv.length&&window.AT_CLIENTES)AT_CLIENTES.load(function(l){var gb=/(^|\.)guiadesantarita\.com$/.test(location.hostname)?'/':'/guia/';VX=(l||[]).filter(function(c){return c.sys==='catalogo'&&tv.indexOf(c.id)>=0}).map(function(c){return {n:c.name,lg:/^https:\/\//.test(c.logo||'')?c.logo:'',d:L==='pt'?(c.segPt||c.segEs):(c.segEs||c.segPt),v:gb+encodeURIComponent(c.id)}});AL=VX.concat(AL.filter(function(x){return !x.v}));drawAl()})}).catch(function(){AL=[];drawAl()});
 /* mapa: só os aliados que têm a localização certa no link do mapa (nada inventado) */
 function geoOf(u){u=String(u||'');var m=u.match(/[?&](?:q|query|ll)=(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/)||u.match(/@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/)||u.match(/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/);if(!m)return null;var a=+m[1],b=+m[2];return Math.abs(a)<=90&&Math.abs(b)<=180?[a,b]:null}
 function drawMap(){var pts=(AL||[]).map(function(c){return [c,geoOf(c.map)]}).filter(function(x){return x[1]});if(pts.length<2)return;var box=document.getElementById('tdmap');box.hidden=false;
