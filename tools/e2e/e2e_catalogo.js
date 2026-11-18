@@ -150,6 +150,8 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
     check(fz.f === 0 && fz.coord === true && fz.f2 === 5000, 'barrio sin costo (con envío mínimo cargado): queda "a coordinar" y no suma nada; barrio con costo sigue usando el mínimo', JSON.stringify(fz));
     const ft = await c.evaluate(() => { const s0 = JSON.stringify(pub.store), m0 = ck.mode, b0 = ck.bairro; pub.store.feeMode = 'bairro'; pub.store.minFee = 5000; pub.store.bairros = [{ name: 'Centro T', fee: 5000 }]; ck.mode = 'delivery'; ck.bairro = 'Centro T'; const r = { before: fee() }; pub.store.feeTbd = true; r.f = fee(); r.coord = bairroCoord(); const sn = feeSnap({ store: pub.store, zones: [] }); r.snap = !!sn.feeTbd; pub.store.feeTbd = false; r.snapOff = 'feeTbd' in feeSnap({ store: pub.store, zones: [] }); pub.store = JSON.parse(s0); ck.mode = m0; ck.bairro = b0; return r; });
     check(ft.before === 5000 && ft.f === 0 && ft.coord === true && ft.snap && !ft.snapOff, '"Envío a confirmar" activado: barrio con 5.000 pasa a "a confirmar" y no suma; apagado no cambia las aprobaciones viejas', JSON.stringify(ft));
+    const pv = await c.evaluate(() => { const p0 = ck.pay; ck.pay = ''; validate(); const r = { e: ckErr.pay || '' }; ck.pay = p0; return r; });
+    check(/forma de pago/.test(pv.e), 'checkout: sin forma de pago elegida no envía ("Elegí la forma de pago")', JSON.stringify(pv));
   }, c);
   if (STOP === 'D') return L.done();
 
