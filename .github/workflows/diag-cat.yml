@@ -1,0 +1,28 @@
+name: Diagnóstico de um catálogo (só leitura)
+
+# Só leitura: mostra as categorias e a data da última gravação de um catálogo (dados públicos do catálogo).
+on:
+  workflow_dispatch:
+    inputs:
+      shop:
+        description: 'id da loja (ex.: lojastatus)'
+        default: 'lojastatus'
+
+jobs:
+  ver:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ler
+        env:
+          SHOP: ${{ inputs.shop }}
+        run: |
+          python3 - <<'P'
+          import json,os,re,urllib.request
+          s=os.environ['SHOP']
+          if not re.match(r'^[a-z0-9][a-z0-9-]{1,60}$',s): raise SystemExit('id inválido')
+          u='https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/shops/'+s+'?mask.fieldPaths=cfg&mask.fieldPaths=updated'
+          d=json.loads(urllib.request.urlopen(u,timeout=30).read())
+          f=d.get('fields',{});print('updated:',f.get('updated',{}).get('stringValue'))
+          c=json.loads(f.get('cfg',{}).get('stringValue','{}'))
+          for x in c.get('cats',[]): print('cat', x.get('id'), json.dumps(x.get('n'),ensure_ascii=False), 'hide' if x.get('hide') else '', sum(1 for p in c.get('products',[]) if p.get('cat')==x.get('id')))
+          P
