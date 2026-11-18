@@ -69,6 +69,28 @@ const FX = __dirname + '/fix/';
   const lbl = await c.evaluate(() => lineLabel(pub, cart[0], 'es').join(' · '));
   info(lbl);
   check(/Sabor: Limón/.test(lbl), 'o pedido diz "Sabor: Limón"');
+
+  sec('C. Produto que já é uma das opções: creatina 100g + opção 250g');
+  await o.evaluate(() => acts.newprod()); await o.w(500);
+  await o.set('#ed_nes', 'Creatina 100g'); await o.set('#ed_pr', '75000');
+  await o.locator('[data-act=addvar]').click(); await o.w(300);
+  await o.evaluate(() => { const i = document.activeElement; i.value = '250g'; i.dispatchEvent(new Event('input', { bubbles: true })); const p = document.querySelector('input[data-evar="0"][data-f=p]'); p.value = '145000'; p.dispatchEvent(new Event('input', { bubbles: true })); });
+  await o.evaluate(() => editorSheet()); await o.w(300);
+  const nt = await o.evaluate(() => [...document.querySelectorAll('.sheet .note')].some(n => /propio producto/.test(n.textContent)));
+  check(nt, 'o editor avisa que o próprio produto aparece como primeira opção');
+  await o.evaluate(() => acts.saveprod()); await o.w(5000);
+  const cid = await o.evaluate(() => (pub.products.find(p => tr(p.n) === 'Creatina 100g') || {}).id);
+  await c.evaluate(() => { cart.length = 0; }); await c.reload(); await c.w(5000);
+  await c.evaluate(id => productSheet(id), cid); await c.w(2000);
+  const k1 = await c.evaluate(() => ({ rows: [...document.querySelectorAll('.sheet .vopt')].map(l => l.querySelector('span').textContent + '=' + l.querySelector('em').textContent + (l.querySelector('input').checked ? '*' : '')), tot: (document.querySelector('.sheet .sh-foot') || {}).innerText }));
+  info(JSON.stringify(k1));
+  check(k1.rows.length === 2 && /^Creatina 100g=Gs\.? ?75\.000\*$/.test(k1.rows[0]) && /^250g=Gs\.? ?145\.000$/.test(k1.rows[1]) && /75\.000/.test(k1.tot), 'aparecem as duas: o produto (100g, 75.000, já marcado) e a de 250g (145.000)');
+  await c.act('addcart'); await c.w(600);
+  const b1 = await c.evaluate(() => ({ v: lineVal(pub, cart[cart.length - 1]), l: lineLabel(pub, cart[cart.length - 1], 'es').join(' · ') }));
+  await c.evaluate(id => productSheet(id), cid); await c.w(1500); await c.locator('.sheet .vopt').nth(1).click(); await c.w(800); await c.act('addcart'); await c.w(600);
+  const b2 = await c.evaluate(() => ({ v: lineVal(pub, cart[cart.length - 1]), l: lineLabel(pub, cart[cart.length - 1], 'es').join(' · ') }));
+  info(JSON.stringify([b1, b2]));
+  check(b1.v === 75000 && b1.l === '' && b2.v === 145000 && /250g/.test(b2.l), 'no carrinho: 100g a 75.000 (só o nome do produto) e 250g a 145.000 ("Sabor: 250g")');
   if (process.env.SHOT) { await c.evaluate(id => { closeSheet(); productSheet(id); }, pid); await c.w(1800); await c.screenshot({ path: process.env.SHOT }); }
   if (process.env.SHOT2) { await o.evaluate(id => acts.editprod({ dataset: { pid: id } }), pid); await o.w(2000); await o.evaluate(() => document.querySelector('.vrow').scrollIntoView({ block: 'center' })); await o.w(300); await o.screenshot({ path: process.env.SHOT2 }); }
   check(!o.errs.length && !c.errs.length, 'sem erros de JavaScript', o.errs.concat(c.errs).join(' | '));
