@@ -23,6 +23,11 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
       sh2.querySelector('.gg-bar [data-gg="all"]').click(); await W(50); r.all = [...sh2.querySelectorAll('.card[data-gg]')].filter(c => !c.hidden).length; return r; });
     info(JSON.stringify(GG));
     check(GG.tabs === 'all,res,pub,com,ciu,con' && GG.tagged === GG.n && GG.other === 0 && GG.n >= 15, 'painel da Guía organizado por áreas (Resumen, Publicidad, Comercial, Ciudad, Contenido); todos os cartões continuam lá');
+    const GA = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const sh = () => document.querySelector('.sheet[data-k="gu"]'); sh().querySelector('.gg-bar [data-gg="com"]').click(); await W(50);
+      const n0 = ui.gu.dir.length; sh().querySelector('[data-act="guadd"][data-k="dir"]').click(); await W(300); const its = [...document.querySelectorAll('#gu-nav .at-item')]; const last = its[its.length - 1];
+      const r = { added: ui.gu.dir.length === n0 + 1, grp: ui.guGrp, vis: !!last && !last.closest('[hidden]') && last.getBoundingClientRect().height > 0 }; ui.gu.dir.pop(); ui.guGrp = 'all'; guSheet(); await W(50); return r; });
+    info(JSON.stringify(GA));
+    check(GA.added && GA.grp === 'all' && GA.vis, '"Agregar" em Negocios sin catálogo (com o filtro Comercial) abre a ficha nova visível');
     check(GG.pub === 'pub' && GG.keep === 'pub' && GG.bars === 1 && GG.all === GG.n, 'filtrar por área mostra só aquela área, continua ao redesenhar, e "Todo" mostra tudo de novo'); }
 
   sec('B. Banner pago com imagem, link e datas');
