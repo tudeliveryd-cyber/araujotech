@@ -292,7 +292,7 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   check(hv.r.includes('Perro perdido'), 'buscar "perro" encontra o aviso');
   const ed = await h.evaluate(() => { G.util = [{ c: 'escpub', n: 'Colegio Nacional Santa Rita', o: 1 }, { c: 'escpri', n: 'Colegio Privado Alfa', o: 1 }, { c: 'unipub', n: 'Universidad Nacional (filial)', o: 1 }, { c: 'gua', n: 'Jardín Pequeños Pasos', o: 1 }, { c: 'salud', n: 'Hospital', o: 1 }];
     G.atl = [{ k: 'q', es: 'Corredores de seguros', pt: '', ic: 'seg', q: 'seguro corredor' }, { k: 'p', es: 'Universidades públicas', ic: 'uni', q: 'unipub' }, { k: 'all', es: '', pt: '', ic: 'all', q: '' }];
-    CAT = 'home'; document.getElementById('q').value = ''; SPV = ''; render(); const at = [...document.querySelectorAll('#atl [data-a]')].map(b => b.textContent.trim());
+    CAT = 'home'; document.getElementById('q').value = ''; SPV = ''; render(); const at = [...document.querySelectorAll('#atl .atl [data-a]')].map(b => b.textContent.trim());
     SPV = 'edu'; CAT = 'all'; render(); const hs = [...document.querySelectorAll('.spv .uh')].map(x => x.textContent.trim()); return { at, hs }; });
   check(ed.at.join('|') === 'Corredores de seguros|Universidades públicas|Negocios', 'portada usa os accesos do painel, na ordem: ' + ed.at.join(', '));
   check(['Guarderías y jardines', 'Escuelas y colegios públicos', 'Colegios privados', 'Universidades públicas'].every(x => ed.hs.includes(x)), 'Educación separada: guarderías, colégios públicos e privados, universidades');
