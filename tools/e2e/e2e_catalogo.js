@@ -139,6 +139,8 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
       check(ORD.name === 'Cliente E2E' && /San José/.test(ORD.bairro || ''), 'pedido: nome, telefone e bairro gravados', JSON.stringify({ n: ORD.name, b: ORD.bairro, ph: ORD.phone })); }
     const wa = decodeURIComponent(await c.evaluate(() => { const l = document.querySelector('.sheet a.btn-main'); return l ? l.href : ''; }));
     check(/wa\.me\/595981000111/.test(wa) && /Milanesa E2E/.test(wa) && /Cliente E2E/.test(wa) && /45\.000/.test(wa), 'pedido: botão "Abrir WhatsApp" leva ao número do local com a mensagem completa (itens, cliente e total)', wa.slice(0, 200));
+    const fz = await c.evaluate(() => { const s0 = JSON.stringify(pub.store), m0 = ck.mode, b0 = ck.bairro; pub.store.feeMode = 'bairro'; pub.store.minFee = 5000; pub.store.bairros = [{ name: 'Sin Costo T', fee: '' }, { name: 'Con Costo T', fee: 3000 }]; ck.mode = 'delivery'; ck.bairro = 'Sin Costo T'; const r = { f: fee(), coord: bairroCoord() }; ck.bairro = 'Con Costo T'; r.f2 = fee(); pub.store = JSON.parse(s0); ck.mode = m0; ck.bairro = b0; return r; });
+    check(fz.f === 0 && fz.coord === true && fz.f2 === 5000, 'barrio sin costo (con envío mínimo cargado): queda "a coordinar" y no suma nada; barrio con costo sigue usando el mínimo', JSON.stringify(fz));
   }, c);
   if (STOP === 'D') return L.done();
 

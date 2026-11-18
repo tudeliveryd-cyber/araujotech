@@ -2587,7 +2587,7 @@ function zoneByKm(km){const zs=[...pub.zones].sort((a,b)=>a.km-b.km);const i=zs.
 function bairroFee(){return (pub.store.bairros||[]).find(x=>x.name.trim()&&x.name===ck.bairro)}
 function feeKnown(){if(pub.store.feeMode==='bairro')return !!bairroFee();return ck.zone!==''&&ck.zone!=='out'}
 function effFee(v){const st=pub.store;let f=+v||0;if(st.feeMode==='bairro'&&st.feeOrigin==='centro'&&st.storeBairro){const sb=(st.bairros||[]).find(x=>x.name===st.storeBairro);if(sb)f=Math.max(f,+sb.fee||0)}return Math.max(f,+st.minFee||0)}
-function fee(){if(ck.mode==='envio')return shipFee();if(ck.mode!=='delivery')return 0;if(delFree())return 0;if(pub.store.feeMode==='bairro'){const b=bairroFee();return b?effFee(b.fee):0}if(ck.zone===''||ck.zone==='out')return 0;const z=pub.zones[+ck.zone];return z?effFee(z.fee):0}
+function fee(){if(ck.mode==='envio')return shipFee();if(ck.mode!=='delivery')return 0;if(delFree())return 0;if(pub.store.feeMode==='bairro'){const b=bairroFee();return b&&!(b.fee==null||b.fee==='')?effFee(b.fee):0}/* barrio sin costo = a coordinar: no suma nada (ni el envío mínimo) */if(ck.zone===''||ck.zone==='out')return 0;const z=pub.zones[+ck.zone];return z?effFee(z.fee):0}
 function slots(st){const now=new Date();const prep=+st.prep||0;const d=st.days[now.getDay()];const out=[];if(!d||!d.on)return out;
  const m0=now.getHours()*60+now.getMinutes()+prep;
  shifts(d).forEach(([a,b])=>{for(let m=Math.ceil(Math.max(m0,a+prep)/15)*15;m<=b-15&&out.length<20;m+=15)out.push(hhmm(m))});return out}
