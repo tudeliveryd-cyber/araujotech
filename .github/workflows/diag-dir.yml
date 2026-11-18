@@ -1,0 +1,11 @@
+name: Diagnóstico de horários das fichas da Guía
+# Só leitura: lista as fichas sem horário publicado e como o horário está salvo no painel.
+on:
+  workflow_dispatch:
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/diag_dir.py
