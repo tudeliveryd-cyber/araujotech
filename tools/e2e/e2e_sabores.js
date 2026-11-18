@@ -91,6 +91,21 @@ const FX = __dirname + '/fix/';
   const b2 = await c.evaluate(() => ({ v: lineVal(pub, cart[cart.length - 1]), l: lineLabel(pub, cart[cart.length - 1], 'es').join(' · ') }));
   info(JSON.stringify([b1, b2]));
   check(b1.v === 75000 && b1.l === '' && b2.v === 145000 && /250g/.test(b2.l), 'no carrinho: 100g a 75.000 (só o nome do produto) e 250g a 145.000 ("Sabor: 250g")');
+
+  sec('D. Opção agotada');
+  const pidG = await o.evaluate(() => (pub.products.find(p => tr(p.n) === 'Gaseosa 2L') || {}).id);
+  await o.evaluate(id => acts.editprod({ dataset: { pid: id } }), pidG); await o.w(1500);
+  await o.locator('[data-act=varoff][data-i="0"]').click(); await o.w(300);
+  const vo = await o.evaluate(() => ({ off: varG(ui.edit).o.map(x => !!x.off), t: (document.querySelector('[data-act=varoff][data-i="0"]') || {}).textContent }));
+  check(vo.off.join() === 'true,false,false' && vo.t === 'Agotado', 'no painel, "Disponible" vira "Agotado" ao tocar', JSON.stringify(vo));
+  await o.evaluate(() => acts.saveprod()); await o.w(5000);
+  await c.evaluate(() => { cart.length = 0; }); await c.reload(); await c.w(5000);
+  await c.evaluate(id => productSheet(id), pidG); await c.w(2000);
+  const d1 = await c.evaluate(() => [...document.querySelectorAll('.sheet .vopt')].map(l => l.querySelector('span').textContent + '=' + l.querySelector('em').textContent + (l.querySelector('input').disabled ? '(x)' : '') + (l.querySelector('input').checked ? '*' : '')));
+  info(d1.join(' | '));
+  check(/^Naranja=Agotado\(x\)$/.test(d1[0]) && /^Uva=.*\*$/.test(d1[1]), 'no catálogo, Naranja aparece "Agotado" e não dá para escolher; já vem marcada a próxima (Uva)');
+  const ck2 = await c.evaluate(id => { const p = pub.products.find(x => x.id === id), g = varG(p); return cartOk({ pid: id, q: 1, o: { [g.id]: [g.o[0].id] } }); }, pidG);
+  check(ck2 === false, 'se a opção estava no carrinho e ficou agotada, o pedido não sai com ela');
   if (process.env.SHOT) { await c.evaluate(id => { closeSheet(); productSheet(id); }, pid); await c.w(1800); await c.screenshot({ path: process.env.SHOT }); }
   if (process.env.SHOT2) { await o.evaluate(id => acts.editprod({ dataset: { pid: id } }), pid); await o.w(2000); await o.evaluate(() => document.querySelector('.vrow').scrollIntoView({ block: 'center' })); await o.w(300); await o.screenshot({ path: process.env.SHOT2 }); }
   check(!o.errs.length && !c.errs.length, 'sem erros de JavaScript', o.errs.concat(c.errs).join(' | '));
