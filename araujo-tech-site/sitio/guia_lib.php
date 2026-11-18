@@ -3,7 +3,7 @@
 // Os banners só saem entre as datas escolhidas (hora do Paraguai). A imagem vai por gimg.php (o JSON fica leve).
 function guia_doc() {
   $cache = sys_get_temp_dir() . '/at_guia8.json';
-  if (is_file($cache) && time() - filemtime($cache) < 180) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
+  if (is_file($cache) && time() - filemtime($cache) < 60) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
   $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gatl&mask.fieldPaths=gcat&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
