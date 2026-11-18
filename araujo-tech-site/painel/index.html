@@ -4083,7 +4083,7 @@ function gmCard(g){const T=GM_T[lang==='pt'?'pt':'es'],l=g.news.man||[];
   <div class="row2">${gxFld('news.man.'+i+'.u',T.u,x.u,{im:'url',ph:'https://www.instagram.com/p/…'})}${gxFld('news.man.'+i+'.d',T.d,x.d,{type:'date'})}</div></div>`).join('')}</div>`}
 function guFollow(sec,i){const g=ui.gu;if(!g||!g.cat)return;if(sec==='pub'){const x=g.util[i];if(!x)return;const grp=g.cat.pub.find(y=>guFam(y).includes(x.c));ui.guNav={sec:'pub',g:grp?grp.k:null,t:'*'}}else{const x=g.dir[i];if(!x)return;ui.guNav={sec:'neg',g:g.cat.neg.some(y=>y.k===x.g)?x.g:null,t:'*'}}}
 function guSet(path,v){guDraftLater();const ks=path.split('.');let o=ui.gu;for(const k of ks.slice(0,-1)){o=o[k];if(o==null)return}o[ks[ks.length-1]]=v;{const mU=/^util\.(\d+)\.c$/.exec(path),mD=/^dir\.(\d+)\.(g|sub)$/.exec(path);if(mU||mD){if(mD&&mD[2]==='g'){const x=ui.gu.dir[+mD[1]];if(x)x.sub=''}guFollow(mU?'pub':'neg',+(mU||mD)[1]);guSheet();return}}if(/\.(on|td)$/.test(path)||/^dir\.\d+\.g$/.test(path)||/^bus\.\d+\.d$/.test(path))guSheet()}
-function guDy(dy){const ok=v=>/^\d{2}:\d{2}$/.test(v||'')?v:'';if(!Array.isArray(dy)||dy.length!==7)return null;const o=dy.map(d=>({on:!!(d&&d.on),a:[ok(d&&d.a&&d.a[0]),ok(d&&d.a&&d.a[1])],b:[ok(d&&d.b&&d.b[0]),ok(d&&d.b&&d.b[1])]})).map(d=>d.a[0]&&!d.a[1]&&!d.b[0]&&d.b[1]?{on:d.on,a:[d.a[0],d.b[1]],b:['','']}:d);/* abre 07:00 e fecha 23:00 escrito nas pontas = horário corrido */return o.some(d=>d.on&&d.a[0]&&d.a[1])?o:null}
+function guDy(dy){const ok=v=>/^\d{2}:\d{2}$/.test(v||'')?v:'';if(!Array.isArray(dy)||dy.length!==7)return null;const o=dy.map(d=>({on:!!(d&&d.on),a:[ok(d&&d.a&&d.a[0]),ok(d&&d.a&&d.a[1])],b:[ok(d&&d.b&&d.b[0]),ok(d&&d.b&&d.b[1])]})).map(d=>d.a[0]&&!d.a[1]&&!d.b[0]&&d.b[1]?{on:d.on,a:[d.a[0],d.b[1]],b:['','']}:d);/* abre 07:00 e fecha 23:00 escrito nas pontas = horário corrido */return o.some(d=>d.on&&((d.a[0]&&d.a[1])||(d.b[0]&&d.b[1])))?o:null}/* vale também só o horário da tarde/noite */
 const GU_DK='at_gu_draft';let GU_DT=null;
 function guSig(g){try{return JSON.stringify(guClean(g))}catch(e){return ''}}
 function guDraftClear(){try{localStorage.removeItem(GU_DK)}catch(e){}}
@@ -4843,6 +4843,8 @@ function onField(e){const el=e.target,d=el.dataset;if(d.at!=null&&ui.at){atSetPa
  if(d.os&&e.type==='change'){const o=orders.find(x=>x.no===+d.os);if(o){o.status=el.value;if(CLOUD_ON&&o.id&&CLOUD.api){CLOUD.api.updOrder(SHOP,o.id,{status:o.status},{status:TRACK_MAP[o.status]||'recebido'}).catch(er=>{console.warn(er);toast(t('sync_err'),true)})}else S.set(K.orders,orders)}return}
 }
 document.addEventListener('input',onField);
+/* horário das fichas da Guía: guarda já no 'input' (no iPhone o seletor de hora nem sempre dispara 'change') */
+document.addEventListener('input',e=>{const el=e.target;if(el&&el.dataset&&el.dataset.gudy!=null&&el.dataset.f!=='on'&&ui.gu){const x=ui.gu.dir[+el.dataset.gudy];if(!x)return;if(!Array.isArray(x.dy)||x.dy.length!==7)x.dy=[0,1,2,3,4,5,6].map(()=>({on:true,a:['',''],b:['','']}));const o=x.dy[+el.dataset.day],f=el.dataset.f;if(o&&f&&o[f[0]]&&(+el.dataset.day!==1))o[f[0]][+f[1]]=el.value;guDraftLater&&guDraftLater()}});
 document.addEventListener('change',e=>{const el=e.target;
  if(el.dataset.impfile&&el.files&&el.files[0]&&IMP){impFile(el.files[0]);return}
  if(el.dataset.sitefile&&el.files&&el.files[0]){siteImgFile(el.dataset.sitefile,el.files[0]);return}

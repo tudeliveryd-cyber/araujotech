@@ -245,6 +245,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   const dy = await a.evaluate((i) => ui.gu.dir[i].dy.map(d => (d.on ? '' : 'X') + d.a.join('-')), di); info(JSON.stringify(dy));
   check(dy[0] === 'X-' && dy[2] === '18:00-23:30' && dy[6] === '18:00-23:30' && dy[5] === '18:00-23:59', 'ficha: horário da segunda vai para os outros dias, domingo fechado e sexta ajustada à mão');
   check(await a.locator(`[data-gudy="${di}"][data-day="3"][data-f="a1"]`).inputValue() === '23:30', 'a tela da ficha mostra o horário copiado');
+  check(await a.evaluate(() => { const n = { on: true, a: ['', ''], b: ['18:00', '23:00'] }; const r = guDy([0, 1, 2, 3, 4, 5, 6].map(() => JSON.parse(JSON.stringify(n)))); return !!r && r[1].b[1] === '23:00'; }), 'horário só no segundo turno (18:00–23:00) também é salvo');
   await a.act('gusave'); await a.w(2500);
   d = await doc(); const al = (d.gdir || []).find(x => x.n === 'Pizzería Aliada'); info(JSON.stringify(al && { ...al, lg: al.lg && al.lg.slice(0, 30) }));
   check(al && al.td === true && al.ig === 'pizzeria.aliada' && al.wa === '0981 123 456' && /^data:image\/jpeg/.test(al.lg) && al.lg.length < 20000 && al.mu === 'https://pizzeria.test/menu' && al.mt === 'menu' && al.dy && al.dy[3].a[1] === '23:30' && al.dy[0].on === false, 'aliado salvo (com link do menú) com selo, Instagram limpo, WhatsApp e logo pequeno');
