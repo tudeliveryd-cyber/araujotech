@@ -27,8 +27,10 @@ const { sec, check, info } = L;
   check(h.kp[4] === 'Gs. ' + rev.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'), 'cobrado no mês = soma dos pagamentos registrados');
 
   await a.w(1500);
-  const gu = await a.evaluate(() => [...document.querySelectorAll('.cg-gu .cg-kpis:not(.cg-guc) .cg-k b')].map(x => x.textContent));
+  const gu = await a.evaluate(() => [...document.querySelectorAll('.cg-gu .cg-kpis:not(.cg-guc) .cg-k:not(#cg-on) b')].map(x => x.textContent));
   check(gu.join(',') === '7,50,13,130,4', 'visão geral mostra os números da Guía (hoje, 30 dias, toques, anúncios, Conocé): ' + gu.join(','));
+  const con = await a.evaluate(async () => { const f0 = window.fetch; window.fetch = (x, o) => /guia_stats/.test(String(x)) && /"on":1/.test(String((o || {}).body || '')) ? Promise.resolve(new Response(JSON.stringify({ ok: true, n: 4, pk: 9, at: '10:15', h: {} }))) : f0(x, o); await guOnLoad(); window.fetch = f0; const e = document.getElementById('cg-on'); return e ? e.innerText.replace(/\s+/g, ' ') : ''; });
+  check(/^4 conectados ahora · pico de hoy 9 \(10:15\)/.test(con), 'Central, parte da Guía: "conectados ahora" com o pico do dia (' + con + ')');
   const geo = await a.evaluate(() => [...document.querySelectorAll('.cg-geo:not(.cg-top) li')].map(li => li.querySelector('span').textContent + '=' + li.querySelector('b').textContent));
   check(geo.length === 3 && geo[0] === 'Santa Rita, Paraguay=60%' && /Brasil=10%/.test(geo[2]), 'de onde entram: lugares com porcentagem (' + geo.join(' · ') + ')');
   const top = await a.evaluate(() => [...document.querySelectorAll('.cg-top li')].map(li => li.querySelector('span').textContent + '=' + li.querySelector('b').textContent).join(' · '));
