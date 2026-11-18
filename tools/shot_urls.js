@@ -8,6 +8,7 @@ const URLS = (process.env.URLS || 'https://guiadesantarita.com/').split(/\s+/).f
       try { await p.goto(u, { waitUntil: 'load', timeout: 60000 }); await p.waitForTimeout(6000); } catch (e) { console.log('ERR', u, e.message); }
       const buf = await p.screenshot({ type: 'jpeg', quality: 70, fullPage: FULL }); const s = buf.toString('base64');
       console.log('PAGE', nm, i, u, 'altura', await p.evaluate(() => document.body.scrollHeight).catch(() => 0), errs.length ? 'ERROS ' + errs.join(' | ').slice(0, 300) : '');
+      if (nm === 'desk') console.log('LINKS', i, JSON.stringify(await p.evaluate(() => [...document.querySelectorAll('a[href]')].map(a => a.textContent.trim().slice(0, 30) + ' => ' + a.href)).catch(() => [])));
       for (let k = 0; k < s.length; k += 60000) console.log('IMG64 ' + nm + '-' + i + '.jpg ' + s.slice(k, k + 60000));
       await p.close(); }
     await ctx.close(); }
