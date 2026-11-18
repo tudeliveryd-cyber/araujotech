@@ -979,9 +979,13 @@ const TUW={de:[300,660],al:[660,900],me:[900,1140],ce:[1140,1440]};let QTU=null,
 const tuNow=()=>{const d=new Date(),n=d.getHours()*60+d.getMinutes();if(n<120)return 'ce';return Object.keys(TUW).find(k=>n>=TUW[k][0]&&n<TUW[k][1])||'de'};
 function openIn(days,k){const [a,b]=TUW[k],q=(b-a)/4;return [a+q/2,a+q*1.5,a+q*2.5,a+q*3.5].filter(m=>{const d=new Date();d.setHours(0,0,0,0);d.setMinutes(Math.round(m));return (openNow(days,d)||{}).on}).length>=3}/* precisa estar aberto em quase todo o turno (quem abre às 17h não é merienda) */
 const TUX={de:/desayun|cafe da manha|manana/,al:/almuerz|almoc|armuerz|mediodia/,me:/merienda|merenda|lanche da tarde|tarde/,ce:/cena|janta|jantar|noche|noite/};
-const tuOf=c=>{const tx=norm(c.segEs||'');return Object.keys(TUW).filter(k=>(c.tu||[]).includes(k)||(c.dy&&openIn(c.dy,k))||TUX[k].test(tx))};/* turno marcado, escrito no rubro ou deduzido do horário *//* turno marcado no painel ou deduzido do horário */
+/* o que cada rubro serve: o horário sozinho não basta (heladería aberta ao meio-dia não vende almoço; loja de roupa nunca entra) */
+const TUR=[[/helad|sorvet|acai|batido|smoothie/,['me']],[/cafe|cafeter|panader|padaria|confiter|reposter|pasteler|docer|dulcer|chipa|bakery/,['de','me']],[/pizz|lomit|hamburg|burger|lanch|pancho|hot ?dog|sandwich|sanduich/,['ce']],[/restaur|comedor|parrill|asado|churrasc|sushi|rotiser|comida|cocina|buffet|pollo|empanad|pasta|marisc|bistro|grill|minuta|menu del dia|almuerz|almoc/,['al','ce']]];
+const tuOf=c=>{if(c._g!=='food')return [];const tx=norm([c.segEs,c.segPt,c._sub].filter(Boolean).join(' '));
+ const rb=new Set();TUR.forEach(([r,ks])=>{if(r.test(tx))ks.forEach(k=>rb.add(k))});const d=c._dir?c.dy:(INFO[c.id]||{}).days;
+ const mk=(c.tu||[]).length>0;return Object.keys(TUW).filter(k=>(c.tu||[]).includes(k)||TUX[k].test(tx)||(!mk&&rb.has(k)&&(!d||openIn(d,k))))};/* marcado no painel ou escrito no rubro ("Desayuno y almuerzo"); sem nada marcado, pelo tipo de negócio, se estiver aberto no turno. O horário sozinho nunca basta */
 function qcaHTML(){const t=TX[L],k=QTU||tuNow();const ds=dirL().filter(c=>tuOf(c).length);if(!ds.length)return '';
- const vx=(LIST||[]).filter(c=>c._g==='food'&&(INFO[c.id]||{}).days&&!(INFO[c.id]||{}).paused&&openIn(INFO[c.id].days,k)).sort((a,b)=>(b.dest?1:0)-(a.dest?1:0));
+ const vx=(LIST||[]).filter(c=>c._g==='food'&&(INFO[c.id]||{}).days&&!(INFO[c.id]||{}).paused&&tuOf(c).includes(k)).sort((a,b)=>(b.dest?1:0)-(a.dest?1:0));
  const op=c=>{const d=c._dir?c.dy:(INFO[c.id]||{}).days;const o=d?openNow(d):null;return o?(o.on?1:0):.5};
  const l=vx.concat(ds.filter(c=>tuOf(c).includes(k))).map((c,i)=>({c,i})).sort((a,b)=>(op(b.c)-op(a.c))||(((b.c.dest||b.c.td)?1:0)-((a.c.dest||a.c.td)?1:0))||(a.i-b.i)).map(x=>x.c);
  const MX=matchMedia('(max-width:899px)').matches?999:8,sh=QX?l:l.slice(0,MX);/* no celular o carrossel mostra todos; no computador, 8 e 'Ver los N' */
