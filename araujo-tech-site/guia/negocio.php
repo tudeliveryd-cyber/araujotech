@@ -168,7 +168,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <p class="rep"><a href="<?= $e('https://wa.me/595982086171?text=' . rawurlencode('Hola, en la Guía de Santa Rita hay un dato incorrecto de ' . $name . ' (' . $url . '): ')) ?>" target="_blank" rel="noopener nofollow" data-pt="Algum dado errado? Avise a Guia">¿Algún dato incorrecto? Avisale a la Guía</a></p>
 <section class="cta"><div><b data-pt="Mais negócios de Santa Rita">Más negocios de Santa Rita</b><p data-pt="Ofertas, farmácia de plantão, ônibus e tudo o que é útil na cidade.">Ofertas, farmacia de turno, ómnibus y todo lo útil de la ciudad.</p></div><a href="/guia/" data-pt="Abrir a Guia de Santa Rita">Abrir la Guía de Santa Rita</a></section>
 </main>
-<footer id="gft"></footer><script src="/guia/rodape.js" defer></script>
+<footer id="gft"></footer><script src="/guia/rodape.js" defer></script><script src="/guia/on.js" defer></script>
 <script>try{if(localStorage.getItem('at_lang')==='pt'){document.documentElement.lang='pt';document.querySelectorAll('[data-pt]').forEach(function(e){e.textContent=e.getAttribute('data-pt')})}}catch(e){}</script>
 <script>
 var HU=(location.hostname.endsWith('guiadesantarita.com')?'https://araujotechsistemas.com':'')+'/sitio/guia_hit.php';/* os números ficam todos no servidor principal */

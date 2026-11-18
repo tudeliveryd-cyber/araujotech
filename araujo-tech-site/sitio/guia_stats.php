@@ -13,6 +13,10 @@ curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 8, CUR
 $r = json_decode((string)curl_exec($c), true);
 $mail = strtolower((string)($r['users'][0]['email'] ?? ''));
 $admin = $mail === 'admin@araujotechsistemas.com';
+if (!empty($in['on'])) { // "Ahora en la Guía": solo el admin
+  if (!$admin) { echo '{"ok":false}'; exit; }
+  require_once __DIR__ . '/guia_on_lib.php'; $on = guia_on(''); echo json_encode($on ? ['ok' => true] + $on : ['ok' => false]); exit;
+}
 // ficha própria (conta da Guía, /cuenta/): só os toques da ficha de quem está logado. O id vem do login verificado, não do pedido.
 if (!empty($in['ficha'])) {
   $uid = (string)($r['users'][0]['localId'] ?? '');
