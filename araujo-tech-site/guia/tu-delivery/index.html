@@ -69,6 +69,10 @@ section.s{padding:72px 0 0}
 .tl li.now::before{background:var(--yellow);color:var(--night)}
 .tl b{display:block;font-family:var(--display);font-size:19px;color:var(--td);line-height:1.2;padding-top:6px}.tl p{color:var(--muted);margin-top:4px;font-size:15.5px}
 /* aliados */
+.tdmap{margin-top:22px;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#fff}#tdm{height:380px}
+@media (max-width:899px){#tdm{height:300px}}
+.leaflet-popup-content b{display:block;font-family:var(--display);color:var(--td)}.leaflet-popup-content a{color:var(--wa);font-weight:700}
+
 .al{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:28px}
 .ali{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;text-decoration:none}
 .ali:hover{border-color:var(--purple)}
@@ -190,6 +194,7 @@ form.f{background:#fff;color:var(--ink);border-radius:24px;padding:28px;display:
 <h2 class="h2"><span data-l="es">Dónde pedir</span><span data-l="pt">Onde pedir</span></h2>
 <p class="sub"><span data-l="es">Negocios aliados que envían sus pedidos con Tu Delivery. El pedido se hace directo con el negocio.</span><span data-l="pt">Negócios aliados que enviam seus pedidos com a Tu Delivery. O pedido é feito direto com o negócio.</span></p>
 <div class="al" id="al"><p class="al-load"><span data-l="es">Cargando negocios…</span><span data-l="pt">Carregando negócios…</span></p></div>
+<div class="tdmap" id="tdmap" hidden><div id="tdm"></div></div>
 <p class="al-more"><a href="/guia/"><span data-l="es">Ver todos los negocios en la Guía</span><span data-l="pt">Ver todos os negócios no Guia</span><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p>
 </div></section>
 
@@ -276,7 +281,15 @@ function drawAl(){var el=document.getElementById('al');if(!AL)return;if(!AL.leng
  var txt=L==='pt'?'Olá! Vi seu negócio no Guia de Santa Rita e quero fazer um pedido.':'¡Hola! Vi tu negocio en la Guía de Santa Rita y quiero hacer un pedido.',go=L==='pt'?'Pedir':'Pedir';
  el.innerHTML=AL.map(function(c){var w=String(c.wa||'').replace(/\D/g,'');if(w&&w.length<=10)w='595'+w.replace(/^0/,'');var href=w?'https://wa.me/'+w+'?text='+encodeURIComponent(txt):'/guia/';
   return '<a class="ali" href="'+esc(href)+'"'+(w?' target="_blank" rel="noopener"':'')+'><span class="lg">'+(c.lg?'<img src="'+esc(c.lg)+'" alt="" loading="lazy">':esc(ini(c.n)))+'</span><b>'+esc(c.n)+'</b>'+(c.d?'<small>'+esc(c.d)+'</small>':'')+(w?'<span class="go"><svg class="i" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4A8.5 8.5 0 1 1 8 19.6z"/></svg>'+go+'</span>':'')+'</a>'}).join('')}
-fetch('/sitio/guia.php?g=1').then(function(r){return r.ok?r.json():null}).then(function(j){AL=((j&&j.dir)||[]).filter(function(x){return x&&x.td&&x.n}).sort(function(a,b){return (b.lg?1:0)-(a.lg?1:0)});drawAl()}).catch(function(){AL=[];drawAl()});
+fetch('/sitio/guia.php?g=1').then(function(r){return r.ok?r.json():null}).then(function(j){AL=((j&&j.dir)||[]).filter(function(x){return x&&x.td&&x.n}).sort(function(a,b){return (b.lg?1:0)-(a.lg?1:0)});drawAl();drawMap()}).catch(function(){AL=[];drawAl()});
+/* mapa: só os aliados que têm a localização certa no link do mapa (nada inventado) */
+function geoOf(u){u=String(u||'');var m=u.match(/[?&](?:q|query|ll)=(-?\d{1,2}\.\d+),\s*(-?\d{1,3}\.\d+)/)||u.match(/@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/)||u.match(/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/);if(!m)return null;var a=+m[1],b=+m[2];return Math.abs(a)<=90&&Math.abs(b)<=180?[a,b]:null}
+function drawMap(){var pts=(AL||[]).map(function(c){return [c,geoOf(c.map)]}).filter(function(x){return x[1]});if(pts.length<2)return;var box=document.getElementById('tdmap');box.hidden=false;
+ var go=function(){var Lf=window.L,M=Lf.map('tdm',{scrollWheelZoom:false});Lf.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(M);
+  var ic=Lf.divIcon({className:'',html:'<svg width="30" height="40" viewBox="0 0 30 40"><path d="M15 39s13-12.6 13-23A13 13 0 0 0 2 16c0 10.4 13 23 13 23z" fill="#5B21B6" stroke="#fff" stroke-width="2"/><circle cx="15" cy="16" r="5" fill="#FFC21A"/></svg>',iconSize:[30,40],iconAnchor:[15,39],popupAnchor:[0,-34]});
+  pts.forEach(function(x){var c=x[0],w=String(c.wa||'').replace(/\D/g,'');if(w&&w.length<=10)w='595'+w.replace(/^0/,'');Lf.marker(x[1],{icon:ic,title:c.n}).addTo(M).bindPopup('<b>'+esc(c.n)+'</b>'+(c.d?esc(c.d)+'<br>':'')+(w?'<a href="https://wa.me/'+w+'" target="_blank" rel="noopener">WhatsApp</a>':''))});
+  M.fitBounds(pts.map(function(x){return x[1]}),{padding:[30,30],maxZoom:16})};
+ if(window.L)return go();var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';document.head.appendChild(l);var sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';sc.onload=go;document.head.appendChild(sc)}
 /* formulário: monta a mensagem e abre o WhatsApp (nada é guardado) */
 var f=document.getElementById('fj');f.addEventListener('submit',function(e){e.preventDefault();var g=function(n){var x=f.elements[n];return x?String(x.value||'').trim():''};
  var n=g('n'),w=g('w').replace(/[^\d+ ]/g,''),ok=n.length>=3&&w.replace(/\D/g,'').length>=8;document.getElementById('fe').style.display=ok?'none':'block';if(!ok){(n.length<3?f.elements.n:f.elements.w).focus();return}

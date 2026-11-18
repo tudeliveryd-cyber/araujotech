@@ -28,7 +28,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
       const r = { added: ui.gu.dir.length === n0 + 1, grp: ui.guGrp, vis: !!last && !last.closest('[hidden]') && last.getBoundingClientRect().height > 0 }; ui.gu.dir.pop(); ui.guGrp = 'all'; guSheet(); await W(50); return r; });
     info(JSON.stringify(GA));
     check(GA.added && GA.grp === 'all' && GA.vis, '"Agregar" em Negocios sin catálogo (com o filtro Comercial) abre a ficha nova visível');
-    check(GG.pub === 'pub' && GG.keep === 'pub' && GG.bars === 1 && GG.all === GG.n, 'filtrar por área mostra só aquela área, continua ao redesenhar, e "Todo" mostra tudo de novo'); }
+    check(GG.pub.split(',').every(x => x === 'pub') && GG.keep === 'pub' && GG.bars === 1 && GG.all === GG.n, 'filtrar por área mostra só aquela área, continua ao redesenhar, e "Todo" mostra tudo de novo'); }
 
   sec('B. Banner pago com imagem, link e datas');
   await a.act('guadd', '[data-k="ads"]'); await a.w(300);
@@ -586,6 +586,31 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     check(err && /wa\.me\/595982086171/.test(op) && /Quiero trabajar como repartidor/.test(dec) && /Juan Pérez/.test(dec) && /Moto propia: Sí/.test(dec) && /Noche/.test(dec), 'formulário de repartidor: sem nome/WhatsApp avisa; completo, abre o WhatsApp da Tu Delivery com os dados');
     check(/Seu pedido, na porta da sua casa/.test(r2.h1) && !r2.es, 'botão PT troca toda a página para português');
     check(!T.p.errs.length, 'página da Tu Delivery sem erros de JavaScript', T.p.errs.join(' | ')); }
+  { const T2 = await L.open({ w: 1366 }); const tp = T2.p;
+    await tp.route('**/sitio/guia.php?g=1', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ dir: [{ id: 'a1', n: 'Aliado Uno', d: 'Pizzas', td: true, wa: '0981111222', map: 'https://www.google.com/maps/place/x/@-25.7950,-55.0900,17z' }, { id: 'a2', n: 'Aliado Dos', d: 'Lanches', td: true, wa: '0981111333', map: 'https://maps.google.com/?q=-25.7990,-55.0850' }, { id: 'a3', n: 'Sin mapa', td: true, wa: '0981111444', map: '' }, { id: 'x', n: 'No aliado', td: false, map: 'https://maps.google.com/?q=-25.7,-55.0' }] }) }));
+    await tp.goto('https://araujotechsistemas.com/guia/tu-delivery/'); await tp.w(1500);
+    const r = await tp.evaluate(() => ({ cards: [...document.querySelectorAll('#al .ali b')].map(b => b.textContent).join('|'), map: !document.getElementById('tdmap').hidden }));
+    info(JSON.stringify(r));
+    check(r.cards === 'Aliado Uno|Aliado Dos|Sin mapa' && r.map, 'Tu Delivery: lista só os aliados e mostra o mapa quando há pelo menos 2 com localização no link'); }
+  sec('V. Promo del día e relatório para os aliados');
+  { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
+    const fid = await a.evaluate(() => { ui.gu.dir.push({ id: 'pv1', n: 'Pizzería Promo', g: 'food', d: 'Pizzas', wa: '0981 444 555', td: true, on: true, tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], mt: 'menu', mu: '' }); guSheet(); return 'd:pv1'; }); await a.w(300);
+    await a.act('guadd', '[data-k="promo"]'); await a.w(300);
+    await a.locator('select[data-gu="promo.0.fid"]').selectOption(fid); await a.fill('[data-gu="promo.0.t"]', 'Pizza grande 2x1 solo hoy'); await a.w(200);
+    const today = await a.evaluate(() => guDay()); const yest = await a.evaluate(() => { const d = new Date(Date.now() - 864e5); return d.toLocaleDateString('en-CA', { timeZone: 'America/Asuncion' }); });
+    await a.act('guadd', '[data-k="promo"]'); await a.w(200); await a.locator('select[data-gu="promo.0.fid"]').selectOption(fid); await a.fill('[data-gu="promo.0.t"]', 'Promo vieja'); await a.fill('[data-gu="promo.0.d"]', yest); await a.w(200);
+    await a.act('gusave'); await a.w(2500); const dd = await doc();
+    info(JSON.stringify(dd.gpromo));
+    check(Array.isArray(dd.gpromo) && dd.gpromo.length === 1 && dd.gpromo[0].fid === 'd:pv1' && dd.gpromo[0].t === 'Pizza grande 2x1 solo hoy' && dd.gpromo[0].d === today, 'promo do dia salva em platform/sitio (gpromo); a de ontem não é salva');
+    const pp = JSON.parse(require('child_process').execFileSync('php', ['-r', "require 'prods_lib.php'; require 'guia_lib.php'; $p = guia_pub(); echo json_encode($p['promo']);"], { cwd: require('path').join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gp-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString());
+    check(pp.length === 1 && pp[0].k === 'd' && pp[0].id === 'pv1' && /2x1/.test(pp[0].t), 'servidor entrega só a promo de hoje', JSON.stringify(pp));
+    const rp = await a.evaluate(async () => { ui.guSt = { v: 10, c: { 'd-pv1': 7 }, s: {}, k: {}, q: {}, p: {}, vd: {}, geo: {} }; guSheet(); await new Promise(f => setTimeout(f, 100)); const c = document.querySelector('.gu-rep'); const row = c && [...c.querySelectorAll('.gx-list>div')].find(d => /Pizzería Promo/.test(d.textContent)); const a = row && row.querySelector('a'); return { has: !!c, n: row ? row.querySelector('b + b, b:nth-of-type(2)') && row.textContent : '', href: a ? decodeURIComponent(a.href) : '' }; });
+    info(JSON.stringify(rp));
+    check(rp.has && /wa\.me\/595981444555/.test(rp.href) && /tocaron 7 veces/.test(rp.href) && /Verificado/.test(rp.href), 'relatório para aliados: toques reais (7) e botão que abre o WhatsApp do negócio com a mensagem pronta');
+    await a.evaluate(() => { ui.gu.dir = ui.gu.dir.filter(x => x.id !== 'pv1'); ui.gu.promo = []; }); await a.act('gusave'); await a.w(1500);
+    const PR = await g4.evaluate(async () => { G.dir = [{ id: 'pv1', n: 'Pizzería Promo', g: 'food', d: 'Pizzas', wa: '0981 444 555', td: true }]; G.promo = [{ k: 'd', id: 'pv1', t: 'Pizza grande 2x1 solo hoy' }]; G.cat = {}; applyCat(); document.getElementById('q').value = ''; CAT = 'home'; SPV = ''; render(); await new Promise(f => setTimeout(f, 80)); const c = document.querySelector('#promos .prm-c'); const r = { has: !!c, t: c ? c.textContent : '', href: c ? decodeURIComponent(c.href) : '' }; G.promo = []; render(); r.gone = !document.getElementById('promos'); return r; });
+    info(JSON.stringify(PR));
+    check(PR.has && /Pizza grande 2x1/.test(PR.t) && /Solo hoy/.test(PR.t) && /wa\.me\/595981444555/.test(PR.href) && /promo de hoy/.test(PR.href) && PR.gone, 'portada: "Promos de hoy" com o negócio e o botão de pedir pelo WhatsApp; sem promo, a faixa some'); }
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
