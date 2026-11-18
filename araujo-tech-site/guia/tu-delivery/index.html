@@ -2,7 +2,7 @@
 <html lang="es"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tu Delivery · Delivery en Santa Rita, de confianza | Guía de Santa Rita</title>
-<meta name="description" content="Tu Delivery: tu pedido en la puerta de tu casa en Santa Rita. Pedí por WhatsApp 0982 086 171, conocé los negocios aliados y postulate para trabajar con nosotros.">
+<meta name="description" content="Tu Delivery: 13 repartidores y más de 8.200 entregas por mes en Santa Rita. Tu pedido en la puerta de tu casa. Pedí por WhatsApp 0982 086 171, conocé los negocios aliados y postulate para trabajar con nosotros.">
 <link rel="canonical" href="https://guiadesantarita.com/tu-delivery/">
 <meta property="og:type" content="website"><meta property="og:title" content="Tu Delivery · Delivery en Santa Rita, de confianza"><meta property="og:description" content="Tu pedido en la puerta de tu casa. Pedí por WhatsApp 0982 086 171."><meta property="og:image" content="https://araujotechsistemas.com/img/guia/tu-delivery.jpg">
 <link rel="icon" href="/img/guia/favicon.png?v=2"><meta name="theme-color" content="#2A1350">
@@ -36,10 +36,11 @@ svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-widt
 .btn.gh{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}.btn.gh:hover{background:rgba(255,255,255,.08)}
 .btn.y{background:var(--yellow);color:var(--night)}
 .ph{align-self:end;position:relative}.ph img{width:100%;height:auto;border-radius:28px 28px 0 0;object-fit:cover;aspect-ratio:685/720;object-position:center 20%}
-.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:0;background:#fff;border:1px solid var(--line);border-radius:22px;margin-top:-36px;position:relative;z-index:2}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#fff;border:1px solid var(--line);border-radius:22px;margin-top:-36px;position:relative;z-index:2}
 .facts div{padding:20px 22px;display:flex;gap:14px;align-items:flex-start}.facts div+div{border-left:1px solid var(--line)}
 .facts .ic{width:44px;height:44px;border-radius:12px;background:var(--lilac);color:var(--brand);display:grid;place-items:center;flex:none}
-.facts b{display:block;font-family:var(--display);font-size:18px;color:var(--td);line-height:1.2}.facts small{color:var(--muted);font-size:14px}
+.facts b{display:block;font-family:var(--display);font-size:18px;color:var(--td);line-height:1.2}
+.facts.nums div{flex-direction:column;gap:6px;padding:22px 24px}.facts.nums b{font-weight:900;font-size:clamp(30px,3.2vw,42px);letter-spacing:-1px;line-height:1}.facts.nums small{font-size:14.5px;line-height:1.35}.facts small{color:var(--muted);font-size:14px}
 /* seções */
 section.s{padding:72px 0 0}
 .h2{font-family:var(--display);font-weight:900;font-size:clamp(28px,3.4vw,40px);line-height:1.08;letter-spacing:-.8px;color:var(--td)}
@@ -60,6 +61,13 @@ section.s{padding:72px 0 0}
 .val{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px 22px;display:flex;gap:16px;align-items:flex-start}
 .val .ic{width:44px;height:44px;border-radius:12px;background:var(--lilac);color:var(--brand);display:grid;place-items:center;flex:none}
 .val h3{font-family:var(--display);font-size:18px;color:var(--td);line-height:1.2}.val p{color:var(--muted);font-size:15px;margin-top:4px}
+.tl{list-style:none;padding:0;margin:0;display:grid;gap:0;counter-reset:tl;align-content:start}
+.tl li{position:relative;padding:4px 0 22px 52px;counter-increment:tl}
+.tl li::before{content:counter(tl);position:absolute;left:0;top:0;width:36px;height:36px;border-radius:50%;background:var(--lilac);color:var(--brand);font-family:var(--display);font-weight:900;display:grid;place-items:center}
+.tl li::after{content:"";position:absolute;left:17px;top:40px;bottom:0;width:2px;background:var(--line)}
+.tl li:last-child::after{display:none}.tl li:last-child{padding-bottom:0}
+.tl li.now::before{background:var(--yellow);color:var(--night)}
+.tl b{display:block;font-family:var(--display);font-size:19px;color:var(--td);line-height:1.2;padding-top:6px}.tl p{color:var(--muted);margin-top:4px;font-size:15.5px}
 /* aliados */
 .al{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:28px}
 .ali{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;text-decoration:none}
@@ -110,7 +118,7 @@ form.f{background:#fff;color:var(--ink);border-radius:24px;padding:28px;display:
  .hero .wrap{grid-template-columns:1fr;gap:0;padding-top:34px}
  .hero .tx{padding-bottom:26px}
  .ph{max-width:420px;margin:0 auto;width:100%}
- .facts{grid-template-columns:1fr;margin-top:-20px}.facts div+div{border-left:0;border-top:1px solid var(--line)}
+ .facts{grid-template-columns:1fr 1fr;margin-top:-20px}.facts div+div{border-left:0}.facts div:nth-child(even){border-left:1px solid var(--line)}.facts div:nth-child(n+3){border-top:1px solid var(--line)}.facts.nums div{padding:18px}
  .steps,.story,.duo,.join .wrap{grid-template-columns:1fr}
  section.s{padding-top:52px}.join{margin-top:52px;padding:52px 0}
  .story .card{min-height:0;padding:26px}.panel{padding:24px}
@@ -143,12 +151,30 @@ form.f{background:#fff;color:var(--ink);border-radius:24px;padding:28px;display:
 
 <main>
 <div class="wrap">
-<div class="facts">
-<div><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span><span><b><span data-l="es">Toda Santa Rita</span><span data-l="pt">Toda Santa Rita</span></b><small><span data-l="es">Entregamos en los barrios de la ciudad</span><span data-l="pt">Entregamos nos bairros da cidade</span></small></span></div>
-<div><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4A8.5 8.5 0 1 1 8 19.6z"/></svg></span><span><b>WhatsApp</b><small><span data-l="es">Sin apps ni registros: escribís y listo</span><span data-l="pt">Sem apps nem cadastro: escreve e pronto</span></small></span></div>
-<div><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b><span data-l="es">De confianza</span><span data-l="pt">De confiança</span></b><small><span data-l="es">Empresa familiar de la ciudad</span><span data-l="pt">Empresa familiar da cidade</span></small></span></div>
+<div class="facts nums">
+<div><b>13</b><small><span data-l="es">repartidores en la calle</span><span data-l="pt">entregadores na rua</span></small></div>
+<div><b>+8.200</b><small><span data-l="es">entregas por mes</span><span data-l="pt">entregas por mês</span></small></div>
+<div><b>+60%</b><small><span data-l="es">de los negocios con delivery de la ciudad trabajan con nosotros</span><span data-l="pt">dos negócios com delivery da cidade trabalham com a gente</span></small></div>
+<div><b><span data-l="es">Desde 2022</span><span data-l="pt">Desde 2022</span></b><small><span data-l="es">casi 5 años llevando pedidos en Santa Rita</span><span data-l="pt">quase 5 anos levando pedidos em Santa Rita</span></small></div>
 </div>
 </div>
+
+<section class="s" id="historia"><div class="wrap">
+<h2 class="h2"><span data-l="es">Nuestra historia</span><span data-l="pt">Nossa história</span></h2>
+<p class="sub"><span data-l="es">De una moto a una referencia en la ciudad.</span><span data-l="pt">De uma moto a uma referência na cidade.</span></p>
+<div class="story">
+<div class="card">
+<blockquote><span data-l="es">Empezamos con <span>una sola moto.</span></span><span data-l="pt">Começamos com <span>uma moto só.</span></span></blockquote>
+<p><span data-l="es">Hoy somos una empresa familiar con 13 repartidores y más de 8.200 entregas por mes. La mayoría de los negocios con delivery de Santa Rita confía en nosotros por la seriedad y la calidad del servicio.</span><span data-l="pt">Hoje somos uma empresa familiar com 13 entregadores e mais de 8.200 entregas por mês. A maioria dos negócios com delivery de Santa Rita confia na gente pela seriedade e pela qualidade do serviço.</span></p>
+</div>
+<ol class="tl">
+<li><b><span data-l="es">Una moto y ganas de trabajar</span><span data-l="pt">Uma moto e vontade de trabalhar</span></b><p><span data-l="es">Todo empezó con el fundador, solo, en su moto, haciendo entregas para sostenerse.</span><span data-l="pt">Tudo começou com o fundador, sozinho, na sua moto, fazendo entregas para se manter.</span></p></li>
+<li><b><span data-l="es">El primer compañero</span><span data-l="pt">O primeiro companheiro</span></b><p><span data-l="es">Los pedidos crecieron y llegó el primer repartidor, para trabajar juntos de noche.</span><span data-l="pt">Os pedidos cresceram e chegou o primeiro entregador, para trabalhar junto à noite.</span></p></li>
+<li><b><span data-l="es">La familia se suma</span><span data-l="pt">A família se junta</span></b><p><span data-l="es">Su esposa dejó su trabajo para sumarse, y juntos armaron de verdad Tu Delivery.</span><span data-l="pt">A esposa deixou o emprego para se juntar, e juntos montaram de verdade a Tu Delivery.</span></p></li>
+<li class="now"><b><span data-l="es">Hoy, una referencia en Santa Rita</span><span data-l="pt">Hoje, uma referência em Santa Rita</span></b><p><span data-l="es">13 repartidores, más de 8.200 entregas por mes y casi 5 años de empresa.</span><span data-l="pt">13 entregadores, mais de 8.200 entregas por mês e quase 5 anos de empresa.</span></p></li>
+</ol>
+</div>
+</div></section>
 
 <section class="s" id="como"><div class="wrap">
 <h2 class="h2"><span data-l="es">Así de simple</span><span data-l="pt">Simples assim</span></h2>
@@ -167,19 +193,7 @@ form.f{background:#fff;color:var(--ink);border-radius:24px;padding:28px;display:
 <p class="al-more"><a href="/guia/"><span data-l="es">Ver todos los negocios en la Guía</span><span data-l="pt">Ver todos os negócios no Guia</span><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></p>
 </div></section>
 
-<section class="s" id="historia"><div class="wrap">
-<div class="story">
-<div class="card">
-<blockquote><span data-l="es">Empezamos con <span>una sola moto.</span></span><span data-l="pt">Começamos com <span>uma moto só.</span></span></blockquote>
-<p><span data-l="es">Tu Delivery nació en Santa Rita con un repartidor y muchas ganas de servir bien. Hoy es una empresa familiar con un equipo que sale todos los días a la calle a llevar los pedidos de la ciudad.</span><span data-l="pt">A Tu Delivery nasceu em Santa Rita com um entregador e muita vontade de servir bem. Hoje é uma empresa familiar com uma equipe que sai todos os dias para levar os pedidos da cidade.</span></p>
-</div>
-<div class="vals">
-<div class="val"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/></svg></span><span><h3><span data-l="es">Gente de confianza</span><span data-l="pt">Gente de confiança</span></h3><p><span data-l="es">Repartidores de la ciudad, identificados con la ropa y la mochila de Tu Delivery.</span><span data-l="pt">Entregadores da cidade, identificados com a roupa e a mochila da Tu Delivery.</span></p></span></div>
-<div class="val"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg></span><span><h3><span data-l="es">Conocemos cada barrio</span><span data-l="pt">Conhecemos cada bairro</span></h3><p><span data-l="es">Salimos del centro y llegamos a todos los barrios de Santa Rita.</span><span data-l="pt">Saímos do centro e chegamos a todos os bairros de Santa Rita.</span></p></span></div>
-<div class="val"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4A8.5 8.5 0 1 1 8 19.6z"/></svg></span><span><h3><span data-l="es">Todo por WhatsApp</span><span data-l="pt">Tudo pelo WhatsApp</span></h3><p><span data-l="es">Sin apps para descargar: una conversación y tu pedido sale.</span><span data-l="pt">Sem aplicativo para baixar: uma conversa e seu pedido sai.</span></p></span></div>
-</div>
-</div>
-</div></section>
+
 
 <section class="s" id="tarifa"><div class="wrap">
 <div class="duo">

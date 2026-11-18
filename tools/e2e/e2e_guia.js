@@ -339,7 +339,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(simp.chips === 0 && simp.filt === 0 && ['all', 'gas', 'del', 'em', 'sal', 'far', 'igl', 'edu', 'tra', 'ev', 'job', 'mas'].every(k => simp.atl.includes(k)), 'início: acessos rápidos com ícones (sem repetir a fila de categorias)');
   check(simp.srchBeforeSl, 'a busca fica no topo e os destacados (slider) saem do topo');
   const nav = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms));
-    document.querySelector('#atl [data-a="del"]').click(); await W(50); r.open = F_DEL && CAT === 'all' && !document.body.classList.contains('home');
+    let nv = ''; window.__nav = u => { nv = u }; document.querySelector('#atl [data-a="del"]').click(); await W(50); r.open = /tu-delivery\/$/.test(nv);
     goHome(); render(); const ye = []; window.addEventListener('error', ev => ye.push(ev.message)); for (const k of ['tra', 'ev', 'gas', 'sal', 'far', 'em', 'del', 'igl', 'edu', 'job', 'mas']) { goHome(); render(); try { document.querySelector('#atl [data-a="' + k + '"]').click() } catch (x) { ye.push(k + ': ' + x.message) } await W(30) } r.atlErr = ye; r.uf = UFULL;
     document.querySelector('#bnav [data-b="home"]').click(); await W(50); r.home = CAT === 'home' && !F_OPEN && document.body.classList.contains('home');
     document.querySelector('#bnav [data-b="more"]').click(); await W(50); r.moreOpen = !document.getElementById('more').hidden;
