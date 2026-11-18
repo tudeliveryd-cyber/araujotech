@@ -87,6 +87,8 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
     check(+p2.stock === 5 && p2.bc === '7790001112223', 'Firebase: estoque e código de barras gravados', JSON.stringify(p2).slice(0, 240));
     info('bairros depois de salvar 2 taxas: ' + JSON.stringify(c.store.bairros.slice(0, 4)));
     check(c.store && c.store.bairros[0].fee === 7000 && c.store.bairros[1].fee === 12000, 'Firebase: taxas por bairro gravadas', JSON.stringify(c.store && c.store.bairros.slice(0, 2)));
+    const bm = await o.evaluate(() => { const a = document.querySelector('#br_n_0') && document.querySelector('#br_n_0').closest('tr').querySelector('a[href*="google.com/maps"]'); return { href: a ? decodeURIComponent(a.href) : '', nm: pub.store.bairros[0].name }; });
+    check(bm.href.includes(bm.nm + ', ') && /Paraguay/.test(bm.href) && /target|_blank/.test(await o.evaluate(() => (document.querySelector('#br_n_0').closest('tr').querySelector('a[href*="google.com/maps"]') || {}).target || '')), 'painel: cada barrio tem "Ver en el mapa" que abre o barrio no Google Maps', bm.href);
     const hasMedia = Object.keys(d).some(k => /^media/i.test(k)) || /data:image|"img":"m:/.test(d.cfg || '');
     check(hasMedia || !!pr.img, 'Firebase: foto do produto gravada', 'campos: ' + Object.keys(d).join(',') + ' img=' + String(pr.img).slice(0, 40));
     if (!(await o.locator('#cpg_0').count())) { info('plano do local de teste sem cupons: libera só nesta página para testar a opção'); await o.evaluate(() => { if (LIM && Array.isArray(LIM.off)) LIM.off = LIM.off.filter(x => x !== 'coupons'); render(); }); await o.w(500); }
