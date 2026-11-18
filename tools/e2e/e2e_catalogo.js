@@ -168,6 +168,13 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
     check(s1 === 'preparo', 'mudança de status no computador aparece no celular em segundos', 'status no celular: ' + s1);
     const tr = await c.evaluate(() => ({ t: typeof TRACK !== 'undefined' && TRACK ? TRACK.status : null, box: (document.querySelector('#trackBox') || {}).innerText || '' }));
     check(tr.t === 'preparo', 'cliente: o acompanhamento do pedido atualiza sozinho no aparelho dele', JSON.stringify(tr).slice(0, 200));
+    await o.evaluate(id => applyBoth(c2 => { const p = c2.products.find(x => x.id === id); c2.products.push(Object.assign(JSON.parse(JSON.stringify(p)), { id: 'tmpdel', n: { es: 'Temp E2E', pt: 'Temp E2E' } })); }), PID); await o.w(3500);
+    await o2.reload(); await o2.w(4000);
+    const o2t = await o2.evaluate(() => pub.products.some(p => p.id === 'tmpdel'));
+    await o.evaluate(() => applyBoth(c2 => c2.products = c2.products.filter(p => p.id !== 'tmpdel'))); await o.w(3500);
+    await o2.evaluate(id => applyBoth(c2 => { const p = c2.products.find(x => x.id === id); if (p) p.feat = !p.feat; }), PID); await o2.w(5000);
+    const dc = cfgOf(await shopDoc()); const o2has = await o2.evaluate(() => pub.products.some(p => p.id === 'tmpdel'));
+    check(o2t && !(dc.products || []).some(p => p.id === 'tmpdel') && !o2has, 'produto apagado num aparelho não volta quando o outro aparelho (aberto antes) salva: o outro recarrega a versão nova', JSON.stringify({ o2t, cloud: (dc.products || []).map(p => p.id), o2has }));
     // edição simultânea: preço no computador, depois conferir no celular
     await tab(o2, 'products'); await o2.set('#pp_' + PID, '31000'); await o2.w(3000);
     await o.reload(); await o.w(3500);
