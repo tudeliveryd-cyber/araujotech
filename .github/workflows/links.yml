@@ -1,0 +1,13 @@
+name: Links de uma página (só leitura)
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        default: 'https://tudelivery.com.py/'
+jobs:
+  l:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/links.py "${{ inputs.url }}"
