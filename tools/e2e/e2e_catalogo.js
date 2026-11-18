@@ -129,6 +129,11 @@ const noite = min => { const d = new Date(Date.now() - 3 * 3600e3); const t = Da
     const rf = c.locator('[data-ck=ref]'); if (await rf.count()) await rf.fill('Casa verde');
     if (await c.locator('[data-ck=couponIn]').count()) { await c.fill('[data-ck=couponIn]', 'BIENVENIDO10'); await c.act('applycoupon'); }
     const cup = await c.evaluate(() => ck.coupon || ''); info('cupom no plano Esencial: ' + (cup ? 'aplicado' : 'não disponível (correto: cupons são do plano Crecimiento)') + ' · bairros: ' + bo.join(' ; '));
+    await c.act('send'); await c.w(800);
+    const nolc = await c.evaluate(() => ({ e: (typeof ckErr !== 'undefined' && ckErr.street) || '', shown: /Marcá tu ubicación/.test((document.querySelector('.sheet') || {}).textContent || '') }));
+    const q0 = await L.fsReq(P, 'GET', 'shops/' + SID + '/orders', 'owner');
+    check(/Marcá tu ubicación/.test(nolc.e) && nolc.shown && !((q0.json && q0.json.documents) || []).length, 'delivery sin ubicación: no envía y muestra "Marcá tu ubicación" (barrio y referencia no alcanzan)', JSON.stringify(nolc));
+    await c.fill('[data-ck=link]', 'https://maps.app.goo.gl/abcDEF123'); await c.w(200);
     await c.act('send'); await c.w(3500);
     const errTxt = await c.evaluate(() => Object.values(typeof ckErr !== 'undefined' ? ckErr : {}).join(' '));
     const q = await L.fsReq(P, 'GET', 'shops/' + SID + '/orders', 'owner'); const docs = (q.json && q.json.documents) || [];
