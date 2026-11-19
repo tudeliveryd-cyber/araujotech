@@ -24,5 +24,18 @@ jobs:
           d=json.loads(urllib.request.urlopen(u,timeout=30).read())
           f=d.get('fields',{});print('updated:',f.get('updated',{}).get('stringValue'))
           c=json.loads(f.get('cfg',{}).get('stringValue','{}'))
+          st=c.get('store',{});print('nome:',st.get('name'),'| logo:',bool(st.get('logo')),'| wa:',bool(st.get('wa')))
+          for i,dd in enumerate(st.get('days') or []): print('dia',i,dd)
+          try:
+            g=json.loads(urllib.request.urlopen(urllib.request.Request('https://guiadesantarita.com/sitio/guia.php?g=1',headers={'User-Agent':'Mozilla/5.0 diag'}),timeout=30).read())
+            print('guia tdv tem a loja:', s in ((g.get('soc') or {}).get('tdv') or []))
+            print('ficha antiga ainda na lista dir:', [x.get('n') for x in g.get('dir',[]) if 'chip' in (x.get('n') or '').lower()])
+          except Exception as e: print('guia erro',e)
+          try:
+            v=json.loads(urllib.request.urlopen('https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?mask.fieldPaths=clientes',timeout=30).read())
+            for it in v['fields']['clientes']['arrayValue'].get('values',[]):
+              m={k:list(x.values())[0] for k,x in it['mapValue']['fields'].items()}
+              if m.get('id')==s: print('cliente publico:', {k:m.get(k) for k in ('id','name','seg','sys','url','plan')})
+          except Exception as e: print('clientes erro',e)
           for x in c.get('cats',[]): print('cat', x.get('id'), json.dumps(x.get('n'),ensure_ascii=False), 'hide' if x.get('hide') else '', sum(1 for p in c.get('products',[]) if p.get('cat')==x.get('id')))
           P
