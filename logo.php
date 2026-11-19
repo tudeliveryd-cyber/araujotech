@@ -19,7 +19,7 @@ if (!$s || $s['logo'] === '') {
 }
 $id = $s['id'];
 $cache = sys_get_temp_dir() . '/at_logo2_' . md5($id . '|' . md5($s['logo']) . '|' . $N) . ($N ? '.png' : '.jpg');
-if (is_file($cache) && time() - filemtime($cache) < 86400) lg_out(@file_get_contents($cache), $N ? 'image/png' : 'image/jpeg', $N ? 3600 : 86400);
+if (is_file($cache) && time() - filemtime($cache) < 86400) lg_out(@file_get_contents($cache), $N ? 'image/png' : 'image/jpeg', 3600); // 1 h: logo trocado no painel aparece logo na Guía
 $src = $s['logo'];
 if (strpos($src, 'm:') === 0) {                       // logo guardado nos pacotes de imagens da loja
   $found = '';
@@ -56,5 +56,5 @@ if (function_exists('imagecreatefromstring') && ($im = @imagecreatefromstring($b
   ob_start(); if ($N) imagepng($dst, null, 6); else imagejpeg($dst, null, 86); $bin = ob_get_clean(); $type = $N ? 'image/png' : 'image/jpeg';
   @file_put_contents($cache, $bin);
 }
-lg_out($bin, $type, $N ? 3600 : 86400);
+lg_out($bin, $type, 3600);
 function lg_out($bin, $type, $age) { if ($bin === false || $bin === '') { http_response_code(404); exit; } header('X-Content-Type-Options: nosniff'); header('Content-Type: ' . $type); header('Cache-Control: public, max-age=' . $age); header('Content-Length: ' . strlen($bin)); echo $bin; exit; }
