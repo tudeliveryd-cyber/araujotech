@@ -459,6 +459,14 @@ function guia_lugares() {
   $p = guia_pub(); $o = [];
   $base = is_array($p['util'] ?? null) && $p['util'] ? $p['util'] : [];
   if (!$base) { $j = json_decode((string)@file_get_contents(__DIR__ . '/../guia/lugares-publicos.json'), true); foreach ((array)($j['items'] ?? []) as $x) if (is_array($x) && !empty($x['n'])) $base[] = ['c' => (string)($x['c'] ?? ''), 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => (string)($x['tel'] ?? ''), 'h' => (string)($x['h'] ?? ''), 'map' => (string)($x['map'] ?? ''), 'd' => '', 'src' => (string)($x['src'] ?? '')]; }
+  // como na Guía: se o painel não trouxe a lista inteira (nenhum item 'o'), os lugares do arquivo público também valem (sem repetir)
+  if ($base && !array_filter($base, function ($x) { return !empty($x['o']); })) {
+    $nm = function ($s) { return guia_nslug($s); }; $have = array_map(function ($x) use ($nm) { return [(string)($x['c'] ?? ''), $nm($x['n'] ?? '')]; }, $base);
+    $j = json_decode((string)@file_get_contents(__DIR__ . '/../guia/lugares-publicos.json'), true);
+    foreach ((array)($j['items'] ?? []) as $x) { if (!is_array($x) || empty($x['n'])) continue; $c = (string)($x['c'] ?? ''); $h = $nm($x['n']); $dup = false;
+      foreach ($have as $hv) if (($hv[0] === $c || ($c === 'far' && $hv[0] === 'salud')) && ($hv[1] === $h || ($h !== '' && strpos($hv[1], $h) !== false))) { $dup = true; break; }
+      if (!$dup) $base[] = ['c' => $c, 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => (string)($x['tel'] ?? ''), 'h' => (string)($x['h'] ?? ''), 'map' => (string)($x['map'] ?? ''), 'd' => '', 'src' => (string)($x['src'] ?? '')]; }
+  }
   foreach ($base as $x) $o[] = $x + ['d' => '', 'wa' => '', 'web' => '', 'ig' => '', 'ph' => '', 'lg' => ''];
   foreach ((array)($p['fu'] ?? []) as $x) $o[] = $x + ['h' => '', 'src' => ''];
   foreach ($o as &$x) $x['slug'] = guia_slug($x['n'], $x['c']); unset($x);
