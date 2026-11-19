@@ -6,5 +6,5 @@ jobs:
     steps:
       - run: pip install -q pillow
       - run: |
-          for p in "comer https://pd.w.org/2026/04/10269cf3350242c23.61056435.jpg" "quedarse https://pd.w.org/2025/06/36168414d8986b968.45807581.jpg"; do set -- $p
+          for p in "comer https://pd.w.org/2026/01/471695d0a60168062.45908022.jpg" "quedarse https://pd.w.org/2025/06/36168414d8986b968.45807581.jpg"; do set -- $p
             curl -sSL --max-time 60 -o $1.jpg "$2" && python3 -c "from PIL import Image,ImageOps;im=ImageOps.exif_transpose(Image.open('$1.jpg')).convert('RGB');im.thumbnail((1800,1800));im.save('$1-s.jpg',quality=82)" && echo "IMG64 $1 $(base64 -w0 $1-s.jpg)"; done
