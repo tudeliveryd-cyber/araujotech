@@ -226,6 +226,7 @@ function guia_pub() {
   // endereço próprio de cada negócio sem catálogo: /negocio/<nome> (único; se repetir, leva o começo do id)
   $seen = [];
   foreach ($dir as $i => $x) { $sl = guia_nslug($x['n']); if ($sl === '') $sl = 'negocio'; if (isset($seen[$sl])) $sl .= '-' . strtolower(substr($x['id'], 0, 5)); $seen[$sl] = 1; $dir[$i]['sl'] = $sl; }
+  foreach ($dir as $i => $x) if ($ll = guia_dir_ll($x['map'] ?? '')) $dir[$i]['ll'] = $ll; // ponto no mapa e 'Cerca de mí' (link curto do Maps convertido no servidor)
   return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10), 'cat' => $cat, 'atl' => $atl, 'promo' => $promo];
 }
 
@@ -341,6 +342,20 @@ function guia_clients() {
 // Localização confiável de um catálogo para a Guía (mapa, "Cerca de mí", página do negócio):
 // 1) a ubicación marcada no catálogo (store.locSet); 2) o link do Google/Apple Maps do site do negócio;
 // nunca a coordenada padrão de exemplo (centro de Santa Rita). Sem nenhuma: null (o mapa busca pelo nome e endereço).
+// Coordenadas do link do Maps de uma ficha (inclusive maps.app.goo.gl e maps.apple/p): usa o maps.php do servidor principal.
+// Fica 30 dias em cache (link sem coordenada: 1 dia). No máximo 4 links novos por vez, para a Guía nunca demorar.
+function guia_dir_ll($u) {
+  static $budget = 4; $u = (string)$u; if (!preg_match('#^https://[^\s"\'<>]{8,300}$#i', $u)) return null;
+  $cache = sys_get_temp_dir() . '/at_gdll_' . md5($u) . '.json';
+  if (is_file($cache)) { $c = json_decode((string)@file_get_contents($cache), true); $age = time() - filemtime($cache);
+    if (is_array($c) && ((isset($c['lat']) && $age < 30 * 86400) || (!isset($c['lat']) && $age < 86400))) return isset($c['lat']) ? [$c['lat'], $c['lng']] : null; }
+  if ($budget <= 0) return null; $budget--;
+  $r = at_get('https://araujotechsistemas.com/maps.php?u=' . rawurlencode($u)); $c = $r ? json_decode($r, true) : null; $ok = null;
+  if (is_array($c) && isset($c['lat'], $c['lng']) && is_numeric($c['lat']) && is_numeric($c['lng'])) { $la = (float)$c['lat']; $ln = (float)$c['lng'];
+    if (abs($la + 25.7917) >= 0.00005 || abs($ln + 55.0886) >= 0.00005) if (abs($la) <= 90 && abs($ln) <= 180 && abs($la) > 0.01) $ok = [round($la, 6), round($ln, 6)]; }
+  if ($r !== null) @file_put_contents($cache, json_encode($ok ? ['lat' => $ok[0], 'lng' => $ok[1]] : ['none' => 1]));
+  return $ok;
+}
 function guia_loc($id, $sh) {
   $st = $sh['cfg']['store'] ?? []; $dflt = function ($la, $ln) { return abs($la + 25.7917) < 0.00005 && abs($ln + 55.0886) < 0.00005; };
   if (!empty($st['locSet']) && is_numeric($st['lat'] ?? null) && is_numeric($st['lng'] ?? null) && abs($st['lat']) > 0.01) return ['lat' => round((float)$st['lat'], 6), 'lng' => round((float)$st['lng'], 6), 'src' => 'cat'];
