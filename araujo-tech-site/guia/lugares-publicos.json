@@ -243,13 +243,13 @@
   },
   {
    "c": "fin",
-   "n": "Visión Banco",
+   "n": "ueno bank (ex Visión Banco)",
    "a": "",
    "tel": "",
    "h": "",
    "map": "https://www.google.com/maps?q=-25.79388,-55.08731",
    "src": "OpenStreetMap",
-   "k": "vision"
+   "k": "ueno|vision"
   },
   {
    "c": "dep",
@@ -420,6 +420,26 @@
    "map": "https://www.google.com/maps/search/?api=1&query=Espa%C3%B1a%20y%20Bernardino%20Caballero%2C%20Santa%20Rita%2C%20Alto%20Paran%C3%A1%2C%20Paraguay",
    "src": "ierp.org.ar",
    "k": "rio de la plata|ierp"
+  },
+  {
+   "c": "fin",
+   "n": "Bancop · Sucursal Santa Rita",
+   "a": "Avda. Gaspar Rodríguez de Francia esq. Cristóbal Colón",
+   "tel": "(021) 325 5501",
+   "h": "08:30–14:00",
+   "map": "https://www.google.com/maps/search/?api=1&query=Bancop%2C%20Avda.%20Gaspar%20Rodr%C3%ADguez%20de%20Francia%20esq.%20Crist%C3%B3bal%20Col%C3%B3n%2C%20Santa%20Rita%2C%20Alto%20Paran%C3%A1%2C%20Paraguay",
+   "src": "bancop.com.py (consultado 19/11/2026)",
+   "k": "bancop"
+  },
+  {
+   "c": "fin",
+   "n": "Cooperativa Colonias Unidas · Sucursal Santa Rita",
+   "a": "Ruta 6ta Km 212, Avda. Albano Birnfeld",
+   "tel": "0985 518 002",
+   "h": "",
+   "map": "https://www.google.com/maps/search/?api=1&query=Cooperativa%20Colonias%20Unidas%2C%20Ruta%206%20Km%20212%2C%20Santa%20Rita%2C%20Alto%20Paran%C3%A1%2C%20Paraguay",
+   "src": "colonias.com.py (consultado 19/11/2026)",
+   "k": "colonias"
   }
  ]
 }

@@ -718,6 +718,12 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     info(JSON.stringify(TQ));
     check(TQ.inAtl && !TQ.inList && /^tt,cats,comer$/.test(TQ.order) && !TQ.qcaHasBas, '"¿Qué comer ahora?" logo depois das categorias; ficha básica não entra no destaque');
     check(/^Todo\|Desayuno\|.*Cena$/.test(TQ.chips) && TQ.de.includes('Café Mañana') && !TQ.de.includes('Cena Noche') && TQ.basNoHrs !== false, 'página de Comida com os turnos (Desayuno, Almuerzo, Merienda, Cena) filtrando a lista; ficha básica sem "Horario no informado"', JSON.stringify(TQ)); }
+  { const NU = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const U0 = G.util; G.util = [{ c: 'seg', n: 'Comisaría Prueba', tel: '0673 999 000', map: 'https://www.google.com/maps?q=-25.79,-55.08' }, { c: 'fin', n: 'Banco Prueba', tel: '021 111 222' }]; CAT = 'home'; SPV = ''; UFULL = true; render(); await W(60);
+      const u = document.getElementById('util'); const hs = u ? [...u.querySelectorAll('.uh')].map(h => h.textContent.trim()) : []; const loc = u ? [...u.querySelectorAll('.ugrid.emg')][1] : null; const r = { hs, loc: loc ? loc.textContent : '', ueno: OSMP.some(p => /^ueno bank/.test(p.n)) && !OSMP.some(p => p.n === 'Visión Banco'), bancop: OSMP.some(p => /Bancop/.test(p.n) && p.tel) };
+      G.util = U0; UFULL = false; render(); return r; });
+    info(JSON.stringify(NU));
+    check(NU.hs.includes('Números nacionales de emergencia') && NU.hs.includes('Números locales de Santa Rita') && /Comisaría Prueba/.test(NU.loc) && !/Banco Prueba/.test(NU.loc), 'Santa Rita útil: números nacionais separados dos locais (só segurança, saúde, governo, documentos e transporte com telefone)');
+    check(NU.ueno && NU.bancop, 'lugares públicos: "ueno bank (ex Visión Banco)" e Bancop com telefone da fonte oficial'); }
   sec('V. Promo del día e relatório para os aliados');
   { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
     const fid = await a.evaluate(() => { ui.gu.dir.push({ id: 'pv1', n: 'Pizzería Promo', g: 'food', d: 'Pizzas', wa: '0981 444 555', td: true, on: true, tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], mt: 'menu', mu: '' }); guSheet(); return 'd:pv1'; }); await a.w(300);
