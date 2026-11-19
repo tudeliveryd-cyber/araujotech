@@ -1193,7 +1193,7 @@ function openNow(days,dt){if(!Array.isArray(days)||days.length!==7)return null;c
  for(const [a,b,c] of ivs(days[(wd+6)%7]))if(b>1440&&n<b-1440)return {on:true,until:c};
  return {on:false}}
 const grpOf=c=>{const t=(c.segEs||'')+' '+(c.segPt||'')+' '+(c.name||'');return (GR.find(g=>g[1].test(t))||GR[GR.length-1])[0]};
-let SPV=/^#empleos/.test(location.hash)?'job':/^#clasificados/.test(location.hash)?'cla':/^#alquileres/.test(location.hash)?'alq':/^#feriados/.test(location.hash)?'fer':'';let UFULL=/^#util/.test(location.hash);
+let SPV=/^#empleos/.test(location.hash)?'job':/^#clasificados/.test(location.hash)?'cla':/^#alquileres/.test(location.hash)?'alq':/^#feriados/.test(location.hash)?'fer':/^#farmacias/.test(location.hash)?'far':/^#quedarse/.test(location.hash)?'hot':/^#hacer/.test(location.hash)?'qh':'';if(SPV)CAT='all';/* link direto (rodapé das páginas dos negócios): abre a página certa */let UFULL=/^#util/.test(location.hash);
 function texts(){const t=TX[L];document.documentElement.lang=L;document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t[e.dataset.t]);document.querySelectorAll('[data-th]').forEach(e=>e.innerHTML=t[e.dataset.th]);document.getElementById('q').placeholder=t.ph;document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on',b.dataset.lang===L))}
 /* negócios sem catálogo: ficha simples (cadastrada no painel), depois dos clientes Vitrix */
 const TIDYW=/^(Desayuno|Almuerzo|Merienda|Cena|Comida|Comidas|Bebidas|Pizza|Pizzas|Hamburguesas?|Lomitos?|Empanadas?|Asado|Postres?|Helados?|Caf[eé]|Delivery|Minutas?|Platos?|Sushi|Panader[ií]a|Confiter[ií]a)$/;
