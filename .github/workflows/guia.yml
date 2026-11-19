@@ -111,6 +111,8 @@ jobs:
           if [ "$DESTINO" = producao ]; then
             lftp -e "$L; mirror --reverse --verbose --only-newer --parallel=3 ./out/ ./; bye"
           else
+            # imagens novas que a revisão usa (só acrescenta arquivos; não muda a página de verdade)
+            lftp -e "$L; mirror --reverse --verbose --only-newer --parallel=3 ./out/img/ ./img/; bye"
             echo "Só a revisão foi publicada. O site de verdade continua como estava."
           fi
       - name: Regras de endereço (.htaccess)
