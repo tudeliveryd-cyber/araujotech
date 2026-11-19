@@ -574,6 +574,21 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     document.getElementById('q').value = ''; CAT = 'home'; render(); return r; });
   info(JSON.stringify(SB));
   check(SB.chips === 'Todos|Mecánicas|Autoeléctricas' && SB.ele && SB.all && SB.q, 'dentro da categoria, as abas viram botões (Todos, Mecánicas, Autoeléctricas) e cada uma abre só os seus; buscar "mecanica" acha as mecânicas');
+  const AU = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const r = {};
+    G.cat = { pub: [], neg: [{ k: 'car', n: { es: 'Autos', pt: 'Carros' }, ic: '', tabs: [] }] }; applyCat();
+    G.dir = [['a1', 'Taller Uno', 'Mecánica'], ['a2', 'Taller Dos', 'Mecánica'], ['a3', 'Taller Tres', 'mecánica'], ['a4', 'Goma Uno', 'Gomería'], ['a5', 'Goma Dos', 'Gomería'], ['a6', 'Lava Uno', 'Lavadero'], ['a7', 'Mix', 'Repuestos, aceite y más']].map(([id, n, d]) => ({ id, n, g: 'car', d, wa: '0981 000 600' }));
+    document.getElementById('q').value = ''; SPV = ''; SUBT = {}; CAT = 'car'; render(); await W(50); const L = () => document.getElementById('list');
+    r.chips = [...L().querySelectorAll('.subt button')].map(b => b.textContent.replace(/\d+$/, '').trim()).join('|');
+    const gb = L().querySelector('.subt [data-tk^="a-goma"],.subt [data-tk^="a-gomer"]'); if (gb) { gb.click(); await W(80); r.go = /Goma Dos/.test(L().textContent) && !/Taller Uno/.test(L().textContent); }
+    G.dir = G.dir.slice(0, 4); SUBT = {}; render(); await W(50); r.few = L().querySelectorAll('.subt button').length;
+    window.__h = []; window.__hitSpy = (t, i) => window.__h.push(t + ':' + i); G.dir = [{ id: 'r1', n: 'Almuerzo Feliz', g: 'food', d: 'Restaurante', wa: '0981 000 601' }]; CAT = 'all'; const q = document.getElementById('q');
+    q.value = 'borracharia'; q.dispatchEvent(new Event('input', { bubbles: true })); await W(1900);
+    q.value = 'almuezo'; q.dispatchEvent(new Event('input', { bubbles: true })); await W(1900);
+    F_OPEN = true; q.value = 'zzzpizza'; q.dispatchEvent(new Event('input', { bubbles: true })); await W(1900); F_OPEN = false;
+    r.hits = window.__h.join('|'); window.__hitSpy = null; q.value = ''; CAT = 'home'; render(); return r; });
+  info(JSON.stringify(AU));
+  check(AU.chips === 'Todos|Mecánica|Gomería' && AU.go && AU.few === 0, 'categoria sem abas no painel ganha subcategorias automáticas pelo rubro (Mecánica, Gomería); com poucos negócios não aparecem', JSON.stringify(AU));
+  check(/z:borracharia/.test(AU.hits) && !/almuezo/.test(AU.hits) && !/zzzpizza/.test(AU.hits), 'busca sem resultado é registrada para a Central (não conta erro de digitação com sugestão nem busca com filtro ligado)', AU.hits);
   check(HL.tile && HL.last === 'mas' && HL.sug && HL.click, 'aba Heladerías com negócios vira atalho em Categorías principales (antes de Más) e sugestão da busca');
   sec('U. Página da Tu Delivery');
   { const T = await L.open({ w: 390, mob: true }); const tp = T.p; await tp.goto('https://araujotechsistemas.com/guia/tu-delivery/'); await tp.w(2000);
@@ -610,9 +625,9 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     const rp = await a.evaluate(async () => { ui.guSt = { v: 10, c: { 'd-pv1': 7 }, s: {}, k: {}, q: {}, p: {}, vd: {}, geo: {} }; guSheet(); await new Promise(f => setTimeout(f, 100)); const c = document.querySelector('.gu-rep'); const row = c && [...c.querySelectorAll('.gx-list>div')].find(d => /Pizzería Promo/.test(d.textContent)); const a = row && row.querySelector('a'); return { has: !!c, n: row ? row.querySelector('b + b, b:nth-of-type(2)') && row.textContent : '', href: a ? decodeURIComponent(a.href) : '' }; });
     info(JSON.stringify(rp));
     check(rp.has && /wa\.me\/595981444555/.test(rp.href) && /tocaron 7 veces/.test(rp.href) && /Verificado/.test(rp.href), 'relatório para aliados: toques reais (7) e botão que abre o WhatsApp do negócio com a mensagem pronta');
-    const on = await a.evaluate(async () => { const f0 = window.fetch; window.fetch = (u, o) => /guia_stats/.test(String(u)) && /"on":1/.test(String((o || {}).body || '')) ? Promise.resolve(new Response(JSON.stringify({ ok: true, n: 3, pk: 7, at: '11:40', h: { '10': 4, '11': 7 } }))) : f0(u, o); ui.guOn = undefined; guSheet(); await new Promise(r => setTimeout(r, 800)); window.fetch = f0; const c = document.getElementById('gu-on'); const card = c && c.closest('.card'); return { t: c ? c.textContent : '', gg: card ? card.dataset.gg : '', bars: c ? c.querySelectorAll('.go-bars>div').length : 0 }; });
+    const on = await a.evaluate(async () => { const f0 = window.fetch; window.fetch = (u, o) => /guia_stats/.test(String(u)) && /"on":1/.test(String((o || {}).body || '')) ? Promise.resolve(new Response(JSON.stringify({ ok: true, n: 3, pk: 7, at: '11:40', h: { '10': 4, '11': 7 }, hh: { '2026-11-16': { '19': 5 }, '2026-11-17': { '19': 6 }, '2026-11-18': { '19': 4, '20': 2 } } }))) : f0(u, o); ui.guOn = undefined; guSheet(); await new Promise(r => setTimeout(r, 800)); window.fetch = f0; const c = document.getElementById('gu-on'); const card = c && c.closest('.card'); return { t: c ? c.textContent : '', gg: card ? card.dataset.gg : '', bars: c ? c.querySelectorAll('.go-bars>div').length : 0 }; });
     info(JSON.stringify(on));
-    check(/^3/.test(on.t) && /7/.test(on.t) && /11:40/.test(on.t) && on.bars === 2 && on.gg === 'res', 'painel: "Ahora en la Guía" mostra conectados agora, pico do dia e máximo por hora, no grupo Resumen');
+    check(/3conectados/.test(on.t) && /promedio de los últimos 3 días\): 19 h – 20 h/.test(on.t) && /7/.test(on.t) && /11:40/.test(on.t) && on.bars === 2 && on.gg === 'res', 'painel: "Ahora en la Guía" mostra conectados agora, pico do dia, máximo por hora e o melhor horário para publicar, no grupo Resumen');
     await a.evaluate(() => { ui.gu.dir = ui.gu.dir.filter(x => x.id !== 'pv1'); ui.gu.promo = []; }); await a.act('gusave'); await a.w(1500);
     const sid = await a.evaluate(() => ((PL.shops || [])[0] || {}).id || ''); let tv = null;
     if (sid) { await a.evaluate(id => { const c = document.querySelector('[data-gutdv="' + id + '"]'); c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); }, sid); await a.act('gusave'); await a.w(2000); tv = ((await doc()).gsoc || {}).tdv; }

@@ -15,9 +15,12 @@ function guia_on($s = '') {
     if (!is_array($d['h'] ?? null)) $d['h'] = [];
     if ($n > (int)($d['pk'] ?? 0)) { $d['pk'] = $n; $d['at'] = $dt->format('H:i'); }
     if ($n > (int)($d['h'][$hr] ?? 0)) $d['h'][$hr] = $n;
+    if (!is_array($d['hh'] ?? null)) $d['hh'] = []; // máximo por hora de cada dia (últimos 14 dias): melhor horário para publicar
+    if ($n > (int)($d['hh'][$day][$hr] ?? 0)) $d['hh'][$day][$hr] = $n;
+    if (count($d['hh']) > 14) { ksort($d['hh']); $d['hh'] = array_slice($d['hh'], -14, null, true); }
     $d['a'] = (object)$a;
     ftruncate($h, 0); rewind($h); fwrite($h, json_encode($d)); fflush($h); flock($h, LOCK_UN);
-    $out = ['n' => $n, 'pk' => (int)$d['pk'], 'at' => (string)$d['at'], 'h' => (object)$d['h']];
+    $out = ['n' => $n, 'pk' => (int)$d['pk'], 'at' => (string)$d['at'], 'h' => (object)$d['h'], 'hh' => (object)$d['hh']];
   }
   fclose($h); return $out;
 }
