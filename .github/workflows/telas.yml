@@ -2,9 +2,12 @@ name: Capturar telas das demos (com fotos)
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '23 10 * * 1' # toda segunda: a foto da Guía no site fica sempre atual
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   capturar:
@@ -23,10 +26,16 @@ jobs:
         run: python3 tools/make_demo.py
       - name: Tirar as telas
         run: node tools/capturar_telas.js
+      - name: Foto da Guía de verdade
+        run: node tools/capturar_guia.js || echo 'Guía não respondeu agora; fica a foto anterior'
       - name: Salvar no repositório
         run: |
           git config user.name "Araújo Tech (telas)"
           git config user.email "actions@users.noreply.github.com"
           git add araujo-tech-site/img/sistemas tools/telas
-          git diff --cached --quiet && echo "Nada mudou" || git commit -m "Telas das demos com fotos (automático)"
-          git push
+          if git diff --cached --quiet; then echo "Nada mudou"; else git commit -m "Telas das demos e da Guía (automático)"; git push; echo "PUB=1" >> $GITHUB_ENV; fi
+      - name: Publicar o site com as fotos novas
+        if: env.PUB == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST repos/${{ github.repository }}/actions/workflows/site.yml/dispatches -f ref=main

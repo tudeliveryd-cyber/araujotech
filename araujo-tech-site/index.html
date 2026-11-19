@@ -114,15 +114,15 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .hwhere{margin-top:26px;font-size:14.5px;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:8px}
 /* palco com notebook + celular (prints reais) */
 .stage{position:relative;padding:0 8% 6% 0}
-.laptop{position:relative;width:100%;filter:drop-shadow(0 30px 40px rgba(0,0,0,.45))}
-.laptop .lid{border-radius:2.2% 2.2% .6% .6%/3.4% 3.4% 1% 1%;padding:.55%;background:linear-gradient(180deg,#C9C6D3,#77737F 55%,#5B5865)}
+.laptop{position:relative;width:100%}/* sem filter: no iPhone (Safari) o filter desenha as telas em baixa resolução e elas ficam borradas */
+.laptop .lid{box-shadow:0 30px 40px -10px rgba(0,0,0,.45);border-radius:2.2% 2.2% .6% .6%/3.4% 3.4% 1% 1%;padding:.55%;background:linear-gradient(180deg,#C9C6D3,#77737F 55%,#5B5865)}
 .laptop .bezel{background:#08060C;border-radius:1.8% 1.8% .4% .4%/2.8% 2.8% .6% .6%;padding:2.2% 1.6% 2.6%;position:relative}
 .laptop .bezel::before{content:"";position:absolute;top:.9%;left:50%;width:.7%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:#1E2433}
 .laptop .screen{position:relative;overflow:hidden;border-radius:2px;background:#fff;aspect-ratio:16/10}
 .laptop .screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;transition:opacity .6s}
 .laptop .base{position:relative;height:0;padding-bottom:3%;margin:0 -7.5%;border-radius:0 0 18% 18%/0 0 100% 100%;background:linear-gradient(180deg,#ECEAF1 0%,#CBC8D4 40%,#8D8999 85%,#6A6676 100%)}
 .laptop .base::before{content:"";position:absolute;left:42%;right:42%;top:0;height:40%;background:linear-gradient(180deg,#A9A5B4,#CAC7D2);border-radius:0 0 10px 10px}
-.phone{position:absolute;right:0;bottom:0;width:25%;min-width:92px;aspect-ratio:390/844;border-radius:16%/7.4%;padding:1.6%;background:linear-gradient(135deg,#DAD7E2 0%,#77737F 25%,#2B2833 50%,#7D7989 78%,#CFCCD8 100%);filter:drop-shadow(0 24px 30px rgba(0,0,0,.5))}
+.phone{position:absolute;right:0;bottom:0;width:25%;min-width:92px;aspect-ratio:390/844;border-radius:16%/7.4%;padding:1.6%;background:linear-gradient(135deg,#DAD7E2 0%,#77737F 25%,#2B2833 50%,#7D7989 78%,#CFCCD8 100%);box-shadow:0 24px 30px -8px rgba(0,0,0,.5)}
 .phone .inner{width:100%;height:100%;background:#08060C;border-radius:14.5%/6.8%;padding:3.2%}
 .phone .scr{position:relative;width:100%;height:100%;overflow:hidden;border-radius:12.5%/5.8%;background:#fff}
 .phone .scr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;transition:opacity .6s}
