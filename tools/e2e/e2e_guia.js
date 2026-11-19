@@ -684,7 +684,10 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     const tl = k => (RD.tiles.find(x => x.includes(k)) || '');
     check(RD.has && RD.gg === 'res' && /fichas/.test(tl('Negocios en la Guía')) && / 2 fichas/.test(tl('Negocios en la Guía')) && /^1 ?Banners del slider ?en el aire/.test(tl('Banners')) && /1 programados/.test(tl('Banners')) && /1 notas · 1 eventos próximos/.test(tl('Contenido')) && /farmacia de turno hoy: cargada/.test(tl('Ciudad')), 'Resumen: negócios (Vitrix + fichas), banners no ar/programados, conteúdo e farmácia de turno com os números do painel', JSON.stringify(RD.tiles));
     check(/fichas sin WhatsApp ni teléfono1/.test(RD.todo) && /fichas sin link del mapa1/.test(RD.todo) && /banners que vencen en 7 días1/.test(RD.todo) && /eventos que ya pasaron \(se pueden borrar\)1/.test(RD.todo) && /notas sin foto1/.test(RD.todo), '"Para revisar" lista o que falta (ficha sem contato, sem mapa, banner vencendo, evento passado, nota sem foto)', RD.todo);
-    check(RD.tab === 'pub', 'tocar num número abre aquela área do painel'); }
+    check(RD.tab === 'pub', 'tocar num número abre aquela área do painel');
+    if (process.env.SHOT_DIR) { await a.evaluate(() => { window.__bak = JSON.stringify(ui.gu); ui.guGrp = 'all'; ui.gu.notas = [{ id: 'sh1', k: 'tur', t: 'Ejemplo de nota', x: 'Texto de ejemplo.', u: '', d: guDay(), ph: '' }]; guSheet(); }); await a.w(300);
+      await a.locator('.sheet[data-k="gu"] .card.gd').screenshot({ path: process.env.SHOT_DIR + '/resumen.png' }); const nc = a.locator('.sheet[data-k="gu"] .card', { hasText: 'Santa Rita al día' }).first(); await nc.screenshot({ path: process.env.SHOT_DIR + '/notas.png' });
+      await a.evaluate(() => { ui.gu = JSON.parse(window.__bak); guSheet(); }); } }
   sec('V. Promo del día e relatório para os aliados');
   { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
     const fid = await a.evaluate(() => { ui.gu.dir.push({ id: 'pv1', n: 'Pizzería Promo', g: 'food', d: 'Pizzas', wa: '0981 444 555', td: true, on: true, tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], mt: 'menu', mu: '' }); guSheet(); return 'd:pv1'; }); await a.w(300);
