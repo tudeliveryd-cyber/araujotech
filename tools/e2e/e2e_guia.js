@@ -427,7 +427,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     goHome(); render(); await W(30);
     r.fd = [...document.querySelectorAll('#destacados .fc-t b')].map(b => b.textContent); r.tags = [...document.querySelectorAll('#destacados .fc-tg')].map(t => t.textContent);
     r.wa = [...document.querySelectorAll('#destacados .fc-wa')].map(a => a.getAttribute('href')); r.rt = (document.querySelector('#destacados em') || {}).textContent || '';
-    r.rc = [...document.querySelectorAll('#aliados .fc-t b')].map(b => b.textContent); r.rcwa = document.querySelectorAll('#aliados .fc-wa').length; r.rcph = [...document.querySelectorAll('#aliados .fc-cv > img')].map(i => i.getAttribute('src')); r.rclink = [...document.querySelectorAll('#aliados a.fc-a')].map(x => x.getAttribute('href')); r.vxlink = [...document.querySelectorAll('#destacados a.fc-a')].map(x => x.getAttribute('href')); r.sug = document.querySelectorAll('#sug [data-tq]').length; r.side = !!document.querySelector('a.pbn[href="/guia/negocios/"]');
+    r.rc = [...document.querySelectorAll('#aliados .fc-t b')].map(b => b.textContent); r.rcwa = document.querySelectorAll('#aliados .fc-wa').length; r.rcph = [...document.querySelectorAll('#aliados .fc-cv > img')].map(i => i.getAttribute('src')); r.rclink = [...document.querySelectorAll('#aliados a.fc-a')].map(x => x.getAttribute('href')); r.vxlink = [...document.querySelectorAll('#destacados a.fc-a')].map(x => x.getAttribute('href')); r.sug = document.querySelectorAll('#sug [data-tq]').length; r.vxl = [...document.querySelectorAll('#catalogos .fc-t b')].map(b => b.textContent); r.side = !!document.querySelector('a.pbn[href="/guia/negocios/"]');
     document.getElementById('q').value = 'ropa'; document.getElementById('qgo').click(); await W(30); r.search = CAT === 'all' && [...document.querySelectorAll('#list .card h3')].some(h => /Pre X|Com X/.test(h.textContent));
     LIST = L0; G.dir = G0; INFO = Object.assign(INFO, I0); delete INFO.vipx; goHome(); render(); return r; });
   info(JSON.stringify(v3));
@@ -435,6 +435,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(v3.wa.length === 1 && /wa\.me\/595981000000/.test(v3.wa[0]) && /4,8/.test(v3.rt), 'destacado com WhatsApp do catálogo e nota real (só quando existem)');
   check(v3.rc.join('|') === 'Aliado Foto|Aliado Uno' && v3.rcwa === 1 && v3.rcph[0] === '/sitio/gimg.php?d=td2&k=ph&v=abc123', 'Recomendados Aliado Tu Delivery: só clientes Tu Delivery, com WhatsApp; os com foto do local primeiro');
   check(v3.rclink.length === 1 && /wa\.me/.test(v3.rclink[0]) && v3.vxlink.every(h => !/wa\.me/.test(h)) && v3.vxlink.length === 2, 'aliado: tocar no card abre o WhatsApp; cliente Vitrix: abre a página dele na Guía');
+  check(v3.vxl.join('|') === 'Vip X|Pre X|Com X', '"Catálogos Vitrix": todos os clientes Vitrix, de qualquer plano (os destacados primeiro)', JSON.stringify(v3.vxl));
   check(v3.sug >= 3 && v3.side, 'busca com sugestões tocáveis e cartão "Publicá tu negocio"');
   check(v3.search, 'botão Buscar mostra os resultados');
   check(simp.busShort && simp.busFull, 'Santa Rita útil resumido no início e abre o resto ao tocar');
