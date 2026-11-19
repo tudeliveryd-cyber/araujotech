@@ -4454,7 +4454,7 @@ function newShopSheet(){const n=ui.ns;openSheet(`<div class="sh-top"><h2>${t('ne
  ${RGRP.map(([g,gn])=>`<div class="ramo-g" data-g="${g}"><small class="ramo-h">${esc(tr(gn))}</small><div class="ramos">${RAMOS.filter(r=>r.grp===g).map(r=>`<button type="button" class="ramo" data-act="nsramo" data-r="${r.id}" data-q="${esc(rnorm(r.n.pt+' '+r.n.es))}" aria-pressed="${n.ramo===r.id}">${ic(r.i,20)}<span>${esc(tr(r.n))}</span></button>`).join('')}</div></div>`).join('')}
  <p class="note" id="ramoNone" hidden>${t('ramo_none')}</p>
  ${n.ramo==='otro'?`<div class="fld" style="margin-top:6px"><label for="ns_segc">${t('ramo_custom')}</label><input id="ns_segc" class="inp" data-ns="segc" value="${esc(n.segc||'')}" placeholder="${t('ramo_custom_ph')}"></div>`:''}
- <span class="note">${t('ramo_note')}</span></div>
+ ${n.ramo==='otro'?'':`<span class="note">${t('ramo_note')}</span>`}</div>
  ${cityFld('ns',n)}
  ${trialFld('ns',n)}
  <div class="row2"><div class="fld"><label for="ns_plan">${t('plan')}</label><select id="ns_plan" class="inp" data-ns="plan">${plansFor('catalogo').map(p=>`<option value="${p.id}" ${p.id===n.plan?'selected':''}>${esc(p.n)} · ${gs(p.price)}${+p.inst?' + '+t('inst_l')+' '+gs(p.inst):''}</option>`).join('')}</select></div></div>

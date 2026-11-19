@@ -4617,7 +4617,7 @@ function newShopSheet(){const n=ui.ns;openSheet(`<div class="sh-top"><h2>${t('ne
  <p class="note" id="ramoNone" hidden>${t('ramo_none')}</p>
  ${n.ramo==='otro'?`<div class="fld" style="margin-top:6px"><label for="ns_segc">${t('ramo_custom')}</label><input id="ns_segc" class="inp" data-ns="segc" value="${esc(n.segc||'')}" placeholder="${t('ramo_custom_ph')}"><div id="nsSug">${nsSugHTML()}</div></div>
  <div class="fld"><label for="ns_cats">${t('ns_cats')}</label><input id="ns_cats" class="inp" data-ns="cats" value="${esc(n.cats||'')}" placeholder="${t('ns_cats_ph')}"><span class="note">${t('ns_cats_note')}</span></div>`:''}
- <span class="note">${t('ramo_note')}</span></div>
+ ${n.ramo==='otro'?'':`<span class="note">${t('ramo_note')}</span>`}</div>
  ${cityFld('ns',n)}
  ${trialFld('ns',n)}
  <div class="row2"><div class="fld"><label for="ns_plan">${t('plan')}</label><select id="ns_plan" class="inp" data-ns="plan">${plansFor('catalogo').map(p=>`<option value="${p.id}" ${p.id===n.plan?'selected':''}>${esc(p.n)} · ${gs(p.price)}${+p.inst?' + '+t('inst_l')+' '+gs(p.inst):''}</option>`).join('')}</select></div></div>
