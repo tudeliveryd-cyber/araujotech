@@ -2,6 +2,7 @@
 const L = require('./lib'); const P = 'araujotech-catalogos';
 const { info, sec, check } = L;
 const FX = __dirname + '/fix/';
+const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.parse(d.cfg); } catch (e) { return {}; } };
 (async () => {
   const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026'];
   await L.signUp(...ADM);
@@ -153,6 +154,24 @@ const FX = __dirname + '/fix/';
   const fv = await o.evaluate(() => { const g = varG(ui.edit); return { ph: !!(g && g.o[0].ph), nm: ui.edit.n.es }; });
   check(fv.ph && fv.nm === 'Creatina Monohidratada 300g', 'a foto vai para a opção e o nome do produto não muda', JSON.stringify(fv));
   await o.evaluate(() => { ui.edit = null; closeSheet(); }); await o.w(300);
+  sec('G. Envíos por barrio: marcar a zona de cada barrio no mapa (quando a busca pelo nome erra o lugar)');
+  await o.evaluate(() => { applyBoth(c => { c.store.feeMode = 'bairro'; if (!(c.store.bairros || []).length) c.store.bairros = [{ name: 'San José', fee: 7000 }]; c.store.bairros[0].fee = 7000; }); ui.tab = 'delivery'; render(); }); await o.w(800);
+  check(await o.locator('[data-act=bzone][data-i="0"]').count() === 1, 'cada barrio tem "Marcar zona"');
+  await o.locator('[data-act=bzone][data-i="0"]').click(); await o.waitForSelector('#bzmap.leaflet-container', { timeout: 15000 }).catch(() => {}); await o.w(800);
+  const bb = await o.locator('#bzmap').boundingBox();
+  for (const [dx, dy] of [[0.3, 0.3], [0.7, 0.3], [0.7, 0.7], [0.3, 0.7]]) { await o.mouse.click(bb.x + bb.width * dx, bb.y + bb.height * dy); await o.w(250); }
+  check(await o.evaluate(() => ui.brz.pts.length) === 4 && /4 puntos/.test(await o.txt('#bzn')), 'tocar no mapa marca os pontos da zona (4 pontos)');
+  if (process.env.SHOT5) await o.screenshot({ path: process.env.SHOT5 });
+  await o.locator('[data-act=bzundo]').click(); await o.w(200);
+  check(await o.evaluate(() => ui.brz.pts.length) === 3, '"Deshacer" tira o último ponto');
+  await o.locator('[data-act=bzsave]').click(); await o.w(3000);
+  const zb = await o.evaluate(() => { const b = pub.store.bairros[0]; return { z: (b.zone || []).length, lat: b.lat != null, btn: (document.querySelector('[data-act=bzone][data-i="0"]') || {}).textContent, href: ((document.querySelector('#br_n_0') || document.body).closest('tr') || document).querySelector('a[href*="google.com/maps"]')?.href || '' }; });
+  check(zb.z === 3 && zb.lat && /Zona marcada/.test(zb.btn) && /query=-?\d+\.\d+,-?\d+\.\d+/.test(zb.href), 'a zona fica salva, o botão mostra "Zona marcada" e "Ver en el mapa" vai para o ponto marcado', JSON.stringify(zb));
+  await o.w(3000); const zd = cfgOfShop(await L.fsReq(P, 'GET', 'shops/' + shop.id, 'owner'));
+  check(((zd.store.bairros || [])[0].zone || []).length === 3, 'Firebase: a zona do barrio foi gravada na nuvem');
+  await o.evaluate(() => acts.bzall()); await o.waitForSelector('#bzmap.leaflet-container', { timeout: 15000 }).catch(() => {}); await o.w(800);
+  check(await o.locator('.bztip').count() >= 1 && /7\.000/.test(await o.txt('.bztip')), '"Ver todos en el mapa" mostra as zonas com nome e preço', await o.txt('.bztip'));
+  await o.evaluate(() => closeSheet()); await o.w(300);
   check(!o.errs.length && !c.errs.length, 'sem erros de JavaScript', o.errs.concat(c.errs).join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
