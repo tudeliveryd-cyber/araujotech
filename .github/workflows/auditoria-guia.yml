@@ -1,0 +1,14 @@
+name: Auditoria da Guía (só leitura)
+
+# Abre a Guía no ar, confere links, categorias, repetidos, lugares públicos, agenda e clima/câmbio. Não grava nada.
+on:
+  workflow_dispatch:
+
+jobs:
+  auditoria:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i playwright@1.47.2 && npx playwright install --with-deps chromium
+      - run: node tools/auditoria_guia.js
