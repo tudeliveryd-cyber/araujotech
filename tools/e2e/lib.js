@@ -52,6 +52,7 @@ async function route(ctx) {
         return r.fulfill({ status: 200, contentType: MIME.js, body, headers: { 'access-control-allow-origin': '*' } });
       }
       if (u.hostname === 'cdn.jsdelivr.net' && /zxing/.test(u.pathname) && fs.existsSync(path.join(SDK, 'zxing.min.js'))) return r.fulfill({ status: 200, contentType: MIME.js, body: fs.readFileSync(path.join(SDK, 'zxing.min.js')) });
+      if (u.hostname === 'cdnjs.cloudflare.com' && /^\/ajax\/libs\/leaflet\/[\d.]+\/leaflet\.min\.(js|css)$/.test(u.pathname)) { const f = path.join(SDK, 'leaflet.' + u.pathname.split('.').pop()); if (fs.existsSync(f)) return r.fulfill({ status: 200, contentType: /css$/.test(f) ? 'text/css' : MIME.js, body: fs.readFileSync(f) }); }
       if (u.hostname === 'unpkg.com' && /^\/leaflet@[\d.]+\/dist\/leaflet\.(js|css)$/.test(u.pathname)) { const f = path.join(SDK, u.pathname.split('/').pop()); if (fs.existsSync(f)) return r.fulfill({ status: 200, contentType: /css$/.test(f) ? 'text/css' : MIME.js, body: fs.readFileSync(f) }); return r.abort(); } // mapa das zonas (Leaflet): cópia local
       if (u.hostname === 'open.er-api.com') return r.fulfill({ status: 200, contentType: MIME.json, headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ result: 'success', rates: { USD: 1, PYG: 6250, BRL: 5.5 } }) });
       if (u.hostname === 'firestore.googleapis.com') { // páginas que usam a API REST direto (reservas, licenças): mesma rota no emulador

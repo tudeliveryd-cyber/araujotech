@@ -127,6 +127,7 @@ foreach ($ids as $id) {
   if ($sl && ($sl['es'] . $sl['pt']) !== '') $o['sl'] = $sl;
   if (!function_exists('guia_loc')) require_once __DIR__ . '/guia_lib.php';
   if ($loc = guia_loc($id, $s)) { $o['lat'] = round($loc['lat'], 5); $o['lng'] = round($loc['lng'], 5); } // para 'Cerca de mí' e o mapa (só localização confirmada)
+  $ad = trim(preg_replace('/^[\s—-]+/u', '', (string)($st['address'] ?? ''))); if ($ad !== '') $o['ad'] = mb_substr($ad, 0, 90); // endereço no cartão da página de categoria
   $out[$id] = $o;
 }
 echo json_encode($out ?: new stdClass(), JSON_UNESCAPED_UNICODE);

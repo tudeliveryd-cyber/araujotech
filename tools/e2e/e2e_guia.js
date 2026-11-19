@@ -624,6 +624,23 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     const r = await tp.evaluate(() => ({ cards: [...document.querySelectorAll('#al .ali b')].map(b => b.textContent).join('|'), map: !document.getElementById('tdmap').hidden }));
     info(JSON.stringify(r));
     check(r.cards === 'Aliado Uno|Aliado Dos|Sin mapa' && r.map, 'Tu Delivery: lista só os aliados e mostra o mapa quando há pelo menos 2 com localização no link'); }
+  sec('V2. Videos de los negocios (links de Instagram, TikTok e YouTube)');
+  { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
+    await a.evaluate(() => { if (!ui.gu.dir.some(x => x.id === 'vd1')) ui.gu.dir.push({ id: 'vd1', n: 'Heladería Video', g: 'food', d: 'Helados', wa: '0981 777 888', td: false, on: true, tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], mt: 'menu', mu: '' }); guSheet(); }); await a.w(300);
+    check(await a.evaluate(() => /Videos de los negocios/.test(document.querySelector('.sheet[data-k="gu"]').textContent)), 'painel da Guía tem o cartão "Videos de los negocios"');
+    await a.act('guadd', '[data-k="vid"]'); await a.w(300);
+    await a.locator('select[data-gu="vid.0.fid"]').selectOption('d:vd1');
+    await a.fill('[data-gu="vid.0.u"]', 'https://www.instagram.com/reel/C9abcDEF12/\nhttps://youtu.be/dQw4w9WgXcQ\nhttps://www.tiktok.com/@helados/video/7300000000000000001\nhttps://malo.example/video'); await a.w(200);
+    await a.evaluate(() => guSheet()); await a.w(200);
+    const warn = await a.evaluate(() => { const t = document.querySelector('.sheet[data-k="gu"]').textContent; return /malo\.example\/video: link no reconocido/.test(t) && /3 video\(s\)/.test(t); });
+    check(warn, 'link que não é de Instagram, TikTok ou YouTube aparece avisado; os outros contam como vídeos');
+    await a.act('gusave'); await a.w(2500); const dv = await doc();
+    info(JSON.stringify(dv.gvid));
+    check(Array.isArray(dv.gvid) && dv.gvid.length === 1 && dv.gvid[0].fid === 'd:vd1' && dv.gvid[0].u.length === 3 && !dv.gvid[0].u.some(x => /malo/.test(x)), 'salva só os links válidos em platform/sitio (gvid)');
+    const pv = JSON.parse(require('child_process').execFileSync('php', ['-r', "require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(['d' => guia_vids('d:vd1'), 'x' => guia_vids('d:outro'), 'bad' => guia_vid_embed('javascript:alert(1)')]);"], { cwd: require('path').join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gv-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString());
+    info(JSON.stringify(pv));
+    check(pv.d.length === 3 && pv.d[0].src === 'https://www.instagram.com/reel/C9abcDEF12/embed' && pv.d[1].src === 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0' && pv.d[2].src === 'https://www.tiktok.com/embed/v2/7300000000000000001' && !pv.x.length && pv.bad === null, 'servidor transforma os links em vídeo embutido (Instagram, YouTube, TikTok); outro negócio não recebe nada');
+    await a.evaluate(() => { ui.gu.vid = []; ui.gu.dir = ui.gu.dir.filter(x => x.id !== 'vd1'); guSheet(); }); await a.act('gusave'); await a.w(1500); }
   sec('V. Promo del día e relatório para os aliados');
   { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
     const fid = await a.evaluate(() => { ui.gu.dir.push({ id: 'pv1', n: 'Pizzería Promo', g: 'food', d: 'Pizzas', wa: '0981 444 555', td: true, on: true, tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], mt: 'menu', mu: '' }); guSheet(); return 'd:pv1'; }); await a.w(300);
@@ -655,19 +672,20 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     info(JSON.stringify(PR));
     check(PR.has && /Pizza grande 2x1/.test(PR.t) && /Solo hoy/.test(PR.t) && /wa\.me\/595981444555/.test(PR.href) && /promo de hoy/.test(PR.href) && PR.gone, 'portada: "Promos de hoy" com o negócio e o botão de pedir pelo WhatsApp; sem promo, a faixa some'); }
   { const CP = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const all = [0,1,2,3,4,5,6].map(() => ({ on: true, a: ['00:00', '23:59'], b: ['', ''] })), none = [0,1,2,3,4,5,6].map(() => ({ on: false, a: ['', ''], b: ['', ''] }));
-      G.dir = [{ id: 'cp1', n: 'Zeta Cerrado', g: 'food', d: 'Pizzería', wa: '0981 111 222', dy: none, sl: 'zeta-cerrado' }, { id: 'cp2', n: 'Alfa Abierto', g: 'food', d: 'Hamburguesas', wa: '0981 333 444', dy: all, a: 'Av. Gaspar R. de Francia' }]; G.promo = []; applyCat(); document.getElementById('q').value = ''; SPV = ''; SORTM = 'rec'; CAT = 'food'; render(); await W(60);
+      G.dir = [{ id: 'cp1', n: 'Zeta Cerrado', g: 'food', d: 'Pizzería', wa: '0981 111 222', dy: none, sl: 'zeta-cerrado' }, { id: 'cp2', n: 'Alfa Abierto', g: 'food', d: 'Hamburguesas', wa: '0981 333 444', dy: all, a: 'Av. Gaspar R. de Francia', map: 'https://www.google.com/maps?q=-25.7931,-55.0867' }]; G.promo = []; applyCat(); document.getElementById('q').value = ''; SPV = ''; SORTM = 'rec'; CAT = 'food'; render(); await W(60);
       const pg = document.querySelector('.cpg.c-food'); const r = { pg: !!pg, h1: pg ? (pg.querySelector('h1') || {}).textContent : '', desc: pg ? (pg.querySelector('.cph p') || {}).textContent : '', cnt: pg ? (pg.querySelector('.cpb span') || {}).textContent : '', n: pg ? pg.querySelectorAll('.card.dir, .cc').length : 0, total: (LIST || []).concat(dirL()).filter(c => c._g === 'food').length };
       const names = () => [...document.querySelectorAll('.cpg .card.dir h3, .cpg .cc h3')].map(h => h.textContent.trim());
       const so = document.getElementById('ccsort'); so.value = 'name'; so.dispatchEvent(new Event('change', { bubbles: true })); await W(40); r.byName = names(); const i1 = r.byName.findIndex(x => /Alfa/.test(x)), i2 = r.byName.findIndex(x => /Zeta/.test(x)); r.nameOk = i1 > -1 && i2 > i1;
       const s2 = document.getElementById('ccsort'); s2.value = 'open'; s2.dispatchEvent(new Event('change', { bubbles: true })); await W(40); r.byOpen = names(); r.openOk = r.byOpen.indexOf('Alfa Abierto') > -1 && r.byOpen.indexOf('Alfa Abierto') < r.byOpen.indexOf('Zeta Cerrado');
       const z = [...document.querySelectorAll('.cpg .card.dir')].find(c => /Zeta/.test(c.textContent)); r.vn = z ? (z.querySelector('a.vn') || {}).getAttribute('href') : ''; r.wa = z ? !!z.querySelector('a[href*="wa.me"]') : false; r.mp = z ? !!z.querySelector('a[href*="google.com/maps"]') : false;
-      r.vmap = !!document.querySelector('.cpg [data-vmap]'); document.querySelector('.cpg [data-vmap]').click(); await W(60); r.mapOn = MAPON === true; MAPON = false;
+      r.vmap = !!document.querySelector('.cpg [data-vmap]'); document.querySelector('.cpg [data-vmap]').click(); await W(60); r.mapOn = MAPON === true; for (let i = 0; i < 40 && !document.querySelector('#gmf [data-mnear]'); i++) await W(100); r.mapf = MAPF; r.gmf = [...document.querySelectorAll('#gmf button')].map(b => b.textContent.replace(/\s+/g, ' ').trim()); MAPF = ''; MAPON = false;
       CAT = 'all'; render(); await W(40); r.allNoPage = !document.querySelector('.cpg'); SORTM = 'rec'; CAT = 'home'; render(); return r; });
     info(JSON.stringify(CP));
     check(CP.pg && /Comida/.test(CP.h1) && CP.desc.length > 10 && CP.cnt === CP.total + ' negocios encontrados' && CP.n === CP.total, 'página de categoria: cabeçalho com nome e descrição e o número real de negócios encontrados');
     check(CP.nameOk && CP.openOk, 'Ordenar: por nome (A-Z) e abiertos primero reorganizam a lista');
     check(/negocio\/zeta-cerrado$/.test(CP.vn || '') && CP.wa && CP.mp, 'cada ficha da categoria tem WhatsApp, mapa e "Ver negocio"');
-    check(CP.vmap && CP.mapOn && CP.allNoPage, '"Ver en el mapa" abre o mapa; "Todos" continua com a lista normal'); }
+    check(CP.vmap && CP.mapOn && CP.allNoPage, '"Ver en el mapa" abre o mapa; "Todos" continua com a lista normal');
+    check(CP.mapf === 'g:food' && /Cerca de mí/.test(CP.gmf[0] || '') && CP.gmf.some(x => /^Comida y bebidas [1-9]\d*$/.test(x)), 'mapa: "Ver en el mapa" da categoria já abre filtrado nela, com filtro por categoria e o botão Cerca de mí', JSON.stringify(CP.gmf)); }
   { const FT = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const t = [...document.querySelectorAll('footer .ft-cols b')].map(b => b.textContent); document.querySelector('footer [data-go=far]').click(); await W(60); const far = SPV; SPV = ''; goHome(); render(); document.querySelector('footer [data-tt=hot]').click(); await W(60); const hot = SPV; SPV = ''; goHome(); render(); return { t, far, hot }; });
     check(FT.t.join('|') === 'Explorar|Información útil|Para negocios' && FT.far === 'far' && FT.hot === 'hot', 'rodapé: Explorar, Información útil e Para negocios, e os links abrem as páginas (Farmacias, Dónde quedarse)', JSON.stringify(FT)); }
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));

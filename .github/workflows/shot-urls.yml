@@ -10,6 +10,9 @@ on:
       full:
         description: 'Página inteira (1) ou só a tela (0)'
         default: '0'
+      local:
+        description: 'Abrir o código do repositório num servidor PHP só deste teste (1) para ver páginas ainda não publicadas'
+        default: '0'
 
 jobs:
   shot:
@@ -18,6 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: npm i playwright@1.47.2 && npx playwright install --with-deps chromium
+      - if: inputs.local == '1'
+        run: |
+          # servidor PHP só dentro deste teste: lê os dados públicos (só leitura), não grava nada
+          (cd araujo-tech-site && nohup php -S 127.0.0.1:8000 > /tmp/php.log 2>&1 &) ; sleep 2; curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:8000/guia/ || true
       - run: node tools/shot_urls.js
         env:
           URLS: ${{ inputs.urls }}

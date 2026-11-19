@@ -4,7 +4,7 @@
 function guia_doc() {
   $cache = sys_get_temp_dir() . '/at_guia8.json';
   if (is_file($cache) && time() - filemtime($cache) < 60) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gatl&mask.fieldPaths=gcat&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gpromo&mask.fieldPaths=gadsAt');
+  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gatl&mask.fieldPaths=gcat&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gpromo&mask.fieldPaths=gvid&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -16,7 +16,7 @@ function guia_doc() {
     if (isset($v['arrayValue'])) return array_map($val, $v['arrayValue']['values'] ?? []);
     return null;
   };
-  $d = ['gcat' => $val($f['gcat'] ?? null) ?: [], 'gatl' => $val($f['gatl'] ?? null) ?: [], 'gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'gpromo' => $val($f['gpromo'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
+  $d = ['gcat' => $val($f['gcat'] ?? null) ?: [], 'gatl' => $val($f['gatl'] ?? null) ?: [], 'gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'gpromo' => $val($f['gpromo'] ?? null) ?: [], 'gvid' => $val($f['gvid'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
@@ -227,6 +227,26 @@ function guia_pub() {
   $seen = [];
   foreach ($dir as $i => $x) { $sl = guia_nslug($x['n']); if ($sl === '') $sl = 'negocio'; if (isset($seen[$sl])) $sl .= '-' . strtolower(substr($x['id'], 0, 5)); $seen[$sl] = 1; $dir[$i]['sl'] = $sl; }
   return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10), 'cat' => $cat, 'atl' => $atl, 'promo' => $promo];
+}
+
+// Vídeos de um negócio (painel da Guía → Videos de los negocios): só links do Instagram, TikTok e YouTube, mostrados embutidos.
+// $fid = 'v:<id do cliente Vitrix>' ou 'd:<id da ficha>'. Nada é baixado nem guardado na hospedagem.
+function guia_vid_embed($u) {
+  $u = trim((string)$u); if (!preg_match('#^https://#i', $u) || strlen($u) > 300) return null;
+  if (preg_match('#^https://(?:www\.|m\.)?youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/)([\w-]{11})#i', $u, $m) || preg_match('#^https://youtu\.be/([\w-]{11})#i', $u, $m))
+    return ['k' => 'yt', 'u' => $u, 'src' => 'https://www.youtube-nocookie.com/embed/' . $m[1] . '?rel=0', 'v' => preg_match('#/shorts/#i', $u) ? 1 : 0];
+  if (preg_match('#^https://(?:www\.|m\.)?tiktok\.com/@[\w.-]+/video/(\d{8,25})#i', $u, $m)) return ['k' => 'tt', 'u' => $u, 'src' => 'https://www.tiktok.com/embed/v2/' . $m[1], 'v' => 1];
+  if (preg_match('#^https://(?:vm|vt)\.tiktok\.com/[\w-]{5,20}/?$#i', $u)) return ['k' => 'tt', 'u' => $u, 'src' => '', 'v' => 1];
+  if (preg_match('#^https://(?:www\.)?instagram\.com/(p|reels?|tv)/([\w-]{5,40})#i', $u, $m)) return ['k' => 'ig', 'u' => $u, 'src' => 'https://www.instagram.com/' . (strtolower($m[1]) === 'p' ? 'p' : 'reel') . '/' . $m[2] . '/embed', 'v' => 1];
+  return null;
+}
+function guia_vids($fid) {
+  foreach ((array)(guia_doc()['gvid'] ?? []) as $x) {
+    if (!is_array($x) || ($x['fid'] ?? '') !== $fid) continue; $o = [];
+    foreach (array_slice((array)($x['u'] ?? []), 0, 4) as $u) if ($v = guia_vid_embed($u)) $o[] = $v;
+    return $o;
+  }
+  return [];
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
