@@ -668,6 +668,8 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     check(CP.nameOk && CP.openOk, 'Ordenar: por nome (A-Z) e abiertos primero reorganizam a lista');
     check(/negocio\/zeta-cerrado$/.test(CP.vn || '') && CP.wa && CP.mp, 'cada ficha da categoria tem WhatsApp, mapa e "Ver negocio"');
     check(CP.vmap && CP.mapOn && CP.allNoPage, '"Ver en el mapa" abre o mapa; "Todos" continua com a lista normal'); }
+  { const FT = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const t = [...document.querySelectorAll('footer .ft-cols b')].map(b => b.textContent); document.querySelector('footer [data-go=far]').click(); await W(60); const far = SPV; SPV = ''; goHome(); render(); document.querySelector('footer [data-tt=hot]').click(); await W(60); const hot = SPV; SPV = ''; goHome(); render(); return { t, far, hot }; });
+    check(FT.t.join('|') === 'Explorar|Información útil|Para negocios' && FT.far === 'far' && FT.hot === 'hot', 'rodapé: Explorar, Información útil e Para negocios, e os links abrem as páginas (Farmacias, Dónde quedarse)', JSON.stringify(FT)); }
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
