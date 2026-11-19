@@ -6,11 +6,7 @@ jobs:
     steps:
       - run: |
           for h in araujotechsistemas.com www.araujotechsistemas.com lojastatus.araujotechsistemas.com fogaomineiro.araujotechsistemas.com; do
-            echo "=== $h"; dig +short $h
-            echo | openssl s_client -connect $h:443 -servername $h -alpn h2 2>/dev/null | grep -E "ALPN|subject=|issuer=" 
-            echo | openssl s_client -connect $h:443 -servername $h 2>/dev/null | openssl x509 -noout -ext subjectAltName -dates
-            curl -sI --http2 https://$h/ | head -3
+            echo "=== $h"; echo | openssl s_client -connect $h:443 -servername $h 2>/dev/null | openssl x509 -noout -ext subjectAltName -dates
           done
-          echo "=== coalescing test (SNI main, Host sub)"
-          curl -s -o /dev/null -w "%{http_code} %{http_version}\n" --http2 --resolve lojastatus.araujotechsistemas.com:443:$(dig +short araujotechsistemas.com|head -1) https://araujotechsistemas.com/ https://lojastatus.araujotechsistemas.com/ 
-          curl -sv --http2 https://araujotechsistemas.com/ https://lojastatus.araujotechsistemas.com/ -o /dev/null 2>&1 | grep -Ei "re-us|HTTP/2 [0-9]|connected|alpn" 
+          for u in https://lojastatus.araujotechsistemas.com/sitio/guia_on.php https://lojastatus.araujotechsistemas.com/painel/ https://lojastatus.araujotechsistemas.com/loja/catalogo.html https://araujotechsistemas.com/painel/; do
+            echo "URL $u -> $(curl -s -o /dev/null -w '%{http_code} %{size_download}' "$u")"; done
