@@ -6,7 +6,7 @@ jobs:
     steps:
       - run: |
           chk(){ c=$(curl -sS --max-time 30 "$1" | grep -o "$2" | head -1); echo "$1 :: $2 => ${c:-NAO ENCONTRADO}"; }
-          curl -sS --max-time 30 https://lojastatus.araujotechsistemas.com/ | head -c 3000; echo; curl -sS --max-time 30 https://lojastatus.araujotechsistemas.com/ | grep -o "src=\"[^\"]*\"" | head; curl -sSI https://lojastatus.araujotechsistemas.com/ | head -12
+          for k in edpaste bzone REF_GUIA "Pedido hecho desde" varfind imgOpen; do for u in https://lojastatus.araujotechsistemas.com/ https://araujotechsistemas.com/loja/lojastatus/ https://chiperiasantarita.araujotechsistemas.com/ https://fogaomineiro.araujotechsistemas.com/; do echo "K $k $u $(curl -sS --max-time 30 "$u" | grep -c "$k")"; done; done
           chk https://araujotechsistemas.com/vitrix/ "const GSX={24:150000,40:250000,62:390000,104:650000,56:350000,239:1500000}"
           chk https://araujotechsistemas.com/vitrix/ "'Esencial','Para empezar',24,56"
           chk https://araujotechsistemas.com/ "Desde <b>Gs. 150.000</b>"
