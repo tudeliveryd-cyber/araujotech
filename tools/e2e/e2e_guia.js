@@ -365,7 +365,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(nav.atlErr.length === 0, 'todos os acessos rápidos (Transporte, Eventos, Gastronomía, Salud, Farmacias, Emergencias, Delivery) respondem sem erro');
   check(nav.moreOpen && nav.util, 'barra de baixo: "Más" abre o menu e "Santa Rita útil" abre a central completa');
   check(nav.map && nav.mnav, 'barra de baixo abre o mapa; menu do topo leva aos negócios');
-  check(nav.labels.join('|') === 'Inicio|Buscar|Mapa|Agenda|Mi cuenta', 'barra de baixo com Inicio, Buscar, Mapa, Agenda e Mi cuenta');
+  check(nav.labels.join('|') === 'Inicio|Categorías|Mapa|Agenda|Más', 'barra de baixo com Inicio, Categorías, Mapa, Agenda e Más', nav.labels.join('|'));
   const v2 = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms)); goHome(); render(); await W(30);
     r.cat = !!document.querySelector('#cats .atl [data-a]') && /Categor/.test((document.querySelector('#cats h2') || {}).textContent || '');
     r.info = [...document.querySelectorAll('.infr .ic-c')].map(x => x.className.replace('ic-c ', ''));
@@ -373,8 +373,8 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     r.pb = (document.querySelector('.pbn') || {}).getAttribute ? document.querySelector('.pbn').getAttribute('href') : '';
     r.vfOk = (LIST || []).length ? !!document.querySelector('#destacados .vf, #aliados .vf') || !document.querySelector('#destacados, #aliados') : true; r.vfFn = typeof vfB === 'function' && /verificado/.test(vfB()) && !/\bvf\b/.test(dirCard({ id: 'd-x', name: 'Sin selo', _dir: 1, segEs: '', td: false, acc: false })) && /class="vf"/.test(dirCard({ id: 'd-y', name: 'Aliado', _dir: 1, segEs: '', td: true }));
     { const A0 = G.ads, S0 = G.soc; G.ads = [{ id: 'z1', img: '/img/guia/tu-delivery.jpg' }, { id: 'z2', img: '/img/guia/tu-delivery.jpg' }, { id: 'z3', img: '/img/guia/tu-delivery.jpg' }]; G.soc = Object.assign({}, S0, { slo: 'list' }); SL.ord = {}; r.ord = slItems().filter(x => x.k === 'ad').map(x => x.a.id).join(','); G.ads = A0; G.soc = S0; SL.sig = ''; slRender(); }
-    r.hq = [...document.querySelectorAll('.hq a:not([hidden])')].length; r.h1 = (document.querySelector('h1') || {}).textContent || '';
-    document.querySelector('#bnav [data-b=find]').click(); await W(450); r.find = document.activeElement && document.activeElement.id === 'q';
+    r.hq = [...document.querySelectorAll('.tt a[data-tt]')].length; r.h1 = (document.querySelector('h1') || {}).textContent || '';
+    document.querySelector('#bnav [data-b=cats]').click(); await W(700); { const c = document.getElementById('cats').getBoundingClientRect(); r.find = c.top < innerHeight && c.bottom > 0; } r.tq = await (async () => { document.querySelector('[data-tt=hot]').click(); await W(80); const a = SPV === 'hot' && /Dónde quedarse/.test((document.querySelector('.spv h2') || {}).textContent || ''); document.querySelector('[data-tt=qh]').click(); await W(80); const b = SPV === 'qh' && /Qué hacer/.test((document.querySelector('.spv h2') || {}).textContent || ''); SPV = ''; goHome(); render(); return a && b; })();
     document.getElementById('hacc').click(); await W(30); r.acc = !document.getElementById('more').hidden; document.getElementById('more').hidden = true;
     CAT = 'all'; render(); document.querySelector('.mnav [data-go=home]').click(); await W(30); r.home = CAT === 'home';
     return r; });
@@ -382,8 +382,9 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(v2.cat && v2.info.includes('ic-ev') && v2.info.includes('ic-tel') && v2.tel[0] === 'tel:911', 'início novo: Categorías principales e a linha com eventos e teléfonos útiles (911 para ligar)');
   check(v2.ord === 'z1,z2,z3', 'slider na ordem da lista quando o painel pede (' + v2.ord + ')');
   check(v2.vfOk && v2.vfFn, 'selo verificado: clientes Vitrix e aliados Tu Delivery têm; ficha simples sem relação não tem');
-  check(v2.pb === '/guia/negocios/' && v2.hq >= 3 && /Santa Rita/.test(v2.h1), 'início novo: atalhos da busca, cartão Publicá tu negocio e o título da página (h1)');
-  check(v2.find && v2.acc && v2.home, 'Buscar (barra de baixo) foca a busca, Mi cuenta (topo) abre o menu e Inicio (topo) volta ao começo');
+  check(v2.pb === '/guia/negocios/' && v2.hq >= 3 && /Santa Rita/.test(v2.h1), 'início novo: os 3 blocos (Dónde comer, Qué hacer, Dónde quedarse), cartão Publicá tu negocio e o título da página (h1)');
+  check(v2.tq, '"Dónde quedarse" e "Qué hacer" abrem as páginas deles');
+  check(v2.find && v2.acc && v2.home, 'Categorías (barra de baixo) leva às categorias, Mi cuenta (topo) abre o menu e Inicio (topo) volta ao começo');
   const v4 = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms)); const G0 = G.util, S0 = G.soc;
     goHome(); render(); document.querySelector('#atl [data-a="far"]').click(); await W(40);
     r.far = (document.querySelector('.spv h2') || {}).textContent || ''; r.farPub = [...document.querySelectorAll('.spv .pc b')].map(b => b.textContent); r.farMap = (document.querySelector('.spv-map') || {}).href || '';
