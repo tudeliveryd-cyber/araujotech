@@ -1,0 +1,13 @@
+name: Prospecção - comércios de Santa Rita no OpenStreetMap (só leitura)
+
+# Lê empresas e comércios de Santa Rita no OpenStreetMap e imprime no registro. Não grava nada.
+on:
+  workflow_dispatch:
+
+jobs:
+  osm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/osm_comercios.py
