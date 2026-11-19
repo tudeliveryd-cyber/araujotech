@@ -511,7 +511,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     const r = {}; r.pub = [...document.querySelectorAll('.tg.pub .tile[data-pk] b')].map(b => b.textContent);
     SPV = 'salud'; CAT = 'all'; render(); await W(50); r.salud = [...document.querySelectorAll('.spv .uh')].map(h => h.textContent).filter(t => /Hospitales|Clínicas/.test(t));
     SPV = 'xmus'; CAT = 'all'; render(); await W(50); r.mus = !!document.querySelector('.spv') && /Museo Teste/.test(document.querySelector('.spv').textContent);
-    SPV = ''; CAT = fk; render(); await W(50); const sec = document.querySelector('.grp.c-' + fk); r.neg = sec ? sec.querySelector('h2').textContent : null; r.negSub = sec ? [...sec.querySelectorAll('.uh')].map(h => h.textContent) : [];
+    SPV = ''; CAT = fk; render(); await W(50); const sec = document.querySelector('.grp.c-' + fk); r.neg = sec ? sec.querySelector('h1,h2').textContent : null; r.negSub = sec ? [...sec.querySelectorAll('.uh')].map(h => h.textContent) : [];
     r.chip = !!document.querySelector('[data-c="' + fk + '"]'); r.firstChip = ([...document.querySelectorAll('#chips [data-c]')].map(b => b.dataset.c).filter(k => k !== 'home' && k !== 'all')[0]) || '';
     return r; }, P1.fk);
   info(JSON.stringify(P2));
@@ -654,6 +654,20 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     const PR = await g4.evaluate(async () => { G.dir = [{ id: 'pv1', n: 'Pizzería Promo', g: 'food', d: 'Pizzas', wa: '0981 444 555', td: true }]; G.promo = [{ k: 'd', id: 'pv1', t: 'Pizza grande 2x1 solo hoy' }]; G.cat = {}; applyCat(); document.getElementById('q').value = ''; CAT = 'home'; SPV = ''; render(); await new Promise(f => setTimeout(f, 80)); const c = document.querySelector('#promos .prm-c'); const r = { has: !!c, t: c ? c.textContent : '', href: c ? decodeURIComponent(c.href) : '' }; G.promo = []; render(); r.gone = !document.getElementById('promos'); return r; });
     info(JSON.stringify(PR));
     check(PR.has && /Pizza grande 2x1/.test(PR.t) && /Solo hoy/.test(PR.t) && /wa\.me\/595981444555/.test(PR.href) && /promo de hoy/.test(PR.href) && PR.gone, 'portada: "Promos de hoy" com o negócio e o botão de pedir pelo WhatsApp; sem promo, a faixa some'); }
+  { const CP = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const all = [0,1,2,3,4,5,6].map(() => ({ on: true, a: ['00:00', '23:59'], b: ['', ''] })), none = [0,1,2,3,4,5,6].map(() => ({ on: false, a: ['', ''], b: ['', ''] }));
+      G.dir = [{ id: 'cp1', n: 'Zeta Cerrado', g: 'food', d: 'Pizzería', wa: '0981 111 222', dy: none, sl: 'zeta-cerrado' }, { id: 'cp2', n: 'Alfa Abierto', g: 'food', d: 'Hamburguesas', wa: '0981 333 444', dy: all, a: 'Av. Gaspar R. de Francia' }]; G.promo = []; applyCat(); document.getElementById('q').value = ''; SPV = ''; SORTM = 'rec'; CAT = 'food'; render(); await W(60);
+      const pg = document.querySelector('.cpg.c-food'); const r = { pg: !!pg, h1: pg ? (pg.querySelector('h1') || {}).textContent : '', desc: pg ? (pg.querySelector('.cph p') || {}).textContent : '', cnt: pg ? (pg.querySelector('.cpb span') || {}).textContent : '', n: pg ? pg.querySelectorAll('.card.dir, .cc').length : 0, total: (LIST || []).concat(dirL()).filter(c => c._g === 'food').length };
+      const names = () => [...document.querySelectorAll('.cpg .card.dir h3, .cpg .cc h3')].map(h => h.textContent.trim());
+      const so = document.getElementById('ccsort'); so.value = 'name'; so.dispatchEvent(new Event('change', { bubbles: true })); await W(40); r.byName = names(); const i1 = r.byName.findIndex(x => /Alfa/.test(x)), i2 = r.byName.findIndex(x => /Zeta/.test(x)); r.nameOk = i1 > -1 && i2 > i1;
+      const s2 = document.getElementById('ccsort'); s2.value = 'open'; s2.dispatchEvent(new Event('change', { bubbles: true })); await W(40); r.byOpen = names(); r.openOk = r.byOpen.indexOf('Alfa Abierto') > -1 && r.byOpen.indexOf('Alfa Abierto') < r.byOpen.indexOf('Zeta Cerrado');
+      const z = [...document.querySelectorAll('.cpg .card.dir')].find(c => /Zeta/.test(c.textContent)); r.vn = z ? (z.querySelector('a.vn') || {}).getAttribute('href') : ''; r.wa = z ? !!z.querySelector('a[href*="wa.me"]') : false; r.mp = z ? !!z.querySelector('a[href*="google.com/maps"]') : false;
+      r.vmap = !!document.querySelector('.cpg [data-vmap]'); document.querySelector('.cpg [data-vmap]').click(); await W(60); r.mapOn = MAPON === true; MAPON = false;
+      CAT = 'all'; render(); await W(40); r.allNoPage = !document.querySelector('.cpg'); SORTM = 'rec'; CAT = 'home'; render(); return r; });
+    info(JSON.stringify(CP));
+    check(CP.pg && /Comida/.test(CP.h1) && CP.desc.length > 10 && CP.cnt === CP.total + ' negocios encontrados' && CP.n === CP.total, 'página de categoria: cabeçalho com nome e descrição e o número real de negócios encontrados');
+    check(CP.nameOk && CP.openOk, 'Ordenar: por nome (A-Z) e abiertos primero reorganizam a lista');
+    check(/negocio\/zeta-cerrado$/.test(CP.vn || '') && CP.wa && CP.mp, 'cada ficha da categoria tem WhatsApp, mapa e "Ver negocio"');
+    check(CP.vmap && CP.mapOn && CP.allNoPage, '"Ver en el mapa" abre o mapa; "Todos" continua com a lista normal'); }
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
