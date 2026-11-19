@@ -18,7 +18,6 @@ jobs:
       FTP_SERVER: ${{ secrets.FTP_SERVER }}
       SITE_FTP_USERNAME: ${{ secrets.SITE_FTP_USERNAME }}
       SITE_FTP_PASSWORD: ${{ secrets.SITE_FTP_PASSWORD }}
-      BRAVE_KEY: ${{ secrets.BRAVE_KEY }}
     steps:
       - name: Aguardando os dados do FTP do site
         if: env.SITE_FTP_USERNAME == '' || env.SITE_FTP_PASSWORD == ''
@@ -40,9 +39,6 @@ jobs:
       - name: Gerar a demonstração (Casa Brasa) a partir do catálogo atual
         if: env.SITE_FTP_USERNAME != '' && env.SITE_FTP_PASSWORD != ''
         run: python3 tools/make_demo.py
-      - name: Chave da busca de fotos (fica só no servidor, nunca no repositório)
-        if: env.BRAVE_KEY != ''
-        run: python3 -c "import os;k=os.environ['BRAVE_KEY'].strip().replace(chr(92),'').replace(chr(39),'');open('araujo-tech-site/sitio/img_key.php','w').write('<?php return '+chr(39)+k+chr(39)+';')"
       - name: Enviar arquivos para araujotechsistemas.com
         if: env.SITE_FTP_USERNAME != '' && env.SITE_FTP_PASSWORD != ''
         run: |

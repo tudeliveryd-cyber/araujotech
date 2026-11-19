@@ -21,6 +21,9 @@ on:
       - 'araujo-tech-site/sitio/gimg.php'
       - 'araujo-tech-site/sitio/pimg.php'
       - 'araujo-tech-site/sitio/img.php'
+      - 'araujo-tech-site/sitio/img_lib.php'
+      - 'araujo-tech-site/sitio/img_busca.php'
+      - 'araujo-tech-site/sitio/img_traer.php'
       - 'araujo-tech-site/clientes.js'
       - 'tools/guia_htaccess.txt'
       - '.github/workflows/guia.yml'
@@ -42,6 +45,7 @@ jobs:
       GUIA_FTP_USERNAME: ${{ secrets.GUIA_FTP_USERNAME }}
       GUIA_FTP_PASSWORD: ${{ secrets.GUIA_FTP_PASSWORD }}
       GUIA_FTP_FINGERPRINT: ${{ secrets.GUIA_FTP_FINGERPRINT }}
+      BRAVE_KEY: ${{ secrets.BRAVE_KEY }}
       DESTINO: ${{ inputs.destino || 'revision' }}
     steps:
       - name: Aguardando os dados do FTP da Guía
@@ -65,7 +69,11 @@ jobs:
         run: |
           S=araujo-tech-site; D=out; rm -rf $D; mkdir -p $D/sitio
           cp -r $S/guia $S/img $D/
-          for f in guia.php guia_lib.php prods_lib.php gimg.php pimg.php img.php; do cp $S/sitio/$f $D/sitio/; done
+          for f in guia.php guia_lib.php prods_lib.php gimg.php pimg.php img.php img_lib.php img_busca.php img_traer.php; do cp $S/sitio/$f $D/sitio/; done
+          # busca de fotos do painel Vitrix: fica neste domínio porque o painel no subdomínio não pode chamar
+          # araujotechsistemas.com no iPhone (erro 421). A chave vem do secret e nunca entra no repositório.
+          mkdir -p $D/sitio/datos/imgq; : > $D/sitio/datos/index.html; : > $D/sitio/datos/imgq/index.html
+          if [ -n "$BRAVE_KEY" ]; then python3 -c "import os;k=os.environ['BRAVE_KEY'].strip().replace(chr(92),'').replace(chr(39),'');open('$D/sitio/img_key.php','w').write('<?php return '+chr(39)+k+chr(39)+';')"; fi
           cp $S/clientes.js $S/nao-encontrado.html $D/
           cp $S/guia/google*.html $D/ 2>/dev/null || true # verificação do Google Search Console (na raiz do domínio)
           # Nada de contagens, painel ou dados aqui: isso fica só no servidor principal.
