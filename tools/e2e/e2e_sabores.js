@@ -108,6 +108,19 @@ const FX = __dirname + '/fix/';
   check(ck2 === false, 'se a opção estava no carrinho e ficou agotada, o pedido não sai com ela');
   if (process.env.SHOT) { await c.evaluate(id => { closeSheet(); productSheet(id); }, pid); await c.w(1800); await c.screenshot({ path: process.env.SHOT }); }
   if (process.env.SHOT2) { await o.evaluate(id => acts.editprod({ dataset: { pid: id } }), pid); await o.w(2000); await o.evaluate(() => document.querySelector('.vrow').scrollIntoView({ block: 'center' })); await o.w(300); await o.screenshot({ path: process.env.SHOT2 }); }
+  sec('E. Painel: "Pegar foto" cola a imagem copiada da busca, sem baixar nem subir arquivo');
+  await o.context().grantPermissions(['clipboard-read', 'clipboard-write'], { origin: HOST });
+  await o.evaluate(() => { closeSheet && closeSheet(); acts.newprod(); }); await o.w(600);
+  check(await o.locator('[data-act=edpaste]').count() === 1, 'o editor de produto novo tem o botão "Pegar foto" ao lado de "Buscar foto en internet"');
+  await o.evaluate(async () => { const cv = document.createElement('canvas'); cv.width = cv.height = 300; const x = cv.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 300, 300); x.fillStyle = '#c00'; x.fillRect(90, 60, 120, 180); const b = await new Promise(r => cv.toBlob(r, 'image/png')); await navigator.clipboard.write([new ClipboardItem({ 'image/png': b })]); });
+  await o.locator('[data-act=edpaste]').click(); await o.w(2500);
+  const pz = await o.evaluate(() => ({ ph: String(ui.edit && ui.edit.photo || '').slice(0, 15), th: !!document.querySelector('.sheet .thumb img') }));
+  check(/^data:image/.test(pz.ph) && pz.th, 'tocar "Pegar foto" coloca a foto copiada no produto (aparece a miniatura)', JSON.stringify(pz));
+  await o.evaluate(() => { ui.edit.photo = ''; editorSheet(); }); await o.w(300);
+  await o.evaluate(() => navigator.clipboard.writeText('texto')); await o.locator('[data-act=edpaste]').click(); await o.w(800);
+  const tz = await o.evaluate(() => document.body.innerText);
+  check(/No hay ninguna foto copiada|Nenhuma foto copiada/.test(tz) && !(await o.evaluate(() => ui.edit.photo)), 'sem foto copiada, avisa como copiar e não muda nada');
+  await o.evaluate(() => { ui.edit = null; closeSheet(); }); await o.w(300);
   check(!o.errs.length && !c.errs.length, 'sem erros de JavaScript', o.errs.concat(c.errs).join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
