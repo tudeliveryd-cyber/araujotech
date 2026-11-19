@@ -4,7 +4,7 @@
 function guia_doc() {
   $cache = sys_get_temp_dir() . '/at_guia8.json';
   if (is_file($cache) && time() - filemtime($cache) < 60) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
-  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gatl&mask.fieldPaths=gcat&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gpromo&mask.fieldPaths=gvid&mask.fieldPaths=gadsAt');
+  $r = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=' . AT_KEY . '&mask.fieldPaths=gads&mask.fieldPaths=gatl&mask.fieldPaths=gcat&mask.fieldPaths=gutil&mask.fieldPaths=gpro&mask.fieldPaths=gbus&mask.fieldPaths=gturno&mask.fieldPaths=gev&mask.fieldPaths=gnews&mask.fieldPaths=gdir&mask.fieldPaths=gsoc&mask.fieldPaths=gjobs&mask.fieldPaths=gjobx&mask.fieldPaths=gclas&mask.fieldPaths=gpromo&mask.fieldPaths=gvid&mask.fieldPaths=gnotas&mask.fieldPaths=gadsAt');
   if ($r === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; } return []; }
   $f = json_decode($r, true)['fields'] ?? [];
   $val = function ($v) use (&$val) {
@@ -16,7 +16,7 @@ function guia_doc() {
     if (isset($v['arrayValue'])) return array_map($val, $v['arrayValue']['values'] ?? []);
     return null;
   };
-  $d = ['gcat' => $val($f['gcat'] ?? null) ?: [], 'gatl' => $val($f['gatl'] ?? null) ?: [], 'gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'gpromo' => $val($f['gpromo'] ?? null) ?: [], 'gvid' => $val($f['gvid'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
+  $d = ['gcat' => $val($f['gcat'] ?? null) ?: [], 'gatl' => $val($f['gatl'] ?? null) ?: [], 'gads' => $val($f['gads'] ?? null) ?: [], 'gutil' => isset($f['gutil']) ? ($val($f['gutil']) ?: []) : null, 'gpro' => $val($f['gpro'] ?? null) ?: [], 'gbus' => $val($f['gbus'] ?? null) ?: [], 'gturno' => $val($f['gturno'] ?? null) ?: [], 'gev' => $val($f['gev'] ?? null) ?: [], 'gdir' => $val($f['gdir'] ?? null) ?: [], 'gnews' => $val($f['gnews'] ?? null) ?: null, 'gsoc' => $val($f['gsoc'] ?? null) ?: [], 'gjobs' => $val($f['gjobs'] ?? null) ?: [], 'gjobx' => $val($f['gjobx'] ?? null) ?: [], 'gclas' => $val($f['gclas'] ?? null) ?: [], 'gpromo' => $val($f['gpromo'] ?? null) ?: [], 'gvid' => $val($f['gvid'] ?? null) ?: [], 'gnotas' => $val($f['gnotas'] ?? null) ?: [], 'at' => (string)($val($f['gadsAt'] ?? null) ?? '')];
   @file_put_contents($cache, json_encode($d));
   return $d;
 }
@@ -250,6 +250,29 @@ function guia_vids($fid) {
   return [];
 }
 
+// "Santa Rita al día": notas escritas pela própria Guía no painel (noticias, acontecimientos, turismo, lugares para conocer).
+// Cada uma tem página própria (/nota/<id>). $full = true traz o texto inteiro (página da nota); senão só um resumo (portada).
+const GUIA_NK = ['not' => ['Noticia', 'Notícia'], 'acon' => ['Acontecimiento', 'Acontecimento'], 'tur' => ['Turismo', 'Turismo'], 'lug' => ['Lugar para conocer', 'Lugar para conhecer']];
+function guia_notas($full = false) {
+  $out = [];
+  foreach (array_slice((array)(guia_doc()['gnotas'] ?? []), 0, 30) as $x) {
+    if (!is_array($x)) continue; $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); $t = trim((string)($x['t'] ?? ''));
+    if ($id === '' || mb_strlen($t) < 3) continue;
+    $tx = trim(str_replace("\r", '', (string)($x['x'] ?? ''))); $u = preg_match('#^https://[^\s"\'<>]{4,400}$#i', (string)($x['u'] ?? '')) ? (string)$x['u'] : '';
+    if ($tx === '' && $u === '') continue;
+    $k = isset(GUIA_NK[$x['k'] ?? '']) ? $x['k'] : 'not'; $d = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($x['d'] ?? '')) ? (string)$x['d'] : '';
+    $ph = (string)($x['ph'] ?? ''); $img = '';
+    if (preg_match('#^gimg:[A-Za-z0-9_]{1,60}:([a-f0-9]{1,16})$#', $ph, $m)) $img = '/sitio/gimg.php?t=' . $id . '&v=' . $m[1];
+    elseif (preg_match('#^data:image/(jpeg|png|webp);base64,#', $ph)) $img = '/sitio/gimg.php?t=' . $id . '&v=' . substr(md5($ph), 0, 8);
+    $o = ['id' => $id, 'k' => $k, 't' => mb_substr($t, 0, 140), 'd' => in_array($k, ['tur', 'lug'], true) ? '' : $d, 'img' => $img, 'u' => $u, 'dest' => !empty($x['dest'])];
+    $o['r'] = mb_substr(preg_replace('/\s+/u', ' ', $tx), 0, 200) . (mb_strlen($tx) > 200 ? '…' : '');
+    if ($full) $o['x'] = mb_substr($tx, 0, 4000);
+    $o['_s'] = $d; $out[] = $o;
+  }
+  usort($out, function ($a, $b) { return ($b['dest'] <=> $a['dest']) ?: strcmp($b['_s'], $a['_s']); });
+  return array_map(function ($o) { unset($o['_s']); return $o; }, $out);
+}
+
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
 function guia_news() {
   $cfg = guia_doc()['gnews'] ?? null;
@@ -408,6 +431,7 @@ function guia_item($k, $id) {
   if ($k === 'vacante') { foreach (guia_jobs(false) as $j) if ($j['id'] === $id) return $j; return null; }
   $p = guia_pub();
   if ($k === 'aviso') { foreach ($p['clas'] as $c) if ($c['id'] === $id) return $c; return null; }
+  if ($k === 'nota') { foreach (guia_notas(true) as $n) if ($n['id'] === $id) return $n; return null; }
   if ($k === 'evento') { foreach ($p['ev'] as $e) if (($e['id'] ?? '') === $id) return $e; return null; }
   if ($k === 'lugar') { foreach (guia_lugares() as $l) if ($l['slug'] === $id) return $l; return null; }
   return null;

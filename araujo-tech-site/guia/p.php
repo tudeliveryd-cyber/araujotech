@@ -8,8 +8,8 @@ header('Cache-Control: public, max-age=300');
 require __DIR__ . '/../sitio/prods_lib.php';
 require __DIR__ . '/../sitio/guia_lib.php';
 $k = (string)($_GET['k'] ?? ''); $rid = (string)($_GET['id'] ?? '');
-$id = ($k === 'lugar' || $k === 'negocio') ? $rid : str_replace('.', ':', $rid);
-$x = (in_array($k, ['vacante', 'aviso', 'evento', 'lugar', 'negocio'], true) && preg_match('/^[A-Za-z0-9:_-]{2,90}$/', $id)) ? guia_item($k, $id) : null;
+$id = ($k === 'lugar' || $k === 'negocio' || $k === 'nota') ? $rid : str_replace('.', ':', $rid);
+$x = (in_array($k, ['vacante', 'aviso', 'evento', 'lugar', 'negocio', 'nota'], true) && preg_match('/^[A-Za-z0-9:_-]{2,90}$/', $id)) ? guia_item($k, $id) : null;
 $e = function ($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); };
 $host = preg_match('/(^|\.)guiadesantarita\.com$/i', (string)($_SERVER['HTTP_HOST'] ?? '')) ? 'https://guiadesantarita.com' : 'https://araujotechsistemas.com/guia';
 $G = $host . '/';
@@ -71,6 +71,17 @@ if (!$x) {
     $ld = json_encode(array_filter(['@context' => 'https://schema.org', '@type' => $x['g'] === 'food' ? 'FoodEstablishment' : 'LocalBusiness', 'name' => $x['n'], 'description' => $x['d'] ?: null, 'url' => $self, 'telephone' => $x['tel'] ?: ($wn ? '+' . $wn : null), 'image' => ($x['ph'] ?? '') ? 'https://guiadesantarita.com' . $x['ph'] : ((($x['lg'] ?? '') !== '') ? 'https://guiadesantarita.com' . $x['lg'] : null),
       'address' => ['@type' => 'PostalAddress', 'streetAddress' => $x['a'] ?: null, 'addressLocality' => 'Santa Rita', 'addressRegion' => 'Alto Paraná', 'addressCountry' => 'PY'], 'hasMap' => $mq, 'openingHoursSpecification' => $oh ?: null, 'sameAs' => ($x['ig'] ?? '') ? ['https://instagram.com/' . $x['ig']] : null]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if (($x['ph'] ?? '') !== '') $img = 'https://guiadesantarita.com' . $x['ph']; elseif (($x['lg'] ?? '') !== '') $img = 'https://guiadesantarita.com' . $x['lg'];
+  } elseif ($k === 'nota') {
+    $kind = GUIA_NK[$x['k']][0] ?? 'Noticia';
+    $title = $x['t'] . ' — Santa Rita al día';
+    $desc = mb_substr($x['r'] !== '' ? $x['r'] : $kind . ' de Santa Rita, Alto Paraná.', 0, 160);
+    $tags = array_filter([$kind, $x['d'] ? $fd($x['d']) : '']);
+    $body = (string)($x['x'] ?? '');
+    $x['ph'] = $x['img'];
+    $btns = $x['u'] ? '<a class="btn pri" style="background:var(--deep);border-color:var(--deep)" href="' . $e($x['u']) . '" target="_blank" rel="noopener">' . ($body !== '' ? 'Ver la fuente' : 'Leer la nota completa') . '</a>' : '';
+    $ld = json_encode(array_filter(['@context' => 'https://schema.org', '@type' => $x['k'] === 'not' || $x['k'] === 'acon' ? 'NewsArticle' : 'Article', 'headline' => $x['t'], 'datePublished' => $x['d'] ?: null, 'image' => $x['img'] ? 'https://guiadesantarita.com' . $x['img'] : null, 'url' => $self,
+      'publisher' => ['@type' => 'Organization', 'name' => 'Guía de Santa Rita', 'url' => 'https://guiadesantarita.com/']]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($x['img']) $img = 'https://guiadesantarita.com' . $x['img'];
   } elseif ($k === 'lugar') {
     $PC = ['gob' => 'Gobierno y trámites', 'doc' => 'Documentos', 'salud' => 'Salud', 'far' => 'Farmacia', 'seg' => 'Seguridad', 'ocio' => 'Plazas y recreación', 'trans' => 'Transporte', 'serv' => 'Servicios públicos', 'edu' => 'Educación', 'gua' => 'Guardería y jardín', 'escpub' => 'Escuela o colegio público', 'escpri' => 'Colegio privado', 'unipub' => 'Universidad pública', 'unipri' => 'Universidad privada', 'inst' => 'Instituto, cursos e idiomas', 'igl' => 'Iglesia', 'com' => 'Comunidad y ONGs', 'dep' => 'Deportes y clubes', 'ani' => 'Animales y adopción', 'fin' => 'Bancos y finanzas'];
     foreach (guia_cat(guia_doc()['gcat'] ?? [])['pub'] as $cg) { if (!$cg['tabs'] && $cg['n']['es'] !== '') $PC[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '') $PC[$ct['k']] = $ct['n']['es']; } // nomes das pastas e abas do painel
@@ -97,7 +108,7 @@ if (!$x) {
     $kind = 'Agenda de Santa Rita';
   }
 }
-$back = $k === 'vacante' ? $G . '#empleos' : ($k === 'aviso' ? $G . '#clasificados' : ($k === 'lugar' ? $G . '#util' : ($k === 'negocio' ? $G . '#negocios' : $G . '#agenda')));
+$back = $k === 'nota' ? $G . '#aldia' : ($k === 'vacante' ? $G . '#empleos' : ($k === 'aviso' ? $G . '#clasificados' : ($k === 'lugar' ? $G . '#util' : ($k === 'negocio' ? $G . '#negocios' : $G . '#agenda'))));
 ?><!doctype html>
 <html lang="es"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -137,6 +148,7 @@ h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,5vw,36px);lin
 .btn:focus-visible,.bk:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
 .vf{display:inline-flex;vertical-align:-2px;margin-left:8px;color:var(--purple)}.vf svg{display:block}
 .vds{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:8px 0 16px}.vd{border:1px solid #EEE7F6;border-radius:14px;overflow:hidden;background:#fff}.vd iframe{display:block;width:100%;aspect-ratio:16/9;border:0;background:#111}.vd.vt iframe{aspect-ratio:9/16;max-height:600px}.vd .vl{display:block;padding:9px 12px;font-weight:700;font-size:14px;color:#4A0A80;text-decoration:none}
+.nt-x{margin:14px 0 4px;font-size:17px;line-height:1.7;color:#2A1F38}.nt-x p{margin:0 0 14px}
 </style>
 </head>
 <body>
@@ -145,12 +157,12 @@ h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,5vw,36px);lin
 <?php if (!$x): ?>
 <div class="box empty"><h1>Esta publicación ya no está disponible</h1><p>Venció o fue retirada por quien la publicó.</p><div class="act" style="justify-content:center"><a class="btn pri" style="background:var(--deep);border-color:var(--deep)" href="<?= $e($G) ?>">Ver lo que hay hoy en la Guía</a></div></div>
 <?php else: ?>
-<article class="box"><?php if (($k === 'aviso' || $k === 'lugar' || $k === 'negocio') && ($x['ph'] ?? '') !== ''): ?><img class="ph" src="<?= $e($x['ph']) ?>" alt="<?= $e($k === 'negocio' ? 'Foto de ' . $x['n'] : '') ?>"><?php endif; ?><div class="in">
+<article class="box"><?php if (($k === 'aviso' || $k === 'lugar' || $k === 'negocio' || $k === 'nota') && ($x['ph'] ?? '') !== ''): ?><img class="ph" src="<?= $e($x['ph']) ?>" alt="<?= $e($k === 'negocio' ? 'Foto de ' . $x['n'] : '') ?>"><?php endif; ?><div class="in">
 <?php if ($k === 'negocio' && ($x['lg'] ?? '') !== ''): ?><img class="nlg" src="<?= $e($x['lg']) ?>" alt="Logo de <?= $e($x['n']) ?>" width="72" height="72"><?php endif; ?>
 <p class="kd"><?= $e($kind) ?></p><h1><?= $e($x['t']) ?><?php if ($k === 'negocio' && !empty($x['td'])): ?><span class="vf" title="Verificado: trabaja con Tu Delivery" aria-label="Negocio verificado"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12.00 1.00L14.41 3.02L17.50 2.47L18.58 5.42L21.53 6.50L20.98 9.59L23.00 12.00L20.98 14.41L21.53 17.50L18.58 18.58L17.50 21.53L14.41 20.98L12.00 23.00L9.59 20.98L6.50 21.53L5.42 18.58L2.47 17.50L3.02 14.41L1.00 12.00L3.02 9.59L2.47 6.50L5.42 5.42L6.50 2.47L9.59 3.02z"/><path d="m7.8 12.3 2.9 2.9 5.5-5.6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><?php endif; ?></h1>
 <?php if ($k === 'vacante' && ($x['co']['n'] ?? '') !== ''): ?><p class="co"><?= $e($x['co']['n']) ?></p><?php endif; ?>
 <?php if ($tags): ?><div class="tg"><?php foreach ($tags as $t): ?><span><?= $e($t) ?></span><?php endforeach; ?></div><?php endif; ?>
-<?php if ($body !== ''): ?><p class="tx"><?= $e($body) ?></p><?php endif; ?>
+<?php if ($body !== '' && $k === 'nota'): ?><div class="nt-x"><?php foreach (preg_split('/\n\s*\n/', $body) as $pp): if (trim($pp) === '') continue; ?><p><?= nl2br($e(trim($pp))) ?></p><?php endforeach; ?></div><?php elseif ($body !== ''): ?><p class="tx"><?= $e($body) ?></p><?php endif; ?>
 <?php if ($k === 'negocio' && !empty($hrsL)): ?><h2 class="sh2">Horarios</h2><ul class="hrs"><?php foreach ($hrsL as $h): ?><li<?= $h[2] === (int)(new DateTime('now', new DateTimeZone('America/Asuncion')))->format('w') ? ' class="hoy"' : '' ?>><span><?= $e($h[0]) ?></span><b><?= $e($h[1]) ?></b></li><?php endforeach; ?></ul><?php endif; ?>
 <?php $vids = $k === 'negocio' ? guia_vids('d:' . ($x['id'] ?? '')) : []; if ($vids): ?><h2 class="sh2">Videos</h2><div class="vds"><?php foreach ($vids as $v): ?><div class="vd<?= $v['v'] ? ' vt' : '' ?>"><?php if ($v['src']): ?><iframe src="<?= $e($v['src']) ?>" title="Video de <?= $e($x['n']) ?>" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><?php endif; ?><a class="vl" href="<?= $e($v['u']) ?>" target="_blank" rel="noopener"><?= $v['k'] === 'yt' ? 'Ver en YouTube' : ($v['k'] === 'tt' ? 'Ver en TikTok' : 'Ver en Instagram') ?></a></div><?php endforeach; ?></div><?php endif; ?>
 <div class="act"><?= $btns ?><button class="btn" type="button" id="sh">Compartir</button><a class="btn" href="<?= $e($back) ?>">Ver más en la Guía</a></div>

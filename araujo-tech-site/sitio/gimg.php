@@ -7,6 +7,7 @@ $dd = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['d'] ?? '')); // d = logo 
 if ($i === '' && $pp !== '') $i = 'p' . $pp;
 if ($i === '' && $nn !== '') $i = 'n' . $nn;
 $cc = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['c'] ?? '')); // c = foto de clasificado
+$tt = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['t'] ?? '')); // t = foto de uma nota de "Santa Rita al día"
 $ff = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['f'] ?? '')); // f = logo/foto de uma conta própria aprovada (gfichas)
 if ($ff !== '' && $i === '') {
   require __DIR__ . '/prods_lib.php'; require __DIR__ . '/guia_lib.php';
@@ -22,6 +23,7 @@ if ($ff !== '' && $i === '') {
 $dk = (($_GET['k'] ?? '') === 'ph') ? 'ph' : 'lg'; // ficha simples: logo (lg) ou foto do local (ph)
 if ($i === '' && $dd !== '') $i = 'd' . $dd;
 if ($i === '' && $cc !== '') $i = 'c' . $cc;
+if ($i === '' && $tt !== '') $i = 't' . $tt;
 if ($i === '') { http_response_code(404); exit; }
 require __DIR__ . '/prods_lib.php';
 require __DIR__ . '/guia_lib.php';
@@ -33,7 +35,8 @@ $list = $pp !== '' ? (array)($doc['gpro'] ?? []) : (array)($doc['gads'] ?? []); 
 if ($pp === '' && $nn !== '' && $i === 'n' . $nn) { $list = (array)(($doc['gnews'] ?? [])['man'] ?? []); $want = $nn; $fld = 'ph'; }
 if ($pp === '' && $nn === '' && $dd !== '' && $i === 'd' . $dd) { $list = (array)($doc['gdir'] ?? []); $want = $dd; $fld = $dk; }
 if ($pp === '' && $nn === '' && $dd === '' && $cc !== '' && $i === 'c' . $cc) { $list = (array)($doc['gclas'] ?? []); $want = $cc; $fld = 'ph'; }
-$wd = ($pp === '' && $nn === '' && $dd === '' && $cc === '' && (($_GET['k'] ?? '') === 'd')); if ($wd) $fld = 'imgd'; // imagem larga do banner, só para computador
+if ($pp === '' && $nn === '' && $dd === '' && $cc === '' && $tt !== '' && $i === 't' . $tt) { $list = (array)($doc['gnotas'] ?? []); $want = $tt; $fld = 'ph'; }
+$wd = ($tt === '') && ($pp === '' && $nn === '' && $dd === '' && $cc === '' && (($_GET['k'] ?? '') === 'd')); if ($wd) $fld = 'imgd'; // imagem larga do banner, só para computador
 foreach ($list as $x) { if (is_array($x) && ($x['id'] ?? '') === $want) { $src = (string)($x[$fld] ?? ''); break; } }
 // banner guardado à parte (platform/sitio/gimg/<id>): o gads só tem "gimg:<id>:<versão>"; busca a imagem uma vez e guarda em cache
 if (preg_match('#^gimg:([A-Za-z0-9_]{1,60}):([a-f0-9]{1,16})$#', $src, $gm)) {

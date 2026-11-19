@@ -99,7 +99,7 @@ if (isset($_GET['hoy'])) { // 'Hoy en Santa Rita': clima (MET Norway) e câmbio 
     $fx = ['usd' => (int)round($bcp['usd']), 'brl' => (int)round($bcp['brl']), 'd' => $bcp['fecha'], 'src' => 'bcp'];
   header('Cache-Control: public, max-age=600'); echo json_encode(['w' => $w, 'fx' => $fx]); exit;
 }
-if (isset($_GET['news'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_news(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; }
+if (isset($_GET['news'])) { require __DIR__ . '/guia_lib.php'; echo json_encode(guia_news() + ['notas' => guia_notas()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; } // notícias do parceiro + "Santa Rita al día"
 if (isset($_GET['jobs'])) { require_once __DIR__ . '/guia_lib.php'; header('Cache-Control: public, max-age=300'); echo json_encode(['jobs' => guia_jobs(false)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; } // Empleos (só as vagas ativas)
 if (isset($_GET['soc'])) { require_once __DIR__ . '/guia_lib.php'; $p = guia_pub(); header('Cache-Control: public, max-age=900'); echo json_encode(['soc' => $p['soc'] ?? (object)[]], JSON_UNESCAPED_SLASHES); exit; } // só as redes da Guía (rodapé das páginas internas)
 if (isset($_GET['g'])) { require __DIR__ . '/guia_lib.php'; header('Cache-Control: public, max-age=60'); echo json_encode(guia_pub() + ['nov' => guia_nov()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); exit; } // banners pagos e lugares públicos

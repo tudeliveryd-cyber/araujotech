@@ -641,6 +641,36 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     info(JSON.stringify(pv));
     check(pv.d.length === 3 && pv.d[0].src === 'https://www.instagram.com/reel/C9abcDEF12/embed' && pv.d[1].src === 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0' && pv.d[2].src === 'https://www.tiktok.com/embed/v2/7300000000000000001' && !pv.x.length && pv.bad === null, 'servidor transforma os links em vídeo embutido (Instagram, YouTube, TikTok); outro negócio não recebe nada');
     await a.evaluate(() => { ui.gu.vid = []; ui.gu.dir = ui.gu.dir.filter(x => x.id !== 'vd1'); guSheet(); }); await a.act('gusave'); await a.w(1500); }
+  sec('V3. Santa Rita al día (notas da Guía com página própria)');
+  { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
+    check(await a.evaluate(() => /Santa Rita al día/.test(document.querySelector('.sheet[data-k="gu"]').textContent) && !!document.querySelector('.card[data-gg="con"] [data-k="nota"]')), 'painel da Guía tem o cartão "Santa Rita al día" em Contenido');
+    await a.act('guadd', '[data-k="nota"]'); await a.w(300);
+    await a.fill('[data-gu="notas.0.t"]', 'Nueva plaza en el barrio San José'); await a.fill('[data-gu="notas.0.x"]', 'La municipalidad inauguró la plaza.\n\nTiene juegos y una pista para caminar.'); await a.w(100);
+    const PH = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    await a.evaluate(ph => { ui.gu.notas[0].ph = ph; }, PH);
+    await a.act('guadd', '[data-k="nota"]'); await a.w(300);
+    await a.locator('select[data-gu="notas.0.k"]').selectOption('tur'); await a.fill('[data-gu="notas.0.t"]', 'Paseo por el lago'); await a.fill('[data-gu="notas.0.u"]', 'https://turismo.example/lago'); await a.w(100);
+    await a.act('guadd', '[data-k="nota"]'); await a.w(300); await a.fill('[data-gu="notas.0.t"]', 'X'); await a.w(100);
+    await a.act('gusave'); await a.w(3000); const dn = await doc();
+    info(JSON.stringify((dn.gnotas || []).map(x => [x.k, x.t, (x.ph || '').slice(0, 12), x.u, x.d])));
+    const nt = dn.gnotas || [], pl = nt.find(x => /plaza/.test(x.t)), tu = nt.find(x => x.k === 'tur');
+    check(nt.length === 2 && pl && /^gimg:nt[A-Za-z0-9]+:[a-f0-9]+$/.test(pl.ph) && tu && tu.u === 'https://turismo.example/lago', 'salva as notas completas (a incompleta não entra); a foto vai guardada à parte (não pesa no documento)');
+    const php = code => JSON.parse(require('child_process').execFileSync('php', ['-r', code], { cwd: require('path').join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gn-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString());
+    const sv = php("require 'prods_lib.php'; require 'guia_lib.php'; $l = guia_notas(); $it = guia_item('nota', $l[0]['id'] ?? ''); echo json_encode(['l' => $l, 'it' => $it]);");
+    info(JSON.stringify(sv.l));
+    const sp = sv.l.find(x => /plaza/.test(x.t)), st = sv.l.find(x => x.k === 'tur');
+    check(sp && /^\/sitio\/gimg\.php\?t=[a-z0-9]+&v=[a-f0-9]+$/i.test(sp.img) && !('x' in sp) && /inauguró/.test(sp.r) && st && st.d === '' && sv.it && 'x' in sv.it, 'servidor: lista com resumo e foto; turismo sem data; a página da nota recebe o texto inteiro');
+    const img = require('child_process').execFileSync('php', ['-r', "$_GET = ['t' => '" + sp.id + "', 'v' => 'x']; ob_start(); include 'gimg.php'; echo base64_encode(ob_get_clean());"], { cwd: require('path').join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gn2-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString();
+    check(Buffer.from(img, 'base64').slice(1, 4).toString() === 'PNG', 'a foto da nota sai pelo gimg.php (guardada à parte no Firestore)');
+    const pg = require('child_process').execFileSync('php', ['-r', "$_GET = ['k' => 'nota', 'id' => '" + sp.id + "']; include 'p.php';"], { cwd: require('path').join(L.DIRS.site, 'guia'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gn3-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString();
+    check(/<h1>Nueva plaza en el barrio San José/.test(pg) && /<p>La municipalidad inauguró la plaza.<\/p><p>Tiene juegos/.test(pg) && /NewsArticle/.test(pg) && /og:image/.test(pg), 'página /nota/<id>: título, parágrafos, foto para o WhatsApp e dados para o Google');
+    const PO = await g4.evaluate(async (l) => { const W = ms => new Promise(f => setTimeout(f, ms)); NEWS = { items: [], notas: l }; ALD = ''; document.getElementById('q').value = ''; CAT = 'home'; SPV = ''; render(); await W(60); const s = document.getElementById('aldia'); const r = { has: !!s, big: s ? (s.querySelector('.ald-b b') || {}).textContent : '', href: s ? s.querySelector('.ald-b').getAttribute('href') : '', chips: s ? [...s.querySelectorAll('[data-ald]')].map(b => b.textContent) : [] };
+      const tb = s && s.querySelector('[data-ald="tur"]'); if (tb) { tb.click(); await W(60); } r.tur = [...document.querySelectorAll('#aldia .ald-b b, #aldia .ald-i b')].map(b => b.textContent); ALD = '';
+      SPV = 'qh'; CAT = 'all'; render(); await W(60); r.qh = [...document.querySelectorAll('.ald .ald-i b')].map(b => b.textContent); SPV = ''; CAT = 'home'; NEWS = null; render(); r.gone = !document.getElementById('aldia'); return r; }, sv.l);
+    info(JSON.stringify(PO));
+    check(PO.has && /plaza|lago/i.test(PO.big) && /^\/?(guia\/)?nota\/[a-z0-9]+$/i.test(PO.href.replace(/^https?:\/\/[^/]+/, '')) && PO.chips.join('|') === 'Todo|Noticias|Turismo', 'portada: "Santa Rita al día" com a nota em destaque, link para a página da nota e filtros só dos tipos que têm nota', JSON.stringify(PO.chips));
+    check(PO.tur.join('|') === 'Paseo por el lago' && PO.qh.join('|') === 'Paseo por el lago' && PO.gone, 'filtro Turismo mostra só turismo; "Qué hacer" mostra os lugares e o turismo; sem notas a seção some');
+    await a.evaluate(() => { ui.gu.notas = []; guSheet(); }); await a.act('gusave'); await a.w(1500); }
   sec('V. Promo del día e relatório para os aliados');
   { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
     const fid = await a.evaluate(() => { ui.gu.dir.push({ id: 'pv1', n: 'Pizzería Promo', g: 'food', d: 'Pizzas', wa: '0981 444 555', td: true, on: true, tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], mt: 'menu', mu: '' }); guSheet(); return 'd:pv1'; }); await a.w(300);
