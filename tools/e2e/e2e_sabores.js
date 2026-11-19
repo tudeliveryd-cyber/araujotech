@@ -172,6 +172,11 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   await o.evaluate(() => acts.bzall()); await o.waitForSelector('#bzmap.leaflet-container', { timeout: 15000 }).catch(() => {}); await o.w(800);
   check(await o.locator('.bztip').count() >= 1 && /7\.000/.test(await o.txt('.bztip')), '"Ver todos en el mapa" mostra as zonas com nome e preço', await o.txt('.bztip'));
   await o.evaluate(() => closeSheet()); await o.w(300);
+  sec('H. Cliente que chega pela Guía: o pedido avisa "Pedido hecho desde la Guía de Santa Rita"');
+  await c.evaluate(() => { try { sessionStorage.setItem('at_ref', 'guia'); } catch (e) {} }); await c.reload(); await c.w(4000);
+  const rg = await c.evaluate(() => { const o = { lang: 'es', no: 1, name: 'Ana', phone: '0981', lines: [], sub: 0, fee: 0, disc: 0, total: 0, mode: 'pickup', pay: 'cash', change: '', ref: REF_GUIA ? 'guia' : '' }; let m = ''; try { m = buildMessage(o); } catch (e) { m = 'ERR ' + e.message; } return { ref: REF_GUIA, has: /Pedido hecho desde la Guía de Santa Rita/.test(m), m: m.slice(-120) }; });
+  check(rg.ref && rg.has, 'o WhatsApp do pedido diz que veio da Guía', JSON.stringify(rg));
+  await c.evaluate(() => { try { sessionStorage.removeItem('at_ref'); } catch (e) {} });
   check(!o.errs.length && !c.errs.length, 'sem erros de JavaScript', o.errs.concat(c.errs).join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });

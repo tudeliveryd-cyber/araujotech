@@ -442,7 +442,9 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(simp.busShort && simp.busFull, 'Santa Rita útil resumido no início e abre o resto ao tocar');
   check(/Desayuno, almuerzo, merienda y cena/.test(simp.tidy), 'rubro escrito com espaços/maiúsculas aparece arrumado');
   check(simp.bmax <= 2, 'cada negócio com no máximo dois selos');
-  check(out.pord === 'https://wa.me/595981123456?text=' + encodeURIComponent('Hola, vi tu negocio en la Guía de Santa Rita y quiero hacer un pedido'), '"Pedir por WhatsApp" vai direto ao WhatsApp do negócio com a mensagem da Guía');
+  check(out.pord === 'https://wa.me/595981123456?text=' + encodeURIComponent('Hola, te encontré en la Guía de Santa Rita. ¿Me pasás el menú? Quiero hacer un pedido.'), '"Pedir por WhatsApp" vai direto ao WhatsApp do negócio com a mensagem da Guía, conforme o rubro (comida: pede o menú)', out.pord);
+  const wmq = await gr3.evaluate(() => [waMsg({ _g: 'food' }, 'al'), waMsg({ _g: 'shop' }), waMsg({ _g: 'serv' })]);
+  check(/¿Qué tienen hoy de almuerzo\?/.test(wmq[0]) && /productos y precios/.test(wmq[1]) && /una consulta/.test(wmq[2]) && wmq.every(x => /Guía de Santa Rita/.test(x)), 'mensagem por rubro: no "¿Qué comer?" pergunta pelo almuerzo de hoy; tienda pede produtos e preços; serviço, consulta', JSON.stringify(wmq));
   check(out.pig && out.plg === '/sitio/gimg.php?d=t1&v=1', 'aliado mostra Instagram e logo');
   check(!out.mseal && out.mwa.includes('WhatsApp') && !out.mwa.includes('Pedir por WhatsApp'), 'ficha comum continua sem selo e com WhatsApp normal');
   check(!out.xlg, 'logo de endereço desconhecido não é mostrado');
