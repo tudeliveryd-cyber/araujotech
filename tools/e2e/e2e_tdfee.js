@@ -1,0 +1,41 @@
+// Tabela de envíos Tu Delivery: copiar barrios, zonas e preços de um local modelo para os clientes com Tu Delivery.
+const L = require('./lib'); const P = 'araujotech-catalogos';
+const { info, sec, check } = L;
+(async () => {
+  const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026'];
+  await L.signUp(...ADM);
+  const A = await L.open({ w: 1366 }); const a = A.p;
+  await a.goto('https://araujotechsistemas.com/admin/'); await a.w(2500);
+  await a.fill('#lg_user', ADM[0]); await a.fill('#lg_pass', ADM[1]); await a.press('#lg_pass', 'Enter'); await a.w(5000);
+  const mk = async (n, wa) => { await a.act('newshop'); await a.w(300); await a.set('#ns_name', n); await a.set('#ns_wa', wa); await a.act('createshop'); await a.w(4000); return a.evaluate(n => PL.shops.find(x => x.name === n).id, n); };
+  const M = await mk('Modelo TD', '595981000001'), B = await mk('Boi TD', '595981000002'), O = await mk('Otro sin TD', '595981000003');
+  info([M, B, O].join(' '));
+  for (const [id, n] of [[M, 'Modelo TD'], [B, 'Boi TD'], [O, 'Otro sin TD']]) info('cfg ' + id + ': HTTP ' + (await L.fsReq(P, 'PATCH', 'shops/' + id + '?updateMask.fieldPaths=cfg', 'owner', L.fields({ cfg: JSON.stringify({ store: { name: n, whatsapp: '595981000000', feeMode: 'zona', bairros: [] }, zones: [], products: [], cats: [] }) }))).status);
+  sec('A. Preparar o modelo com barrios, zonas e preços');
+  const sq = (la, ln, d) => [[la - d, ln - d], [la - d, ln + d], [la + d, ln + d], [la + d, ln - d]];
+  await a.evaluate(async ({ M, z1, z2 }) => { const api = await CLOUD.init(); const d = await api.getShopDoc(M); const c = JSON.parse(d.cfg); c.store.feeMode = 'bairro'; c.store.feeOrigin = 'centro'; c.store.minFee = 5000; c.store.bairros = [{ name: 'Centro', fee: 8000, zone: z1, lat: -25.79, lng: -55.09 }, { name: 'Anillo', fee: 15000, zone: z2, lat: -25.8, lng: -55.1 }]; await api.putShop(M, { cfg: JSON.stringify(c), updated: new Date().toISOString() });
+    PL.shops.forEach(x => { if (x.name === 'Modelo TD' || x.name === 'Boi TD') x.td = true }); render(); }, { M, z1: sq(-25.79, -55.09, 0.01), z2: sq(-25.79, -55.09, 0.03) });
+  await a.w(800);
+  const btn = await a.evaluate(B => ({ b: !!document.querySelector(`[data-act="tdfee"][data-id="${B}"]`), o: !!document.querySelector('[data-act="tdfee"][data-id]:not([data-id="' + B + '"]):not([data-id="' + 'x' + '"])') }), B);
+  check(btn.b, 'cliente com Tu Delivery tem o botão "Usar la tabla de envíos de Tu Delivery"');
+  const noBtnOther = await a.evaluate(O => !document.querySelector(`[data-act="tdfee"][data-id="${O}"]`), O);
+  check(noBtnOther, 'cliente sem Tu Delivery não tem o botão (cada um desenha a sua tabela)');
+  sec('B. Copiar para o Boi');
+  await a.evaluate(B => document.querySelector(`[data-act="tdfee"][data-id="${B}"]`).click(), B); await a.w(1500);
+  const def = await a.evaluate(() => document.getElementById('tdf_from').value);
+  check(def === 'fogao-mineiro', 'o modelo sugerido é o Fogão Mineiro');
+  await a.evaluate(M => { const s = document.getElementById('tdf_from'); s.value = M; s.dispatchEvent(new Event('change')); }, M); await a.w(1500);
+  const sh = await a.evaluate(() => ({ sel: (document.getElementById('tdf_from') || {}).value, inf: (document.getElementById('tdf_inf') || {}).textContent }));
+  info(JSON.stringify(sh));
+  check(sh.sel === M && /2 barrios · 2 con zona/.test(sh.inf), 'a janela mostra o modelo e quantos barrios/zonas tem');
+  await a.evaluate(B => document.querySelector(`[data-act="tdfgo"][data-to="${B}"]`).click(), B);
+  let tt = ''; for (let i = 0; i < 30 && !/copiada/.test(tt); i++) { await a.w(150); tt = await a.evaluate(() => (document.querySelector('.toast') || {}).textContent || ''); }
+  const r = await a.evaluate(async ({ B, O }) => { const api = await CLOUD.init(); const g = async id => { const d = await api.getShopDoc(id); return { c: JSON.parse(d.cfg), d } }; const b = await g(B), o = await g(O);
+    return { mode: b.c.store.feeMode, orig: b.c.store.feeOrigin, min: b.c.store.minFee, names: b.c.store.bairros.map(x => x.name + ':' + x.fee + ':' + (x.zone || []).length).join(','), appr: (o => JSON.stringify(o, Object.keys(o).sort()))(b.d.feeApproved || {}) === (o => JSON.stringify(o, Object.keys(o).sort()))(feeSnap(b.c)) && JSON.stringify(b.d.feeApproved.bairros) === JSON.stringify(feeSnap(b.c).bairros), pend: !!b.d.feePending, other: (o.c.store.bairros || []).map(x => x.name).join(',') + '|' + o.c.store.feeMode, toast: (document.querySelector('.toast') || {}).textContent || '', fa: JSON.stringify(b.d.feeApproved), fs: JSON.stringify(feeSnap(b.c)), sheet: !!document.querySelector('#tdf_from') }; }, { B, O });
+  info(JSON.stringify(r));
+  check(r.mode === 'bairro' && r.orig === 'centro' && r.min === 5000 && r.names === 'Centro:8000:4,Anillo:15000:4', 'o Boi ficou com os mesmos barrios, zonas do mapa e preços do modelo');
+  check(r.appr && !r.pend, 'as tarifas copiadas já ficam aprovadas');
+  check(!/Anillo/.test(r.other), 'o cliente sem Tu Delivery não foi mexido');
+  check(/Tabla copiada a 1 local/.test(tt), 'aviso "Tabla copiada a 1 local(es)"');
+  L.done();
+})().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
