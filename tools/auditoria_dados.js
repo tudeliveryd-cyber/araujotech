@@ -51,7 +51,12 @@ const BB = { s: -25.90, n: -25.70, w: -55.20, e: -55.00 }; // distrito de Santa 
   for (const k of ['home', 'cats', 'map', 'agenda']) await tap({ s: '#bnav [data-b=' + k + ']' }, 'barra ' + k);
   await p.evaluate(() => { goHome(); render(); }); await p.locator('#bnav [data-b=more]').click(); await p.waitForTimeout(600);
   const items = await p.evaluate(() => [...document.querySelectorAll('#more a, #more button')].filter(x => x.offsetParent && !x.matches('[data-close],.xbtn')).map((x, i) => ({ i, t: (x.textContent || x.getAttribute('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 40) })));
-  for (const it of items) await tap({ more: 1, s: `#more :is(a,button) >> nth=${it.i}` }, 'Más: ' + it.t);
+  for (const it of items) { const e0 = errs.length; try { await p.evaluate(() => { goHome(); render(); scrollTo(0, 0); }); await p.waitForTimeout(300); await p.locator('#bnav [data-b=more]').click(); await p.waitForTimeout(500);
+      const info = await p.evaluate(i => { const x = [...document.querySelectorAll('#more a, #more button')].filter(x => x.offsetParent && !x.matches('[data-close],.xbtn'))[i]; if (!x) return null; const h = x.getAttribute('href'); if (h && !x.dataset.go && !x.dataset.sp && !x.dataset.a && !/^#/.test(h)) return { href: new URL(h, location.href).href }; x.click(); return { clicked: 1 }; }, it.i);
+      if (!info) { console.log('TOQUE Más: ' + it.t + ' · NÃO ENCONTRADO'); continue; }
+      if (info.href) { let st = '?'; try { st = (await fetch(info.href, { redirect: 'manual' })).status; } catch (e) { st = 'ERRO'; } console.log('TOQUE Más: ' + it.t + ' · link ' + info.href + ' → ' + st); continue; }
+      await p.waitForTimeout(900); const r = await p.evaluate(() => ({ spv: SPV, cat: CAT, lang: L, h2: ((document.querySelector('#list h2,.spv h2') || {}).textContent || '').trim().slice(0, 50), sheet: [...document.querySelectorAll('.sheet,[role=dialog]')].filter(x => x.offsetParent && !x.hidden).map(x => x.id || x.className).join(',') }));
+      console.log('TOQUE Más: ' + it.t + ' · ' + JSON.stringify(r) + (errs.length > e0 ? ' · ERRO JS ' + errs.slice(e0).join(' | ') : '')); await p.evaluate(() => { if (typeof setLang === 'function') try { setLang('es') } catch (e) {} }); } catch (e) { console.log('TOQUE Más: ' + it.t + ' · FALHOU ' + e.message.split('\n')[0]); } }
   console.log('ERROS JS: ' + (errs.length ? errs.join(' | ') : 'nenhum'));
   await b.close();
 })();
