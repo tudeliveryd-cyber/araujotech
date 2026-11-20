@@ -1,0 +1,51 @@
+name: Diagnóstico do documento da Guía (só leitura)
+
+# Mostra o tamanho de cada parte da Guía (platform/sitio) agora e nas cópias de segurança automáticas. Não grava nada.
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Agora no Firestore e nas cópias
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > /tmp/sz.py <<'PY'
+          import json,sys
+          def sz(v):
+            if isinstance(v,list): return 'lista %d'%len(v)
+            if isinstance(v,dict): return 'obj %d chaves'%len(v)
+            if isinstance(v,str):
+              try:
+                j=json.loads(v); return sz(j)+' (json)'
+              except Exception: return 'texto %d'%len(v)
+            return str(v)[:30]
+          d=json.load(open(sys.argv[1]))
+          s=d.get('sitio') if 'sitio' in d else None
+          docs=s if isinstance(s,list) else [d]
+          for x in docs:
+            if x.get('_id') not in (None,'sitio'): continue
+            print('  at', d.get('at'))
+            for k in sorted(x):
+              if k.startswith('g') or k in ('clientes','clientesAt'): print('   ',k,sz(x[k]))
+          PY
+          curl -s "https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/platform/sitio?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U" -o now.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('now.json')); f=d.get('fields',{}); print('AGORA updateTime', d.get('updateTime'))
+          for k in sorted(f):
+            v=f[k]; t=list(v.keys())[0]
+            n=len(v[t].get('values',[])) if t=='arrayValue' else (len(v[t].get('fields',{})) if t=='mapValue' else str(v[t])[:40])
+            if k.startswith('g') or k.startswith('cl'): print('   ',k,t,n)
+          PY
+          for id in $(gh run list -w backup.yml -L 4 --json databaseId -q '.[].databaseId'); do
+            mkdir -p b$id; gh run download $id -D b$id >/dev/null 2>&1 || { echo "sem $id"; continue; }
+            f=$(find b$id -name '*.json' | head -1); echo "COPIA $id"; python3 /tmp/sz.py "$f"
+          done
