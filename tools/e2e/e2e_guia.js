@@ -814,6 +814,21 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     check(CP.mapf === 'g:food' && /Cerca de mí/.test(CP.gmf[0] || '') && CP.gmf.some(x => /^Comida y bebidas 2$/.test(x)), 'mapa: "Ver en el mapa" da categoria já abre filtrado nela, com filtro por categoria e o botão Cerca de mí', JSON.stringify(CP.gmf)); }
   { const FT = await g4.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const t = [...document.querySelectorAll('footer .ft-cols b')].map(b => b.textContent); document.querySelector('footer [data-go=far]').click(); await W(60); const far = SPV; SPV = ''; goHome(); render(); document.querySelector('footer [data-tt=hot]').click(); await W(60); const hot = SPV; SPV = ''; goHome(); render(); return { t, far, hot }; });
     check(FT.t.join('|') === 'Explorar|Información útil|Para negocios' && FT.far === 'far' && FT.hot === 'hot', 'rodapé: Explorar, Información útil e Para negocios, e os links abrem as páginas (Farmacias, Dónde quedarse)', JSON.stringify(FT)); }
+  sec('W. Proteção contra apagar a Guía e recuperação da cópia de 19/11');
+  { await a.evaluate(() => { document.querySelectorAll('.sheet').forEach(x => x.remove && x.remove()); ui.view = 'platform'; render(); }); await a.w(300);
+    const F = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const orig = CLOUD.api.getSiteCfg; CLOUD.api.getSiteCfg = () => Promise.reject(new Error('rede')); acts.gusite(); await W(300); const sh = document.querySelector('.sheet[data-k="gu"]'); const r = { gu: ui.gu, msg: sh ? sh.textContent : '', save: !!(sh && sh.querySelector('[data-act="gusave"]')), retry: !!(sh && sh.querySelector('[data-act="gusite"]')) }; CLOUD.api.getSiteCfg = orig; return r; });
+    check(F.gu === null && /No se pudieron cargar los datos de la Guía/.test(F.msg) && !F.save && F.retry, 'se os dados da Guía não carregam, o painel não abre vazio (sem botão de salvar) e oferece tentar de novo');
+    await a.evaluate(() => { document.querySelectorAll('.sheet').forEach(x => x.remove()); acts.gusite(); }); await a.w(2000);
+    const before = (await doc()).gdir || [];
+    const WP = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); ui.guBase = { dir: 5, ads: 0, util: 0 }; const bak = JSON.stringify(ui.gu); ui.gu.dir = []; await acts.gusave(); await W(800); const r = { toast: (document.querySelector('.toast') || {}).textContent || '' }; ui.gu = JSON.parse(bak); return r; });
+    const after = (await doc()).gdir || [];
+    check(/No guardé/.test(WP.toast) && JSON.stringify(before) === JSON.stringify(after), 'não salva um painel que perdeu de uma vez todas as fichas que tinha', WP.toast);
+    const RS = await a.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); ui.gu.dir = []; ui.gu.ads = []; ui.gu.soc.tdv = []; ui.guRestored = 0; ui.guBase = { dir: 0, ads: 0, util: 0 }; ui.guGrp = 'all'; guSheet(); await W(80); const card = !!document.querySelector('[data-act="gurest"]'); document.querySelector('[data-act="gurest"]').click(); for (let i = 0; i < 40 && !ui.guRestored; i++) await W(100); await W(100);
+      return { card, dir: ui.gu.dir.length, lg: ui.gu.dir.filter(x => /^data:image\//.test(x.lg || '')).length, ads: ui.gu.ads.length, adImg: ui.gu.ads.filter(x => /^data:image\//.test(x.img || '')).length, tdv: (ui.gu.soc.tdv || []).join(','), boi: (ui.gu.dir.find(x => x.n === 'Boi de ouro') || {}).wa, gone: !document.querySelector('[data-act="gurest"]') }; });
+    info(JSON.stringify(RS));
+    check(RS.card && RS.dir === 19 && RS.lg === 19 && RS.ads === 3 && RS.adImg === 3 && /fogao-mineiro/.test(RS.tdv) && RS.boi === '0984084440' && RS.gone, '"Recuperar la copia del 19/11": volta 19 fichas com logo, 3 banners e os aliados, só no que estava vazio (nada salvo até tocar em Guardar)');
+    await a.act('gusave'); await a.w(4000); const dr = await doc();
+    check((dr.gdir || []).length === 19 && (dr.gads || []).length === 3 && (dr.gads || []).every(x => /^gimg:/.test(x.img || '')), 'depois de Guardar, a Guía fica com as fichas e os banners (imagens guardadas à parte)'); }
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
