@@ -429,7 +429,10 @@
    "h": "08:30–14:00",
    "map": "https://www.google.com/maps/search/?api=1&query=Bancop%2C%20Avda.%20Gaspar%20Rodr%C3%ADguez%20de%20Francia%20esq.%20Crist%C3%B3bal%20Col%C3%B3n%2C%20Santa%20Rita%2C%20Alto%20Paran%C3%A1%2C%20Paraguay",
    "src": "bancop.com.py (consultado 19/11/2026)",
-   "k": "bancop"
+   "k": "bancop",
+   "vs": "ver",
+   "vf": "bancop.com.py (sitio oficial)",
+   "vd": "2026-11-19"
   },
   {
    "c": "fin",
@@ -439,7 +442,10 @@
    "h": "",
    "map": "https://www.google.com/maps/search/?api=1&query=Cooperativa%20Colonias%20Unidas%2C%20Ruta%206%20Km%20212%2C%20Santa%20Rita%2C%20Alto%20Paran%C3%A1%2C%20Paraguay",
    "src": "colonias.com.py (consultado 19/11/2026)",
-   "k": "colonias"
+   "k": "colonias",
+   "vs": "ver",
+   "vf": "colonias.com.py (sitio oficial)",
+   "vd": "2026-11-19"
   }
  ]
 }

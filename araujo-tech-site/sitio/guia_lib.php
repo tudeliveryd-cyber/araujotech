@@ -155,7 +155,7 @@ function guia_pub() {
     foreach ($d['gutil'] as $x) {
       if (!is_array($x) || trim((string)($x['n'] ?? '')) === '') continue;
       $m = (string)($x['map'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $m)) $m = '';
-      $util[] = ['c' => preg_match('/^[a-z][a-z0-9]{0,15}$/', (string)($x['c'] ?? '')) ? (string)$x['c'] : 'gob', 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'h' => (string)($x['h'] ?? ''), 'map' => $m, 'o' => empty($x['o']) ? 0 : 1];
+      $util[] = (in_array($x['vs'] ?? '', ['cer', 'fue'], true) ? ['off' => 1] : []) + ['c' => preg_match('/^[a-z][a-z0-9]{0,15}$/', (string)($x['c'] ?? '')) ? (string)$x['c'] : 'gob', 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'h' => (string)($x['h'] ?? ''), 'map' => $m, 'o' => empty($x['o']) ? 0 : 1];
     }
   }
   $pros = [];
@@ -196,7 +196,7 @@ function guia_pub() {
   // negócios sem catálogo (ficha simples cadastrada no Panel Araújo Tech)
   $dir = [];
   foreach ((array)($d['gdir'] ?? []) as $x) {
-    if (!is_array($x) || ($x['on'] ?? true) === false || trim((string)($x['n'] ?? '')) === '') continue;
+    if (!is_array($x) || ($x['on'] ?? true) === false || trim((string)($x['n'] ?? '')) === '' || in_array($x['vs'] ?? '', ['cer', 'fue'], true)) continue; // cerrado ou fora de Santa Rita: não aparece
     $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
     $m = (string)($x['map'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $m)) $m = '';
     $g = (string)($x['g'] ?? 'serv'); if (!in_array($g, $negk, true)) $g = 'serv';
@@ -469,6 +469,7 @@ function guia_lugares() {
   }
   foreach ($base as $x) $o[] = $x + ['d' => '', 'wa' => '', 'web' => '', 'ig' => '', 'ph' => '', 'lg' => ''];
   foreach ((array)($p['fu'] ?? []) as $x) $o[] = $x + ['h' => '', 'src' => ''];
+  $o = array_values(array_filter($o, function ($x) { return empty($x['off']) && !in_array($x['vs'] ?? '', ['cer', 'fue'], true); })); // cerrado ou fora de Santa Rita: sem página
   foreach ($o as &$x) $x['slug'] = guia_slug($x['n'], $x['c']); unset($x);
   return $o;
 }
