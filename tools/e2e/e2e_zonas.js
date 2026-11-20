@@ -1,0 +1,36 @@
+// Zonas de entrega desenhadas: em vez da página vazia, aviso "Estamos preparando" com Vitrix e Araújo Tech; com produtos, o aviso some.
+const L = require('./lib'); const P = 'araujotech-catalogos';
+const { info, sec, check } = L;
+(async () => {
+  const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026'];
+  await L.signUp(...ADM);
+  const A = await L.open({ w: 1366 }); const a = A.p;
+  await a.goto('https://araujotechsistemas.com/admin/'); await a.w(2500);
+  await a.fill('#lg_user', ADM[0]); await a.fill('#lg_pass', ADM[1]); await a.press('#lg_pass', 'Enter'); await a.w(5000);
+  await a.act('newshop'); await a.w(300);
+  await a.set('#ns_name', 'Prepara E2E'); await a.set('#ns_wa', '595981000977');
+  await a.act('createshop'); await a.w(4000);
+  const shop = await a.evaluate(() => { const s = PL.shops.find(x => x.name === 'Prepara E2E'); return s && { id: s.id }; });
+  const URL = 'https://araujotechsistemas.com/loja/' + shop.id + '/';
+  const T0 = await L.open({ w: 390 }); await T0.p.goto(URL); await T0.p.w(3000);
+  const base = await T0.p.evaluate(() => JSON.parse(JSON.stringify(pub))); await T0.ctx.close();
+  base.store.days = Array(7).fill(0).map(() => ({ on: true, a: ['00:00', '23:59'], b: ['', ''] }));
+  const pubSave = async cfg => info('publicado: HTTP ' + (await L.fsReq(P, 'PATCH', 'shops/' + shop.id + '?updateMask.fieldPaths=cfg&updateMask.fieldPaths=status', 'owner', L.fields({ cfg: JSON.stringify(cfg), status: 'ativo' }))).status);
+  await pubSave(base);
+  const C = await L.open({ w: 390, dpr: 2 }); const c = C.p;
+  await c.goto(URL); await c.w(5000);
+  sec('Z. Zonas desenhadas: Centro dentro de uma zona maior; fora de tudo = fora da área');
+  const Z = await c.evaluate(() => { const sq = (la, ln, d) => [[la - d, ln - d], [la - d, ln + d], [la + d, ln + d], [la + d, ln - d]];
+    const la = -25.79, ln = -55.09; pub.store.feeMode = 'bairro';
+    pub.store.bairros = [{ name: 'Anillo', fee: 15000, zone: sq(la, ln, 0.03) }, { name: 'Centro', fee: 8000, zone: sq(la, ln, 0.01) }, { name: 'Viejo sin zona', fee: 20000, lat: la + 0.2, lng: ln + 0.2 }];
+    const n = (a, b) => (nearestBairro(a, b) || { name: null }).name;
+    const r = { centro: n(la, ln), anillo: n(la + 0.02, ln), fuera: n(la + 0.06, ln), viejo: n(la + 0.199, ln + 0.2) };
+    pub.store.bairros = [{ name: 'Anillo', fee: 15000, zone: sq(la, ln, 0.03) }, { name: 'Centro', fee: 8000, zone: sq(la, ln, 0.01) }];
+    r.soZonas = n(la + 0.05, ln); return r; });
+  info(JSON.stringify(Z));
+  check(Z.centro === 'Centro', 'dentro do Centro vale o Centro (mesmo estando dentro da zona maior)');
+  check(Z.anillo === 'Anillo', 'entre o Centro e a borda da zona maior vale a zona maior');
+  check(Z.fuera === null && Z.soZonas === null, 'fora de todas as zonas desenhadas sai como fora da área (não sai sem cobrar)');
+  check(Z.viejo === 'Viejo sin zona', 'bairro antigo sem zona desenhada continua pelo ponto mais perto');
+  L.done();
+})().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
