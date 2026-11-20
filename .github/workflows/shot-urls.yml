@@ -10,6 +10,9 @@ on:
       full:
         description: 'Página inteira (1) ou só a tela (0)'
         default: '0'
+      dpr:
+        description: 'Densidade da foto (1 normal, 2 nítida)'
+        default: '1'
       local:
         description: 'Abrir o código do repositório num servidor PHP só deste teste (1) para ver páginas ainda não publicadas'
         default: '0'
@@ -29,3 +32,4 @@ jobs:
         env:
           URLS: ${{ inputs.urls }}
           FULL: ${{ inputs.full }}
+          DPR: ${{ inputs.dpr }}
