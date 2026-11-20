@@ -1,0 +1,19 @@
+name: Vídeo passo a passo da Guía (só leitura)
+
+on:
+  workflow_dispatch:
+    inputs:
+      passos:
+        description: 'Ações separadas por ;'
+        default: 'goto:https://guiadesantarita.com/;wait:3000'
+
+jobs:
+  video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i playwright@1.47.2 && npx playwright install --with-deps chromium
+      - run: node tools/video_guia.js
+        env:
+          PASSOS: ${{ inputs.passos }}
