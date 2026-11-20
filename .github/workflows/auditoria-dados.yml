@@ -1,0 +1,14 @@
+name: Auditoria dos dados da Guía (só leitura)
+
+# Pontos do mapa, clientes Vitrix, banners, agenda, ônibus e toques no menu do celular. Não grava nada.
+on:
+  workflow_dispatch:
+
+jobs:
+  dados:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i playwright@1.47.2 && npx playwright install --with-deps chromium
+      - run: node tools/auditoria_dados.js
