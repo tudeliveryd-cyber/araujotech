@@ -6,6 +6,12 @@ on:
       passos:
         description: 'Ações separadas por ;'
         default: 'goto:https://guiadesantarita.com/;wait:3000'
+      vw:
+        description: 'Largura da tela (vazio = celular)'
+        default: ''
+      vh:
+        description: 'Altura da tela'
+        default: ''
 
 jobs:
   video:
@@ -17,3 +23,5 @@ jobs:
       - run: node tools/video_guia.js
         env:
           PASSOS: ${{ inputs.passos }}
+          VW: ${{ inputs.vw }}
+          VH: ${{ inputs.vh }}

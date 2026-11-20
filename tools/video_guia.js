@@ -2,7 +2,7 @@
 // PASSOS: lista separada por ";" de ações: "goto:URL", "wait:ms", "scroll:#id", "click:seletor", "js:código".
 const { chromium } = require('playwright'); const fs = require('fs');
 (async () => {
-  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: 'es-PY', timezoneId: 'America/Asuncion', recordVideo: { dir: 'vid', size: { width: 390, height: 844 } } });
+  const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: +(process.env.VW || 390), height: +(process.env.VH || 844) }, deviceScaleFactor: process.env.VW ? 1 : 2, isMobile: !process.env.VW, hasTouch: !process.env.VW, locale: 'es-PY', timezoneId: 'America/Asuncion', recordVideo: { dir: 'vid', size: { width: +(process.env.VW || 390), height: +(process.env.VH || 844) } } });
   const p = await ctx.newPage(); const log = [];
   for (const st of (process.env.PASSOS || '').split(';').map(s => s.trim()).filter(Boolean)) {
     const [k, ...r] = st.split(':'); const v = r.join(':');
