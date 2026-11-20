@@ -16,7 +16,7 @@ for x in items:
     assert not x.get('map') or re.match(r'^https://[^\s"\'<>]+$', x['map']), x
     k = x.get('k') or re.escape(x['n'].lower())
     re.compile(k)
-    f = [f"c:{js(x['c'])}", f"n:{js(x['n'])}", f"a:{js(x.get('a', ''))}", f"tel:{js(x.get('tel', ''))}", f"h:{js(x.get('h', ''))}", f"map:{js(x.get('map', ''))}", f"src:{js(x.get('src', ''))}", f"k:/{k.replace('/', chr(92) + '/')}/"]
+    f = [f"c:{js(x['c'])}", f"n:{js(x['n'])}", f"a:{js(x.get('a', ''))}", f"tel:{js(x.get('tel', ''))}", f"h:{js(x.get('h', ''))}", f"map:{js(x.get('map', ''))}", f"src:{js(x.get('src', ''))}", f"vs:{js(x.get('vs', ''))}", f"vd:{js(x.get('vd', ''))}", f"k:/{k.replace('/', chr(92) + '/')}/"]
     lines.append(' {' + ','.join(f) + '}')
 p = os.path.join(D, 'index.html'); s = open(p).read()
 i = s.index('const OSMP=['); j = s.index('}];', i) + 3

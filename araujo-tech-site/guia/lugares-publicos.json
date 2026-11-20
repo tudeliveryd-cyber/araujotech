@@ -446,6 +446,39 @@
    "vs": "ver",
    "vf": "colonias.com.py (sitio oficial)",
    "vd": "2026-11-19"
+  },
+  {
+   "c": "gob",
+   "n": "Municipalidad de Santa Rita",
+   "a": "Avda. De Los Pioneros e/ Adela Speratti",
+   "tel": "0673 220 470",
+   "h": "",
+   "map": "https://www.google.com/maps/search/?api=1&query=Municipalidad%20de%20Santa%20Rita%2C%20Avenida%20De%20Los%20Pioneros%2C%20Santa%20Rita%2C%20Alto%20Paran%C3%A1%2C%20Paraguay",
+   "src": "santarita.gov.py",
+   "k": "municipalidad",
+   "vs": "pend"
+  },
+  {
+   "c": "gob",
+   "n": "Juzgados de Santa Rita (Poder Judicial)",
+   "a": "Avda. Santa Rita y España",
+   "tel": "",
+   "h": "",
+   "map": "https://www.google.com/maps/search/?api=1&query=Avenida%20Santa%20Rita%20y%20Espa%C3%B1a%2C%20Santa%20Rita%2C%20Alto%20Paran%C3%A1%2C%20Paraguay",
+   "src": "pj.gov.py",
+   "k": "juzgad",
+   "vs": "pend"
+  },
+  {
+   "c": "doc",
+   "n": "Registro Civil · Oficina registral",
+   "a": "Dentro del Hospital Distrital de Santa Rita",
+   "tel": "",
+   "h": "",
+   "map": "https://www.google.com/maps/search/?api=1&query=Hospital%20Distrital%20de%20Santa%20Rita%2C%20Santa%20Rita%2C%20Alto%20Paran%C3%A1%2C%20Paraguay",
+   "src": "registrocivil.gov.py",
+   "k": "registro civil",
+   "vs": "pend"
   }
  ]
 }
