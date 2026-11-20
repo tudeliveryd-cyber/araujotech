@@ -698,15 +698,16 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     if (process.env.SHOT_DIR) { await a.evaluate(() => { window.__bak = JSON.stringify(ui.gu); ui.guGrp = 'all'; ui.gu.notas = [{ id: 'sh1', k: 'tur', t: 'Ejemplo de nota', x: 'Texto de ejemplo.', u: '', d: guDay(), ph: '' }]; guSheet(); }); await a.w(300);
       await a.locator('.sheet[data-k="gu"] .card.gd').screenshot({ path: process.env.SHOT_DIR + '/resumen.png' }); const nc = a.locator('.sheet[data-k="gu"] .card', { hasText: 'Santa Rita al día' }).first(); await nc.screenshot({ path: process.env.SHOT_DIR + '/notas.png' });
       await a.evaluate(() => { ui.gu = JSON.parse(window.__bak); guSheet(); }); } }
-  sec('V5. Ficha comercial sem Premium nem Aliado: só nome, rubro e mapa');
+  sec('V5. Ficha comercial sem Premium nem Aliado: não aparece na Guía (fica guardada no painel)');
   { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
     await a.evaluate(() => { const b = { g: 'food', d: 'Pizzería', tel: '0673 111', wa: '0981 222 333', a: 'Calle 1', map: 'https://maps.app.goo.gl/x', hrs: 'Lun a Sab', ig: 'pizzab', lg: '', td: false, on: true, tu: ['ce'], mt: 'menu', mu: 'https://menu.example/b' }; ui.gu.dir.push(Object.assign({ id: 'bs1', n: 'Pizzería Básica' }, b), Object.assign({ id: 'bs2', n: 'Pizzería Premium', pr: true }, b)); ui.gu.promo = [{ id: 'pb1', fid: 'd:bs1', t: 'Promo de la básica', d: guDay() }, { id: 'pb2', fid: 'd:bs2', t: 'Promo de la premium', d: guDay() }]; guFollow('neg', ui.gu.dir.length - 2); guSheet(); });
-    const pnote = await a.evaluate(() => /Sin Premium ni Aliado Tu Delivery: en la Guía aparece solo nombre, rubro y mapa/.test(document.querySelector('.sheet[data-k="gu"]').textContent));
+    const pnote = await a.evaluate(() => /Sin Premium ni Aliado Tu Delivery: no aparece en la Guía/.test(document.querySelector('.sheet[data-k="gu"]').textContent));
     await a.act('gusave'); await a.w(2500);
     const bs = JSON.parse(require('child_process').execFileSync('php', ['-r', "require 'prods_lib.php'; require 'guia_lib.php'; $p = guia_pub(); echo json_encode(['dir' => array_values(array_filter($p['dir'], function ($x) { return in_array($x['id'], ['bs1', 'bs2'], true); })), 'promo' => $p['promo']]);"], { cwd: require('path').join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gb-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString());
     info(JSON.stringify(bs));
     const b1 = bs.dir.find(x => x.id === 'bs1'), b2 = bs.dir.find(x => x.id === 'bs2');
-    check(pnote && b1 && b1.bas === 1 && b1.wa === '' && b1.tel === '' && b1.ig === '' && b1.mu === '' && b1.hrs === '' && !b1.tu.length && b1.n === 'Pizzería Básica' && b1.d === 'Pizzería' && b1.map && b1.a === 'Calle 1', 'ficha sem Premium nem Aliado: o servidor manda só nome, rubro, endereço e mapa (sem WhatsApp, telefone, redes, menu nem turnos); o painel avisa');
+    const kept = await a.evaluate(() => ui.gu.dir.some(x => x.id === 'bs1' && x.wa === '0981 222 333'));
+    check(pnote && !b1 && kept, 'ficha sem Premium nem Aliado: não sai na Guía, mas continua guardada no painel com todos os dados; o painel avisa');
     check(b2 && !b2.bas && b2.pr === 1 && b2.wa && b2.ig === 'pizzab' && b2.mu, 'ficha com "Plan Premium activo" continua completa');
     check(bs.promo.some(x => x.id === 'bs2') && !bs.promo.some(x => x.id === 'bs1'), 'promo do dia só sai para ficha com Premium ou Aliado');
     await a.evaluate(() => { ui.gu.dir = ui.gu.dir.filter(x => !/^bs[12]$/.test(x.id)); ui.gu.promo = []; guSheet(); }); await a.act('gusave'); await a.w(1500);
