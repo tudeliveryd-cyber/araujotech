@@ -2,7 +2,8 @@
 const { chromium } = require('playwright');
 const URLS = (process.env.URLS || 'https://guiadesantarita.com/').split(/\s+/).filter(Boolean), FULL = process.env.FULL === '1';
 (async () => { const b = await chromium.launch();
-  for (const [nm, W, H, mob] of [['mob', 390, 844, true], ['desk', 1366, 860, false]]) {
+  const SIZES = process.env.WS ? process.env.WS.split(',').map(w => [+w < 700 ? 'mob' + w : 'desk' + w, +w, +w < 700 ? 844 : 860, +w < 700]) : [['mob', 390, 844, true], ['desk', 1366, 860, false]]; /* WS=390,1280,1920: larguras extras */
+  for (const [nm, W, H, mob] of SIZES) {
     const ctx = await b.newContext({ viewport: { width: W, height: H }, isMobile: mob, hasTouch: mob, locale: 'es-PY', timezoneId: 'America/Asuncion', deviceScaleFactor: +(process.env.DPR || 1) });
     for (const [i, u] of URLS.entries()) { const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
       try { const [uu, ...clk] = u.split('|'); await p.goto(uu, { waitUntil: 'load', timeout: 60000 }); await p.waitForTimeout(6000); for (const c of clk) { await p.locator(c).first().click({ timeout: 15000 }); await p.waitForTimeout(4000); } /* 'endereço|seletor|seletor': toca nesses itens antes da foto */ if (FULL) { const hh = await p.evaluate(() => document.body.scrollHeight); for (let y = 0; y < hh; y += Math.round(H * 0.8)) { await p.evaluate(v => window.scrollTo(0, v), y); await p.waitForTimeout(350); } await p.evaluate(() => window.scrollTo(0, 0)); await p.waitForTimeout(1500); } } catch (e) { console.log('ERR', u, e.message); }
