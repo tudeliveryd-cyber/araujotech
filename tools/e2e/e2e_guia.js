@@ -747,6 +747,11 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
       G.util = U0; MAPON = false; render(); return r; });
     info(JSON.stringify(MP));
     check(MP.pu >= 1 && MP.biz >= 1 && /Negocios/.test(MP.lg) && /Servicios públicos/.test(MP.lg) && !MP.oculto && !MP.titles.includes('Puesto Oculto'), 'mapa: negócio em gota e serviço público em círculo, com legenda; lugar fechado não aparece'); }
+  { const DP = await L.open({ w: 1366 }); const d = DP.p; await d.goto('https://araujotechsistemas.com/admin/guia/'); await d.w(2500);
+    const at = d.url(); await d.fill('#lg_user', ADM[0]); await d.fill('#lg_pass', ADM[1]); await d.press('#lg_pass', 'Enter'); await d.w(6000);
+    const r = await d.evaluate(() => ({ sheet: !!document.querySelector('.sheet[data-k="gu"]'), hash: location.hash }));
+    info(at + ' ' + JSON.stringify(r));
+    check(/\/admin\/#guia$/.test(at) && r.sheet && r.hash === '', 'atalho /admin/guia: depois de entrar, abre direto o painel da Guía'); }
   sec('V. Promo del día e relatório para os aliados');
   { if (!(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')))) { await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(300); await a.act('gusite'); await a.w(2000); }
     const fid = await a.evaluate(() => { ui.gu.dir.push({ id: 'pv1', n: 'Pizzería Promo', g: 'food', d: 'Pizzas', wa: '0981 444 555', td: true, on: true, tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], mt: 'menu', mu: '' }); guSheet(); return 'd:pv1'; }); await a.w(300);
