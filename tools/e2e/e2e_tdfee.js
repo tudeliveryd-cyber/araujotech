@@ -41,13 +41,14 @@ const { info, sec, check } = L;
   check(/Tabla copiada a 1 local/.test(tt), 'aviso "Tabla copiada a 1 local(es)"');
   sec('C. Tabla Tu Delivery fora das empresas (mapa na Central, dia e noite) e cópia a partir dela');
   check(await a.evaluate(() => !!document.querySelector('[data-act="tdtmap"]')), 'a Central tem o botão "Mapa de envíos Tu Delivery"');
+  if (process.env.SHOT_DIR) { await a.evaluate(() => { closeSheet && closeSheet(); window.scrollTo(0, 0); const b = document.querySelector('[data-act="tdtmap"]'); b.style.outline = '4px solid #FFC21A'; b.style.outlineOffset = '3px'; }); await a.w(500); await a.screenshot({ path: process.env.SHOT_DIR + '/central-boton.png', clip: { x: 0, y: 0, width: 1366, height: 260 } }); }
   await a.evaluate(() => closeSheet && closeSheet()); await a.w(300);
   await a.evaluate(() => document.querySelector('[data-act="tdtmap"]').click()); await a.waitForSelector('#bzmap.leaflet-container', { timeout: 15000 }).catch(() => {}); await a.w(800);
   const T1 = await a.evaluate(() => ({ h: (document.querySelector('.sheet .sh-top h2') || {}).textContent, bzx: !!BZX }));
   check(T1.h === 'Tabla Tu Delivery' && T1.bzx, 'abre o mapa da Tabla Tu Delivery', JSON.stringify(T1));
   await a.evaluate(() => { const z = ui.brz; [[-25.78, -55.10], [-25.78, -55.08], [-25.80, -55.09]].forEach(p => z.map.fire('click', { latlng: window.L.latLng(p[0], p[1]) })); }); await a.w(300);
   info('pontos: ' + await a.evaluate(() => { const m = document.querySelector('.bzpt.first'); if (!m) return 'sem marcador ' + ui.brz.pts.length; const r = m.getBoundingClientRect(); const e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return JSON.stringify([Math.round(r.x), Math.round(r.y), Math.round(r.width), innerHeight, e && (e.className || e.tagName)]); })); await a.evaluate(() => bzmClose()); await a.w(300);
-  await a.fill('#bzm_f', '9000'); await a.fill('#bzm_fn', '12000'); await a.fill('#bzm_n', 'Centro TD'); await a.locator('[data-act=bzmsave]').click(); await a.w(2500);
+  await a.fill('#bzm_f', '9000'); await a.fill('#bzm_fn', '12000'); if (process.env.SHOT_DIR) await a.screenshot({ path: process.env.SHOT_DIR + '/central-tabla.png' }); await a.fill('#bzm_n', 'Centro TD'); await a.locator('[data-act=bzmsave]').click(); await a.w(2500);
   const T2 = await a.evaluate(async () => { const api = await CLOUD.init(); const p = await api.getPlatform(); const tt = JSON.parse(p.tdt || '{}'); return { n: (tt.bairros || []).map(b => b.name + ':' + b.fee + ':' + b.feeN + ':' + (b.zone || []).length).join(','), fm: (pub.store.bairros || []).some(b => b.name === 'Centro TD') }; });
   info(JSON.stringify(T2));
   check(/Centro TD:9000:12000:3/.test(T2.n) && !T2.fm, 'a zona fica salva na Tabla Tu Delivery (dia 9.000, noite 12.000), sem mexer em nenhuma empresa');
