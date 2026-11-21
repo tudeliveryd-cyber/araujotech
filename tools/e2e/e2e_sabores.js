@@ -222,6 +222,14 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   await o.fill('#bzm_f', '20000'); await o.press('#bzm_f', 'Enter'); await o.w(600);
   const z3 = await o.evaluate(() => { const b = pub.store.bairros[pub.store.bairros.length - 1]; return b.name + ':' + b.fee + ':' + (b.zone || []).length; });
   check(z3 === 'Zona 1:20000:3', 'o nome é opcional: sem nome vira "Zona 1"; Enter salva', z3);
+  { const M0 = await o.evaluate(() => { const c = [...document.querySelectorAll('#bzmiss .bzmc')].find(x => /sin zona/.test(x.textContent)); return c ? { k: +c.dataset.k, txt: c.textContent } : null; });
+    check(!!M0, '"Falta completar" lista os barrios sin zona / sin precio', JSON.stringify(M0));
+    if (M0) { await o.evaluate(k => document.querySelector(`#bzmiss .bzmc[data-k="${k}"]`).click(), M0.k); await o.w(300);
+      await o.evaluate(() => { const z = ui.brz; [[-26.6, -55.9], [-26.6, -55.8], [-26.5, -55.85]].forEach(p => z.map.fire('click', { latlng: window.L.latLng(p[0], p[1]) })); bzmClose(); }); await o.w(300);
+      const nm = await o.evaluate(() => document.getElementById('bzm_n').value);
+      await o.fill('#bzm_f', '33000'); await o.locator('[data-act=bzmsave]').click(); await o.w(600);
+      const M1 = await o.evaluate(k => { const b = pub.store.bairros[k]; return { n: b.name, fee: b.fee, z: (b.zone || []).length, chip: !!document.querySelector(`#bzmiss .bzmc[data-k="${k}"]`) }; }, M0.k);
+      check(M1.n === nm && nm && M1.fee === 33000 && M1.z === 3 && !M1.chip, 'tocar num barrio "sin zona": desenha a zona dele, pede o preço e sai da lista', JSON.stringify(M1)); } }
   const nz = await o.evaluate(() => pub.store.bairros.length);
   await o.locator('[data-act=bzmzero]').click(); await o.w(300);
   check(await o.evaluate(() => /¿Borrar las \d+ zonas/.test(document.getElementById('bzform').textContent) && pub.store.bairros.length > 0), '"Empezar de cero" pergunta antes de apagar');
