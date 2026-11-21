@@ -182,6 +182,8 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   await o.locator('#bzmap').scrollIntoViewIfNeeded(); await o.w(300);
   const mb0 = await o.locator('#bzmap').boundingBox(); const vh = o.viewportSize().height; const mb = { x: mb0.x, width: mb0.width, y: Math.max(mb0.y, 0), height: Math.min(mb0.y + mb0.height, vh) - Math.max(mb0.y, 0) }; info('mapa visível: ' + JSON.stringify(mb)); const P2 = (dx, dy) => [mb.x + mb.width * dx, mb.y + mb.height * dy];
   for (const [dx, dy] of [[0.2, 0.2], [0.8, 0.2], [0.8, 0.8], [0.2, 0.8]]) { const [x, y] = P2(dx, dy); await o.mouse.click(x, y); await o.w(250); }
+  const op = await o.evaluate(() => ({ poly: ui.brz.poly.getLatLngs()[0].length, line: ui.brz.line.getLatLngs().length }));
+  check(op.poly === 0 && op.line === 4, 'enquanto desenha, só a linha segue os toques (a zona não fecha sozinha)', JSON.stringify(op));
   check(await o.evaluate(() => ui.brz.pts.length) === 4 && await o.evaluate(() => !document.getElementById('bzm_c').disabled), '"Agregar puntos": cada toque marca um ponto e "Cerrar zona" libera com 3 ou mais');
   { const [x, y] = P2(0.8, 0.8); await o.mouse.move(x, y); await o.mouse.down(); await o.mouse.move(x - 40, y - 30, { steps: 6 }); await o.mouse.up(); await o.w(400); }
   await o.keyboard.press('Control+z'); await o.w(200);
@@ -191,6 +193,7 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   check(dr === 4, 'arrastar um ponto move o ponto (não cria outro)', String(dr));
   await o.locator('.bzpt.first').click(); await o.w(400);
   check(await o.evaluate(() => !document.getElementById('bzform').hidden && !!document.getElementById('bzm_n')), 'tocar no primeiro ponto fecha a zona e pede nome e preço');
+  check(await o.evaluate(() => ui.brz.poly.getLatLngs()[0].length === 4 && ui.brz.line.getLatLngs().length === 0), 'ao tocar no primeiro ponto, a linha vira a área fechada');
   await o.fill('#bzm_n', 'Centro mapa'); await o.fill('#bzm_f', '8000'); await o.locator('[data-act=bzmsave]').click(); await o.w(800);
   const z1 = await o.evaluate(n0 => { const b = pub.store.bairros[pub.store.bairros.length - 1]; return { n: pub.store.bairros.length - n0, name: b.name, fee: b.fee, z: (b.zone || []).length, pts: ui.brz.pts.length, form: document.getElementById('bzform').hidden }; }, nb0);
   check(z1.n === 1 && z1.name === 'Centro mapa' && z1.fee === 8000 && z1.z === 4 && z1.pts === 0 && z1.form, 'a zona vira um barrio com nome, preço e área, e o mapa fica pronto para a próxima', JSON.stringify(z1));
