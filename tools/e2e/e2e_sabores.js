@@ -176,6 +176,9 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   await o.evaluate(() => { ui.tab = 'delivery'; render(); }); await o.w(600);
   const nb0 = await o.evaluate(() => pub.store.bairros.length);
   await o.locator('[data-act=bzmap]').click(); await o.waitForSelector('#bzmap.leaflet-container', { timeout: 15000 }).catch(() => {}); await o.w(900);
+  const fs = await o.evaluate(() => { const r = document.querySelector('.sheet[data-k="bzm"]').getBoundingClientRect(), m = document.getElementById('bzmap').getBoundingClientRect(); return { w: Math.round(r.width), h: Math.round(r.height), iw: innerWidth, ih: innerHeight, mh: Math.round(m.height) }; });
+  check(fs.w === fs.iw && fs.h === fs.ih && fs.mh > fs.ih * 0.5, 'o mapa de zonas abre em tela inteira', JSON.stringify(fs));
+  if (process.env.SHOT7) await o.screenshot({ path: process.env.SHOT7 });
   await o.locator('#bzmap').scrollIntoViewIfNeeded(); await o.w(300);
   const mb0 = await o.locator('#bzmap').boundingBox(); const vh = o.viewportSize().height; const mb = { x: mb0.x, width: mb0.width, y: Math.max(mb0.y, 0), height: Math.min(mb0.y + mb0.height, vh) - Math.max(mb0.y, 0) }; info('mapa visível: ' + JSON.stringify(mb)); const P2 = (dx, dy) => [mb.x + mb.width * dx, mb.y + mb.height * dy];
   for (const [dx, dy] of [[0.2, 0.2], [0.8, 0.2], [0.8, 0.8], [0.2, 0.8]]) { const [x, y] = P2(dx, dy); await o.mouse.click(x, y); await o.w(250); }
