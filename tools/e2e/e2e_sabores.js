@@ -172,6 +172,32 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   await o.evaluate(() => acts.bzall()); await o.waitForSelector('#bzmap.leaflet-container', { timeout: 15000 }).catch(() => {}); await o.w(800);
   check(await o.locator('.bztip').count() >= 1 && /7\.000/.test(await o.txt('.bztip')), '"Ver todos en el mapa" mostra as zonas com nome e preço', await o.txt('.bztip'));
   await o.evaluate(() => closeSheet()); await o.w(300);
+  sec('G2. Mapa de zonas: desenhar uma atrás da outra, fechar no primeiro ponto, nome e preço, arrastar pontos, mover sem criar pontos');
+  await o.evaluate(() => { ui.tab = 'delivery'; render(); }); await o.w(600);
+  const nb0 = await o.evaluate(() => pub.store.bairros.length);
+  await o.locator('[data-act=bzmap]').click(); await o.waitForSelector('#bzmap.leaflet-container', { timeout: 15000 }).catch(() => {}); await o.w(900);
+  await o.locator('#bzmap').scrollIntoViewIfNeeded(); await o.w(300);
+  const mb0 = await o.locator('#bzmap').boundingBox(); const vh = o.viewportSize().height; const mb = { x: mb0.x, width: mb0.width, y: Math.max(mb0.y, 0), height: Math.min(mb0.y + mb0.height, vh) - Math.max(mb0.y, 0) }; info('mapa visível: ' + JSON.stringify(mb)); const P2 = (dx, dy) => [mb.x + mb.width * dx, mb.y + mb.height * dy];
+  for (const [dx, dy] of [[0.2, 0.2], [0.8, 0.2], [0.8, 0.8], [0.2, 0.8]]) { const [x, y] = P2(dx, dy); await o.mouse.click(x, y); await o.w(250); }
+  check(await o.evaluate(() => ui.brz.pts.length) === 4 && await o.evaluate(() => !document.getElementById('bzm_c').disabled), '"Agregar puntos": cada toque marca um ponto e "Cerrar zona" libera com 3 ou mais');
+  { const [x, y] = P2(0.8, 0.8); await o.mouse.move(x, y); await o.mouse.down(); await o.mouse.move(x - 40, y - 30, { steps: 6 }); await o.mouse.up(); await o.w(400); }
+  const dr = await o.evaluate(() => ui.brz.pts.length);
+  check(dr === 4, 'arrastar um ponto move o ponto (não cria outro)', String(dr));
+  await o.locator('.bzpt.first').click(); await o.w(400);
+  check(await o.evaluate(() => !document.getElementById('bzform').hidden && !!document.getElementById('bzm_n')), 'tocar no primeiro ponto fecha a zona e pede nome e preço');
+  await o.fill('#bzm_n', 'Centro mapa'); await o.fill('#bzm_f', '8000'); await o.locator('[data-act=bzmsave]').click(); await o.w(800);
+  const z1 = await o.evaluate(n0 => { const b = pub.store.bairros[pub.store.bairros.length - 1]; return { n: pub.store.bairros.length - n0, name: b.name, fee: b.fee, z: (b.zone || []).length, pts: ui.brz.pts.length, form: document.getElementById('bzform').hidden }; }, nb0);
+  check(z1.n === 1 && z1.name === 'Centro mapa' && z1.fee === 8000 && z1.z === 4 && z1.pts === 0 && z1.form, 'a zona vira um barrio com nome, preço e área, e o mapa fica pronto para a próxima', JSON.stringify(z1));
+  await o.locator('[data-act=bzmmode][data-m="0"]').click(); await o.w(200);
+  { const [x, y] = P2(0.9, 0.1); await o.mouse.click(x, y); await o.w(300); }
+  check(await o.evaluate(() => ui.brz.pts.length) === 0, '"Mover mapa": tocar no mapa não cria ponto');
+  { const [x, y] = P2(0.5, 0.5); await o.mouse.click(x, y); await o.w(500); }
+  const ed = await o.evaluate(() => ({ i: ui.brz.i, n: (document.getElementById('bzm_n') || {}).value, pts: ui.brz.pts.length }));
+  check(ed.n === 'Centro mapa' && ed.pts === 4, 'tocar numa zona já feita abre para corrigir (nome, preço e pontos)', JSON.stringify(ed));
+  await o.fill('#bzm_f', '9000'); await o.locator('[data-act=bzmsave]').click(); await o.w(600);
+  check(await o.evaluate(n0 => pub.store.bairros.length - n0 === 1 && pub.store.bairros.find(b => b.name === 'Centro mapa').fee === 9000, nb0), 'corrigir salva no mesmo barrio (não duplica)');
+  if (process.env.SHOT6) await o.screenshot({ path: process.env.SHOT6 });
+  await o.evaluate(() => closeSheet()); await o.w(300);
   sec('H. Cliente que chega pela Guía: o pedido avisa "Pedido hecho desde la Guía de Santa Rita"');
   await c.evaluate(() => { try { sessionStorage.setItem('at_ref', 'guia'); } catch (e) {} }); await c.reload(); await c.w(4000);
   const rg = await c.evaluate(() => { const o = { lang: 'es', no: 1, name: 'Ana', phone: '0981', lines: [], sub: 0, fee: 0, disc: 0, total: 0, mode: 'pickup', pay: 'cash', change: '', ref: REF_GUIA ? 'guia' : '' }; let m = ''; try { m = buildMessage(o); } catch (e) { m = 'ERR ' + e.message; } return { ref: REF_GUIA, has: /Pedido hecho desde la Guía de Santa Rita/.test(m), m: m.slice(-120) }; });
