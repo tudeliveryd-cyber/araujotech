@@ -181,6 +181,9 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   for (const [dx, dy] of [[0.2, 0.2], [0.8, 0.2], [0.8, 0.8], [0.2, 0.8]]) { const [x, y] = P2(dx, dy); await o.mouse.click(x, y); await o.w(250); }
   check(await o.evaluate(() => ui.brz.pts.length) === 4 && await o.evaluate(() => !document.getElementById('bzm_c').disabled), '"Agregar puntos": cada toque marca um ponto e "Cerrar zona" libera com 3 ou mais');
   { const [x, y] = P2(0.8, 0.8); await o.mouse.move(x, y); await o.mouse.down(); await o.mouse.move(x - 40, y - 30, { steps: 6 }); await o.mouse.up(); await o.w(400); }
+  await o.keyboard.press('Control+z'); await o.w(200);
+  check(await o.evaluate(() => ui.brz.pts.length) === 3, 'Ctrl+Z apaga o último ponto');
+  { const [x, y] = P2(0.2, 0.8); await o.mouse.click(x, y); await o.w(250); }
   const dr = await o.evaluate(() => ui.brz.pts.length);
   check(dr === 4, 'arrastar um ponto move o ponto (não cria outro)', String(dr));
   await o.locator('.bzpt.first').click(); await o.w(400);
@@ -191,9 +194,10 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   await o.locator('[data-act=bzmmode][data-m="0"]').click(); await o.w(200);
   const pan = await o.evaluate(() => { const z = ui.brz; z.map.fire('click', { latlng: window.L.latLng(-26.5, -55.9) }); return z.pts.length; });
   check(pan === 0 && await o.evaluate(() => !ui.brz.draw), '"Mover mapa": tocar no mapa não cria ponto');
-  await o.evaluate(() => { const z = ui.brz; z.oth.eachLayer(l => { const tt = l.getTooltip && l.getTooltip(); if (tt && /Centro mapa/.test(tt.getContent())) l.fire('click'); }); }); await o.w(500);
+  await o.locator('[data-act=bzmmode][data-m="1"]').click(); await o.w(200);
+  await o.locator('.bzlab', { hasText: 'Centro mapa' }).first().click({ force: true }); await o.w(500);
   const ed = await o.evaluate(() => ({ i: ui.brz.i, n: (document.getElementById('bzm_n') || {}).value, pts: ui.brz.pts.length }));
-  check(ed.n === 'Centro mapa' && ed.pts === 4, 'tocar numa zona já feita abre para corrigir (nome, preço e pontos)', JSON.stringify(ed));
+  check(ed.n === 'Centro mapa' && ed.pts === 4, 'tocar no nome de uma zona já feita (mesmo no modo de desenhar) abre para trocar o preço e corrigir', JSON.stringify(ed));
   await o.fill('#bzm_f', '9000'); await o.locator('[data-act=bzmsave]').click(); await o.w(600);
   check(await o.evaluate(n0 => pub.store.bairros.length - n0 === 1 && pub.store.bairros.find(b => b.name === 'Centro mapa').fee === 9000, nb0), 'corrigir salva no mesmo barrio (não duplica)');
   check(await o.evaluate(() => /Satélite/.test((document.querySelector('#bzmap .leaflet-control-layers') || {}).textContent || '')), 'o mapa de zonas tem a opção Satélite / Calles');
