@@ -201,6 +201,13 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   check(ed.n === 'Centro mapa' && ed.pts === 4, 'tocar no nome de uma zona já feita (mesmo no modo de desenhar) abre para trocar o preço e corrigir', JSON.stringify(ed));
   await o.fill('#bzm_f', '9000'); await o.locator('[data-act=bzmsave]').click(); await o.w(600);
   check(await o.evaluate(n0 => pub.store.bairros.length - n0 === 1 && pub.store.bairros.find(b => b.name === 'Centro mapa').fee === 9000, nb0), 'corrigir salva no mesmo barrio (não duplica)');
+  { await o.evaluate(() => { const b = pub.store.bairros.find(x => x.name === 'Centro mapa'); ui.brz.map.fitBounds(b.zone, { padding: [60, 60], animate: false }); }); await o.w(400);
+    const before = await o.evaluate(() => JSON.stringify(pub.store.bairros.find(x => x.name === 'Centro mapa').zone));
+    const h = await o.evaluate(() => { const mb = document.getElementById('bzmap').getBoundingClientRect(); const L = [...document.querySelectorAll('.bzpt.sm')].map(e => e.getBoundingClientRect()).filter(r => r.x > mb.x + 20 && r.y > mb.y + 20 && r.right < mb.right - 20 && r.bottom < mb.bottom - 20 && r.y < innerHeight - 20); return L.length ? { x: L[0].x + L[0].width / 2, y: L[0].y + L[0].height / 2, n: L.length } : null; });
+    info('pontos arrastáveis visíveis: ' + JSON.stringify(h));
+    if (h) { await o.mouse.move(h.x, h.y); await o.mouse.down(); await o.mouse.move(h.x + 30, h.y + 25, { steps: 8 }); await o.mouse.up(); await o.w(600); }
+    const after = await o.evaluate(() => JSON.stringify(pub.store.bairros.map(x => x.zone || [])));
+    check(h && !after.includes(before) || (h && after !== before), 'dá para arrastar o ponto de uma zona já salva (fica salvo ao soltar)'); }
   check(await o.evaluate(() => /Satélite/.test((document.querySelector('#bzmap .leaflet-control-layers') || {}).textContent || '')), 'o mapa de zonas tem a opção Satélite / Calles');
   await o.locator('[data-act=bzmmode][data-m="1"]').click(); await o.w(200);
   await o.evaluate(() => { const z = ui.brz; [[-26.5, -55.9], [-26.5, -55.8], [-26.4, -55.85]].forEach(p => z.map.fire('click', { latlng: window.L.latLng(p[0], p[1]) })); z.map.setView([-26.45, -55.85], 12); }); await o.w(600);
