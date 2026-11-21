@@ -37,5 +37,8 @@ const { info, sec, check } = L;
     const r = {}; pub.store.nightOn = false; r.off = fee(); pub.store.nightOn = true; pub.store.nightFrom = '00:00'; r.on = fee(); ck.bairro = 'Lejos'; r.semN = fee(); pub.store.bairros[1].feeN = 0; r.zero = fee(); const h = new Date().getHours(); pub.store.nightFrom = String((h + 2) % 24).padStart(2, '0') + ':00'; ck.bairro = 'Centro'; r.antes = (h + 2) % 24 > h && h >= 6 ? fee() : 8000; pub.store.nightOn = false; return r; });
   info(JSON.stringify(N));
   check(N.off === 8000 && N.on === 10000 && N.semN === 15000 && N.zero === 15000 && N.antes === 8000, 'com "precio de noche" ligado e na hora, cobra o preço de noite; desligado ou antes da hora, o de dia; barrio sem preço de noite (vazio ou 0) usa o de dia');
+  sec('A2. Local da Tu Delivery (tarifas aprovadas): as zonas desenhadas continuam valendo no catálogo');
+  const AP = await c.evaluate(() => { const z = [[-25.8, -55.1], [-25.8, -55.08], [-25.78, -55.08], [-25.78, -55.1]]; const cc = { store: { feeMode: 'bairro', bairros: [{ name: 'Centro', fee: 9999, zone: z, lat: -25.79, lng: -55.09 }], feeApproved: { feeMode: 'bairro', feeOrigin: 'local', minFee: 0, bairros: [{ name: 'Centro', fee: 8000 }] } }, zones: [] }; applyApproved(cc); const b = cc.store.bairros[0]; return { fee: b.fee, z: (b.zone || []).length }; });
+  check(AP.fee === 8000 && AP.z === 4, 'com tarifas aprovadas, o preço vem do aprovado e a zona desenhada é mantida', JSON.stringify(AP));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
