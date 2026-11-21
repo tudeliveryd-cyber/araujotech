@@ -195,7 +195,8 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   const pan = await o.evaluate(() => { const z = ui.brz; z.map.fire('click', { latlng: window.L.latLng(-26.5, -55.9) }); return z.pts.length; });
   check(pan === 0 && await o.evaluate(() => !ui.brz.draw), '"Mover mapa": tocar no mapa não cria ponto');
   await o.locator('[data-act=bzmmode][data-m="1"]').click(); await o.w(200);
-  await o.locator('.bzlab', { hasText: 'Centro mapa' }).first().click({ force: true }); await o.w(500);
+  await o.evaluate(() => { const b = pub.store.bairros.find(x => x.name === 'Centro mapa'); ui.brz.map.setView(bzMid(b.zone), ui.brz.map.getZoom(), { animate: false }); }); await o.w(400);
+  await o.locator('.bzlab', { hasText: 'Centro mapa' }).first().click(); await o.w(500);
   const ed = await o.evaluate(() => ({ i: ui.brz.i, n: (document.getElementById('bzm_n') || {}).value, pts: ui.brz.pts.length }));
   check(ed.n === 'Centro mapa' && ed.pts === 4, 'tocar no nome de uma zona já feita (mesmo no modo de desenhar) abre para trocar o preço e corrigir', JSON.stringify(ed));
   await o.fill('#bzm_f', '9000'); await o.locator('[data-act=bzmsave]').click(); await o.w(600);
@@ -208,6 +209,14 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   await o.fill('#bzm_f', '20000'); await o.press('#bzm_f', 'Enter'); await o.w(600);
   const z3 = await o.evaluate(() => { const b = pub.store.bairros[pub.store.bairros.length - 1]; return b.name + ':' + b.fee + ':' + (b.zone || []).length; });
   check(z3 === 'Zona 1:20000:3', 'o nome é opcional: sem nome vira "Zona 1"; Enter salva', z3);
+  const nz = await o.evaluate(() => pub.store.bairros.length);
+  await o.locator('[data-act=bzmzero]').click(); await o.w(300);
+  check(await o.evaluate(() => /¿Borrar las \d+ zonas/.test(document.getElementById('bzform').textContent) && pub.store.bairros.length > 0), '"Empezar de cero" pergunta antes de apagar');
+  await o.locator('[data-act=bzmzerook]').click(); await o.w(500);
+  const zr = await o.evaluate(() => ({ n: pub.store.bairros.length, undo: !!document.querySelector('[data-act=bzmunzero]') }));
+  check(zr.n === 0 && zr.undo, 'confirmando, apaga todas as zonas e oferece desfazer', JSON.stringify(zr));
+  await o.locator('[data-act=bzmunzero]').click(); await o.w(500);
+  check(await o.evaluate(n => pub.store.bairros.length === n && pub.store.bairros.some(b => b.name === 'Zona 1'), nz), '"Deshacer" recupera todas as zonas com os preços');
   if (process.env.SHOT6) await o.screenshot({ path: process.env.SHOT6 });
   await o.evaluate(() => closeSheet()); await o.w(300);
   sec('H. Cliente que chega pela Guía: o pedido avisa "Pedido hecho desde la Guía de Santa Rita"');
