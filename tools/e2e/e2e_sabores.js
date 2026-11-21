@@ -222,8 +222,9 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   await o.fill('#bzm_f', '20000'); await o.press('#bzm_f', 'Enter'); await o.w(600);
   const z3 = await o.evaluate(() => { const b = pub.store.bairros[pub.store.bairros.length - 1]; return b.name + ':' + b.fee + ':' + (b.zone || []).length; });
   check(z3 === 'Zona 1:20000:3', 'o nome é opcional: sem nome vira "Zona 1"; Enter salva', z3);
+  await o.evaluate(() => { applyBoth(c => c.store.bairros.push({ name: 'Lejano', fee: 20000 })); bzmOthers(); }); await o.w(200);
   { const M0 = await o.evaluate(() => { const c = [...document.querySelectorAll('#bzmiss .bzmc')].find(x => /sin zona/.test(x.textContent)); return c ? { k: +c.dataset.k, txt: c.textContent } : null; });
-    check(!!M0, '"Falta completar" lista os barrios sin zona / sin precio', JSON.stringify(M0));
+    check(!!M0, '"Falta completar" lista barrio com preço e sem zona (os sem preço e sem zona são só referência)', JSON.stringify(M0));
     if (M0) { await o.evaluate(k => document.querySelector(`#bzmiss .bzmc[data-k="${k}"]`).click(), M0.k); await o.w(300);
       await o.evaluate(() => { const z = ui.brz; [[-26.6, -55.9], [-26.6, -55.8], [-26.5, -55.85]].forEach(p => z.map.fire('click', { latlng: window.L.latLng(p[0], p[1]) })); bzmClose(); }); await o.w(300);
       const nm = await o.evaluate(() => document.getElementById('bzm_n').value);
