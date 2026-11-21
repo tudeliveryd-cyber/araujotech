@@ -189,13 +189,21 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   const z1 = await o.evaluate(n0 => { const b = pub.store.bairros[pub.store.bairros.length - 1]; return { n: pub.store.bairros.length - n0, name: b.name, fee: b.fee, z: (b.zone || []).length, pts: ui.brz.pts.length, form: document.getElementById('bzform').hidden }; }, nb0);
   check(z1.n === 1 && z1.name === 'Centro mapa' && z1.fee === 8000 && z1.z === 4 && z1.pts === 0 && z1.form, 'a zona vira um barrio com nome, preço e área, e o mapa fica pronto para a próxima', JSON.stringify(z1));
   await o.locator('[data-act=bzmmode][data-m="0"]').click(); await o.w(200);
-  { const [x, y] = P2(0.9, 0.1); await o.mouse.click(x, y); await o.w(300); }
-  check(await o.evaluate(() => ui.brz.pts.length) === 0, '"Mover mapa": tocar no mapa não cria ponto');
-  { const [x, y] = P2(0.5, 0.5); await o.mouse.click(x, y); await o.w(500); }
+  const pan = await o.evaluate(() => { const z = ui.brz; z.map.fire('click', { latlng: window.L.latLng(-26.5, -55.9) }); return z.pts.length; });
+  check(pan === 0 && await o.evaluate(() => !ui.brz.draw), '"Mover mapa": tocar no mapa não cria ponto');
+  await o.evaluate(() => { const z = ui.brz; z.oth.eachLayer(l => { const tt = l.getTooltip && l.getTooltip(); if (tt && /Centro mapa/.test(tt.getContent())) l.fire('click'); }); }); await o.w(500);
   const ed = await o.evaluate(() => ({ i: ui.brz.i, n: (document.getElementById('bzm_n') || {}).value, pts: ui.brz.pts.length }));
   check(ed.n === 'Centro mapa' && ed.pts === 4, 'tocar numa zona já feita abre para corrigir (nome, preço e pontos)', JSON.stringify(ed));
   await o.fill('#bzm_f', '9000'); await o.locator('[data-act=bzmsave]').click(); await o.w(600);
   check(await o.evaluate(n0 => pub.store.bairros.length - n0 === 1 && pub.store.bairros.find(b => b.name === 'Centro mapa').fee === 9000, nb0), 'corrigir salva no mesmo barrio (não duplica)');
+  check(await o.evaluate(() => /Satélite/.test((document.querySelector('#bzmap .leaflet-control-layers') || {}).textContent || '')), 'o mapa de zonas tem a opção Satélite / Calles');
+  await o.locator('[data-act=bzmmode][data-m="1"]').click(); await o.w(200);
+  await o.evaluate(() => { const z = ui.brz; [[-26.5, -55.9], [-26.5, -55.8], [-26.4, -55.85]].forEach(p => z.map.fire('click', { latlng: window.L.latLng(p[0], p[1]) })); z.map.setView([-26.45, -55.85], 12); }); await o.w(600);
+  await o.locator('.bzpt.first').click(); await o.w(400);
+  check(await o.evaluate(() => document.activeElement && document.activeElement.id === 'bzm_f'), 'ao fechar a zona, o cursor já vai para o preço');
+  await o.fill('#bzm_f', '20000'); await o.press('#bzm_f', 'Enter'); await o.w(600);
+  const z3 = await o.evaluate(() => { const b = pub.store.bairros[pub.store.bairros.length - 1]; return b.name + ':' + b.fee + ':' + (b.zone || []).length; });
+  check(z3 === 'Zona 1:20000:3', 'o nome é opcional: sem nome vira "Zona 1"; Enter salva', z3);
   if (process.env.SHOT6) await o.screenshot({ path: process.env.SHOT6 });
   await o.evaluate(() => closeSheet()); await o.w(300);
   sec('H. Cliente que chega pela Guía: o pedido avisa "Pedido hecho desde la Guía de Santa Rita"');
