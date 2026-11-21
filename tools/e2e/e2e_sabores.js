@@ -166,7 +166,10 @@ const cfgOfShop = r => { const d = L.unfields(r.json) || {}; try { return JSON.p
   check(await o.evaluate(() => ui.brz.pts.length) === 3, '"Deshacer" tira o último ponto');
   await o.locator('[data-act=bzsave]').click(); await o.w(3000);
   const zb = await o.evaluate(() => { const b = pub.store.bairros[0]; return { z: (b.zone || []).length, lat: b.lat != null, btn: (document.querySelector('[data-act=bzone][data-i="0"]') || {}).textContent, href: ((document.querySelector('#br_n_0') || document.body).closest('tr') || document).querySelector('a[href*="google.com/maps"]')?.href || '' }; });
-  check(zb.z === 3 && zb.lat && /Zona marcada/.test(zb.btn) && /query=-?\d+\.\d+,-?\d+\.\d+/.test(zb.href), 'a zona fica salva, o botão mostra "Zona marcada" e "Ver en el mapa" vai para o ponto marcado', JSON.stringify(zb));
+  const zsum = await o.evaluate(() => ({ sum: /zonas marcadas en el mapa/.test(document.body.textContent), tbl: !!document.querySelector('#br_n_0'), clean: !!document.querySelector('[data-act=bzclean]') }));
+  check(zb.z === 3 && zb.lat && zsum.sum && !zsum.tbl && zsum.clean, 'a zona fica salva; com zonas no mapa a tabela de barrios some (o preço sai da zona) e aparece "Borrar barrios sin zona"', JSON.stringify([zb, zsum]));
+  { const before = await o.evaluate(() => pub.store.bairros.length); await o.locator('[data-act=bzclean]').click(); await o.w(500); const after = await o.evaluate(() => ({ n: pub.store.bairros.length, all: pub.store.bairros.every(b => b.zone && b.zone.length > 2) }));
+    check(after.all && after.n < before, '"Borrar barrios sin zona" deixa só as zonas do mapa', JSON.stringify([before, after])); }
   await o.w(3000); const zd = cfgOfShop(await L.fsReq(P, 'GET', 'shops/' + shop.id, 'owner'));
   check(((zd.store.bairros || [])[0].zone || []).length === 3, 'Firebase: a zona do barrio foi gravada na nuvem');
   await o.evaluate(() => acts.bzall()); await o.waitForSelector('#bzmap.leaflet-container', { timeout: 15000 }).catch(() => {}); await o.w(800);
