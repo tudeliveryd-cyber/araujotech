@@ -79,5 +79,19 @@ const { info, sec, check } = L;
   const F3 = await a.evaluate(O => ({ td: PL.shops.find(x => x.id === O).td, btn: !!document.querySelector(`.sheet [data-act="tdfee"][data-id="${O}"]`) }), O);
   check(F3.td === true && F3.btn, 'marcar "Entrega con Tu Delivery" na ficha já mostra o botão de escolher o mapa');
   if (process.env.SHOT_DIR) await a.screenshot({ path: process.env.SHOT_DIR + '/ficha-envios.png' });
+  sec('C2. No painel do local: "La entrega la hace Tu Delivery" liga/desliga o mapa da Tu Delivery');
+  { const pp = a; await pp.goto('https://araujotechsistemas.com/painel/?loja=' + B); await pp.w(6000);
+    await pp.evaluate(async B => { const api = await CLOUD.init(); const d = await api.getShopDoc(B); const st = JSON.parse(d.cfg).store; ['feeMode', 'feeOrigin', 'minFee', 'bairros', 'tdMap', 'useTd', 'ownB', 'feeFrom', 'nightOn', 'nightFrom'].forEach(k => { if (st[k] !== undefined) pub.store[k] = st[k]; else delete pub.store[k]; }); draft = clone(pub); ui.tab = 'delivery'; render(); }, B); await pp.w(600);
+    info('painel: ' + await pp.evaluate(() => JSON.stringify({ n: pub.store.name, td: !!pub.store.tdMap, fm: pub.store.feeMode, ff: pub.store.feeFrom, url: location.href, mode: typeof MODE !== 'undefined' ? MODE : '' })));
+    const s0 = await pp.evaluate(() => ({ tog: !!document.querySelector('[data-act="usetd"]'), on: pub.store.useTd, n: (pub.store.bairros || []).length, draw: !!document.querySelector('[data-act="bzmap"]') }));
+    check(s0.tog && s0.on === true && s0.n === 1 && !s0.draw, 'o painel do local mostra "La entrega la hace Tu Delivery" ligado, com o mapa copiado e sem desenhar', JSON.stringify(s0));
+    await pp.evaluate(() => document.querySelector('[data-act="usetd"]').click()); await pp.w(500);
+    const s1 = await pp.evaluate(() => ({ on: pub.store.useTd, n: (pub.store.bairros || []).length, draw: !!document.querySelector('[data-act="bzmap"]') }));
+    check(s1.on === false && s1.n === 0 && s1.draw, 'desligando, volta para o delivery próprio (desenha as zonas dele)', JSON.stringify(s1));
+    await pp.evaluate(() => document.querySelector('[data-act="usetd"]').click()); await pp.w(500);
+    const s2 = await pp.evaluate(() => ({ on: pub.store.useTd, b: (pub.store.bairros || []).map(b => b.name + ':' + b.fee).join(',') }));
+    check(s2.on === true && s2.b === 'Centro TD:9000', 'ligando de novo, o mapa da Tu Delivery volta sozinho', JSON.stringify(s2));
+    }
+
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
