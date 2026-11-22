@@ -2906,7 +2906,7 @@ function cartSheet(){
  ${bad?`<div class="info bad">${t('err_unavail')}</div>`:''}</div>
  ${cart.length?`<div class="sh-foot">${blockedNow(pub.store)?`<button class="btn-main" disabled>${esc(openLabel(pub.store))}</button>`:`<button class="btn-main" data-act="checkout" ${bad?'disabled':''}>${t('continue')}</button>`}</div>`:''}`)}
 let ckErr={};
-function checkoutSheet(){
+function checkoutSheet(){/* entrega por zonas: o bairro não vem preenchido do pedido anterior (quem manda é a localização); só fica o que a pessoa escrever agora */if(zmode()&&!ck._bt&&ck.bairro!=='__out')ck.bairro='';
  const st=pub.store;if(MESA&&!limOff('mesas'))ck.mode='mesa';
  if(MODE==='demo'&&!ck._demo){ck._demo=1;if(!ck.name)ck.name=lang==='pt'?'Cliente teste':'Cliente de prueba';if(!ck.phone)ck.phone='0981 123 456';if(!ck.mode&&st.delivery&&!(MESA&&!limOff('mesas')))ck.mode='delivery'}/* demonstração: dados já preenchidos; só tocar em Usar mi ubicación e enviar */{const av=['delivery','pickup','envio'].filter(k=>k==='envio'?!!st.ship:!!st[k]);if(ck.mode&&ck.mode!=='mesa'&&!av.includes(ck.mode))ck.mode='';if(!ck.mode&&av.length===1)ck.mode=av[0]}
  const pays=Object.keys(st.pay).filter(k=>st.pay[k]);if(!pays.includes(ck.pay))ck.pay=pays[0]||'';
@@ -5187,7 +5187,7 @@ function onField(e){const el=e.target,d=el.dataset;if(d.at!=null&&ui.at){atSetPa
  if(d.crm){const k=d.crm;if(k==='Msg'){ui.crmMsg=el.value;S.set(crmKey(),el.value)}else if(k==='Q'){ui.crmQ=el.value;const b=document.getElementById('crmBody');if(b)b.innerHTML=crmBody()}else if(k==='S'){ui.crmS=el.value;const b=document.getElementById('crmBody');if(b)b.innerHTML=crmBody()}return}
  if(d.posq){ui.posQ=el.value;if(e.type==='change'){const c=el.value.trim();const bp=c.length>=4&&pub.products.find(p=>p.on&&p.bc&&String(p.bc)===c);if(bp){ui.posQ='';posAddP(bp);render();setTimeout(()=>{const x=document.querySelector('[data-posq]');x&&x.focus()},30)}return}const g=document.getElementById('posGrid');if(g){const q=rnormP(el.value),cat=ui.posCat||'';g.innerHTML=pub.products.filter(p=>p.on&&!soldToday(p)&&(!cat||p.cat===cat)&&(!q||rnormP(tr(p.n)).includes(q))).map(p=>`<button class="ptile" data-act="posadd" data-pid="${p.id}"><div class="ph">${photo(pub,p,28)}</div><b>${esc(tr(p.n))}</b><span class="num">${gs(eff(p))}</span></button>`).join('')||'<p class="muted">—</p>'}return}
  if(d.pos){const P=posState();if(d.pos==='kitchen')P.kitchen=el.checked;else P[d.pos]=el.value;posSave();if(d.pos==='recv'){const c=document.getElementById('posChg');if(c){const r=toInt(el.value),tt=posTotal();c.textContent=r>tt?gs(r-tt):'—'}}return}
- if(d.ck){ck[d.ck]=el.value;if(e.type==='change'&&(d.re||d.ck==='zone'))checkoutSheet();return}
+ if(d.ck){ck[d.ck]=el.value;if(d.ck==='bairro')ck._bt=1;if(e.type==='change'&&(d.re||d.ck==='zone'))checkoutSheet();return}
  if(d.th){draft.theme[d.th]=el.value;const c=document.getElementById('cv_'+d.th);if(c)c.textContent=el.value.toUpperCase();dirty();return}
  if(d.lay){draft.layout[d.lay]=el.checked;dirty();return}
  if(d.id){setPath(draft.store,d.id,el.value);dirty();return}
