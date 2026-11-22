@@ -17,6 +17,8 @@ if (isset($_GET['ofs'])) { // ofertas de hoje: produtos em promoção (com foto)
       $pr = +($p['price'] ?? 0); $pm = +($p['promo'] ?? 0); $isP = $pm > 0 && ($pr <= 0 || $pm < $pr);
       if ($isP) $cand[] = [0, $p]; elseif (!empty($p['feat']) && $pr > 0) $cand[] = [1, $p];
     }
+    // catálogo grande sem destaques ainda: a vitrine que o sistema escolheu (produtos com foto) aparece como destacado
+    if (!$cand && !empty($sh['cfg']['big'])) foreach (($sh['cfg']['products'] ?? []) as $p) { if (is_array($p) && ($p['on'] ?? true) !== false && !isset($hid[$p['cat'] ?? '']) && +($p['price'] ?? 0) > 0) $cand[] = [1, $p]; }
     usort($cand, function ($a, $b) { return $a[0] <=> $b[0]; });
     $n = 0; foreach ($cand as [$kind, $p]) {
       if ($n >= 2) break;

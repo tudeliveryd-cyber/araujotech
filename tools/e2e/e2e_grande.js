@@ -44,6 +44,18 @@ const N = +process.env.N || 20000;
   const sumN = cfg.big.ch.reduce((s, x) => s + x.n, 0); check(sumN === N, 'soma dos blocos = total de produtos', sumN);
   check(new Set(cfg.big.ch.map(x => x.cat)).size === 60 && (cfg.cats || []).length >= 60, 'categorias da planilha criadas (60)');
 
+  const vit = (cfg.products || []); check(vit.length === 8 && vit.every(p => /^https:/.test(p.photo || '')) && new Set(vit.map(p => p.cat)).size === 8, 'vitrine: sem destaques, leva 8 produtos com foto de categorias diferentes (Guía e site)', JSON.stringify(vit.map(p => [p.cat, p.photo])).slice(0, 200));
+
+  sec('A2. Painel: buscar em todos os produtos e trazer um para editar');
+  await o.evaluate(() => { ui.tab = 'products'; render(); }); await o.w(500);
+  await o.locator('#bigpq').fill('789000000003'); await o.locator('#bigpq').dispatchEvent('input');
+  await o.waitForSelector('[data-act=bigpedit]', { timeout: 30000 }).catch(() => {});
+  check(/Producto prueba 3 marca 3/.test(await o.txt('#bigpres')), 'busca do painel acha produto que não está na lista (pelo código)', (await o.txt('#bigpres')).slice(0, 160));
+  await o.locator('[data-act=bigpedit]').first().click(); await o.w(2500);
+  const ed = await o.evaluate(() => ui.edit && ui.edit.bc);
+  check(ed === '789000000003' && (await o.locator('.sheet').count()) > 0, '"Traer y editar" abre o editor do produto', String(ed) + ' | ' + o.errs.join('|'));
+  await o.evaluate(() => { closeSheet(); const id = ui.edit.id; applyBoth(c => { const p = c.products.find(x => x.id === id); p.feat = true; p.d = { es: 'Descripción del panel', pt: 'Descrição do painel' }; }); }); await o.w(4000);
+
   sec('B. Importar de novo com preços novos (atualiza pelo código, não duplica)');
   const rows2 = 'Nombre\tPrecio\tCategoría\tCódigo\nOtro nombre cualquiera\t55555\tSección 3\t789000000003\nProducto nuevo E2E\t7777\tNovedades\t789999999999';
   await o.evaluate(tx => { IMP = { txt: tx, replace: false }; impSheet(); }, rows2); await o.w(800);
@@ -52,6 +64,8 @@ const N = +process.env.N || 20000;
   check(cfg2.big && cfg2.big.n === N + 1, 'segunda importação: 1 atualizado + 1 novo (total ' + (N + 1) + ')', JSON.stringify(cfg2.big || {}).slice(0, 120));
   let upd = null; for (const c of cfg2.big.ch) { if (upd) break; const b = await media(c.k); upd = JSON.parse(b.pl).find(p => p.bc === '789000000003'); }
   check(upd && upd.price === 55555, 'produto achado pelo código teve o preço atualizado', JSON.stringify(upd || {}).slice(0, 160));
+  check(upd && upd.feat === true && upd.d && upd.d.es === 'Descripción del panel', 'reimportar mantém o destaque e a descrição feitos no painel (o preço vem da planilha)', JSON.stringify(upd || {}).slice(0, 200));
+  check((cfg2.products || []).some(p => p.bc === '789000000003' && p.price === 55555), 'produto destacado no painel continua na lista do painel e da Guía com o preço novo');
   const oldKeys = cfg.big.ch.map(x => x.k).filter(k => !cfg2.big.ch.some(x => x.k === k));
   for (const k of oldKeys.slice(0, 3)) check(!(await media(k)), 'bloco que deixou de ser usado foi apagado: ' + k);
   await O.ctx.close();
@@ -64,7 +78,7 @@ const N = +process.env.N || 20000;
   check(st.secs >= 60 && st.btn >= 60, 'catálogo mostra as categorias com o total de cada uma', JSON.stringify(st) + ' | ' + c.errs.join('|'));
   check(st.prods < 200, 'ao abrir não baixa todos os produtos (só ' + st.prods + ')');
   const t2 = Date.now(); await c.locator('[data-act=bigcat]').first().click();
-  await c.waitForFunction(() => document.querySelector('section .grid .pcard'), null, { timeout: 30000 }).catch(() => {});
+  await c.waitForFunction(() => document.querySelector('[data-act=bigmore]'), null, { timeout: 30000 }).catch(() => {});
   info('abrir uma categoria: ' + (Date.now() - t2) + ' ms');
   const s2 = await c.evaluate(() => ({ cards: document.querySelectorAll('section:first-of-type .pcard').length, more: !!document.querySelector('[data-act=bigmore]') }));
   check(s2.cards > 0 && s2.cards <= 24 && s2.more, 'categoria mostra os primeiros produtos e "Ver más"', JSON.stringify(s2));
