@@ -436,8 +436,8 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(v3.wa.length === 1 && /wa\.me\/595981000000/.test(v3.wa[0]) && /4,8/.test(v3.rt), 'destacado com WhatsApp do catálogo e nota real (só quando existem)');
   check(v3.rc.join('|') === 'Aliado Foto|Aliado Uno' && v3.rcwa === 1 && v3.rcph[0] === '/sitio/gimg.php?d=td2&k=ph&v=abc123', 'Recomendados Aliado Tu Delivery: só clientes Tu Delivery, com WhatsApp; os com foto do local primeiro');
   check(v3.rclink.length === 1 && /wa\.me/.test(v3.rclink[0]) && v3.vxlink.every(h => !/wa\.me/.test(h)) && v3.vxlink.length === 2, 'aliado: tocar no card abre o WhatsApp; cliente Vitrix: abre a página dele na Guía');
-  check(v3.vxl.join('|') === 'Com X', '"Más catálogos Vitrix": só os clientes Vitrix que não estão nos destacados (sem repetir)', JSON.stringify(v3.vxl));
-  check(v3.basic && !v3.basic.wa && !v3.basic.cv && !v3.basic.rt && !v3.vipc, 'plano básico em "Más catálogos Vitrix": cartão simples (sem capa, WhatsApp e nota); o VIP fica só nos destacados, com cartão completo', JSON.stringify([v3.basic, v3.vipc]));
+  check(v3.vxl.join('|') === 'Vip X|Pre X|Com X', '"Catálogos Vitrix": todos os clientes Vitrix, de qualquer plano (os destacados primeiro)', JSON.stringify(v3.vxl));
+  check(v3.basic && !v3.basic.wa && !v3.basic.cv && !v3.basic.rt && v3.vipc && v3.vipc.wa, 'plano básico em "Catálogos Vitrix": cartão simples (sem capa, WhatsApp e nota); VIP com o cartão completo', JSON.stringify([v3.basic, v3.vipc]));
   check(v3.sug >= 3 && v3.side, 'busca com sugestões tocáveis e cartão "Publicá tu negocio"');
   check(v3.search, 'botão Buscar mostra os resultados');
   check(simp.busShort && simp.busFull, 'Santa Rita útil resumido no início e abre o resto ao tocar');
