@@ -11,6 +11,13 @@ function at_get($url) {
   $r = @file_get_contents($url, false, stream_context_create(['http' => ['timeout' => 10]]));
   return $r === false ? null : $r;
 }
+// foto do produto para a Guía e o site: foto enviada no painel (m:xxx, servida pelo pimg.php) ou link https importado da planilha
+function at_pimg($id, $ph) {
+  $ph = (string)$ph;
+  if (preg_match('/^m:([a-z0-9]{2,24})$/', $ph, $m)) return '/sitio/pimg.php?s=' . rawurlencode($id) . '&k=' . $m[1];
+  if (strlen($ph) < 600 && preg_match('#^https://[^\s"\'<>`\\\\]+$#i', $ph)) return $ph;
+  return null;
+}
 function at_shop_cfg($id) {
   $cache = sys_get_temp_dir() . '/at_pcfg3_' . md5($id) . '.json';
   if (is_file($cache) && time() - filemtime($cache) < 600) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d ?: null; }

@@ -21,9 +21,9 @@ if (isset($_GET['ofs'])) { // ofertas de hoje: produtos em promoção (com foto)
     $n = 0; foreach ($cand as [$kind, $p]) {
       if ($n >= 2) break;
       $pr = +($p['price'] ?? 0); $pm = $kind === 0 ? +($p['promo'] ?? 0) : 0;
-      if (!preg_match('/^m:([a-z0-9]{2,24})$/', (string)($p['photo'] ?? ''), $m)) continue;
+      if (!function_exists('at_pimg')) require_once __DIR__ . '/prods_lib.php'; $img = at_pimg($id, $p['photo'] ?? ''); if (!$img) continue;
       $nm = $p['n'] ?? ''; if (!is_array($nm)) $nm = ['es' => (string)$nm, 'pt' => (string)$nm];
-      $o[] = ['s' => $id, 'p' => (string)($p['id'] ?? ''), 'n' => ['es' => (string)($nm['es'] ?? $nm['pt'] ?? ''), 'pt' => (string)($nm['pt'] ?? $nm['es'] ?? '')], 'price' => $pr, 'promo' => $pm, 'pm' => $kind === 0, 'cur' => (($sh['cfg']['store']['cur'] ?? '') === 'USD') ? 'USD' : 'PYG', 'img' => '/sitio/pimg.php?s=' . rawurlencode($id) . '&k=' . $m[1]];
+      $o[] = ['s' => $id, 'p' => (string)($p['id'] ?? ''), 'n' => ['es' => (string)($nm['es'] ?? $nm['pt'] ?? ''), 'pt' => (string)($nm['pt'] ?? $nm['es'] ?? '')], 'price' => $pr, 'promo' => $pm, 'pm' => $kind === 0, 'cur' => (($sh['cfg']['store']['cur'] ?? '') === 'USD') ? 'USD' : 'PYG', 'img' => $img];
       $n++;
     }
   }

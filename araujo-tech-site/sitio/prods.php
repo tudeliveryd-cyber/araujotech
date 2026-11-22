@@ -18,16 +18,16 @@ foreach (($cfg['cats'] ?? []) as $c) if (!empty($c['hide'])) $hid[$c['id'] ?? ''
 $list = [];
 foreach ($cfg['products'] as $i => $p) {
   if (!is_array($p) || (($p['on'] ?? true) === false) || isset($hid[$p['cat'] ?? ''])) continue;
-  $ph = (string)($p['photo'] ?? '');
-  if (!preg_match('/^m:([a-z0-9]{2,24})$/', $ph, $m)) continue;           // só produto com foto
+  $img = at_pimg($id, $p['photo'] ?? '');
+  if (!$img) continue;                                                       // só produto com foto
   $n = $p['n'] ?? ''; if (!is_array($n)) $n = ['es' => (string)$n, 'pt' => (string)$n];
   if (trim(($n['es'] ?? '') . ($n['pt'] ?? '')) === '') continue;
   $score = (!empty($p['feat']) ? 100 : 0) + ((+($p['promo'] ?? 0) > 0) ? 10 : 0) - $i * 0.01;
   $list[] = ['s' => $score, 'id' => (string)($p['id'] ?? ''), 'n' => ['es' => (string)($n['es'] ?? $n['pt'] ?? ''), 'pt' => (string)($n['pt'] ?? $n['es'] ?? '')],
-    'price' => +($p['price'] ?? 0), 'promo' => +($p['promo'] ?? 0), 'img' => '/sitio/pimg.php?s=' . rawurlencode($id) . '&k=' . $m[1]];
+    'price' => +($p['price'] ?? 0), 'promo' => +($p['promo'] ?? 0), 'img' => $img];
 }
 usort($list, function ($a, $b) { return $b['s'] <=> $a['s']; });
 $list = array_slice($list, 0, 8);
 foreach ($list as &$x) unset($x['s']); unset($x);
 $st = $cfg['store'] ?? [];
-echo json_encode(['cur' => (($st['cur'] ?? '') === 'USD') ? 'USD' : 'PYG', 'total' => count($cfg['products']), 'items' => $list], JSON_UNESCAPED_UNICODE);
+echo json_encode(['cur' => (($st['cur'] ?? '') === 'USD') ? 'USD' : 'PYG', 'total' => (int)($cfg['big']['n'] ?? 0) ?: count($cfg['products']), 'items' => $list], JSON_UNESCAPED_UNICODE);
