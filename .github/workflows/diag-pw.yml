@@ -1,0 +1,13 @@
+name: diag-pw (somente leitura, roda um script de tools/diag com Playwright)
+on:
+  workflow_dispatch:
+    inputs:
+      script: { default: 'cls.js' }
+      arg: { default: 'https://guiadesantarita.com/' }
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm i playwright@1.47.2 >/dev/null 2>&1 && npx playwright install --with-deps chromium >/dev/null 2>&1
+      - run: node tools/diag/${{ inputs.script }} "${{ inputs.arg }}"
