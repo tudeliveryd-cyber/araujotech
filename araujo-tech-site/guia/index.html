@@ -865,6 +865,19 @@ footer .ft-cols>div:nth-child(3){grid-column:auto}
 /* 20/11: endereço centralizado no computador; texto do primeiro slide cabe no celular */
 @media (min-width:900px){.hero .wrap>p.hloc{max-width:none;margin-left:auto;margin-right:auto}}
 @media (max-width:640px){body.home .dst .sd .hs-in{gap:4px}body.home .dst .sd .hs-p{font-size:12px;line-height:1.25}body.home .dst .sd .hs-bt{margin-top:0}}
+/* atalhos e emergências do início (celular): ícone em selo, nome numa linha, emergências em 3 botões iguais */
+@media (max-width:899px){.tt{gap:10px}
+ .tt a{min-height:0;aspect-ratio:1/1.04;padding:11px;border-radius:18px;justify-content:space-between!important;gap:0!important;box-shadow:0 10px 22px -14px rgba(36,9,63,.7)}
+ .tt a:before{background:linear-gradient(180deg,rgba(36,9,63,.28) 0%,rgba(36,9,63,0) 34%,rgba(36,9,63,.55) 62%,rgba(36,9,63,.94) 100%)}
+ .tt a svg{width:34px!important;height:34px!important;padding:7px;border-radius:11px;background:rgba(255,255,255,.94);color:#5A12A6!important;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+ .tt a b{font-size:14.5px!important;line-height:1.12;letter-spacing:-.1px;text-shadow:0 1px 6px rgba(0,0,0,.35);min-height:2.24em;display:flex;flex-direction:column;justify-content:flex-end}
+ .tt a b:before{content:"";width:22px;height:3px;border-radius:3px;background:#FFC21A;margin-bottom:6px}
+ .emq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;overflow:visible;margin:14px 0 18px;padding:12px;background:#FEF2F2;border:1px solid #FECACA;border-radius:18px}
+ .emq-h{grid-column:1/3;font-size:14.5px}
+ .emq button{grid-column:3;grid-row:1;justify-self:end;border:0;background:transparent;padding:4px 0;color:#B91C1C;font-size:12.5px}
+ .emq a{flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:9px 4px;border-radius:14px;background:#fff;border-color:#F5B5B5;min-width:0;text-align:center}
+ .emq a b{font-size:21px;font-weight:900;line-height:1.05;color:#B91C1C}
+ .emq a small{font-size:11.5px;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 </style></head>
 <body>
 <script>/* início: já nasce com o formato do início (faixa do slider reservada), para a página não pular quando os dados chegam */if(!/^#(empleos|clasificados|alquileres|feriados|farmac|quedarse|hacer)/.test(location.hash)&&!/[?&]q=/.test(location.search))document.body.className='home'</script>
@@ -1193,7 +1206,7 @@ const OSMP=[
 /* situação do dado em lugares públicos: verificado (com data), por confirmar ou cerrado temporalmente. Nada pendente aparece como confirmado */
 function vsTag(p){const t=TX[L];if(p.tc)return `<small class="vst tmp">${ic('clock')}${t.vs_tmp}</small>`;if(p.vs==='ver')return `<small class="vst ok">${ic('check')}${t.vs_ok}${p.vd?' · '+esc(p.vd.split('-').reverse().join('/')):''}</small>`;return `<small class="vst pd">${t.vs_pd}${p.src?' · '+esc(String(p.src).split(' (')[0]):''}</small>`}
 const kmT=d=>d<1?Math.max(50,Math.round(d*1000/50)*50)+' m':(Math.round(d*10)/10).toString().replace('.',',')+' km';
-function emqHTML(){const t=TX[L];return `<nav class="emq" aria-label="${esc(t.emq_h)}"><span class="emq-h">${ic('phone')}${t.emq_h}</span>${EMER.slice(0,3).map(e=>`<a href="tel:${e[0]}"><b>${e[0]}</b><small>${esc(e[1][L].split(' · ')[0].split(' (')[0])}</small></a>`).join('')}<button type="button" data-go="util">${t.emq_more}${ic('arrow')}</button></nav>`}
+function emqHTML(){const t=TX[L];return `<nav class="emq" aria-label="${esc(t.emq_h)}"><span class="emq-h">${ic('phone')}${t.emq_h}</span>${EMER.slice(0,3).map(e=>`<a href="tel:${e[0]}"><b>${e[0]}</b><small>${esc(e[1][L].split(' · ')[0].split(' (')[0].replace(/ Volunt[aá]rios$/,''))}</small></a>`).join('')}<button type="button" data-go="util">${t.emq_more}${ic('arrow')}</button></nav>`}
 function utilAll(){const base=(G.util&&G.util.length?G.util:[])/* nada genérico: sem lista do painel, valem só os lugares reais do arquivo público */.filter(p=>PCAT[p.c]).concat((G.fu||[]).filter(p=>p&&PCAT[p.c]&&p.n));const has=base.map(p=>[p.c,norm(p.n)]);const dup=p=>has.some(([c,h])=>(c===p.c||(p.c==='far'&&c==='salud'))&&(h===norm(p.n)||h.includes(norm(p.n))||(p.k&&p.k.test(h))));if(G.util&&G.util.some(p=>p.o))return base.filter(p=>!p.off);/* o painel já trouxe a lista da Guía: vale só o que está lá (editado ou apagado) */return base.concat(OSMP.filter(p=>!dup(p))).filter(p=>!p.off)}/* off: marcado no painel como cerrado ou fuera de Santa Rita */
 function utilHTML(q){const t=TX[L];const SHORT=!q&&!UFULL;const all=utilAll();
  let pl=all;if(q){const ws=q.split(/\s+/).filter(w=>w.length>2),cs=Object.keys(PSYN).filter(k=>ws.some(w=>PSYN[k].test(w)));const m=all.filter(p=>norm([p.n,p.a,PCAT[p.c][1].es,PCAT[p.c][1].pt].join(' ')).includes(q)||cs.includes(p.c));if(m.length)pl=m}
