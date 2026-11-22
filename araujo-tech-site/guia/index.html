@@ -1491,6 +1491,24 @@ document.getElementById('chips').addEventListener('click',e=>{SPV='';if(e.target
 document.getElementById('q').addEventListener('input',()=>{SPV='';CAT='all';render();clearTimeout(QT);QT=setTimeout(()=>{const v=document.getElementById('q').value.trim();if(v.length>=3&&LASTN>0){hit('q',v);histAdd(v)}else if(v.length>=3&&LASTN===0&&!F_DEL&&!F_OPEN&&!F_FAV&&!dymFor(v))hit('z',v)},1500)});/* só buscas com resultado viram 'Lo más buscado'; as sem resultado vão para a Central (negócios que faltam na Guía) */
 document.getElementById('top2').addEventListener('click',e=>{const b=e.target.closest('[data-tq]');if(!b)return;const q=document.getElementById('q');q.value=b.dataset.tq;CAT='all';render();window.scrollTo({top:q.getBoundingClientRect().top+window.scrollY-12,behavior:'smooth'})});
 document.querySelector('.lang').addEventListener('click',e=>{const b=e.target.closest('[data-lang]');if(!b)return;L=b.dataset.lang;try{localStorage.setItem('at_lang',L)}catch(er){}render()});
+/* voltar (do celular ou do navegador): cada tela da Guía (categoria, busca, lista especial, mapa, menú "Más") entra no histórico.
+   Voltar retorna à tela anterior, no ponto onde a pessoa estava; ao voltar de uma página de negócio, a Guía reabre na mesma tela. */
+const NAV={k:'',lock:false,y:0,y0:null,t:0};
+function navSnap(){return{c:CAT,s:SPV,q:document.getElementById('q').value,o:F_OPEN,d:F_DEL,f:F_FAV,n:NEAR,m:MAPON,u:UFULL,t:SUBT}}
+function navApply(s){CAT=s.c||'home';SPV=s.s||'';document.getElementById('q').value=s.q||'';F_OPEN=!!s.o;F_DEL=!!s.d;F_FAV=!!s.f;NEAR=s.n||null;MAPON=!!s.m;UFULL=!!s.u;SUBT=s.t||{}}
+function navSync(){if(!LIST)return;const s=navSnap(),k=JSON.stringify(s);if(NAV.lock||k===NAV.k){NAV.k=k;return}
+ try{if(NAV.k===''){history.replaceState({g:s,y:(history.state&&history.state.y)||0},'');NAV.k=k;if(MAPON)try{mapShow()}catch(x){}if(NAV.y0!=null){const y=NAV.y0;NAV.y0=null;requestAnimationFrame(()=>scrollTo(0,y));setTimeout(()=>scrollTo(0,y),350)}return}
+  const p=JSON.parse(NAV.k),same=(a,b)=>JSON.stringify(Object.assign({},a,{q:''}))===JSON.stringify(Object.assign({},b,{q:''}));
+  if((p.q&&s.q&&same(p,s))||(history.state&&history.state.sh))history.replaceState({g:s,y:0},'');/* digitando na busca, ou saindo do menú "Más": não empilha uma tela por letra */
+  else{history.replaceState(Object.assign({},history.state||{},{y:NAV.y}),'');history.pushState({g:s,y:0},'')}}catch(e){}
+ NAV.k=k}
+{const _r=render;render=function(){_r.apply(this,arguments);navSync()}}
+addEventListener('scroll',()=>{NAV.y=scrollY;clearTimeout(NAV.t);NAV.t=setTimeout(()=>{try{if(history.state&&history.state.g)history.replaceState(Object.assign({},history.state,{y:scrollY}),'')}catch(e){}},250)},{passive:true});
+addEventListener('popstate',e=>{const st=e.state,sh=document.getElementById('more');if(sh&&!sh.hidden)sh.hidden=true;const g=st&&st.g;if(!g||!LIST)return;
+ NAV.lock=true;try{navApply(g);if(SPV==='job')loadJobs();render();mapShow()}catch(x){}NAV.lock=false;NAV.k=JSON.stringify(navSnap());const y=st.y||0;requestAnimationFrame(()=>scrollTo(0,y));setTimeout(()=>scrollTo(0,y),300)});
+new MutationObserver(()=>{const sh=document.getElementById('more');try{if(!sh.hidden){if(!(history.state&&history.state.sh))history.pushState({g:navSnap(),sh:1,y:scrollY},'')}else if(history.state&&history.state.sh)history.back()}catch(e){}}).observe(document.getElementById('more'),{attributes:true,attributeFilter:['hidden']});
+try{history.scrollRestoration='manual';const st=history.state,nt=(performance.getEntriesByType('navigation')[0]||{}).type;if(st&&st.g&&nt==='back_forward'){navApply(st.g);NAV.y0=st.y||0;if(SPV==='job')loadJobs()}}catch(e){}
+
 texts();
 const qs=new URLSearchParams(location.search);if(qs.get('q'))document.getElementById('q').value=qs.get('q');
 /* abre na hora com a última lista guardada neste aparelho e depois atualiza com a da nuvem */
