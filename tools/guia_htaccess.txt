@@ -43,6 +43,7 @@ RewriteRule ^([a-z0-9][a-z0-9-]{1,60})/?$ /guia/negocio.php?id=$1 [L,QSA]
 <IfModule mod_headers.c>
 Header always set X-Content-Type-Options "nosniff"
 Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set Strict-Transport-Security "max-age=15552000"
 <FilesMatch "\.(html|json|js)$">
 Header set Cache-Control "no-cache"
 </FilesMatch>
