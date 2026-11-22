@@ -1,10 +1,21 @@
-name: baixar-fotos (somente leitura)
-on: { workflow_dispatch: {} }
+name: baixar-fotos (candidatas de foto do Unsplash para um ramo de proposta)
+on:
+  workflow_dispatch:
+    inputs:
+      ramo: { default: 'proposta-atalhos-guia' }
+      lista: { description: 'nome=id-da-foto separados por espaço', default: '' }
+permissions:
+  contents: write
 jobs:
-  d:
+  b:
     runs-on: ubuntu-latest
     steps:
-      - run: pip install -q pillow
+      - uses: actions/checkout@v4
+        with: { ref: '${{ inputs.ramo }}' }
       - run: |
-          for p in "comer https://pd.w.org/2026/01/471695d0a60168062.45908022.jpg" "quedarse https://pd.w.org/2025/06/36168414d8986b968.45807581.jpg"; do set -- $p
-            curl -sSL --max-time 60 -o $1.jpg "$2" && python3 -c "from PIL import Image,ImageOps;im=ImageOps.exif_transpose(Image.open('$1.jpg')).convert('RGB');im.thumbnail((1800,1800));im.save('$1-s.jpg',quality=82)" && echo "IMG64 $1 $(base64 -w0 $1-s.jpg)"; done
+          mkdir -p tools/fotos-cand
+          for x in ${{ inputs.lista }}; do n="${x%%=*}"; id="${x#*=}"
+            curl -sSL -m 40 "https://images.unsplash.com/photo-$id?auto=format&fit=crop&w=1200&q=80&fm=jpg" -o "tools/fotos-cand/$n.jpg" || echo "falhou $n"
+            file "tools/fotos-cand/$n.jpg"; done
+          git config user.name "Araújo Tech (fotos)"; git config user.email "actions@users.noreply.github.com"
+          git add tools/fotos-cand; git commit -m "Fotos candidatas (Unsplash)" || true; git push
