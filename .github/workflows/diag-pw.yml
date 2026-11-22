@@ -4,10 +4,11 @@ on:
     inputs:
       script: { default: 'cls.js' }
       arg: { default: 'https://guiadesantarita.com/' }
+      dev: { default: 'Pixel 5' }
 jobs:
   d:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: npm i playwright@1.47.2 >/dev/null 2>&1 && npx playwright install --with-deps chromium >/dev/null 2>&1
-      - run: node tools/diag/${{ inputs.script }} "${{ inputs.arg }}"
+      - run: DEV="${{ inputs.dev }}" node tools/diag/${{ inputs.script }} "${{ inputs.arg }}"

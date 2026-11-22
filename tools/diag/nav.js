@@ -2,7 +2,7 @@
 const { chromium, devices } = require('playwright');
 (async () => {
   const URL0 = process.argv[2] || 'https://guiadesantarita.com/';
-  const b = await chromium.launch(); const ctx = await b.newContext({ ...devices['Pixel 5'], geolocation: { latitude: -25.79765, longitude: -55.0967 }, permissions: ['geolocation'] }); const p = await ctx.newPage(); const errs = [];
+  const b = await chromium.launch(); const ctx = await b.newContext({ ...devices[process.env.DEV || 'Pixel 5'], geolocation: { latitude: -25.79765, longitude: -55.0967 }, permissions: ['geolocation'] }); const p = await ctx.newPage(); const errs = [];
   p.on('pageerror', e => errs.push(String(e.message).slice(0, 120)));
   const st = () => p.evaluate(() => ({ cat: CAT, spv: SPV, q: document.getElementById('q').value, map: MAPON, fav: F_FAV, open: F_OPEN, del: F_DEL, home: document.body.classList.contains('home'), y: Math.round(scrollY), sheet: !document.getElementById('more').hidden, h: history.length, url: location.pathname + location.hash }));
   const isHome = s => s.cat === 'home' && !s.spv && !s.q && !s.map && !s.fav && s.home && !s.sheet;
