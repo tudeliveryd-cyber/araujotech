@@ -1,0 +1,24 @@
+name: diag-zonas (somente leitura)
+on:
+  workflow_dispatch:
+    inputs:
+      shop: { default: 'fogaomineiro' }
+      lat: { default: '-25.79765' }
+      lng: { default: '-55.09670' }
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          K=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U; B="https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents"
+          curl -sS "$B/shops/${{ inputs.shop }}?key=$K" > shop.json; curl -sS "$B/platform/config?key=$K" > plat.json
+          node - <<'N'
+          const fs=require('fs'),la=+process.env.LA,ln=+process.env.LN;
+          const inP=(z)=>{let c=false;for(let i=0,j=z.length-1;i<z.length;j=i++){const ya=+z[i][0],xa=+z[i][1],yb=+z[j][0],xb=+z[j][1];if((xa>ln)!==(xb>ln)&&la<(yb-ya)*(ln-xa)/(xb-xa)+ya)c=!c}return c};
+          const sh=JSON.parse(fs.readFileSync('shop.json'));const cfg=JSON.parse(sh.fields&&sh.fields.cfg?sh.fields.cfg.stringValue:'{}');const s=cfg.store||{};
+          console.log('useTd',s.useTd,'feeFrom',s.feeFrom,'feeMode',s.feeMode,'tdMap',JSON.stringify(s.tdMap||null).slice(0,80));
+          const show=(lab,L)=>{console.log('== '+lab+': '+(L||[]).length+' bairros');(L||[]).forEach(b=>{const z=Array.isArray(b.zone)&&b.zone.length>2;console.log(' -',b.name,'fee',b.fee,'feeN',b.feeN,'zona',z?b.zone.length+' pts':'NAO',z?('ponto dentro: '+inP(b.zone)):'',z?('lat '+Math.min(...b.zone.map(p=>+p[0])).toFixed(4)+'..'+Math.max(...b.zone.map(p=>+p[0])).toFixed(4)+' lng '+Math.min(...b.zone.map(p=>+p[1])).toFixed(4)+'..'+Math.max(...b.zone.map(p=>+p[1])).toFixed(4)):'')})};
+          show('store.bairros',s.bairros);show('feeApproved.bairros',s.feeApproved&&s.feeApproved.bairros);
+          const p=JSON.parse(fs.readFileSync('plat.json'));if(p.error){console.log('platform:',p.error.status);}else{const t=p.fields&&p.fields.tdts?JSON.parse(p.fields.tdts.stringValue):null;if(t)t.maps.forEach(m=>show('MAPA '+m.name,m.bairros));}
+          N
+        env: { LA: '${{ inputs.lat }}', LN: '${{ inputs.lng }}' }
