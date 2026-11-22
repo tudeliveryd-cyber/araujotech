@@ -379,10 +379,12 @@ html.anim .rv.in{opacity:1;transform:none}
   .hstrip li:last-child{grid-column:1/-1}
   section{padding:72px 0}
   .sec-head{margin-bottom:32px}
-  .sols,.srvs,.segs,.steps,.mvv{grid-template-columns:1fr}
+  .sols,.srvs,.steps,.mvv{grid-template-columns:1fr}
+  .segs{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .sol-b{padding:20px}
   .srv{display:grid;grid-template-columns:52px 1fr;gap:4px 16px;padding:18px}.srv .ic{margin:0;grid-row:span 2}
-  .seg{padding:14px 16px}
+  .seg{padding:12px;gap:10px;font-size:14px;line-height:1.25}
+  .seg svg.i{width:22px;height:22px}
   .cta-b{padding-bottom:72px}.cta-in{padding:30px 22px;text-align:center;justify-content:center}.cta-in .acts{width:100%}.cta-in .btn{width:100%}
   .qform{padding:24px 18px}.qform .row{grid-template-columns:1fr;gap:0}
   .lzbox{padding:26px 20px;border-radius:20px}.lzbox p{font-size:16px}.lzact{width:100%}
@@ -553,11 +555,6 @@ html.anim .rv.in{opacity:1;transform:none}
     <div id="faqList"></div>
   </div>
 </section>
-
-<div class="cta-b"><div class="wrap"><div class="cta-in">
-  <h2 data-t="cb_h">¿Vamos a transformar su idea en una solución digital?</h2>
-  <div class="acts"><a href="#" class="btn btn-y js-wa"><svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-13.4 7.9L3 21l1.1-4.6A9 9 0 1 1 21 12Z"/></svg><span data-t="cb_b">Hablar por WhatsApp</span></a><small data-t="cb_s">o complete el formulario de abajo</small></div>
-</div></div></div>
 
 <section class="contact" id="contacto" aria-labelledby="k-h">
   <div class="wrap grid">
@@ -1032,7 +1029,7 @@ document.addEventListener('click',e=>{const a=e.target&&e.target.closest&&e.targ
 </script>
 <script>/* vagas da promoção de lançamento (admin: caixinha "Lanzamiento") */
 fetch("https://firestore.googleapis.com/v1/projects/araujotech-catalogos/databases/(default)/documents/licencias/_lz?key=AIzaSyBCz2X9BOgO4UZKaXppxlGbiN59qBvUR_U",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{const F=j&&j.fields;if(!F)return;const used=+(F.used&&(F.used.integerValue||F.used.doubleValue))||0,max=+(F.max&&(F.max.integerValue||F.max.doubleValue))||20,left=Math.max(0,max-used);
- if(!left){document.querySelectorAll(".lzhome").forEach(e=>e.remove());return}window.LZ={left,max};const tx=(typeof T!=="undefined"&&typeof lang!=="undefined")?T[lang]:null;document.querySelectorAll("[data-lzleft]").forEach(el=>{el.textContent=(tx?tx.lz_left:"Quedan {n} de {m} cupos").replace("{n}",left).replace("{m}",max);el.hidden=false})}).catch(()=>{});
+ if(!left){document.querySelectorAll(".lzhome").forEach(e=>e.remove());return}window.LZ={left,max};const tx=(typeof T!=="undefined"&&typeof lang!=="undefined")?T[lang]:null;document.querySelectorAll("[data-lzleft]").forEach(el=>{el.textContent=(tx?tx.lz_left:"Quedan {n} de {m} cupos").replace("{n}",left).replace("{m}",max);el.hidden=used<1})}).catch(()=>{});
 </script>
 </body>
 </html>
