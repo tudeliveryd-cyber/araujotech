@@ -1,0 +1,21 @@
+name: auditoria-lh (somente leitura, Lighthouse nas páginas no ar)
+on:
+  workflow_dispatch:
+    inputs:
+      urls: { default: 'https://guiadesantarita.com/ https://guiadesantarita.com/negocios/ https://guiadesantarita.com/sobre/ https://araujotechsistemas.com/ https://araujotechsistemas.com/vitrix/ https://araujotechsistemas.com/catalogo-digital/ https://fogaomineiro.araujotechsistemas.com/ https://araujotechsistemas.com/demo-pizzeria/' }
+jobs:
+  lh:
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm i -g lighthouse@12 >/dev/null 2>&1
+      - run: |
+          i=0
+          for u in ${{ inputs.urls }}; do i=$((i+1))
+            lighthouse "$u" --quiet --chrome-flags="--headless=new --no-sandbox" --output=json --output-path=r$i.json --only-categories=performance,accessibility,best-practices,seo >/dev/null 2>&1 || echo "LH FALHOU $u"
+            node -e '
+            const r=JSON.parse(require("fs").readFileSync(process.argv[1]));const c=r.categories;
+            console.log("LH "+JSON.stringify({u:r.finalDisplayedUrl,perf:Math.round(c.performance.score*100),a11y:Math.round(c.accessibility.score*100),bp:Math.round(c["best-practices"].score*100),seo:Math.round(c.seo.score*100),lcp:r.audits["largest-contentful-paint"].displayValue,tbt:r.audits["total-blocking-time"].displayValue,cls:r.audits["cumulative-layout-shift"].displayValue,kb:Math.round(r.audits["total-byte-weight"].numericValue/1024)}));
+            for(const k of ["accessibility","best-practices","seo"])for(const ref of c[k].auditRefs){const a=r.audits[ref.id];if(a.score!==null&&a.score<1&&a.scoreDisplayMode!=="notApplicable"&&a.scoreDisplayMode!=="manual"&&a.scoreDisplayMode!=="informative"){const it=(a.details&&a.details.items||[]).slice(0,4).map(x=>(x.node&&(x.node.snippet||x.node.selector))||x.url||x.description||"").filter(Boolean).map(s=>String(s).slice(0,140));console.log("  FALHA "+k+" | "+a.id+" | "+a.title.slice(0,90)+" | "+JSON.stringify(it))}}
+            for(const id of ["render-blocking-resources","unused-javascript","uses-optimized-images","modern-image-formats","uses-responsive-images","offscreen-images","uses-text-compression","uses-long-cache-ttl","unminified-javascript","largest-contentful-paint-element"]){const a=r.audits[id];if(a&&a.score!==null&&a.score<0.9){const it=(a.details&&a.details.items||[]).slice(0,4).map(x=>(x.url||(x.node&&x.node.snippet)||"").slice(0,110)+(x.wastedBytes?" -"+Math.round(x.wastedBytes/1024)+"KB":"")+(x.totalBytes?" "+Math.round(x.totalBytes/1024)+"KB":""));console.log("  PERF "+id+" | "+(a.displayValue||"")+" | "+JSON.stringify(it))}}
+            ' r$i.json || true
+          done
