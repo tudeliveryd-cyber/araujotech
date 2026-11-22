@@ -1,0 +1,28 @@
+name: diag-zall (somente leitura, testa todas as zonas no catálogo)
+on:
+  workflow_dispatch:
+    inputs:
+      url: { default: 'https://fogaomineiro.araujotechsistemas.com/' }
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm i playwright@1.47.2 >/dev/null 2>&1 && npx playwright install --with-deps chromium >/dev/null 2>&1
+      - run: |
+          cat > t.js <<'N'
+          const {chromium}=require('playwright');
+          (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});
+          p.on('pageerror',e=>console.log('ERR',e.message));
+          await p.goto(process.env.U);await p.waitForTimeout(5000);
+          const r=await p.evaluate(()=>{const P=pub.products.find(x=>x.on&&x.price>0);cart=[{pid:P.id,q:1,o:{}}];ck.mode='delivery';
+            const inP=(z,la,ln)=>{let c=false;for(let i=0,j=z.length-1;i<z.length;j=i++){const ya=+z[i][0],xa=+z[i][1],yb=+z[j][0],xb=+z[j][1];if((xa>ln)!==(xb>ln)&&la<(yb-ya)*(ln-xa)/(xb-xa)+ya)c=!c}return c};
+            const Z=pub.store.bairros.filter(b=>Array.isArray(b.zone)&&b.zone.length>2);const out=[];
+            Z.forEach((b,k)=>{const z=b.zone;let pt=null;const la0=Math.min(...z.map(q=>+q[0])),la1=Math.max(...z.map(q=>+q[0])),ln0=Math.min(...z.map(q=>+q[1])),ln1=Math.max(...z.map(q=>+q[1]));
+              // ponto interno que não esteja em outra zona menor (para testar a própria zona)
+              let best=null;for(let i=1;i<20&&!pt;i++)for(let j=1;j<20;j++){const la=la0+(la1-la0)*i/20,ln=ln0+(ln1-ln0)*j/20;if(!inP(z,la,ln))continue;if(!best)best=[la,ln];if(!Z.some(o=>o!==b&&inP(o.zone,la,ln))){pt=[la,ln];break}}
+              const own=!!pt;pt=pt||best;if(!pt){out.push([b.name||'(sin nombre #'+k+')',b.fee,'SEM PONTO']);return}
+              ck.lat=pt[0];ck.lng=pt[1];ck.gps='ok';const zz=zoneAt(),f=fee();out.push([b.name||'(sin nombre #'+k+')',b.fee,zz===b?'ok':'outra zona: '+(zz?zz.name:'nenhuma'),f,own?'':'(toda coberta por outras)'])});
+            return out});
+          r.forEach(x=>console.log('Z',JSON.stringify(x)));await b.close()})();
+          N
+          U='${{ inputs.url }}' node t.js
