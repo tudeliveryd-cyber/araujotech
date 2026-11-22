@@ -17,7 +17,7 @@ jobs:
           p.on('pageerror',e=>console.log('ERR',e.message));
           await p.goto(process.env.U);await p.waitForTimeout(5000);
           const r=await p.evaluate(()=>{const P=pub.products.find(x=>x.on&&x.price>0);cart=[{pid:P.id,q:1,o:{}}];ck.mode='delivery';ck.lat=+'${{ inputs.lat }}';ck.lng=+'${{ inputs.lng }}';ck.gps='ok';checkoutSheet();
-            const z=zoneAt();return JSON.stringify({zm:zmode(),z:z&&{n:z.name,f:z.fee},fee:fee(),tot:totals(),tbd:pub.store.feeTbd,fm:pub.store.feeMode,min:pub.store.minFee,orig:pub.store.feeOrigin,sb:pub.store.storeBairro,night:isNight(),free:delFree(),known:feeKnown(),coord:bairroCoord(),txt:(document.getElementById('ckTot')||{}).textContent})});
+            const z=zoneAt();return JSON.stringify({zm:zmode(),z:z&&{n:z.name,f:z.fee},fee:fee(),tot:totals(),tbd:pub.store.feeTbd,appr:JSON.stringify(pub.store.feeApproved).slice(0,200),fm:pub.store.feeMode,min:pub.store.minFee,orig:pub.store.feeOrigin,sb:pub.store.storeBairro,night:isNight(),free:delFree(),known:feeKnown(),coord:bairroCoord(),txt:(document.getElementById('ckTot')||{}).textContent})});
           console.log('RES',r);await b.close()})();
           N
           LA='${{ inputs.lat }}' LN='${{ inputs.lng }}' U='${{ inputs.url }}' node t.js
