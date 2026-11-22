@@ -45,8 +45,8 @@
 <link rel="apple-touch-icon" href="img/simbolo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;800;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="img/sistemas/catalogo-pc.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;800;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;800;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="image" href="img/sistemas/catalogo-pc.webp" fetchpriority="high">
 <style>
 :root{
   --purple:#8A12D6;--deep:#4A0A80;--night:#24093F;--night2:#170528;--lilac:#F3ECFB;--lilac2:#FAF6FE;
@@ -134,9 +134,9 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .sh-cap small{color:#C9B4F0;font-size:14px}
 .sh-cap a{display:inline-flex;align-items:center;gap:6px;color:#fff;font-size:14px;font-weight:700;text-decoration:none;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 14px}
 .sh-cap a:hover{background:rgba(255,255,255,.12)}
-.sh-dots{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.sh-dots{display:flex;justify-content:center;gap:16px;margin-top:12px}
 .sh-dots button{position:relative;width:9px;height:9px;border-radius:9px;border:0;background:rgba(255,255,255,.35);padding:0;cursor:pointer;transition:width .3s,background .3s}
-.sh-dots button::before{content:"";position:absolute;inset:-16px -6px}
+.sh-dots button::before{content:"";position:absolute;inset:-12px -8px}
 .sh-dots button[aria-current="true"]{width:28px;background:var(--yellow)}
 /* faixa de serviços no fim do topo */
 .hstrip{position:relative;z-index:1;margin-top:56px;border-top:1px solid rgba(255,255,255,.12)}
@@ -404,8 +404,8 @@ html.anim .rv.in{opacity:1;transform:none}
 <header class="hdr" id="hdr">
   <div class="wrap nav">
     <a href="#inicio" class="brand" aria-label="Araújo Tech Sistemas, inicio">
-      <img class="w" src="img/logo-blanco.png" alt="Araújo Tech Sistemas" width="200" height="56">
-      <img class="c" src="img/logo.png" alt="" width="200" height="56">
+      <img class="w" src="img/logo-blanco.webp" alt="Araújo Tech Sistemas" width="200" height="56">
+      <img class="c" src="img/logo.webp" alt="" width="200" height="47">
     </a>
     <nav class="menu" id="menu" aria-label="Menú principal">
       <a href="#soluciones" data-t="n1">Soluciones</a>
@@ -439,8 +439,8 @@ html.anim .rv.in{opacity:1;transform:none}
       </div>
       <div class="show" id="show">
         <div class="stage">
-          <div class="laptop"><div class="lid"><div class="bezel"><div class="screen" id="shPc"><img src="img/sistemas/catalogo-pc.jpg" alt="Vitrix en la computadora" width="1280" height="800"><span class="glare"></span></div></div></div><div class="base"></div></div>
-          <div class="phone"><div class="inner"><div class="scr" id="shCel"><img src="img/sistemas/catalogo-cel.jpg" alt="Vitrix en el celular" width="600" height="1298"><span class="glare"></span></div></div></div>
+          <div class="laptop"><div class="lid"><div class="bezel"><div class="screen" id="shPc"><img src="img/sistemas/catalogo-pc.webp" alt="Vitrix en la computadora" width="1280" height="800" fetchpriority="high"><span class="glare"></span></div></div></div><div class="base"></div></div>
+          <div class="phone"><div class="inner"><div class="scr" id="shCel"><img src="img/sistemas/catalogo-cel.webp" alt="Vitrix en el celular" width="600" height="1298"><span class="glare"></span></div></div></div>
         </div>
         <div class="sh-cap" id="shCap" aria-live="polite"></div>
         <div class="sh-dots" id="shDots"></div>
@@ -651,14 +651,14 @@ const CONFIG = {
    pc / celular: capturas REALES de pantalla en img/sistemas/
    ========================================================= */
 const SISTEMAS = [
-  { nombre:"Vitrix", logo:"img/vitrix/vitrix-nombre.webp?v=4", sub:{es:"Catálogo digital y plataforma comercial",pt:"Catálogo digital e plataforma comercial"}, status:"ok", desde:{es:"Desde <b>Gs. 150.000</b> por mes · Lanzamiento: <b>2 meses gratis</b>",pt:"A partir de <b>Gs. 150.000</b> por mês · Lançamento: <b>2 meses grátis</b>"}, link:"demo/", demo:true, mas:"vitrix/", planes:"vitrix/#planes", pc:"img/sistemas/catalogo-pc.jpg", celular:"img/sistemas/catalogo-cel.jpg",
+  { nombre:"Vitrix", logo:"img/vitrix/vitrix-nombre.webp?v=4", sub:{es:"Catálogo digital y plataforma comercial",pt:"Catálogo digital e plataforma comercial"}, status:"ok", desde:{es:"Desde <b>Gs. 150.000</b> por mes · Lanzamiento: <b>2 meses gratis</b>",pt:"A partir de <b>Gs. 150.000</b> por mês · Lançamento: <b>2 meses grátis</b>"}, link:"demo/", demo:true, mas:"vitrix/", planes:"vitrix/#planes", pc:"img/sistemas/catalogo-pc.webp", celular:"img/sistemas/catalogo-cel.webp",
     es:{ para:"Restaurantes, farmacias, tiendas y todo comercio",
          desc:"El menú o catálogo de su negocio en internet. El cliente arma el pedido y le llega listo a su WhatsApp.",
          puntos:["Sin comisión y sin límite de pedidos","Caja, pantalla de cocina y mesas con QR","Clientes, stock, opiniones y sitio web"] },
     pt:{ para:"Restaurantes, farmácias, lojas e todo comércio",
          desc:"O cardápio ou catálogo do seu negócio na internet. O cliente monta o pedido e ele chega pronto no seu WhatsApp.",
          puntos:["Sem comissão e sem limite de pedidos","Caixa, tela da cozinha e mesas com QR","Clientes, estoque, avaliações e site"] } },
-  { nombre:"Guía de Santa Rita", sub:{es:"Portal digital de la ciudad",pt:"Portal digital da cidade"}, status:"ok", link:"https://guiadesantarita.com/", linkTexto:"guiadesantarita.com", mas:"https://guiadesantarita.com/negocios/", masTexto:{es:"Quiero mi negocio en la Guía",pt:"Quero meu negócio no Guia"}, pc:"img/sistemas/guia-pc.jpg", celular:"img/sistemas/guia-cel.jpg",
+  { nombre:"Guía de Santa Rita", sub:{es:"Portal digital de la ciudad",pt:"Portal digital da cidade"}, status:"ok", link:"https://guiadesantarita.com/", linkTexto:"guiadesantarita.com", mas:"https://guiadesantarita.com/negocios/", masTexto:{es:"Quiero mi negocio en la Guía",pt:"Quero meu negócio no Guia"}, pc:"img/sistemas/guia-pc.webp", celular:"img/sistemas/guia-cel.webp",
     es:{ para:"Vecinos, recién llegados y negocios de Santa Rita",
          desc:"Negocios, delivery, farmacias, iglesias, escuelas, empleos, eventos y clasificados de la ciudad, en español y portugués.",
          puntos:["Negocios con catálogo y pedidos por WhatsApp","Farmacia de turno, ómnibus, clima y cambio","Empleos, agenda y guía para quien recién llega"] },
@@ -666,14 +666,14 @@ const SISTEMAS = [
          desc:"Negócios, delivery, farmácias, igrejas, escolas, empregos, eventos e classificados da cidade, em espanhol e português.",
          puntos:["Negócios com catálogo e pedidos pelo WhatsApp","Farmácia de plantão, ônibus, clima e câmbio","Empregos, agenda e guia para quem acabou de chegar"] } },
   { nombre:"Meu Púlpito", sub:{es:"Preparación y organización de sermones",pt:"Preparação e organização de sermões"}, status:"ok", desde:{es:"Plan gratis · Premium desde <b>Gs. 45.000</b> por mes",pt:"Plano grátis · Premium a partir de <b>Gs. 45.000</b> por mês"}, link:"https://meupulpito.com", linkTexto:"meupulpito.com", instagram:"meupulpito",
-    pc:"img/sistemas/pulpito-pc.jpg", celular:"img/sistemas/pulpito-cel.jpg",
+    pc:"img/sistemas/pulpito-pc.webp", celular:"img/sistemas/pulpito-cel.webp",
     es:{ para:"Pastores, predicadores y ministerios",
          desc:"Un bloc de notas para escribir el sermón y leerlo en el púlpito sin perderse, con la Biblia al lado.",
          puntos:["Modo Predicar: cada parte del sermón con su color","Biblia con varias versiones en español y portugués","Proyección para la iglesia y registro de miembros"] },
     pt:{ para:"Pastores, pregadores e ministérios",
          desc:"Um bloco de notas para escrever o sermão e lê-lo no púlpito sem se perder, com a Bíblia ao lado.",
          puntos:["Modo Pregar: cada parte do sermão com sua cor","Bíblia com várias versões em português e espanhol","Projeção para a igreja e cadastro de membros"] } },
-  { nombre:"Caja de Entregas", sub:{es:"Control de entregas y caja",pt:"Controle de entregas e caixa"}, status:"ok", link:"", pc:"img/sistemas/caja-pc.jpg", celular:"img/sistemas/caja-cel.jpg",
+  { nombre:"Caja de Entregas", sub:{es:"Control de entregas y caja",pt:"Controle de entregas e caixa"}, status:"ok", link:"", pc:"img/sistemas/caja-pc.webp", celular:"img/sistemas/caja-cel.webp",
     es:{ para:"Empresas de delivery",
          desc:"Cada entrega anotada en el momento. Al cerrar el día, la caja cuadra sola y cada repartidor ve cuánto le toca.",
          puntos:["Apertura y cierre de caja","Efectivo, transferencia y anotado por repartidor","Puntos y premios para los repartidores"] },
@@ -683,7 +683,7 @@ const SISTEMAS = [
   { nombre:"Agenda para Salones y Barberías", sub:{es:"Gestión de turnos y clientes",pt:"Gestão de horários e clientes"}, status:"ok", link:"demo-agenda/", demo:true,
     mas:"demo-agenda/gestion.html", masTexto:{es:"Ver el panel del negocio",pt:"Ver o painel do negócio"},
     pedir:{es:"Quiero este sistema",pt:"Quero este sistema"},
-    pc:"img/sistemas/agenda-pc.jpg", celular:"img/sistemas/agenda-cel.jpg",
+    pc:"img/sistemas/agenda-pc.webp", celular:"img/sistemas/agenda-cel.webp",
     es:{ para:"Peluquerías, barberías y centros de estética",
          desc:"Las clientas reservan su turno desde el celular, con los horarios libres de cada profesional. El negocio maneja agenda, caja y comisiones en un solo lugar.",
          puntos:["Reservas online con el logo y los colores del negocio","Recordatorios por WhatsApp y tarjeta de fidelidad","Caja con comisiones, productos, stock y reportes"] },
@@ -968,11 +968,11 @@ render();
 (function(){
  const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
  const S=[
-  {n:'Vitrix',pc:'img/sistemas/catalogo-pc.jpg',cel:'img/sistemas/catalogo-cel.jpg',l:'demo/',es:'Catálogo digital',pt:'Catálogo digital'},
-  {n:'Guía de Santa Rita',pc:'img/sistemas/guia-pc.jpg',cel:'img/sistemas/guia-cel.jpg',l:'https://guiadesantarita.com/',es:'Portal de la ciudad',pt:'Portal da cidade'},
-  {n:'Agenda para Salones',pc:'img/sistemas/agenda-pc.jpg',cel:'img/sistemas/agenda-cel.jpg',l:'demo-agenda/',es:'Turnos y clientes',pt:'Horários e clientes'},
-  {n:'Meu Púlpito',pc:'img/sistemas/pulpito-pc.jpg',cel:'img/sistemas/pulpito-cel.jpg',l:'https://meupulpito.com',es:'Sermones y ministerio',pt:'Sermões e ministério'},
-  {n:'Caja de Entregas',pc:'img/sistemas/caja-pc.jpg',cel:'img/sistemas/caja-cel.jpg',l:'#soluciones',es:'Control de entregas',pt:'Controle de entregas'}];
+  {n:'Vitrix',pc:'img/sistemas/catalogo-pc.webp',cel:'img/sistemas/catalogo-cel.webp',l:'demo/',es:'Catálogo digital',pt:'Catálogo digital'},
+  {n:'Guía de Santa Rita',pc:'img/sistemas/guia-pc.webp',cel:'img/sistemas/guia-cel.webp',l:'https://guiadesantarita.com/',es:'Portal de la ciudad',pt:'Portal da cidade'},
+  {n:'Agenda para Salones',pc:'img/sistemas/agenda-pc.webp',cel:'img/sistemas/agenda-cel.webp',l:'demo-agenda/',es:'Turnos y clientes',pt:'Horários e clientes'},
+  {n:'Meu Púlpito',pc:'img/sistemas/pulpito-pc.webp',cel:'img/sistemas/pulpito-cel.webp',l:'https://meupulpito.com',es:'Sermones y ministerio',pt:'Sermões e ministério'},
+  {n:'Caja de Entregas',pc:'img/sistemas/caja-pc.webp',cel:'img/sistemas/caja-cel.webp',l:'#soluciones',es:'Control de entregas',pt:'Controle de entregas'}];
  const pc=document.getElementById('shPc'),cel=document.getElementById('shCel'),cap=document.getElementById('shCap'),dots=document.getElementById('shDots');
  if(!pc)return;let i=0,tm=null;const L=()=>lang==='pt'?'pt':'es';
  dots.innerHTML=S.map(x=>'<button type="button" aria-label="'+x.n+'"></button>').join('');

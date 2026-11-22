@@ -28,6 +28,8 @@ jobs:
         run: node tools/capturar_telas.js
       - name: Foto da Guía de verdade
         run: node tools/capturar_guia.js || echo 'Guía não respondeu agora; fica a foto anterior'
+      - name: Versão leve (webp) das fotos do site
+        run: pip install pillow >/dev/null 2>&1; python3 tools/telas_webp.py || echo 'sem webp desta vez'
       - name: Salvar no repositório
         run: |
           git config user.name "Araújo Tech (telas)"

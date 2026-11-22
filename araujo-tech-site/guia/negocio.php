@@ -88,7 +88,7 @@ $ini = function ($n) { $w = preg_split('/\s+/', trim($n)); $o = ''; foreach (arr
 <meta property="og:type" content="business.business"><meta property="og:title" content="<?= $e($name) ?> · Guía de Santa Rita"><meta property="og:description" content="<?= $e($desc) ?>"><meta property="og:url" content="<?= $e($url) ?>"><meta property="og:image" content="<?= $e($img) ?>"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/img/guia/favicon.png?v=2"><link rel="manifest" href="/guia/manifest.webmanifest"><link rel="apple-touch-icon" href="/guia/icon-180.png?v=3"><meta name="theme-color" content="#24093F">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
 <script type="application/ld+json"><?= str_replace('</', '<\/', json_encode($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?></script>
 <style>
 :root{--purple:#8A12D6;--deep:#4A0A80;--night:#24093F;--lilac:#F3ECFB;--ink:#1A1222;--muted:#5F566B;--line:#E4DAF0;--yellow:#FFC21A;--display:"Red Hat Display",system-ui,sans-serif;--text:"Red Hat Text",system-ui,sans-serif}

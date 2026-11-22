@@ -118,7 +118,7 @@ $back = $k === 'nota' ? $G . '#aldia' : ($k === 'vacante' ? $G . '#empleos' : ($
 <meta property="og:type" content="website"><meta property="og:site_name" content="Guía de Santa Rita"><meta property="og:title" content="<?= $e($title) ?>"><meta property="og:description" content="<?= $e($desc) ?>"><meta property="og:image" content="<?= $e($img) ?>"><meta property="og:url" content="<?= $e($self) ?>"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/img/guia/favicon.png?v=2"><meta name="theme-color" content="#24093F">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
 <?php if ($ld): ?><script type="application/ld+json"><?= $ld ?></script><?php endif; ?>
 <style>
 :root{--purple:#8A12D6;--deep:#4A0A80;--night:#24093F;--lilac:#F3ECFB;--ink:#1A1222;--muted:#5F566B;--line:#E4DAF0;--yellow:#FFC21A;--display:"Red Hat Display",system-ui,sans-serif;--text:"Red Hat Text",system-ui,sans-serif}
