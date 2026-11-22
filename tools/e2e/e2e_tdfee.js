@@ -64,6 +64,16 @@ const { info, sec, check } = L;
   await a.evaluate(() => { closeSheet(); document.querySelector('[data-act="tdtmap"]').click(); }); await a.w(500);
   const L1 = await a.evaluate(() => document.querySelector('.sheet').textContent);
   check(/Mapa 1/.test(L1) && /1 clientes/.test(L1) && /Boi TD \(noche\)/.test(L1), 'a lista mostra o Mapa 1 com o cliente que usa (e se cobra noite)');
+  const PB = await a.evaluate(() => !!document.querySelector('[data-act="tdtpush"][data-m="m1"]'));
+  check(PB, 'mapa com cliente tem o botão "Actualizar en los clientes"');
+  // mudar o preço no Mapa 1 (como o editor faz ao salvar) e ver chegar sozinho no cliente, sem copiar de novo
+  await a.evaluate(async () => { closeSheet(); await tdtOpen('m1'); const m = tdtGet('m1'); m.bairros[0].fee = 9500; BZX.save(); }); await a.w(7000);
+  const T4 = await a.evaluate(async B => { const api = await CLOUD.init(); const d = await api.getShopDoc(B); const c = JSON.parse(d.cfg); return c.store.bairros.map(b => b.name + ':' + b.fee).join(',') + '|' + (c.store.feeApproved.bairros || []).map(b => b.fee).join(','); }, B);
+  check(T4 === 'Centro TD:9500|9500', 'mudou o preço no Mapa 1: o cliente que usa o mapa recebe sozinho, já aprovado', T4);
+  await a.evaluate(async () => { const m = tdtGet('m1'); m.bairros[0].fee = 9000; await tdtSave(); closeSheet(); document.querySelector('[data-act="tdtmap"]').click(); }); await a.w(800);
+  await a.evaluate(() => document.querySelector('[data-act="tdtpush"][data-m="m1"]').click()); await a.w(4000);
+  const T5 = await a.evaluate(async B => { const api = await CLOUD.init(); const d = await api.getShopDoc(B); return JSON.parse(d.cfg).store.bairros[0].fee; }, B);
+  check(T5 === 9000, 'botão "Actualizar en los clientes" leva o mapa para quem usa', String(T5));
   await a.evaluate(() => document.querySelector('[data-act="tdtdup"][data-m="m1"]').click()); await a.w(800);
   const L2 = await a.evaluate(() => ({ maps: tdtAll().maps.map(m => m.name + ':' + (m.bairros || []).length).join(','), txt: document.querySelector('.sheet').textContent }));
   check(L2.maps === 'Mapa 1:1,Mapa 2:1' && /Mapa 2/.test(L2.txt), '"Duplicar" cria o Mapa 2 com as mesmas zonas, para mudar os preços', L2.maps);
