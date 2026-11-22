@@ -1,0 +1,23 @@
+name: diag-ck (somente leitura, abre o catálogo com GPS)
+on:
+  workflow_dispatch:
+    inputs:
+      url: { default: 'https://fogaomineiro.araujotechsistemas.com/' }
+      lat: { default: '-25.79765' }
+      lng: { default: '-55.09670' }
+jobs:
+  d:
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm i playwright@1.47.2 >/dev/null 2>&1 && npx playwright install --with-deps chromium >/dev/null 2>&1
+      - run: |
+          cat > t.js <<'N'
+          const {chromium}=require('playwright');
+          (async()=>{const b=await chromium.launch();const ctx=await b.newContext({viewport:{width:390,height:844},geolocation:{latitude:+process.env.LA,longitude:+process.env.LN},permissions:['geolocation']});const p=await ctx.newPage();
+          p.on('pageerror',e=>console.log('ERR',e.message));
+          await p.goto(process.env.U);await p.waitForTimeout(5000);
+          const r=await p.evaluate(()=>{const P=pub.products.find(x=>x.on&&x.price>0);cart=[{pid:P.id,q:1,o:{}}];ck.mode='delivery';ck.lat=+'${{ inputs.lat }}';ck.lng=+'${{ inputs.lng }}';ck.gps='ok';checkoutSheet();
+            const z=zoneAt();return JSON.stringify({zm:zmode(),z:z&&{n:z.name,f:z.fee},fee:fee(),tot:totals(),tbd:pub.store.feeTbd,fm:pub.store.feeMode,min:pub.store.minFee,orig:pub.store.feeOrigin,sb:pub.store.storeBairro,night:isNight(),free:delFree(),known:feeKnown(),coord:bairroCoord(),txt:(document.getElementById('ckTot')||{}).textContent})});
+          console.log('RES',r);await b.close()})();
+          N
+          LA='${{ inputs.lat }}' LN='${{ inputs.lng }}' U='${{ inputs.url }}' node t.js
