@@ -80,20 +80,20 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
   const R2 = await res();
   info('roto: erros=' + JSON.stringify(R2.err) + ' avisos=' + JSON.stringify(R2.warn));
   if (process.env.SHOT) { try { await a.screenshot({ path: process.env.SHOT.replace(/\.png$/, '-pc.png'), fullPage: true }); await a.setViewportSize({ width: 430, height: 900 }); await a.w(400); await a.screenshot({ path: process.env.SHOT, fullPage: true }); await a.setViewportSize({ width: 1366, height: 800 }); await a.w(300); } catch (e) { info('foto: ' + e.message); } }
-  check(has(R2.err, /WhatsApp de pedidos mal escrito/), 'WhatsApp com o 0 e sem o código do país: erro (o botão do catálogo não abriria a conversa)');
+  check(has(R2.warn, /WhatsApp de pedidos sin el código del país: 0981222333/), 'WhatsApp cadastrado com o 0 e sem o código do país: aviso com "Resolver"');
   check(has(R2.err, /Ningún día con horario/), 'nenhum dia com horário');
   check(has(R2.err, /categoría que no existe/), 'produto em categoria que não existe');
   check(has(R2.err, /código interno repetido/), 'dois produtos com o mesmo código interno');
-  check(has(R2.warn, /sin precio/) && has(R2.warn, /zona\(s\) sin precio/), 'produto sem preço e zona sem preço');
-  check(has(R2.warn, /PIX activado sin clave/), 'PIX sem chave');
+  check(has(R2.warn, /producto\(s\) sin precio/) && has(R2.info, /Las zonas no tienen precio/) && has(R2.warn, /cae en una zona sin precio/), 'produto sem preço (aviso), zonas todas sem preço (dado: entrega "a confirmar") e o ponto testado numa zona sem preço');
+  check(has(R2.info, /PIX sin la clave cargada/), 'PIX sem chave: sugestão (o catálogo avisa que o local manda a chave pelo WhatsApp)');
   check(has(R2.warn, /1 foto\(s\) que no cargan/) && has(R2.warn, /1 foto\(s\) con link "http"/) && has(R2.warn, /Sin logo/), 'fotos: acha a que não carrega, a que está em "http" e a falta do logo', JSON.stringify(R2.warn.filter(t => /foto|logo/i.test(t))));
   check(has(R2.warn, /Nadie abrió el catálogo/), 'avisa quando ninguém abriu o catálogo em 7 dias');
   check(R2.nofix.length === 0, 'todo problema ou aviso vem com a solução', JSON.stringify(R2.nofix));
   check(R2.auto === 'https,ids,orf,wa' && R2.man === 'cq0,pixoff', '"Resolver" técnico (WhatsApp, códigos, categoria, https) separado do que é decisão do dono (PIX, sem preço)', R2.auto + ' | ' + R2.man);
   check(/Solución:/.test(R2.txt) && /problema\(s\) para resolver/.test(R2.txt) && await a.evaluate(() => /\(4\)/.test((document.querySelector('#dg_out [data-act="dgfixall"]') || {}).textContent || '')), 'a tela mostra "Solución", o total de problemas e "Resolver todo (4)"');
   const TX = await a.evaluate(() => ({ t: dgText(DG.cur.s, DG.cur.R), m: dgMsg(DG.cur.s, DG.cur.R), wa: (document.getElementById('dg_wa') || {}).href || '' }));
-  check(/Diagnóstico · Local Roto/.test(TX.t) && /\[X\] WhatsApp de pedidos mal escrito/.test(TX.t) && /Solución:/.test(TX.t), '"Copiar informe" gera o texto com problemas e soluções');
-  check(/Local Roto/.test(TX.m) && /sin precio/.test(TX.m) && /PIX/.test(TX.m) && /painel\//.test(TX.m) && !/código interno/.test(TX.m) && /^https:\/\/wa\.me\/595981000002\?text=/.test(TX.wa), '"Avisar al cliente": mensagem de WhatsApp só com o que o dono precisa arrumar, com o link do painel', TX.wa.slice(0, 60));
+  check(/Diagnóstico · Local Roto/.test(TX.t) && /\[!\] WhatsApp de pedidos sin el código del país/.test(TX.t) && /Solución:/.test(TX.t), '"Copiar informe" gera o texto com problemas e soluções');
+  check(/Local Roto/.test(TX.m) && /sin precio/.test(TX.m) && /horario/.test(TX.m) && /painel\//.test(TX.m) && !/código interno/.test(TX.m) && !/PIX/.test(TX.m) && /^https:\/\/wa\.me\/595981000002\?text=/.test(TX.wa), '"Avisar al cliente": mensagem de WhatsApp só com o que o dono precisa arrumar, com o link do painel', TX.wa.slice(0, 60));
 
   sec('D. "Resolver todo": só o que é técnico; depois dá para desfazer');
   const before = (await doc(BAD)).cfg;
@@ -105,7 +105,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
   check(D1.products.some(p => p.photo === 'https://example.com/h.jpg') && !D1.products.some(p => /^http:/.test(p.photo || '')), 'link "http" da foto passou para "https" (testado antes de trocar)');
   check(D1.store.pay.pix === true && !D1.products.some(p => p.cq) && D1.products.find(p => p.n.es === 'Producto 1').price === 0, 'o que é decisão do dono (PIX, produto sem preço) não foi tocado');
   const R3 = await res();
-  check(R3.auto === '' && !has(R3.err, /WhatsApp|categoría que no existe|código interno/), 'o novo scan já não mostra os problemas corrigidos', JSON.stringify(R3.err));
+  check(R3.auto === '' && !has(R3.err.concat(R3.warn), /WhatsApp|categoría que no existe|código interno|"http"/), 'o novo scan já não mostra os problemas corrigidos', JSON.stringify(R3.err.concat(R3.warn)));
   check(await a.evaluate(() => !!document.querySelector('#dg_out [data-act="dgundo"]')), 'aparece o botão "Deshacer"');
   await a.evaluate(() => document.querySelector('#dg_out [data-act="dgundo"]').click()); await a.w(1500); await wait();
   check((await doc(BAD)).cfg === before, '"Deshacer" devolve o catálogo exatamente como estava');
@@ -185,7 +185,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
   info('todos: ' + JSON.stringify({ n: I1.n, ok: I1.ok, bad: I1.bad, sum: I1.sum }));
   if (process.env.SHOT) { try { await a.screenshot({ path: process.env.SHOT.replace(/\.png$/, '-todos.png'), fullPage: true }); await a.setViewportSize({ width: 430, height: 900 }); await a.w(400); await a.screenshot({ path: process.env.SHOT.replace(/\.png$/, '-todos-cel.png'), fullPage: true }); await a.setViewportSize({ width: 1366, height: 800 }); await a.w(300); } catch (e) { info('foto: ' + e.message); } }
   check(I1.n === 5 && I1.rows === 5, 'revisa os 5 clientes (3 catálogos e 2 de outros sistemas) e lista todos', I1.n + ' ' + I1.rows);
-  check(I1.bad.e >= 4 && I1.first === BAD, 'o cliente com problemas vem primeiro na lista', JSON.stringify(I1.bad) + ' ' + I1.first);
+  check(I1.bad.e >= 3 && I1.first === BAD, 'o cliente com problemas vem primeiro na lista', JSON.stringify(I1.bad) + ' ' + I1.first);
   check(I1.badAuto === 'ids,orf,wa' && !I1.fotos, 'a revisão rápida não baixa fotos (o conserto de "http" fica para a revisão completa)', I1.badAuto);
   check(/\(3\)/.test(I1.every) && I1.sum && I1.sum.bad >= 1 && I1.sum.n === 5, 'mostra "Resolver todo en todos (3)" e guarda o resumo da revisão', I1.every);
   await a.evaluate(() => document.querySelector('.cg-nav button[data-k="home"]').click()); await a.w(900);
@@ -195,7 +195,7 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
   check(await a.evaluate(() => ui.cgv === 'dg' && DG.mode === 'all' && document.querySelectorAll('#dg_out table.cg-t tbody tr').length === 5), 'tocar no aviso abre o Diagnóstico com a lista');
   await a.evaluate(() => document.querySelector('#dg_out [data-act="dgfixevery"]').click()); await a.w(500);
   const I3 = await a.evaluate(() => { const s = document.querySelector('.sheet[data-k="dgprev"]'); return s ? s.textContent : ''; });
-  check(/Local Roto/.test(I3) && /WhatsApp de pedidos mal escrito/.test(I3) && /código interno/.test(I3) && /Aplicar las correcciones \(3\)/.test(I3), 'antes de corrigir em todos, mostra a prévia do que vai mudar em cada cliente');
+  check(/Local Roto/.test(I3) && /WhatsApp de pedidos sin el código del país/.test(I3) && /código interno/.test(I3) && /Aplicar las correcciones \(3\)/.test(I3), 'antes de corrigir em todos, mostra a prévia do que vai mudar em cada cliente');
   check((await cfgOf(BAD)).store.whatsapp === '0981 222 333', 'nada muda antes de confirmar a prévia');
   await a.evaluate(() => document.querySelector('.sheet [data-act="dgfixeveryok"]').click()); await a.w(2500); await wait(); await a.w(1500); await wait();
   const I4 = await cfgOf(BAD);

@@ -117,7 +117,8 @@ foreach ($ids as $id) {
     $days[] = ['on' => ($d['on'] ?? true) !== false, 'a' => array_slice((array)($d['a'] ?? []), 0, 2), 'b' => array_slice((array)($d['b'] ?? []), 0, 2)];
   }
   $o = ['days' => $days, 'del' => !empty($st['delivery']), 'pick' => !empty($st['pickup']), 'paused' => !empty($st['paused'])];
-  $wa = preg_replace('/\D/', '', (string)($st['whatsapp'] ?? '')); if (strlen($wa) >= 8) $o['wa'] = $wa; // o mesmo WhatsApp público do catálogo (botão nos destaques)
+  $wa = preg_replace('/\D/', '', (string)($st['whatsapp'] ?? '')); if ($wa !== '' && $wa[0] === '0') $wa = '595' . substr($wa, 1); elseif ($wa !== '' && strpos($wa, '595') !== 0 && strlen($wa) <= 10) $wa = '595' . $wa; // número cadastrado como se disca aqui (0981…): completa o código do país, igual à página do negócio
+  if (strlen($wa) >= 8) $o['wa'] = $wa; // o mesmo WhatsApp público do catálogo (botão nos destaques)
   if (!function_exists('guia_reviews')) require_once __DIR__ . '/guia_lib.php';
   $rv = guia_reviews($id, $s); if ($rv) { $o['rt'] = $rv['avg']; $o['rn'] = $rv['n']; }
   // capa e slogan do catálogo (slider da Guía para os clientes Premium e VIP)

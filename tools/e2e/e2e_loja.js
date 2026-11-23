@@ -44,7 +44,8 @@ const VT = () => { window.TDC_VTEST = true; };
   await c.locator('[data-act=open]:visible').first().click(); await c.w(600); await c.act('addcart'); await c.act('cart');
   const ct = c.locator('.sheet button:visible', { hasText: 'Continuar' }); if (await ct.count()) { await ct.first().click(); await c.w(400); } else await c.act('checkout');
   await c.locator('[data-act=mode]:visible').nth(1).click(); await c.w(400);
-  await c.evaluate(() => { try { if (!slots(pub.store).length) { const n = new Date(); window.slots = () => [hhmm(n.getHours() * 60 + n.getMinutes() + 5)]; } } catch (e) {} });
+  // perto da hora de fechar não sobra horário de retirada para hoje: o teste usa um horário de mentira e redesenha a tela (senão o pedido falhava só de noite)
+  await c.evaluate(() => { try { if (!slots(pub.store).length) { const n = new Date(); window.slots = () => [hhmm(n.getHours() * 60 + n.getMinutes() + 5)]; checkoutSheet(); } } catch (e) {} }); await c.w(300);
   await c.fill('[data-ck=name]', 'Cliente Camino'); await c.fill('[data-ck=phone]', '0981 333 222');
   const tm = c.locator('[data-ck=time]'); if (await tm.count()) { const ov = await tm.evaluate(e => [...e.options].map(o => o.value).filter(Boolean)); if (ov.length) await tm.selectOption(ov[0]); }
   const fixed = await c.evaluate(() => { try { return openState(pub.store).open } catch (e) { return null } });
@@ -73,6 +74,10 @@ const VT = () => { window.TDC_VTEST = true; };
   check(QS.every((q, i) => oc[i][0] === q[2]), 'catálogo: local que fecha às 02:00 continua aberto depois da meia-noite (e fecha às 02:00); quem fecha à meia-noite fecha à meia-noite', JSON.stringify(QS.map((q, i) => q[0] + ' ' + q[1].slice(5) + '=' + oc[i][0])));
   check(oc[2][1] === 120 && oc[2][2] === 90, 'à 00:30 o catálogo sabe que fecha às 02:00 (faltam 90 minutos)', JSON.stringify(oc[2]));
   check(QS.every((q, i) => oc[i][0] === og[i]), 'o catálogo e a Guía concordam em todos os horários testados');
+  sec('F. WhatsApp do local cadastrado como se disca (0981…): os links saem com o código do país');
+  const wsr = await c.evaluate(() => { const r = [waStore('0981 100 711'), waStore('981100711'), waStore('595981100711'), waStore('595 0981 100711'), waStore('5493764123456'), waStore('+55 45 99999-0000'), waStore('0673 220 470'), waStore('')]; const old = pub.store.whatsapp; pub.store.whatsapp = '0981 100 711'; render(); const fab = (document.querySelector('.wafab') || {}).href || ''; pub.store.whatsapp = old; render(); return { r, fab }; });
+  check(wsr.r.join() === '595981100711,595981100711,595981100711,595981100711,5493764123456,5545999990000,595673220470,', 'número local ganha o 595; número já completo (Paraguai, Brasil, Argentina) fica como está', wsr.r.join());
+  check(/^https:\/\/wa\.me\/595981100711\?text=/.test(wsr.fab), 'o botão de WhatsApp do catálogo abre a conversa com o número completo', wsr.fab.slice(0, 50));
   check(!c.errs.length && !g.errs.length, 'sem erros de JavaScript', c.errs.concat(g.errs).join(' | '));
   await L.done();
 })().catch(e => { L.bad("exceção: " + (e && e.stack || e)); L.done(); });
