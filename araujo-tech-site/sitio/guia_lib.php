@@ -278,9 +278,38 @@ function guia_notas($full = false) {
 }
 
 // Notícias do parceiro: lê o feed RSS configurado no painel (só manchete, foto e link para ler no site deles). Cache de 30 minutos.
+// Notícias automáticas: busca no Google Notícias matérias que citam Santa Rita (Alto Paraná) e mostra só o título, o nome do jornal,
+// a data e o link para ler no site do jornal (não copia texto nem foto). Cache de 1 hora; se a busca falhar, fica a última lista boa.
+function guia_auto_news() {
+  $cache = sys_get_temp_dir() . '/at_news_auto1.json';
+  if (is_file($cache) && time() - filemtime($cache) < 3600) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
+  $q = rawurlencode('"Santa Rita" "Alto Paraná" when:30d');
+  $r = at_get('https://news.google.com/rss/search?q=' . $q . '&hl=es-419&gl=PY&ceid=PY:es-419');
+  $items = []; $seen = [];
+  if ($r && function_exists('simplexml_load_string')) {
+    $x = @simplexml_load_string($r, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NONET);
+    if ($x && isset($x->channel->item)) {
+      foreach ($x->channel->item as $it) {
+        if (count($items) >= 8) break;
+        $src = trim((string)$it->source); $t = trim(html_entity_decode(strip_tags((string)$it->title), ENT_QUOTES, 'UTF-8'));
+        if ($src !== '' && mb_substr($t, -mb_strlen(' - ' . $src)) === ' - ' . $src) $t = trim(mb_substr($t, 0, -mb_strlen(' - ' . $src)));
+        $l = (string)$it->link;
+        if (mb_strlen($t) < 12 || !preg_match('#^https://[^\s"\'<>]+$#i', $l)) continue;
+        $k = mb_strtolower(preg_replace('/\W+/u', '', $t)); if (isset($seen[$k])) continue; $seen[$k] = 1;   // a mesma matéria em vários jornais: fica uma
+        $ts = strtotime((string)$it->pubDate);
+        $items[] = ['t' => mb_substr($t, 0, 140), 'u' => $l, 'img' => '', 'd' => $ts ? date('Y-m-d', $ts) : '', 's' => mb_substr($src, 0, 40)];
+      }
+    }
+  }
+  if ($items) @file_put_contents($cache, json_encode($items, JSON_UNESCAPED_UNICODE));
+  elseif (is_file($cache)) { @touch($cache, time() - 3000); $items = json_decode((string)@file_get_contents($cache), true) ?: []; }   // falhou: usa a última lista e tenta de novo em 10 min
+  return $items;
+}
+
 function guia_news() {
   $cfg = guia_doc()['gnews'] ?? null;
-  if (!is_array($cfg) || empty($cfg['on'])) return ['items' => []];
+  // sem parceiro ligado: mostra as notícias automáticas (podem ser desligadas com gnews.auto = false)
+  if (!is_array($cfg) || empty($cfg['on'])) return (is_array($cfg) && ($cfg['auto'] ?? true) === false) ? ['items' => []] : ['auto' => 1, 'items' => guia_auto_news()];
   $name = (string)($cfg['n'] ?? ''); $site = preg_match('#^https://[^\s"\'<>]+$#i', (string)($cfg['site'] ?? '')) ? (string)$cfg['site'] : '';
   // notícias cadastradas à mão no painel (parceiro que só publica no Instagram): saem primeiro, a mais nova em cima
   $man = [];
@@ -319,7 +348,9 @@ function guia_news() {
   }
   if ($items || !is_file($cache)) @file_put_contents($cache, json_encode($items));
   elseif (is_file($cache)) { $items = json_decode((string)@file_get_contents($cache), true) ?: []; }
-  return ['n' => $name, 'site' => $site, 'items' => array_slice(array_merge($man, $items), 0, 8)];
+  $all = array_merge($man, $items);
+  if (count($all) < 4 && ($cfg['auto'] ?? true) !== false) $all = array_merge($all, guia_auto_news());   // parceiro com poucas notícias: completa com as automáticas
+  return ['n' => $name, 'site' => $site, 'items' => array_slice($all, 0, 8)];
 }
 
 // Clientes publicados pelo Panel Araújo Tech (platform/sitio → clientes), só catálogos. Cache de 10 minutos.
