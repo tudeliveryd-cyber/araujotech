@@ -313,7 +313,7 @@ function guia_auto_news() {
 // tira os anúncios pagos (posts com telefone, preço ou chamada de venda). Cache de 1 hora; se falhar, fica a última lista boa.
 const GUIA_SRV = 'https://santaritavision.paracapcut2026usuario.workers.dev/api/';
 function guia_srv_news() {
-  $cache = sys_get_temp_dir() . '/at_news_srv1.json';
+  $cache = sys_get_temp_dir() . '/at_news_srv2.json';
   if (is_file($cache) && time() - filemtime($cache) < 3600) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
   $items = []; $seen = [];
   foreach (['facebook-news', 'regional-news'] as $ep) {
