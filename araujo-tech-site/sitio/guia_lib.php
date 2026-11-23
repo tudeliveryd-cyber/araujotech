@@ -153,7 +153,7 @@ function guia_pub() {
   if (is_array($d['gutil'] ?? null)) {
     $util = [];
     foreach ($d['gutil'] as $x) {
-      if (!is_array($x) || trim((string)($x['n'] ?? '')) === '') continue;
+      if (!is_array($x) || trim((string)($x['n'] ?? '')) === '' || !empty($x['of'])) continue; // 23/11 (Jean): lugar desativado não aparece
       $m = (string)($x['map'] ?? ''); if (!preg_match('#^https://[^\s"\'<>]+$#i', $m)) $m = '';
       $vsx = in_array($x['vs'] ?? '', ['ver', 'pend', 'tmp', 'cer', 'fue'], true) ? $x['vs'] : '';
       $util[] = (in_array($vsx, ['cer', 'fue'], true) ? ['off' => 1] : []) + ($vsx === 'tmp' ? ['tc' => 1] : []) + ($vsx === 'ver' ? ['vs' => 'ver', 'vd' => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($x['vd'] ?? '')) ? $x['vd'] : ''] : []) + ['c' => preg_match('/^[a-z][a-z0-9]{0,15}$/', (string)($x['c'] ?? '')) ? (string)$x['c'] : 'gob', 'n' => (string)$x['n'], 'a' => (string)($x['a'] ?? ''), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'h' => (string)($x['h'] ?? ''), 'map' => $m, 'o' => empty($x['o']) ? 0 : 1];
@@ -203,7 +203,7 @@ function guia_pub() {
     $g = (string)($x['g'] ?? 'serv'); if (!in_array($g, $negk, true)) $g = 'serv';
     $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'sub' => preg_match('/^[a-z][a-z0-9]{0,15}$/', (string)($x['sub'] ?? '')) ? (string)$x['sub'] : '', 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'td' => !empty($x['td']), 'dy' => guia_dy($x['dy'] ?? null), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : '', 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&k=ph&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
     { $li = count($dir) - 1; if (!empty($x['pr'])) $dir[$li]['pr'] = 1; if (($x['vs'] ?? '') === 'tmp') { $dir[$li]['tc'] = 1; $dir[$li]['dy'] = null; } // cerrado temporalmente
-      if (empty($dir[$li]['td']) && empty($x['pr'])) { array_pop($dir); continue; } } // 20/11 (Jean): negócio comercial sem plano ativo (Premium) nem Aliado Tu Delivery não aparece; a ficha continua guardada no painel e volta ao ativar
+      if (empty($dir[$li]['td']) && empty($x['pr']) && empty($x['qk'])) { array_pop($dir); continue; } } // 23/11 (Jean): ficha do cadastro rápido (qk) aparece mesmo sem plano // 20/11 (Jean): negócio comercial sem plano ativo (Premium) nem Aliado Tu Delivery não aparece; a ficha continua guardada no painel e volta ao ativar
     if (count($dir) >= 300) break;
   }
   foreach ($acc['fichas'] as $x) { // negócios e profissionais com conta própria (aprovados pela Guía depois do pagamento)
