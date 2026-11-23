@@ -17,7 +17,11 @@ const { info, sec, check } = L;
   await put(BAD, { store: { name: 'Local Roto', whatsapp: '', delivery: true, pickup: false, pay: { pix: true }, pixKey: '', days: days(false), feeMode: 'bairro', bairros: [{ name: '', fee: null, zone: sq(-25.79, -55.09, 0.01) }] }, zones: [], cats: [{ id: 'c1', n: { es: 'Comidas', pt: 'Comidas' } }], products: [prod(1, { price: 0 }), prod(2, { cat: 'noexiste' })] });
 
   sec('A. Abrir o Diagnóstico e achar o cliente pelo link');
-  check(await a.evaluate(() => !!document.querySelector('[data-act="dgopen"]')), 'a Central tem o botão "Diagnóstico"');
+  await a.evaluate(() => document.querySelector('.cg-nav button').click()); await a.w(1200);
+  check(await a.evaluate(() => [...document.querySelectorAll('.cg-sc [data-act="dgopen"]')].filter(b => b.offsetParent !== null).length >= 2), 'a Central (tela Visão geral) mostra o botão "Diagnóstico" visível: no cartão da Guía e nos atalhos', await a.evaluate(() => [...document.querySelectorAll('[data-act="dgopen"]')].map(b=>b.parentNode.className+':'+(b.offsetParent!==null)).join() + ' sc=' + [...document.querySelectorAll('.cg-sc')].map(x=>x.children.length).join() + ' gu=' + !!document.querySelector('.cg-gu') + ' | ' + !!document.querySelector('.cg-nav') + ' ' + !!document.querySelector('.ahead') + ' ' + [...document.querySelectorAll('.cg-nav [aria-current]')].map(x=>x.textContent).join() + ' ' + location.href));
+  await a.evaluate(id => cgFicha(id), OK); await a.w(500);
+  check(await a.evaluate(id => !!document.querySelector(`.sheet [data-act="dgpick"][data-id="${id}"]`), OK), 'a ficha do cliente também tem o botão "Diagnóstico"');
+  await a.evaluate(() => closeSheet()); await a.w(300);
   const F = await a.evaluate(({ OK, BAD }) => ({ sub: (dgFind('https://' + OK + '.araujotechsistemas.com/') || {}).id, guia: (dgFind('guiadesantarita.com/' + BAD) || {}).id, nome: (dgFind('local roto') || {}).id, loja: (dgFind('https://araujotechsistemas.com/loja/' + OK + '/') || {}).id, nada: dgFind('https://example.com/xyz123') }), { OK, BAD });
   check(F.sub === OK && F.guia === BAD && F.nome === BAD && F.loja === OK && F.nada === null, 'acha o cliente pelo subdomínio, pelo link da Guía, por /loja/ e pelo nome; link desconhecido não acha ninguém', JSON.stringify(F));
   await a.act('dgopen'); await a.w(400);
