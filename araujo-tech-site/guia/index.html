@@ -317,7 +317,7 @@ footer .allies{justify-content:flex-start;padding:24px 0 14px;border-bottom:1px 
 .fc-a{display:block;text-decoration:none;color:var(--ink)}
 .fc-cv{position:relative;display:block;aspect-ratio:16/8.5;background:linear-gradient(135deg,#EFE4FB,#F8F3FD)}.fc-cv img{width:100%;height:100%;object-fit:cover;display:block}
 .fc-tg{position:absolute;top:10px;left:10px;display:inline-flex;align-items:center;gap:4px;background:var(--yellow);color:var(--night);font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}.fc-tg svg{width:12px;height:12px}.fc-tg.td{background:#4A0A80;color:#fff}
-.fc-b{display:flex;align-items:center;gap:10px;padding:10px 56px 12px 12px;min-height:66px}
+.fc-b{display:flex;align-items:center;gap:10px;padding:10px 56px 12px 12px;min-height:66px}.fc:not(:has(.fc-wa)) .fc-b{padding-right:12px}/* cartão sem botão de WhatsApp: o nome usa a largura toda */
 .fc-lg{width:44px;height:44px;border-radius:50%;flex:none;overflow:hidden;border:1px solid var(--line2);background:#fff;display:grid;place-items:center}.fc-lg img{width:100%;height:100%;object-fit:cover}.fc-lg b{font-family:var(--display);color:var(--purple)}
 .fc-t{min-width:0;display:flex;flex-direction:column;gap:1px}.fc-t b{font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fc-t small{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fc-t em{font-style:normal;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:3px}.fc-t em svg{width:13px;height:13px;color:#F5A800;fill:#F5A800}.fc-t em small{font-weight:500}
@@ -772,7 +772,7 @@ body.home .fd.rc .fr{display:grid!important;grid-template-columns:repeat(4,minma
 body.home .fd.rc .fc{max-width:none!important;flex:none!important;min-width:0}
 @media (max-width:899px){body.home .fd.rc .fr{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory;gap:10px;margin:0 -16px!important;padding:2px 16px 10px!important;scroll-padding-left:16px}
  body.home .fd.rc .fc{flex:0 0 43%!important;scroll-snap-align:start}
- body.home .fd.rc .fc-b{padding:8px 46px 10px 10px;min-height:56px}
+ body.home .fd.rc .fc-b{padding:8px 46px 10px 10px;min-height:56px}body.home .fd.rc .fc:not(:has(.fc-wa)) .fc-b{padding-right:10px}
  body.home .fd.rc .fc-t b{font-size:13.5px;line-height:1.25!important;display:block!important;-webkit-line-clamp:unset}
  body.home .fd.rc .fc-t b .vf{vertical-align:-2px}
  body.home .fd.rc .fc-t small{font-size:11.5px}
@@ -873,7 +873,7 @@ footer .ft-cols>div:nth-child(3){grid-column:auto}
 body.home .fd.rc h2{white-space:nowrap}body.home #atl .qca>h2{position:relative;padding-bottom:7px;display:flex;align-items:center;gap:10px}body.home #atl .qca>h2::after{content:"";position:absolute;left:0;bottom:0;width:44px;height:4px;border-radius:4px;background:var(--purple)}body.home .fd h2{position:relative;padding-bottom:7px}body.home .fd h2::after{content:"";position:absolute;left:0;bottom:0;width:44px;height:4px;border-radius:4px;background:var(--purple)}
 /* "¿Qué comer ahora?": título à esquerda e do tamanho dos outros títulos também no computador (os botões de horário continuam no centro) */
 body.home #atl .qca>h2{justify-content:flex-start;text-align:left}
-@media (min-width:900px){body.home #atl .qca>h2{font-size:26px;line-height:1.15}}
+@media (min-width:900px){body.home #atl .qca{margin-top:30px}body.home #atl .qca>h2{font-size:26px;line-height:1.15}}
 body.home .uh,body.home #atl .tiles .uh{text-transform:none;letter-spacing:0;font-family:var(--display);font-size:16px;font-weight:800;color:var(--deep)}
 /* acabamento do início: clima com ícone de fundo; ícones das categorias todos no lilás da marca */
 .ic-w{position:relative;overflow:hidden}.ic-w>*{position:relative}.ic-w .ic-bg{position:absolute;right:-18px;bottom:-22px;line-height:0;pointer-events:none}.ic-w .ic-bg svg{width:128px;height:128px;color:#F0E7FA;stroke-width:1.4}

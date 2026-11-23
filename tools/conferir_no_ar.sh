@@ -28,6 +28,8 @@ https://araujotechsistemas.com/|id="soluciones"
 https://araujotechsistemas.com/vitrix/|demo-autos
 https://araujotechsistemas.com/catalogo-digital/|vitrix
 https://araujotechsistemas.com/img/vitrix/vitrix-blanco.png|
+https://nauticabrustolin.araujotechsistemas.com/img/vitrix/vitrix-blanco-nombre.png|
+https://nauticabrustolin.araujotechsistemas.com/img/logo-completo-blanco.png|
 https://araujotechsistemas.com/trabaja/|
 https://araujotechsistemas.com/demo/|vxMark
 https://araujotechsistemas.com/demo-farmacia/|q_none
