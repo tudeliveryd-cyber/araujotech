@@ -47,6 +47,14 @@ const { chromium, devices } = require('playwright');
   await p.bringToFront();
   console.log('ROLAR ' + JSON.stringify(await medir('8. esta janela trazida para a frente')));
   await ctx2.close();
+  // 9. menú "Más": "Santa Rita útil" pela primeira e pela segunda vez (com a central já aberta, o toque não fazia nada)
+  const menu = await p.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const r = {};
+    const ate = async id => { let ok = false; for (let k = 0; k < 30 && !ok; k++) { await W(100); const c = document.getElementById(id); ok = !!c && Math.abs(c.getBoundingClientRect().top - 76) < 60; } return ok; };
+    UFULL = false; goHome(); render(); window.scrollTo(0, 0); await W(700);
+    document.querySelector('#bnav [data-b="more"]').click(); await W(300); document.querySelector('#more [data-go="util"]').click(); r.primeira = await ate('util'); r.y1 = Math.round(scrollY);
+    window.scrollTo(0, 0); await W(700); r.centralAberta = UFULL;
+    document.querySelector('#bnav [data-b="more"]').click(); await W(300); document.querySelector('#more [data-go="util"]').click(); r.segunda = await ate('util'); r.y2 = Math.round(scrollY); r.menuFechado = document.getElementById('more').hidden; return r; });
+  console.log('ROLAR ' + JSON.stringify(Object.assign({ nome: '9. menú: Santa Rita útil duas vezes' }, menu)));
   console.log('ERROS ' + (errs.join(' | ') || 'nenhum'));
   await b.close();
 })().catch(e => { console.log('FALHA ' + (e && e.stack || e)); process.exit(1); });
