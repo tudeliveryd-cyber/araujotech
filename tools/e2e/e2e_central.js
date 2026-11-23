@@ -1,4 +1,4 @@
-// Central de Gestão (Panel Araújo Tech): menu com 12 módulos, números reais, busca geral, pagamentos com confirmação,
+// Central de Gestão (Panel Araújo Tech): menu com 13 módulos (com o Diagnóstico), números reais, busca geral, pagamentos com confirmação,
 // registro de atividades, despesas, hospedagens, suporte, sistemas, exportação e versão de celular.
 const L = require('./lib'); const P = 'araujotech-catalogos';
 const { sec, check, info } = L;
@@ -21,7 +21,7 @@ const { sec, check, info } = L;
 
   sec('A. Casca e visão geral');
   const h = await a.evaluate(() => ({ cgm: document.body.classList.contains('cgm'), top: getComputedStyle(document.getElementById('top')).display, nav: [...document.querySelectorAll('.cg-nav button')].map(b => b.dataset.k), kp: [...document.querySelectorAll('.cg-kpis .cg-k b')].map(b => b.textContent), real: (() => { const sh = PL.shops; return [sh.length, sh.filter(s => s.status !== 'suspenso').length, sh.filter(s => s.status === 'suspenso').length]; })() }));
-  check(h.cgm && h.top === 'none' && h.nav.join(',') === 'home,cli,sis,pla,sub,fin,dom,sup,rep,usr,sec,cfg', 'Central abre com menu lateral de 12 módulos');
+  check(h.cgm && h.top === 'none' && h.nav.join(',') === 'home,cli,dg,sis,pla,sub,fin,dom,sup,rep,usr,sec,cfg', 'Central abre com menu lateral de 13 módulos (com o Diagnóstico)');
   check(+h.kp[0] === h.real[0] && +h.kp[1] === h.real[1] && +h.kp[2] === h.real[2], 'números da visão geral = dados reais (' + h.kp.slice(0, 3).join('/') + ')');
   const rev = await a.evaluate(() => { const m = new Date().toISOString().slice(0, 7); return PL.shops.reduce((t, s) => t + (s.pays || []).filter(p => String(p.date).slice(0, 7) === m).reduce((x, p) => x + (+p.v || 0), 0), 0); });
   check(h.kp[4] === 'Gs. ' + rev.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'), 'cobrado no mês = soma dos pagamentos registrados');
@@ -166,7 +166,7 @@ const { sec, check, info } = L;
   check(r.side === 'none' && r.bn === 'grid' && r.sw <= r.cw, 'celular: menu de baixo, sem menu lateral, sem rolagem para o lado (' + r.sw + ')');
   for (const k of ['cli', 'fin', 'home']) { await m.click(`.cg-bnav button[data-k="${k}"]`); await m.w(300); check(await m.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), 'celular: ' + k + ' sem cortes'); }
   await m.click('.cg-bnav [data-act="cgmore"]'); await m.w(300);
-  check(await m.locator('.cg-morel button').count() === 12, '"Más" mostra os 12 módulos');
+  check(await m.locator('.cg-morel button').count() === 13 && await m.locator('.cg-morel button[data-k="dg"]').count() === 1, '"Más" mostra os 13 módulos, com o Diagnóstico');
   await m.click('.cg-morel button[data-k="sup"]'); await m.w(400);
   check(/Cambiar logo/.test(await m.txt('.cg-body')), 'celular vê os mesmos dados (atendimento)');
   check(m.errs.length === 0, 'sem erros de JavaScript no celular', m.errs.join(' | '));
