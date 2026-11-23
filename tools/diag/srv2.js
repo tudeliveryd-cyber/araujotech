@@ -4,5 +4,5 @@
   for (const u of srcs) { const t = await (await fetch(u)).text(); console.log('SCRIPT ' + u + ' ' + t.length);
     for (const m of t.matchAll(/fetch\(([^)]{0,200})\)/g)) console.log('  FETCH ' + m[1]);
     for (const m of t.matchAll(/["'`](\/[a-z0-9_\-\/.]*(?:api|noticias|news|posts|feed)[a-z0-9_\-\/.?=&]*)["'`]/gi)) console.log('  PATH ' + m[1]); }
-  for (const p of ['/api/noticias', '/api/news', '/noticias.json', '/news.json', '/api/posts', '/feed', '/rss', '/noticias']) { try { const r = await fetch(new URL(p, base)); const t = await r.text(); console.log('TRY ' + p + ' ' + r.status + ' ' + (r.headers.get('content-type') || '') + ' ' + t.slice(0, 300).replace(/\s+/g, ' ')); } catch (e) { console.log('TRY ' + p + ' erro'); } }
+  for (const p of ['/api/facebook-news', '/api/regional-news', '/api/noticias', '/api/news', '/noticias.json', '/news.json', '/api/posts', '/feed', '/rss', '/noticias']) { try { const r = await fetch(new URL(p, base)); const t = await r.text(); console.log('TRY ' + p + ' ' + r.status + ' ' + (r.headers.get('content-type') || '') + ' ' + t.slice(0, 1500).replace(/\s+/g, ' ')); } catch (e) { console.log('TRY ' + p + ' erro'); } }
 })();
