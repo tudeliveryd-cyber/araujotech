@@ -53,6 +53,15 @@ function cat_meta($html, $s, $host) {
     $meta .= "<link rel=\"icon\" type=\"image/png\" sizes=\"64x64\" href=\"/favicon.png?v={$v}\">\n<link rel=\"icon\" type=\"image/png\" sizes=\"192x192\" href=\"/icon-192.png?v={$v}\">\n<link rel=\"apple-touch-icon\" href=\"/apple-touch-icon.png?v={$v}\">\n";
   }
   $html = preg_replace('#<meta name="apple-mobile-web-app-title" content="[^"]*">#', '<meta name="apple-mobile-web-app-title" content="' . $e($s['name']) . '">', $html, 1);
+  // Loja de verdade, ativa e com produtos para mostrar: o Google pode listar (endereço oficial = o subdomínio).
+  // O catálogo genérico (endereço que não é de nenhuma loja) e a loja ainda vazia continuam fora do Google.
+  $c = json_decode((string)($s['cfg'] ?? ''), true);
+  $np = 0;
+  if (is_array($c)) foreach ((array)($c['products'] ?? []) as $p) if (is_array($p) && ($p['on'] ?? true) !== false) $np++;
+  if ($np > 0 || (is_array($c) && !empty($c['big']))) {
+    $html = preg_replace('#<meta name="robots" content="noindex">\s*#', '', $html, 1);
+    $meta .= "<link rel=\"canonical\" href=\"{$e($url)}\">\n";
+  }
   return preg_replace('#<title>[^<]*</title>#', $meta, $html, 1);
 }
 
