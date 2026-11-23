@@ -297,10 +297,12 @@ function guia_auto_news() {
         if (mb_strlen($t) < 12 || !preg_match('#^https://[^\s"\'<>]+$#i', $l)) continue;
         $k = mb_strtolower(preg_replace('/\W+/u', '', $t)); if (isset($seen[$k])) continue; $seen[$k] = 1;   // a mesma matéria em vários jornais: fica uma
         $ts = strtotime((string)$it->pubDate);
+        if (preg_match('#^(https?://)?(www\.)?([^/]+)/?$#i', $src, $m) && strpos($src, '.') !== false) $src = $m[3];   // jornal sem nome: fica o endereço curto (latribuna.com.py)
         $items[] = ['t' => mb_substr($t, 0, 140), 'u' => $l, 'img' => '', 'd' => $ts ? date('Y-m-d', $ts) : '', 's' => mb_substr($src, 0, 40)];
       }
     }
   }
+  usort($items, function ($a, $b) { return strcmp($b['d'], $a['d']); });   // a mais nova primeiro
   if ($items) @file_put_contents($cache, json_encode($items, JSON_UNESCAPED_UNICODE));
   elseif (is_file($cache)) { @touch($cache, time() - 3000); $items = json_decode((string)@file_get_contents($cache), true) ?: []; }   // falhou: usa a última lista e tenta de novo em 10 min
   return $items;
