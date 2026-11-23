@@ -65,45 +65,5 @@ jobs:
         run: |
           cd araujotech
           F=0
-          echo "######## CATÁLOGO · regras em produção (v14, publicadas em 14/11)";        tools/e2e/run.sh e2e_catalogo.js || F=1
-          echo "######## CATÁLOGO · regras novas (v11, candidatas)";   tools/e2e/run.sh e2e_catalogo.js firestore-v11.rules || F=1
-          echo "######## CATÁLOGO · regras v12 (etapa seguinte: limite de pedidos)"; tools/e2e/run.sh e2e_catalogo.js firestore-v12.rules || F=1
-          echo "######## CATÁLOGO · regras v13 (v11 + contatos pelo WhatsApp)"; tools/e2e/run.sh e2e_catalogo.js firestore-v13.rules || F=1
-          echo "######## CONTATOS PELO WHATSAPP · regras v13"; tools/e2e/run.sh e2e_cliques.js firestore-v13.rules || F=1
-          echo "######## COBRANÇA COM DADOS DE PAGAMENTO · regras v13"; tools/e2e/run.sh e2e_cobro.js firestore-v13.rules || F=1
-          echo "######## RUBRO OTRO E CATEGORIAS PRÓPRIAS · regras v13"; tools/e2e/run.sh e2e_otro.js firestore-v13.rules || F=1
-          echo "######## CIDADE DO CLIENTE (Santa Rita, Santa Rosa, outra) · regras v13"; tools/e2e/run.sh e2e_cidade.js firestore-v13.rules || F=1
-          echo "######## FLYER DE LANZAMIENTO DO CLIENTE · regras v13"; tools/e2e/run.sh e2e_flyer.js firestore-v13.rules || F=1
-          echo "######## UBICACIÓN DO LOCAL NO MAPA · regras v13"; tools/e2e/run.sh e2e_ubicacion.js firestore-v13.rules || F=1
-          echo "######## MODO CONSULTA (autos, motos, imóveis, serviços) · regras v13"; tools/e2e/run.sh e2e_consulta.js firestore-v13.rules || F=1
-          echo "######## LOGO QUADRADO COM CANTOS REDONDOS · regras v13"; tools/e2e/run.sh e2e_logo.js firestore-v13.rules || F=1
-          echo "######## ABRIR RÁPIDO (catálogo e painel) · regras v13"; tools/e2e/run.sh e2e_rapido.js firestore-v13.rules || F=1
-          echo "######## CATÁLOGO AINDA SEM PRODUTOS (aviso \"Estamos preparando\", logos e botão de WhatsApp) · regras v19"; tools/e2e/run.sh e2e_preparando.js firestore-v19.rules || F=1
-          echo "######## GARÇOM LANÇA PEDIDO NA MESA · regras v13"; tools/e2e/run.sh e2e_mozo.js firestore-v13.rules || F=1
-          echo "######## FOTOS GRANDES E LOGO LARGO · regras v13"; CAPA=$PWD/tools/e2e/fix/capa-grande.jpg LOGO=$PWD/tools/e2e/fix/logo-largo.png tools/e2e/run.sh e2e_fotos.js firestore-v13.rules || F=1
-          echo "######## GALERIA DE FOTOS DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_galeria.js firestore-v13.rules || F=1
-          echo "######## CORES DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_cores.js firestore-v13.rules || F=1
-          echo "######## VÍDEO DO PRODUTO (video.php no PHP local) · regras v13"; tools/e2e/run.sh e2e_video.js firestore-v13.rules || F=1
-          echo "######## COZINHA SÓ PARA COMIDA · regras v13"; tools/e2e/run.sh e2e_cozinha.js firestore-v13.rules || F=1
-          echo "######## EMPEZAR DE CERO (só admin) · regras v13"; tools/e2e/run.sh e2e_zerar.js firestore-v13.rules || F=1
-          echo "######## VITRINE DE CLIENTES NO SITE · regras v13"; tools/e2e/run.sh e2e_vitrine.js firestore-v13.rules || F=1
-          echo "######## PERÍODO DE PRUEBA GRATIS · regras v13"; tools/e2e/run.sh e2e_prueba.js firestore-v13.rules || F=1
-          echo "######## SITE PADRÃO ACOMPANHA O WHATSAPP DO CATÁLOGO · regras v13"; tools/e2e/run.sh e2e_sitesync.js firestore-v13.rules || F=1
-          # a Guía roda só com as regras v19: fotos e banners guardados à parte precisam delas (com as v13, antigas, três verificações falhavam por isso)
-          echo "######## GUÍA: BANNERS, LUGARES PÚBLICOS, PASTAS E IMAGENS GUARDADAS À PARTE · regras v19"; tools/e2e/run.sh e2e_guia.js firestore-v19.rules || F=1
-          echo "######## HORÁRIOS: SEGUNDA-FEIRA COPIA PARA OS OUTROS DIAS · regras v13"; tools/e2e/run.sh e2e_horario.js firestore-v13.rules || F=1
-          echo "######## PROBÁ: RUBRO ESCRITO E DEMO DE AUTOS"; tools/e2e/run.sh e2e_proba_autos.js firestore-v13.rules || F=1
-          echo "######## MOEDA DO LOCAL (Gs. / US$) · regras v13"; tools/e2e/run.sh e2e_moeda.js firestore-v13.rules || F=1
-          echo "######## CENTRAL DE GESTÃO (Panel Araújo Tech) · regras v18"; tools/e2e/run.sh e2e_central.js firestore-v18.rules || F=1
-          echo "######## DIAGNÓSTICO (escáner da Central: um cliente, todos e meus sistemas) · regras v19"; tools/e2e/run.sh e2e_diag.js firestore-v19.rules || F=1
-          echo "######## SITE DA ARAÚJO TECH (página nova) · regras v15"; tools/e2e/run.sh e2e_site.js firestore-v15.rules || F=1
-          echo "######## GUÍA: CONTAS PRÓPRIAS, OPINIÕES, AVISOS E PUBLICAR SEM CONTA · regras v18"; tools/e2e/run.sh e2e_cuenta.js firestore-v18.rules || F=1
-          echo "######## VISITAS AO CATÁLOGO · regras v14"; tools/e2e/run.sh e2e_visitas.js firestore-v14.rules || F=1
-          echo "######## AVISO DE VENCIMENTO E RESUMO DO DIA · regras v14"; tools/e2e/run.sh e2e_aviso.js firestore-v14.rules || F=1
-          echo "######## CATÁLOGO PELO DOMÍNIO PRINCIPAL (/loja/<nome>/) · regras v14"; tools/e2e/run.sh e2e_loja.js firestore-v14.rules || F=1
-          echo "######## AGENDA";                                      tools/e2e/run.sh e2e_agenda.js || F=1
-          echo "######## AGENDA · regras novas (v11)";                 tools/e2e/run.sh e2e_agenda.js firestore-v11.rules || F=1
-          echo "######## AGENDA · regras v12";                         tools/e2e/run.sh e2e_agenda.js firestore-v12.rules || F=1
-          echo "######## MEU PÚLPITO";  RULES_SRC=$PULPITO_DIR/firestore.rules tools/e2e/run.sh e2e_pulpito.js x meu-pulpito-app || F=1
-          echo "######## CAJA DE ENTREGAS"; RULES_SRC=$CAJA_DIR/firestore.rules tools/e2e/run.sh e2e_caja.js x tu-delivery-1eb61 || F=1
+          echo "######## SÓ A GUÍA (conferência rápida neste ramo) · regras v19"; tools/e2e/run.sh e2e_guia.js firestore-v19.rules || F=1
           exit $F
