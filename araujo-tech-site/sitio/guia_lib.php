@@ -335,7 +335,7 @@ function guia_srv_news() {
       $k = mb_strtolower(preg_replace('/\W+/u', '', $t)); if (isset($seen[$k])) continue; $seen[$k] = 1;
       $img = (string)($x['full_picture'] ?? ''); if (!preg_match('#^https://[a-z0-9.\-]+\.fbcdn\.net/[^\s"\'<>]+$#i', $img)) $img = '';
       $ts = strtotime((string)($x['created_time'] ?? ''));
-      $items[] = ['t' => mb_substr($t, 0, 140), 'u' => $u, 'img' => $img, 'd' => $ts ? (new DateTime('@' . $ts))->setTimezone(new DateTimeZone('America/Asuncion'))->format('Y-m-d') : '', 's' => mb_substr(trim((string)($x['page_name'] ?? 'Santa Rita Visión')), 0, 40), 'ts' => $ts];
+      $items[] = ['t' => mb_substr($t, 0, 140), 'u' => $u, 'img' => $img, 'd' => $ts ? (new DateTime('@' . $ts))->setTimezone(new DateTimeZone('America/Asuncion'))->format('Y-m-d') : '', 's' => mb_substr(trim((string)($x['page_name'] ?? 'Santa Rita Visión')), 0, 40), 'ts' => $ts, 'x' => mb_substr(trim(preg_replace('/\n{3,}/', "\n\n", str_replace("\r", '', $msg))), 0, 3000)];   // texto do post (autorizado pelo parceiro): a Guía mostra a notícia completa
     }
   }
   usort($items, function ($a, $b) { return $b['ts'] <=> $a['ts']; });
