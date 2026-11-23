@@ -308,10 +308,49 @@ function guia_auto_news() {
   return $items;
 }
 
+// Parceiro: Grupo Santa Rita Visión (autorizado pelo dono em 23/11/2026). O site deles entrega as publicações do Facebook
+// (Santa Rita Visión Noticias e Regional News). Mostra a primeira linha como título, a foto, a data e o link para o Facebook;
+// tira os anúncios pagos (posts com telefone, preço ou chamada de venda). Cache de 1 hora; se falhar, fica a última lista boa.
+const GUIA_SRV = 'https://santaritavision.paracapcut2026usuario.workers.dev/api/';
+function guia_srv_news() {
+  $cache = sys_get_temp_dir() . '/at_news_srv1.json';
+  if (is_file($cache) && time() - filemtime($cache) < 3600) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
+  $items = []; $seen = [];
+  foreach (['facebook-news', 'regional-news'] as $ep) {
+    $j = json_decode((string)at_get(GUIA_SRV . $ep), true);
+    foreach ((array)($j['data'] ?? []) as $x) {
+      if (!is_array($x)) continue;
+      $msg = trim((string)($x['message'] ?? '')); $u = (string)($x['permalink_url'] ?? '');
+      if ($msg === '' || !preg_match('#^https://(www\.)?facebook\.com/[^\s"\'<>]+$#i', $u)) continue;
+      // anúncio pago: telefone, preço ou chamada de venda
+      if (preg_match('/(\(?09\d{2}\)?[\s.\-]?\d{3}[\s.\-]?\d{3})|\bGs\.?\s?\d|precio|promo|oferta|descuento|llam[aá] (ya|al)|consult(as|á)|whats ?app|delivery|reservas|inscripciones|cupos/iu', $msg)) continue;
+      $t = '';
+      foreach (preg_split('/\R/u', $msg) as $ln) { $ln = trim(preg_replace('/[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{FE0F}\x{200D}\x{2B00}-\x{2BFF}]/u', '', $ln)); $ln = trim($ln, " \t-–—•|:¡!"); if (mb_strlen($ln) >= 8) { $t = $ln; break; } }
+      if ($t === '') continue;
+      if (mb_strtoupper($t) === $t) $t = mb_strtoupper(mb_substr($t, 0, 1)) . mb_strtolower(mb_substr($t, 1));   // TÍTULO TODO EM MAIÚSCULAS fica normal
+      $k = mb_strtolower(preg_replace('/\W+/u', '', $t)); if (isset($seen[$k])) continue; $seen[$k] = 1;
+      $img = (string)($x['full_picture'] ?? ''); if (!preg_match('#^https://[a-z0-9.\-]+\.fbcdn\.net/[^\s"\'<>]+$#i', $img)) $img = '';
+      $ts = strtotime((string)($x['created_time'] ?? ''));
+      $items[] = ['t' => mb_substr($t, 0, 140), 'u' => $u, 'img' => $img, 'd' => $ts ? (new DateTime('@' . $ts))->setTimezone(new DateTimeZone('America/Asuncion'))->format('Y-m-d') : '', 's' => mb_substr(trim((string)($x['page_name'] ?? 'Santa Rita Visión')), 0, 40), 'ts' => $ts];
+    }
+  }
+  usort($items, function ($a, $b) { return $b['ts'] <=> $a['ts']; });
+  $items = array_map(function ($x) { unset($x['ts']); return $x; }, array_slice($items, 0, 8));
+  if ($items) @file_put_contents($cache, json_encode($items, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+  elseif (is_file($cache)) { @touch($cache, time() - 3000); $items = json_decode((string)@file_get_contents($cache), true) ?: []; }
+  return $items;
+}
+
 function guia_news() {
   $cfg = guia_doc()['gnews'] ?? null;
   // sem parceiro ligado: mostra as notícias automáticas (podem ser desligadas com gnews.auto = false)
-  if (!is_array($cfg) || empty($cfg['on'])) return (is_array($cfg) && ($cfg['auto'] ?? true) === false) ? ['items' => []] : ['auto' => 1, 'items' => guia_auto_news()];
+  if (!is_array($cfg) || empty($cfg['on'])) {
+    if (is_array($cfg) && ($cfg['auto'] ?? true) === false) return ['items' => []];
+    $srv = guia_srv_news();   // parceiro Santa Rita Visión primeiro; Google Notícias completa até 8
+    $all = $srv; $k = []; foreach ($all as $x) $k[mb_strtolower(preg_replace('/\W+/u', '', $x['t']))] = 1;
+    if (count($all) < 8) foreach (guia_auto_news() as $x) { if (count($all) >= 8) break; $kk = mb_strtolower(preg_replace('/\W+/u', '', $x['t'])); if (!isset($k[$kk])) { $all[] = $x; $k[$kk] = 1; } }
+    return $srv ? ['n' => 'Santa Rita Visión', 'site' => 'https://www.facebook.com/SantaRitaVisionNoticias', 'auto' => 1, 'items' => $all] : ['auto' => 1, 'items' => $all];
+  }
   $name = (string)($cfg['n'] ?? ''); $site = preg_match('#^https://[^\s"\'<>]+$#i', (string)($cfg['site'] ?? '')) ? (string)$cfg['site'] : '';
   // notícias cadastradas à mão no painel (parceiro que só publica no Instagram): saem primeiro, a mais nova em cima
   $man = [];
