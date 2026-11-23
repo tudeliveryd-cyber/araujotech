@@ -830,6 +830,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     check(RS.card && RS.dir === 19 && RS.lg === 19 && RS.ads === 3 && RS.adImg === 3 && /fogao-mineiro/.test(RS.tdv) && RS.boi === '0984084440' && RS.gone, '"Recuperar la copia del 19/11": volta 19 fichas com logo, 3 banners e os aliados, só no que estava vazio (nada salvo até tocar em Guardar)');
     await a.act('gusave'); await a.w(4000); const dr = await doc();
     check((dr.gdir || []).length === 19 && (dr.gads || []).length === 3 && (dr.gads || []).every(x => /^gimg:/.test(x.img || '')), 'depois de Guardar, a Guía fica com as fichas e os banners (imagens guardadas à parte)'); }
+  const qkNmT = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
   sec('Y. Registro rápido (Central): nome, categoria, telefone, ubicación y logo; aparece en la Guía');
   { await a.evaluate(() => { closeSheet(); ui.gu = null; ui.view = 'platform'; render(); }); await a.w(400);
     check(await a.locator('[data-act="guquick"]').count() > 0, 'botón "Registro rápido" en el panel');
@@ -898,6 +899,69 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     check(await a.evaluate(() => ui.qk.t === 'pub' && document.getElementById('qk_uc').value === 'escpub'), '"Colegio Nacional…" va a Escuelas y colegios públicos');
     await a.act('qktipo', '[data-k="neg"]'); await a.w(400);
     check(await a.evaluate(() => ui.qk.t === 'neg'), 'si Jean cambia el tipo a mano, el sistema respeta');
+    await a.act('qkcancel'); await a.w(300);
+    // aprende: categoria criada pelo Jean ("Taxis") e ramo usado numa ficha
+    await a.fill('#qk_n', ''); await a.evaluate(() => { ui.qk = qkNew(null); qkSheet(); }); await a.w(300);
+    await a.locator('#qk_n').pressSequentially('Taxista Ramón', { delay: 20 }); await a.w(900);
+    check(await a.evaluate(k => document.getElementById('qk_g').value === k, txk), 'reconoce la categoría que Jean creó ("Taxista" → Taxis)');
+    await a.evaluate(() => { ui.qk = qkNew(null); qkSheet(); }); await a.w(300);
+    await a.fill('#qk_n', 'Cyber Alfa'); await a.locator('#qk_g').selectOption('shop'); await a.fill('#qk_d', 'Cyber e impresiones'); await a.fill('#qk_h', 'Lun a sáb 8:00 – 20:00'); await a.act('qksave', '[data-next]'); await a.w(3500);
+    d = await doc(); const cy = d.gdir.find(x => x.n === 'Cyber Alfa');
+    check(cy && cy.hrs === 'Lun a sáb 8:00 – 20:00', 'horario guardado en la ficha');
+    await a.locator('#qk_n').pressSequentially('Cyber Beta', { delay: 20 }); await a.w(900);
+    check(await a.evaluate(() => document.getElementById('qk_g').value === 'shop' && document.getElementById('qk_d').value === 'Cyber e impresiones'), 'aprende de una ficha ya cargada: "Cyber…" va a la misma categoría y rubro');
+    // nome + "o que faz": cria a categoria com o que Jean escreveu, e depois reconhece
+    await a.evaluate(() => { ui.qk = qkNew(null); qkSheet(); }); await a.w(300);
+    await a.fill('#qk_n', 'Juan Ramírez'); await a.locator('#qk_d').pressSequentially('lan house', { delay: 20 }); await a.w(900);
+    const lh = await a.evaluate(() => ({ g: document.getElementById('qk_g').value, nc: (document.getElementById('qk_nc') || {}).value, foc: document.activeElement && document.activeElement.id, d: document.getElementById('qk_d').value }));
+    check(lh.g === '__new' && lh.nc === 'Lan house' && lh.foc === 'qk_d' && lh.d === 'lan house', 'con "qué hace" desconocido, propone la categoría nueva "Lan house" sin sacar el cursor', JSON.stringify(lh));
+    await a.act('qksave', '[data-next]'); await a.w(3500);
+    d = await doc(); const lhc = d.gcat.neg.filter(c => qkNmT(c.n.es) === 'lan house'); const jr = d.gdir.find(x => x.n === 'Juan Ramírez');
+    check(lhc.length === 1 && jr && jr.g === lhc[0].k && jr.d === 'lan house', 'categoría "Lan house" creada y la empresa guardada en ella');
+    await a.fill('#qk_n', 'Pedro Net'); await a.locator('#qk_d').pressSequentially('lan houses y juegos', { delay: 20 }); await a.w(900);
+    check(await a.evaluate(k => document.getElementById('qk_g').value === k && !document.getElementById('qk_nc'), lhc[0].k), 'otra lan house: detecta que la categoría ya existe (no la crea de nuevo)');
+    await a.evaluate(() => { ui.qk = qkNew(null); qkSheet(); }); await a.w(300);
+    await a.fill('#qk_n', 'Doña Rosa'); await a.locator('#qk_d').pressSequentially('venta de comida casera', { delay: 20 }); await a.w(900);
+    check(await a.evaluate(() => document.getElementById('qk_g').value === 'food'), '"venta de comida casera" va a Comida y bebidas (categoría que ya existe)');
+    await a.locator('#qk_g').selectOption('__new'); await a.w(300); await a.fill('#qk_nc', 'taxi'); await a.act('qksave', '[data-next]'); await a.w(3500);
+    d = await doc(); check(d.gdir.find(x => x.n === 'Doña Rosa').g === txk && d.gcat.neg.filter(c => /^taxi/i.test(c.n.es)).length === 1, 'escribir a mano "taxi" como categoría nueva usa "Taxis" que ya existe');
+    // público e privado na mesma pasta; mapa para conferir
+    await a.evaluate(() => { ui.qk = qkNew(null); qkSheet(); }); await a.w(300);
+    await a.locator('#qk_n').pressSequentially('Farmacia Central', { delay: 20 }); await a.w(900);
+    check(await a.evaluate(() => ui.qk.t === 'pub' && document.getElementById('qk_uc').value === 'far'), '"Farmacia…" va sola a la carpeta Farmacias');
+    await a.evaluate(() => { ui.qk = qkNew(null); qkSheet(); }); await a.w(300);
+    await a.locator('#qk_n').pressSequentially('Sanatorio San José', { delay: 20 }); await a.w(900);
+    const sp = await a.evaluate(() => ({ t: ui.qk.t, uc: document.getElementById('qk_uc').value, pp: [...document.querySelectorAll('[data-act="qkpp"]')].map(b => b.dataset.k + (b.classList.contains('pri') ? '*' : '')) }));
+    check(sp.t === 'pub' && sp.uc === 'salpri' && sp.pp.join() === 'salud,salpri*', 'sanatorio: Salud → Privado, con botones Público / Privado', JSON.stringify(sp));
+    check(await a.evaluate(() => !document.querySelector('#qk_mapv iframe') && !!document.querySelector('[data-act="qkfind"]')), 'sin ubicación aparece "Buscar por el nombre en el mapa"');
+    await a.act('qkfind'); await a.w(400);
+    const mp = await a.evaluate(() => { const f = document.querySelector('#qk_mapv iframe'); return { src: f && f.getAttribute('src'), use: !!document.querySelector('[data-act="qkuse"]') }; });
+    check(mp.src && /output=embed/.test(mp.src) && /Sanatorio/.test(decodeURIComponent(mp.src)) && mp.use, 'muestra el mapa con lo que encuentra por el nombre, para conferir', JSON.stringify(mp));
+    await a.act('qkuse'); await a.w(300);
+    check(await a.evaluate(() => /^https:\/\/www\.google\.com\/maps\/search\/\?api=1&query=Sanatorio/.test(document.getElementById('qk_map').value) && !!document.querySelector('#qk_mapv iframe')), '"Sí, es este" pone la ubicación y deja el mapa a la vista');
+    await a.act('qksave', '[data-next]'); await a.w(3500);
+    d = await doc(); const sj = d.gutil.find(x => x.n === 'Sanatorio San José'), sal = d.gcat.pub.find(c => (c.tabs || []).some(t => t.k === 'salpri'));
+    check(sj && sj.c === 'salpri' && /api=1&query=/.test(sj.map) && sal && sal.tabs[0].k === 'salud' && d.gutil.filter(x => x.c === 'salud').length >= 1, 'guardado en Salud → privados; lo que ya estaba en Salud queda en públicos', JSON.stringify({ c: sj && sj.c, tabs: sal && sal.tabs.map(t => t.k) }));
+    await a.locator('#qk_n').pressSequentially('Hospital Distrital', { delay: 20 }); await a.w(900);
+    check(await a.evaluate(() => document.getElementById('qk_uc').value === 'salud' && document.querySelector('[data-act="qkpp"][data-k="salud"]').classList.contains('pri')), '"Hospital Distrital" va a Salud → Público');
+    await a.act('qkpp', '[data-k="salpri"]'); await a.w(300);
+    check(await a.evaluate(() => ui.qk.uc === 'salpri' && document.getElementById('qk_uc').value === 'salpri'), 'tocar "Privado" lo cambia');
+    await a.evaluate(() => { ui.qk = qkNew(null); qkSheet(); }); await a.w(300);
+    await a.locator('#qk_n').pressSequentially('Colegio San Rafael', { delay: 20 }); await a.w(900);
+    check(await a.evaluate(() => ui.qk.t === 'pub' && document.getElementById('qk_uc').value === 'escpri' && document.querySelectorAll('[data-act="qkpp"]').length === 2), 'colegio: Educación → Privado, con Público / Privado');
+    // corrigir pela lista
+    await a.evaluate(() => { ui.qk = qkNew(null); qkSheet(); }); await a.w(300);
+    await a.fill('#qk_q', 'cyber alfa'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
+    const e0 = await a.evaluate(() => ({ h: document.querySelector('.sheet[data-k="qk"] h2').textContent, n: document.getElementById('qk_n').value, hrs: document.getElementById('qk_h').value, tipos: document.querySelectorAll('[data-act="qktipo"]').length, next: !!document.querySelector('[data-act="qksave"][data-next]'), cancel: !!document.querySelector('[data-act="qkcancel"]') }));
+    check(e0.n === 'Cyber Alfa' && e0.hrs === 'Lun a sáb 8:00 – 20:00' && e0.tipos === 2 && !e0.next && e0.cancel && /Corregir/.test(e0.h), 'tocar el nombre abre el formulario lleno para corregir', JSON.stringify(e0));
+    await a.fill('#qk_tel', '0985 777 888'); await a.fill('#qk_n', 'Cyber Alfa Center'); await a.act('qksave'); await a.w(3500);
+    d = await doc(); const cy2 = d.gdir.find(x => x.id === cy.id);
+    check(cy2 && cy2.n === 'Cyber Alfa Center' && cy2.tel === '0985 777 888' && cy2.wa === '595985777888' && cy2.hrs === cy.hrs && cy2.g === 'shop' && d.gdir.length === dirN + 6 && !d.gdir.some(x => x.n === 'Cyber Alfa'), 'corrección guardada en la misma ficha (no duplica)', JSON.stringify({ n: cy2 && cy2.n, len: d.gdir.length, want: dirN + 6 }));
+    check(await a.evaluate(() => !ui.qk.ed && !!document.querySelector('[data-act="qksave"][data-next]')), 'después de corregir vuelve al formulario de nuevo registro');
+    await a.fill('#qk_q', 'plaza rap'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
+    check(await a.evaluate(() => document.querySelectorAll('[data-act="qktipo"]').length === 1 && document.getElementById('qk_uc').value === 'ocio'), 'lugar público se corrige como público');
+    await a.fill('#qk_h', 'Siempre abierta'); await a.act('qksave'); await a.w(3500);
+    check((await doc()).gutil.find(x => x.n === 'Plaza Rápida').h === 'Siempre abierta', 'horario del lugar público guardado');
     await a.act('qkclose'); await a.w(300);
     check(await a.evaluate(() => { const i = ui.gu.dir.findIndex(x => x.n === 'Hotel Rápido'); return i >= 0 && /data-gu="dir\.\d+\.qk" checked/.test(gdItem(ui.gu, ui.gu.dir[i], i)); }), 'en el panel completo la ficha muestra "Publicada en la Guía sin plan" marcado');
     await a.evaluate(() => closeSheet()); }
