@@ -16,9 +16,10 @@ const { chromium } = require('playwright'); const fs = require('fs'), path = req
     if (!O.tem) return O;
     const api = await CLOUD.init(); const sitio = await api.getSiteCfg();
     const cl = ((sitio && sitio.clientes) || []).filter(c => c && c.sys === 'catalogo');
-    const pl = (PL.plans.find(x => x.site) || PL.plans[0] || {}).id;
+    const pl = (PL.plans.find(x => !(+x.max)) || PL.plans.slice().sort((a, b) => (+b.max || 0) - (+a.max || 0))[0] || {}).id; // plano sem limite de produtos: o plano real fica na Central (com senha)
+    const docs = {}; for (const c of cl) { try { docs[c.id] = await api.getShopDoc(c.id); } catch (e) { } }
     // clientes de mentira só nesta página (nada é salvo): os dados da conta ficam na Central, que precisa de senha
-    PL.shops = cl.map(c => ({ id: c.id, name: c.name, plan: pl, due: '2027-06-30', status: 'ativo', live: c.id === 'fogao-mineiro', user: 'u', pass: 'zzzzzzzzz', wa: '595981000000', seg: { es: c.segEs || '', pt: c.segPt || '' }, gu: c.vip ? 'vip' : c.dest ? 'rec' : undefined, pays: [] }));
+    PL.shops = cl.map(c => ({ id: c.id, name: c.name, plan: pl, due: '2027-06-30', status: 'ativo', live: c.id === 'fogao-mineiro', user: 'u', pass: 'zzzzzzzzz', wa: '595981000000', seg: { es: c.segEs || '', pt: c.segPt || '' }, gu: c.vip ? 'vip' : c.dest ? 'rec' : undefined, pays: [], siteX: docs[c.id] && docs[c.id].site && docs[c.id].site.slug ? { on: true } : undefined, site: docs[c.id] && docs[c.id].site ? docs[c.id].site : undefined }));
     for (const s of PL.shops) {
       const t0 = Date.now(); let R;
       try { R = await dgRun(s, { deep: true, sitio }); } catch (e) { O.cl.push({ id: s.id, crash: String((e && e.stack) || e).slice(0, 300) }); continue; }
