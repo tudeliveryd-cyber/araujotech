@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Guía Santa Rita"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#FFFFFF">
 <!-- primeira imagem do slider (a maior da tela): o navegador começa a baixá-la junto com a página, sem esperar o resto carregar -->
-<link rel="preload" as="image" href="/img/guia/hero-santa-rita-m.webp?v=1" media="(max-width:640px)" fetchpriority="high"><link rel="preload" as="image" href="/img/guia/hero-santa-rita.webp?v=1" media="(min-width:641px)" fetchpriority="high">
+<link rel="preload" as="image" href="/img/guia/hero-santa-rita-m.webp?v=1" media="(max-width:640px)" fetchpriority="high"><link rel="preload" as="image" href="/img/guia/hero-santa-rita.webp?v=1" media="(min-width:641px)" fetchpriority="high"><link rel="preload" as="image" href="/img/guia/tt-comer2.webp" media="(max-width:640px)">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
 <script>try{if(localStorage.getItem("at_theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}</script>
@@ -1524,7 +1524,8 @@ const qs=new URLSearchParams(location.search);if(qs.get('q'))document.getElement
 const CK='at_guia_c1';const ckSave=()=>{try{localStorage.setItem(CK,JSON.stringify({l:RAW,i:INFO,g:G,o:OFS,t:Date.now()}))}catch(e){}};let RAW=null;
 const setList=l=>{RAW=l;LIST=l.filter(c=>c.sys==='catalogo'&&safe(c.url)).map(c=>Object.assign({},c,{_g:grpOf(c)})).sort((a,b)=>a.name.localeCompare(b.name,'es'))};
 try{const c=JSON.parse(localStorage.getItem(CK)||'null');if(c&&Date.now()-c.t<7*864e5){if(c.g&&typeof c.g==='object'){G=Object.assign({ads:[],util:null,pros:[]},c.g);try{applyCat()}catch(e){}}if(c.i&&typeof c.i==='object')INFO=c.i;if(Array.isArray(c.o))OFS=c.o;if(Array.isArray(c.l)&&c.l.length)setList(c.l)}}catch(e){}
-if(LIST)render();else slRender();
+if(LIST)render();else{slRender();/* primeira visita (ainda sem a lista guardada neste aparelho): os atalhos, as emergências e as categorias aparecem na hora, sem esperar a lista de negócios chegar */
+ if(document.body.classList.contains('home')&&CAT==='home')try{document.getElementById('atl').innerHTML=TT_HTML+emqHTML()+catHTML();texts()}catch(e){}}
 AT_CLIENTES.load(l=>{if(!l.length&&LIST)return;setList(l);render();ckSave();
  const ids=LIST.map(c=>c.id).filter(Boolean);if(ids.length)fetch('/sitio/guia.php?ids='+encodeURIComponent(ids.join(','))).then(r=>r.ok?r.json():{}).then(j=>{INFO=j||{};render();ckSave();if(MAPON)mapShow()}).catch(()=>{});
  if(ids.length)fetch('/sitio/guia.php?ofs='+encodeURIComponent(ids.join(','))).then(r=>r.ok?r.json():[]).then(j=>{OFS=Array.isArray(j)?j:[];render();ckSave()}).catch(()=>{})});
