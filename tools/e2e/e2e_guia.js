@@ -839,7 +839,27 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     const e2 = await f.evaluate(() => ({ list: Array.isArray(LIST), tt: document.querySelectorAll('#atl .tt a').length, cats: document.querySelectorAll('#cats .atl button').length, secs: document.querySelectorAll('#atl > section, #atl > nav').length }));
     info(JSON.stringify({ e1, e2 }));
     check(e1.list && e1.tt === 3 && e1.cats >= 6 && e1.emq && e1.sl, 'antes de a lista de negócios chegar já aparecem o slider, os 3 atalhos, as emergências e as categorias');
-    check(e2.list && e2.tt === 3 && e2.cats >= 6 && e2.secs >= 3 && !f.errs.length, 'quando a lista chega, o início fica completo e sem erro de JavaScript', f.errs.join(' | ')); }
+    check(e2.list && e2.tt === 3 && e2.cats >= 6 && e2.secs >= 3 && !f.errs.length, 'quando a lista chega, o início fica completo e sem erro de JavaScript', f.errs.join(' | '));
+    // Menú "Más": um item que não troca de tela (central já aberta) fechava o menú e a tela não saía do lugar, porque o "voltar" do menú
+    // repunha a posição antiga por cima da rolagem. O mesmo atraso derrubava, de vez em quando, o toque seguinte em "Categorías".
+    const mm = await f.evaluate(async () => { const W = ms => new Promise(z => setTimeout(z, ms)), r = {};
+      const ate = async (id) => { let ok = false; for (let k = 0; k < 30 && !ok; k++) { await W(100); const c = document.getElementById(id); ok = !!c && Math.abs(c.getBoundingClientRect().top - 76) < 60; } return ok; };
+      const menu = async () => { document.querySelector('#bnav [data-b="more"]').click(); await W(300); return !document.getElementById('more').hidden; };
+      UFULL = false; goHome(); render(); window.scrollTo(0, 0); await W(700);
+      r.a1 = await menu(); document.querySelector('#more [data-go="util"]').click(); r.u1 = await ate('util'); r.f1 = document.getElementById('more').hidden;
+      window.scrollTo(0, 0); await W(700); r.ufull = UFULL;
+      r.a2 = await menu(); document.querySelector('#more [data-go="util"]').click(); r.u2 = await ate('util'); r.f2 = document.getElementById('more').hidden;
+      window.scrollTo(0, 0); await W(700);
+      await menu(); document.querySelector('#more [data-go="util"]').click(); await W(250); document.querySelector('#bnav [data-b=cats]').click(); r.c3 = await ate('cats');
+      goHome(); UFULL = false; render(); window.scrollTo(0, 0); await W(700); window.scrollTo(0, 600); await W(500);
+      document.querySelector('.mnav [data-go="all"]').click(); await W(1300); r.v1 = CAT; history.back(); await W(900); r.v2 = CAT; r.y2 = Math.round(scrollY);
+      await menu(); document.querySelector('#more .sh-x').click(); await W(700); r.fx = document.getElementById('more').hidden; r.y3 = Math.round(scrollY); return r; });
+    info(JSON.stringify(mm));
+    check(mm.a1 && mm.u1 && mm.f1, 'menú "Más": "Santa Rita útil" fecha o menú e leva à central (primeira vez)');
+    check(mm.ufull && mm.a2 && mm.u2 && mm.f2, 'menú "Más": com a central já aberta, o mesmo item leva de novo à central (antes a tela não saía do lugar)');
+    check(mm.c3, 'logo depois de um item do menú, "Categorías" da barra de baixo rola até as categorias (o "voltar" do menú não repõe a posição por cima)');
+    check(mm.v1 === 'all' && mm.v2 === 'home' && Math.abs(mm.y2 - 600) < 40, 'voltar de verdade continua repondo a tela anterior no ponto onde a pessoa estava', JSON.stringify([mm.v1, mm.v2, mm.y2]));
+    check(mm.fx && Math.abs(mm.y3 - mm.y2) < 40, 'abrir o menú e fechar no X deixa a tela onde estava', JSON.stringify([mm.y2, mm.y3])); }
   check(!a.errs.length, 'sem erros de JavaScript', a.errs.join(' | '));
   L.done();
 })().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
