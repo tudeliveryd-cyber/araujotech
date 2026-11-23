@@ -19,7 +19,7 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120 # a bateria inteira leva pouco mais de 1 hora; com 60 min era cancelada antes do fim e ficava sem resultado
     steps:
       - uses: actions/checkout@v4
         with:
@@ -51,6 +51,9 @@ jobs:
           npx playwright install --with-deps chromium >/dev/null || { echo "dependências do sistema indisponíveis no momento; instalando só o navegador"; npx playwright install chromium >/dev/null; }
           for f in firebase-app.js firebase-firestore.js firebase-auth.js firebase-app-compat.js firebase-firestore-compat.js firebase-auth-compat.js; do curl -sf -o sdk/$f https://www.gstatic.com/firebasejs/10.12.2/$f; done
           curl -sf -o sdk/zxing.min.js https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js || true
+          # mapa (Leaflet): cópia local, como nos testes feitos fora daqui; sem ela os testes do mapa da Guía falhavam só aqui
+          curl -sf -o sdk/leaflet.js https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js || true
+          curl -sf -o sdk/leaflet.css https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css || true
       - name: Rodar os testes
         env:
           FIREBASE_BIN: ${{ github.workspace }}/ferramentas/node_modules/.bin/firebase
@@ -75,6 +78,7 @@ jobs:
           echo "######## MODO CONSULTA (autos, motos, imóveis, serviços) · regras v13"; tools/e2e/run.sh e2e_consulta.js firestore-v13.rules || F=1
           echo "######## LOGO QUADRADO COM CANTOS REDONDOS · regras v13"; tools/e2e/run.sh e2e_logo.js firestore-v13.rules || F=1
           echo "######## ABRIR RÁPIDO (catálogo e painel) · regras v13"; tools/e2e/run.sh e2e_rapido.js firestore-v13.rules || F=1
+          echo "######## CATÁLOGO AINDA SEM PRODUTOS (aviso \"Estamos preparando\", logos e botão de WhatsApp) · regras v19"; tools/e2e/run.sh e2e_preparando.js firestore-v19.rules || F=1
           echo "######## GARÇOM LANÇA PEDIDO NA MESA · regras v13"; tools/e2e/run.sh e2e_mozo.js firestore-v13.rules || F=1
           echo "######## FOTOS GRANDES E LOGO LARGO · regras v13"; CAPA=$PWD/tools/e2e/fix/capa-grande.jpg LOGO=$PWD/tools/e2e/fix/logo-largo.png tools/e2e/run.sh e2e_fotos.js firestore-v13.rules || F=1
           echo "######## GALERIA DE FOTOS DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_galeria.js firestore-v13.rules || F=1
@@ -85,8 +89,8 @@ jobs:
           echo "######## VITRINE DE CLIENTES NO SITE · regras v13"; tools/e2e/run.sh e2e_vitrine.js firestore-v13.rules || F=1
           echo "######## PERÍODO DE PRUEBA GRATIS · regras v13"; tools/e2e/run.sh e2e_prueba.js firestore-v13.rules || F=1
           echo "######## SITE PADRÃO ACOMPANHA O WHATSAPP DO CATÁLOGO · regras v13"; tools/e2e/run.sh e2e_sitesync.js firestore-v13.rules || F=1
-          echo "######## GUÍA VITRIX: BANNERS PAGOS E LUGARES PÚBLICOS · regras v13"; tools/e2e/run.sh e2e_guia.js firestore-v13.rules || F=1
-          echo "######## GUÍA: PASTAS E BANNERS GUARDADOS À PARTE · regras v19"; tools/e2e/run.sh e2e_guia.js firestore-v19.rules || F=1
+          # a Guía roda só com as regras v19: fotos e banners guardados à parte precisam delas (com as v13, antigas, três verificações falhavam por isso)
+          echo "######## GUÍA: BANNERS, LUGARES PÚBLICOS, PASTAS E IMAGENS GUARDADAS À PARTE · regras v19"; tools/e2e/run.sh e2e_guia.js firestore-v19.rules || F=1
           echo "######## HORÁRIOS: SEGUNDA-FEIRA COPIA PARA OS OUTROS DIAS · regras v13"; tools/e2e/run.sh e2e_horario.js firestore-v13.rules || F=1
           echo "######## PROBÁ: RUBRO ESCRITO E DEMO DE AUTOS"; tools/e2e/run.sh e2e_proba_autos.js firestore-v13.rules || F=1
           echo "######## MOEDA DO LOCAL (Gs. / US$) · regras v13"; tools/e2e/run.sh e2e_moeda.js firestore-v13.rules || F=1
