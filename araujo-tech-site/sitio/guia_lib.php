@@ -329,7 +329,7 @@ function guia_srv_news() {
       if (mb_strlen($t) < 8) continue;
       if (mb_strtoupper($t) === $t) {   // TÍTULO TODO EM MAIÚSCULAS fica normal, mantendo os nomes próprios
         $t = mb_strtoupper(mb_substr($t, 0, 1)) . mb_strtolower(mb_substr($t, 1));
-        foreach (['Santa Rita', 'Santa Rosa del Monday', 'Santa Rosa', 'Alto Paraná', 'Paraguay', 'Ciudad del Este', 'Naranjal', 'Ande', 'Policía Nacional', 'Junta Municipal'] as $nm) $t = preg_replace('/\b' . preg_quote(mb_strtolower($nm), '/') . '\b/u', $nm, $t);
+        foreach (['Santa Rita', 'Santa Rosa del Monday', 'Santa Rosa', 'Alto Paraná', 'Paraguay', 'Ciudad del Este', 'Naranjal', 'Ande', 'Policía Nacional', 'Junta Municipal'] as $nm) $t = preg_replace('/\b' . preg_quote($nm, '/') . '\b/iu', $nm, $t);
         $t = str_replace('Ande', 'ANDE', $t);
       }
       $k = mb_strtolower(preg_replace('/\W+/u', '', $t)); if (isset($seen[$k])) continue; $seen[$k] = 1;
