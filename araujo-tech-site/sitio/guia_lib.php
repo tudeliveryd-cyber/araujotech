@@ -325,9 +325,13 @@ function guia_srv_news() {
       // anúncio pago: telefone, preço ou chamada de venda
       if (preg_match('/(\(?09\d{2}\)?[\s.\-]?\d{3}[\s.\-]?\d{3})|\bGs\.?\s?\d|precio|promo|oferta|descuento|llam[aá] (ya|al)|consult(as|á)|whats ?app|delivery|reservas|inscripciones|cupos/iu', $msg)) continue;
       $t = '';
-      foreach (preg_split('/\R/u', $msg) as $ln) { $ln = trim(preg_replace('/[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{FE0F}\x{200D}\x{2B00}-\x{2BFF}]/u', '', $ln)); $ln = trim($ln, " \t-–—•|:¡!"); if (mb_strlen($ln) >= 8) { $t = $ln; break; } }
-      if ($t === '') continue;
-      if (mb_strtoupper($t) === $t) $t = mb_strtoupper(mb_substr($t, 0, 1)) . mb_strtolower(mb_substr($t, 1));   // TÍTULO TODO EM MAIÚSCULAS fica normal
+      foreach (preg_split('/\R/u', $msg) as $ln) { $ln = trim(preg_replace('/[\x{1F000}-\x{1FAFF}\x{2600}-\x{27BF}\x{FE0F}\x{200D}\x{2B00}-\x{2BFF}]/u', '', $ln)); $ln = trim($ln, " \t-–—•|:¡!"); if ($ln === '') continue; $t = $t === '' ? $ln : $t . ' · ' . $ln; if (mb_strlen($t) >= 24) break; }   // linha curta ("SANTA RITA") junta com a seguinte
+      if (mb_strlen($t) < 8) continue;
+      if (mb_strtoupper($t) === $t) {   // TÍTULO TODO EM MAIÚSCULAS fica normal, mantendo os nomes próprios
+        $t = mb_strtoupper(mb_substr($t, 0, 1)) . mb_strtolower(mb_substr($t, 1));
+        foreach (['Santa Rita', 'Santa Rosa del Monday', 'Santa Rosa', 'Alto Paraná', 'Paraguay', 'Ciudad del Este', 'Naranjal', 'Ande', 'Policía Nacional', 'Junta Municipal'] as $nm) $t = preg_replace('/\b' . preg_quote(mb_strtolower($nm), '/') . '\b/u', $nm, $t);
+        $t = str_replace('Ande', 'ANDE', $t);
+      }
       $k = mb_strtolower(preg_replace('/\W+/u', '', $t)); if (isset($seen[$k])) continue; $seen[$k] = 1;
       $img = (string)($x['full_picture'] ?? ''); if (!preg_match('#^https://[a-z0-9.\-]+\.fbcdn\.net/[^\s"\'<>]+$#i', $img)) $img = '';
       $ts = strtotime((string)($x['created_time'] ?? ''));
