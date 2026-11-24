@@ -14,7 +14,7 @@ const { info, sec, check } = L;
   await a.act('newshop'); await a.w(300);
   const opts = await a.evaluate(() => [...document.querySelectorAll('#ns_trial option')].map(o => o.textContent));
   info(JSON.stringify(opts));
-  check(opts.length === 4 && /Pagó hoy/.test(opts[0]) && opts.includes('Prueba gratis de 15 días') && opts.includes('Prueba gratis de 30 días'), 'o formulário tem "Inicio": pagou hoje, ou prueba de 7, 15 ou 30 dias');
+  check(opts.length >= 5 && /Pagó hoy/.test(opts[0]) && opts.includes('Prueba gratis de 7 días') && opts.some(x => /Cortesía hasta/.test(x)) && opts.includes('Prueba gratis de 15 días') && opts.includes('Prueba gratis de 30 días'), 'o formulário tem "Inicio": pagou hoje, prueba de 3, 7, 15 ou 30 dias, ou cortesia até o fim do mês / dia 5');
   await a.set('#ns_name', 'Mueblería Prueba'); await a.set('#ns_wa', '595981000981');
   await a.locator('#ns_trial').selectOption('15');
   await a.act('createshop'); await a.w(3500);

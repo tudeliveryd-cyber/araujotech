@@ -186,6 +186,10 @@ const { sec, check, info } = L;
   sec('Clientes da Guía (24/11): pacotes Presencia, Recomendado e Portada na Central');
   { const g = await a.evaluate(() => { seedSysPlans(); const pl = plansFor('guia').map(p => p.n + ':' + p.price).join(','); acts.newclient(); acts.ncsys({ dataset: { k: 'guia' } }); const chips = !!document.querySelector('[data-act="ncsys"][data-k="guia"]'); ui.nc.name = 'Dr. Prueba Guía'; ui.nc.plan = 'gu-pres'; ui.nc.paid = true; acts.createclient(); const c = PL.shops.find(x => x.name === 'Dr. Prueba Guía'); const r = { pl, chips, sys: c && c.sys, web: c && c.web, site: !!(c && c.site), pay: c && c.pays[0] && c.pays[0].v }; PL.shops = PL.shops.filter(x => x !== c); savePL(); render(); return r; });
     check(g.pl === 'Presencia:200000,Recomendado:400000,Portada:750000' && g.chips && g.sys === 'guia' && g.web === false && !g.site && g.pay === 200000, 'cliente da Guía: escolhe o pacote, paga o mês e não cria site nem aparece na vitrine', JSON.stringify(g)); }
+  { const g2 = await a.evaluate(() => { acts.newclient(); acts.ncsys({ dataset: { k: 'guia' } }); const f = !!document.getElementById('nc_lp'); ui.nc.name = 'Dr. Valor Propio'; ui.nc.plan = 'gu-pres'; ui.nc.lp = '300.000'; ui.nc.paid = true; acts.createclient(); const c = PL.shops.find(x => x.name === 'Dr. Valor Propio'); const r = { f, lock: c && c.lockPrice, pay: c && c.pays[0] && c.pays[0].v, ch: c && chargeOf(c) }; PL.shops = PL.shops.filter(x => x !== c);
+      acts.newclient(); ui.nc.name = 'Local Nuevo Test'; acts.nc2shop(); r.shop = !!document.getElementById('ns_lp') && ui.ns.name === 'Local Nuevo Test' && !!document.querySelector('[data-act="createshop"]'); r.vx = !!(acts.newclient(), document.querySelector('[data-act="nc2shop"]')); closeSheet(); savePL(); render(); return r; });
+    check(g2.f && g2.lock === 300000 && g2.pay === 300000 && g2.ch === 300000, 'valor próprio do cliente (300.000): fica gravado e é o que paga', JSON.stringify(g2));
+    check(g2.vx && g2.shop, 'Vitrix aparece na mesma escolha de sistema e abre o cadastro do local, com o nome e o valor por mês'); }
   const gsT = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   sec('Cobrança do dia 5 (24/11): todos vencem no dia 5; proporcional para quem vence em outro dia');
   await a.evaluate(() => { window.__S0 = JSON.stringify(PL.shops); window.__BD = PL.billDay; window.__now = Date.now; Date.now = () => Date.parse('2026-12-05T12:00:00Z');
@@ -193,8 +197,9 @@ const { sec, check, info } = L;
     PL.shops.push({ id: 'b5a', name: 'Cliente Veinticuatro', sys: 'pulpito', plan: pl.id, lockPrice: 200000, status: 'ativo', due: '2026-12-24', pays: [] },
       { id: 'b5b', name: 'Cliente Atrasado', sys: 'pulpito', plan: pl.id, lockPrice: 200000, status: 'ativo', due: '2026-11-18', pays: [] },
       { id: 'b5c', name: 'Cliente Al Dia', sys: 'pulpito', plan: pl.id, lockPrice: 200000, status: 'ativo', due: '2027-01-05', pays: [] });
-    delete PL.billDay; ui.b5 = null; ui.view = 'platform'; render(); });
+    delete PL.billDay; ui.b5 = null; ui.b5open = true; ui.view = 'platform'; render(); });
   await a.click('.cg-nav button[data-k="cli"]'); await a.w(400);
+  check(await a.evaluate(() => { ui.b5open = false; render(); const ok = !!document.querySelector('[data-act="b5open"]') && !document.querySelector('[data-b5v]') && !!document.querySelector('.cg-body > .cg-acts [data-act="newclient"], .cg-acts [data-act="newclient"]'); ui.b5open = true; render(); return ok; }), 'cobrança do dia 5 começa fechada (resumo) e o "Nuevo cliente" fica no topo');
   const b1 = await a.evaluate(() => { const v = id => (document.querySelector(`[data-b5v="${id}"]`) || {}).value; return { a: v('b5a'), b: v('b5b'), c: v('b5c'), sel: document.querySelector('[data-b5day]').value, txt: document.querySelector('.cg-body').textContent }; });
   info(JSON.stringify({ a: b1.a, b: b1.b, c: b1.c, sel: b1.sel }));
   check(b1.sel === '5' && b1.a === '80.000' && b1.b === '313.000' && b1.c === undefined, 'dia 5: propõe 80.000 (proporcional 24/12→5/1), 313.000 (atrasado: proporcional + mês) e não mostra quem já está pago até 5/1');
@@ -213,6 +218,9 @@ const { sec, check, info } = L;
   check(await a.evaluate(() => PL.shops.find(x => x.id === 'b5a').lockPrice === 250000 && chargeOf(PL.shops.find(x => x.id === 'b5a')) === 250000), 'valor mensal de cada cliente se edita na ficha');
   await a.evaluate(() => { const s = document.querySelector('[data-b5day]'); s.value = '0'; s.dispatchEvent(new Event('change', { bubbles: true })); }); await a.w(300);
   check(await a.evaluate(() => PL.billDay === 0 && !document.querySelector('[data-act="b5pay"]')), 'dá para voltar ao sistema antigo (30 dias)');
+  const ct1 = await a.evaluate(() => { PL.billDay = 5; const pl = PL.plans.find(p => p.per !== 'ano') || PL.plans[0]; PL.shops.push({ id: 'b5d', name: 'Doctor Cortesia', sys: 'guia', plan: pl.id, lockPrice: 300000, status: 'ativo', due: '2026-11-30', trial: 6, pays: [] }); ui.b5 = null; ui.b5open = true; render(); const q = billQuote(PL.shops.find(x => x.id === 'b5d')); const opts = trialOpts().map(x => x[1]).join('|'); return { v: q.v, due: q.due, v2: (document.querySelector('[data-b5v="b5d"]') || {}).value, opts }; });
+  check(ct1.v === 50000 && ct1.due === '2027-01-05' && ct1.v2 === '50.000', 'cortesia até 30/11: no dia 5 paga só os 5 dias usados (50.000) e o próximo pagamento é em 5 de janeiro', JSON.stringify(ct1));
+  check(/fin de mes|fim do mês/.test(ct1.opts) && /hasta el día 5|até o dia 5/.test(ct1.opts) && /3 d/.test(ct1.opts), 'opções de cortesia: 3 dias, até fim do mês, até o dia 5', ct1.opts);
   await a.evaluate(() => { PL.shops = JSON.parse(window.__S0); if (window.__BD === undefined) delete PL.billDay; else PL.billDay = window.__BD; Date.now = window.__now; ui.b5 = null; savePL(); render(); }); await a.w(800);
   await L.done();
 })().catch(async e => { console.error(e); L.bad('erro: ' + e.message); await L.done(); });
