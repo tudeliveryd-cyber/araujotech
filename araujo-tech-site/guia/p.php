@@ -15,6 +15,7 @@ $host = preg_match('/(^|\.)guiadesantarita\.com$/i', (string)($_SERVER['HTTP_HOS
 $G = $host . '/';
 $self = $host . '/' . $k . '/' . rawurlencode($rid);
 $CK = ['per' => 'Perdidos y encontrados', 'inm' => 'Inmueble', 'veh' => 'Vehículo', 'var' => 'Productos y varios', 'ser' => 'Servicios'];
+$TRPT = []; // textos do Jean em espanhol → português (guia_tr), usados quando a pessoa escolheu português
 $COP = ['venta' => 'Venta', 'alq' => 'Alquiler', 'perd' => 'Se perdió', 'enc' => 'Se encontró'];
 $JK = ['full' => 'Tiempo completo', 'part' => 'Medio tiempo', 'temp' => 'Temporal', 'first' => 'Primer empleo'];
 $EK = ['rel' => 'Religioso', 'dep' => 'Deportivo', 'cul' => 'Cultural', 'com' => 'Comunitario', 'neg' => 'Feria o comercial', 'inf' => 'Infantil', 'otr' => 'Evento', 'fer' => 'Feriado'];
@@ -50,6 +51,7 @@ if (!$x) {
     $NG = ['food' => 'Comida y bebidas', 'shop' => 'Tiendas y moda', 'health' => 'Salud y belleza', 'home' => 'Hogar y construcción', 'car' => 'Autos, motos y náutica', 'serv' => 'Servicios'];
     foreach (guia_cat(guia_doc()['gcat'] ?? [])['neg'] as $cg) { if ($cg['n']['es'] !== '') $NG[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '' && $ct['k'] === ($x['sub'] ?? '')) $NG['_sub'] = $ct['n']['es']; }
     $kind = $NG['_sub'] ?? ($NG[$x['g']] ?? 'Negocio');
+    foreach ([$kind, $x['d'] ?? '', $x['hrs'] ?? ''] as $tt) if (($tp = guia_tr($tt)) !== '') $TRPT[$tt] = $tp; // português automático
     $x['t'] = $x['n'];
     $title = $x['n'] . ' — Santa Rita';
     $DN = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; $hrsL = [];
@@ -86,6 +88,7 @@ if (!$x) {
     $PC = ['gob' => 'Gobierno y trámites', 'doc' => 'Documentos', 'salud' => 'Salud', 'far' => 'Farmacia', 'seg' => 'Seguridad', 'ocio' => 'Plazas y recreación', 'trans' => 'Transporte', 'serv' => 'Servicios públicos', 'edu' => 'Educación', 'gua' => 'Guardería y jardín', 'escpub' => 'Escuela o colegio público', 'escpri' => 'Colegio privado', 'unipub' => 'Universidad pública', 'unipri' => 'Universidad privada', 'inst' => 'Instituto, cursos e idiomas', 'igl' => 'Iglesia', 'com' => 'Comunidad y ONGs', 'dep' => 'Deportes y clubes', 'ani' => 'Animales y adopción', 'fin' => 'Bancos y finanzas'];
     foreach (guia_cat(guia_doc()['gcat'] ?? [])['pub'] as $cg) { if (!$cg['tabs'] && $cg['n']['es'] !== '') $PC[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '') $PC[$ct['k']] = $ct['n']['es']; } // nomes das pastas e abas do painel
     $kind = $PC[$x['c']] ?? 'Lugar público';
+    foreach ([$kind, $x['h'] ?? '', $x['d'] ?? ''] as $tt) if (($tp = guia_tr($tt)) !== '') $TRPT[$tt] = $tp;
     $x['t'] = $x['n'];
     $title = $x['n'] . ' — Santa Rita';
     $desc = trim($kind . ' en Santa Rita, Alto Paraná.' . ($x['a'] ? ' ' . $x['a'] . '.' : '') . ($x['h'] ? ' Horario: ' . $x['h'] . '.' : '') . ($x['tel'] ? ' Tel. ' . $x['tel'] . '.' : ''));
@@ -172,5 +175,11 @@ h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,5vw,36px);lin
 <?php endif; ?>
 </main>
 <footer id="gft"></footer><script src="/guia/rodape.js" defer></script>
+<script>/* 24/11 (Jean): quem escolheu português vê a página toda em português (textos da página + o que foi escrito em espanhol, traduzido) */
+(function(){try{if(localStorage.getItem('at_lang')!=='pt')return}catch(e){return}document.documentElement.lang='pt';
+var D=<?= json_encode((object)$TRPT, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>,U={'Volver a la Guía':'Voltar ao Guia','Horarios':'Horários','Lunes':'Segunda','Martes':'Terça','Miércoles':'Quarta','Jueves':'Quinta','Viernes':'Sexta','Sábado':'Sábado','Domingo':'Domingo','Cerrado':'Fechado','Llamar':'Ligar','Cómo llegar':'Como chegar','Compartir':'Compartilhar','Ver más en la Guía':'Ver mais no Guia','¿Algún dato incorrecto? Avisale a la Guía':'Algum dado errado? Avise o Guia','¿Es tu negocio? Para actualizar los datos o tener tu catálogo con pedidos, escribinos por WhatsApp al 0982 086 171.':'É o seu negócio? Para atualizar os dados ou ter seu catálogo com pedidos, fale com a gente pelo WhatsApp 0982 086 171.','Sitio web':'Site','Videos':'Vídeos','Más información':'Mais informações','Consultar por WhatsApp':'Perguntar pelo WhatsApp','Postularme por WhatsApp':'Me candidatar pelo WhatsApp','Ver la fuente':'Ver a fonte','Leer la nota completa':'Ler a notícia completa','La Guía no garantiza la contratación: el contacto es directo con quien publica.':'O Guia não garante a contratação: o contato é direto com quem publica.','Nunca pagues por adelantado sin ver el producto o el inmueble.':'Nunca pague adiantado sem ver o produto ou o imóvel.','Esta publicación ya no está disponible':'Esta publicação não está mais disponível','Venció o fue retirada por quien la publicó.':'Venceu ou foi retirada por quem publicou.','Ver lo que hay hoy en la Guía':'Ver o que tem hoje no Guia','Se perdió':'Perdido','Se encontró':'Encontrado','Venta':'Venda','Alquiler':'Aluguel','Aliado Tu Delivery':'Aliado Tu Delivery','Comida y bebidas':'Comida e bebidas','Tiendas y moda':'Lojas e moda','Salud y belleza':'Saúde e beleza','Hogar y construcción':'Casa e construção','Autos, motos y náutica':'Carros, motos e náutica','Servicios':'Serviços','Negocio':'Negócio','Lugar público':'Lugar público','Vacante de empleo':'Vaga de emprego','Agenda de Santa Rita':'Agenda de Santa Rita','Datos de fuentes públicas':'Dados de fontes públicas'};
+var tr=function(k){return D[k]||U[k]||(/^Llamar /.test(k)?'Ligar '+k.slice(7):/^Datos de fuentes públicas/.test(k)?k.replace('Datos de fuentes públicas','Dados de fontes públicas'):null)};
+var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n,L=[];while(n=w.nextNode())L.push(n);
+L.forEach(function(n){var t=n.nodeValue,k=t.trim();if(!k)return;var v=tr(k)||tr(k.replace(/ · (hoy|hoje)$/,''));if(v)n.nodeValue=t.replace(k,v)});})();</script>
 <script>(function(){var b=document.getElementById('sh');if(!b)return;b.addEventListener('click',function(){var d={title:document.title,text:<?= json_encode($title, JSON_UNESCAPED_UNICODE) ?>,url:<?= json_encode($self, JSON_UNESCAPED_SLASHES) ?>};if(navigator.share)navigator.share(d).catch(function(){});else location.href='https://wa.me/?text='+encodeURIComponent(d.text+' '+d.url)})})();</script>
 </body></html>

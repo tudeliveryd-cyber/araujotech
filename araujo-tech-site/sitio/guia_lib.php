@@ -113,8 +113,29 @@ function guia_dy($dy) {
   return $any ? $o : null;
 }
 // Categorias organizadas pelo painel ("pastas"): pub = informação pública (lugares), neg = negócios. Cada grupo pode ter abas.
+// 24/11 (Jean): "quando a pessoa coloca em português, traduz tudo". O que o Jean escreve só em espanhol (nome de categoria
+// sem versão em português, "qué hace", horário em texto) ganha tradução automática para o português (MyMemory, grátis),
+// guardada para sempre no servidor. Nunca traduz nomes de empresas. Se a tradução falhar, mostra o espanhol.
+function guia_tr($t) {
+  static $C = null, $file = null, $novas = 0, $mud = false;
+  $t = trim((string)$t); if ($t === '' || mb_strlen($t) > 160 || !preg_match('/\pL{3}/u', $t)) return '';
+  if ($C === null) { $file = sys_get_temp_dir() . '/at_tr_pt1.json'; $C = is_file($file) ? (json_decode((string)@file_get_contents($file), true) ?: []) : [];
+    register_shutdown_function(function () use (&$C, &$file, &$mud) { if ($mud) @file_put_contents($file, json_encode($C, JSON_UNESCAPED_UNICODE), LOCK_EX); }); }
+  $k = md5(mb_strtolower($t));
+  if (isset($C[$k])) { if ($C[$k]['p'] !== '' || time() - (int)$C[$k]['t'] < 3600) return $C[$k]['p']; }
+  if (getenv('GUIA_FS_BASE') || $novas >= 4 || !function_exists('curl_init')) return '';
+  $novas++;
+  $c = curl_init('https://api.mymemory.translated.net/get?langpair=es%7Cpt-BR&q=' . rawurlencode($t));
+  curl_setopt_array($c, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 4, CURLOPT_CONNECTTIMEOUT => 2]);
+  $r = curl_exec($c); $code = curl_getinfo($c, CURLINFO_HTTP_CODE); curl_close($c);
+  $j = ($r !== false && $code === 200) ? json_decode((string)$r, true) : null; $p = '';
+  if (is_array($j) && (int)($j['responseStatus'] ?? 0) === 200) { $p = trim(html_entity_decode((string)($j['responseData']['translatedText'] ?? ''), ENT_QUOTES, 'UTF-8'));
+    if ($p === '' || mb_strlen($p) > 200 || preg_match('/MYMEMORY|QUERY LENGTH|INVALID/i', $p)) $p = ''; elseif (mb_strtolower($p) === mb_strtolower($t)) $p = $t; }
+  $C[$k] = ['p' => mb_substr($p, 0, 160), 't' => time()]; $mud = true;
+  return $C[$k]['p'];
+}
 function guia_cat($raw) {
-  $txt = function ($n) { $n = is_array($n) ? $n : []; return ['es' => mb_substr(trim((string)($n['es'] ?? '')), 0, 40), 'pt' => mb_substr(trim((string)($n['pt'] ?? '')), 0, 40)]; };
+  $txt = function ($n) { $n = is_array($n) ? $n : []; $es = mb_substr(trim((string)($n['es'] ?? '')), 0, 40); $pt = mb_substr(trim((string)($n['pt'] ?? '')), 0, 40); if ($pt === '' && $es !== '') $pt = mb_substr(guia_tr($es), 0, 40); return ['es' => $es, 'pt' => $pt]; };
   $key = function ($k) { $k = (string)$k; return preg_match('/^[a-z][a-z0-9]{0,15}$/', $k) ? $k : ''; };
   $out = ['pub' => [], 'neg' => []];
   foreach (['pub', 'neg'] as $sec) {
@@ -231,6 +252,7 @@ function guia_pub() {
   $seen = [];
   foreach ($dir as $i => $x) { $sl = guia_nslug($x['n']); if ($sl === '') $sl = 'negocio'; if (isset($seen[$sl])) $sl .= '-' . strtolower(substr($x['id'], 0, 5)); $seen[$sl] = 1; $dir[$i]['sl'] = $sl; }
   foreach ($dir as $i => $x) if ($ll = guia_dir_ll($x['map'] ?? '')) $dir[$i]['ll'] = $ll; // ponto no mapa e 'Cerca de mí' (link curto do Maps convertido no servidor)
+  foreach ($dir as &$dd) foreach (['d' => 'dP', 'hrs' => 'hP'] as $a => $b) { $tp = guia_tr($dd[$a] ?? ''); if ($tp !== '' && $tp !== ($dd[$a] ?? '')) $dd[$b] = $tp; } unset($dd); // português automático (ver guia_tr)
   return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10), 'cat' => $cat, 'atl' => $atl, 'promo' => $promo];
 }
 
