@@ -183,6 +183,9 @@ const { sec, check, info } = L;
   check(pz.ch && pz.b.join() === '150000,350000,0' && pz.v.join() === '650000,1500000', 'Esencial Gs. 150.000 (instalação 350.000) e VIP Gs. 650.000 (instalação 1.500.000), fixos em guaraní');
   check(pz.lock === 100000 && pz.charge === 100000 && pz.newCharge === 150000 && pz.after === 150000, 'cliente que já existia continua pagando Gs. 100.000; cliente novo paga Gs. 150.000');
   check(pz.again === false, 'a troca roda uma vez só');
+  sec('Clientes da Guía (24/11): pacotes Presencia, Recomendado e Portada na Central');
+  { const g = await a.evaluate(() => { seedSysPlans(); const pl = plansFor('guia').map(p => p.n + ':' + p.price).join(','); acts.newclient(); acts.ncsys({ dataset: { k: 'guia' } }); const chips = !!document.querySelector('[data-act="ncsys"][data-k="guia"]'); ui.nc.name = 'Dr. Prueba Guía'; ui.nc.plan = 'gu-pres'; ui.nc.paid = true; acts.createclient(); const c = PL.shops.find(x => x.name === 'Dr. Prueba Guía'); const r = { pl, chips, sys: c && c.sys, web: c && c.web, site: !!(c && c.site), pay: c && c.pays[0] && c.pays[0].v }; PL.shops = PL.shops.filter(x => x !== c); savePL(); render(); return r; });
+    check(g.pl === 'Presencia:200000,Recomendado:400000,Portada:750000' && g.chips && g.sys === 'guia' && g.web === false && !g.site && g.pay === 200000, 'cliente da Guía: escolhe o pacote, paga o mês e não cria site nem aparece na vitrine', JSON.stringify(g)); }
   const gsT = n => 'Gs. ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   sec('Cobrança do dia 5 (24/11): todos vencem no dia 5; proporcional para quem vence em outro dia');
   await a.evaluate(() => { window.__S0 = JSON.stringify(PL.shops); window.__BD = PL.billDay; window.__now = Date.now; Date.now = () => Date.parse('2026-12-05T12:00:00Z');
