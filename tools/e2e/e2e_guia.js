@@ -991,6 +991,25 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     await a.act('qkaddhere'); await a.w(400);
     check(await a.evaluate(() => ui.qk.t === 'pub' && document.getElementById('qk_uc').value === 'salpri' && document.querySelector('[data-act="qkpp"][data-k="salpri"]').classList.contains('pri')), '"Agregar aquí" en Privados abre como Salud privada');
     await a.act('qkback'); await a.w(300);
+    // horário por dia: aparece na lista e se corrige no formulário
+    await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkBack = 'home'; ui.qkQ = ''; qkSheet(); }); await a.w(300);
+    await a.fill('#qk_q', 'hotel sol'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
+    const wd = await a.evaluate(() => new Date().getDay());
+    check(await a.evaluate(() => document.querySelectorAll('.sheet[data-k="qk"] .gu-dy .day').length === 7), 'formulario de empresa con horario por día');
+    await a.locator(`[data-qkdy="${wd}"][data-f="a0"]`).fill('07:00'); await a.locator(`[data-qkdy="${wd}"][data-f="a1"]`).fill('12:00');
+    await a.locator(`[data-qkdy="${wd}"][data-f="b0"]`).fill('14:00'); await a.locator(`[data-qkdy="${wd}"][data-f="b1"]`).fill('19:00');
+    await a.locator(`[data-qkdy="${(wd + 1) % 7}"][data-f="on"]`).uncheck(); await a.w(200);
+    check(await a.evaluate(k => document.querySelector(`[data-qkdy="${k}"][data-f="a0"]`).disabled, (wd + 1) % 7), 'día apagado bloquea sus horas');
+    await a.act('qksave'); await a.w(3500);
+    d = await doc(); const hsd = d.gdir.find(x => x.n === 'Hotel Sol');
+    check(hsd && Array.isArray(hsd.dy) && hsd.dy[wd].a.join('-') === '07:00-12:00' && hsd.dy[wd].b.join('-') === '14:00-19:00' && hsd.dy[(wd + 1) % 7].on === false, 'horario por día guardado en la ficha', JSON.stringify(hsd && hsd.dy && hsd.dy[wd]));
+    await a.fill('#qk_q', 'hotel sol'); await a.w(300);
+    check(await a.evaluate(() => /(Hoy|Hoje) 07:00–12:00 · 14:00–19:00/.test(document.getElementById('qk_ls').textContent)), 'la lista muestra el horario de hoy');
+    await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
+    check(await a.evaluate(k => document.querySelector(`[data-qkdy="${k}"][data-f="b1"]`).value === '19:00', wd), 'al corregir, el horario ya cargado aparece');
+    await a.fill('#qk_tel', '0983 111 223'); await a.act('qksave'); await a.w(3500);
+    check(JSON.stringify((await doc()).gdir.find(x => x.n === 'Hotel Sol').dy) === JSON.stringify(hsd.dy), 'corregir otra cosa no borra el horario');
+    check(await a.evaluate(() => qkDyTxt([0,1,2,3,4,5,6].map(() => ({ on: true, a: ['08:00', '18:00'], b: ['', ''] }))) .includes('08:00–18:00')), 'horario de catálogos (mismo formato) se lee igual');
     // trocar de tipo ao corrigir e apagar
     await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkBack = 'home'; ui.qkQ = ''; qkSheet(); }); await a.w(300);
     await a.fill('#qk_q', 'farmacia paga'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
