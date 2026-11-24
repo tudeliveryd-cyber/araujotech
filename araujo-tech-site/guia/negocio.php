@@ -168,7 +168,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 <?php foreach ($gal as $gk => $gu): ?><a href="<?= $e($gu) ?>" target="_blank" rel="noopener"><img src="<?= $e($gu) ?>" alt="<?= $e($name) ?> · foto <?= $gk + 1 ?>" loading="lazy" onerror="this.parentNode.style.display='none'"></a>
 <?php endforeach; ?></div></section><?php endif; ?>
 <?php if ($days): ?><section class="sec"><h2><?= $ic($I['clock'], 22) ?><span data-pt="Horários">Horarios</span></h2><div class="box hrs">
-<?php foreach ([1, 2, 3, 4, 5, 6, 0] as $i): $v = $ivs($days[$i]); ?><div class="<?= $i === $wd ? 'td' : '' ?>"><span data-pt="<?= $DP[$i] ?><?= $i === $wd ? ' · hoje' : '' ?>"><?= $DN[$i] ?><?= $i === $wd ? ' · hoy' : '' ?></span><span<?= $v ? '' : ' data-pt="Fechado"' ?>><?= $v ? $e(implode(' · ', array_map(function ($x) { return $x[2] . '–' . $x[3]; }, $v))) : 'Cerrado' ?></span></div>
+<?php foreach ([1, 2, 3, 4, 5, 6, 0] as $i): $v = $ivs($days[$i]); ?><div class="<?= $i === $wd ? 'td' : '' ?>"><span data-pt="<?= $DP[$i] ?><?= $i === $wd ? ' · hoje' : '' ?>"><?= $DN[$i] ?><?= $i === $wd ? ' · hoy' : '' ?></span><span<?= $v ? '' : ' data-pt="Fechado"' ?>><?= $v ? $e(implode(' · ', array_map(function ($x) { return $x[2] === $x[3] ? '24 horas' : $x[2] . '–' . $x[3]; }, $v))) : 'Cerrado' ?></span></div>
 <?php endforeach; ?></div></section><?php endif; ?>
 <?php if ($rv): ?><section class="sec"><h2><?= $ic($I['star'], 22) ?><span data-pt="Opiniões dos clientes">Opiniones de clientes</span></h2>
 <div class="box rvs"><p class="rvh"><b><?= $e($nota) ?></b><span class="stz"><?= $stars((int)round($rv['avg'])) ?></span><small data-pt="<?= (int)$rv['n'] ?> opiniões de pedidos reais"><?= (int)$rv['n'] ?> opiniones de pedidos reales</small></p>

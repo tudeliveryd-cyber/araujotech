@@ -1294,7 +1294,7 @@ function slRender(){const el=document.getElementById('sl');const items=slItems()
 let INFO={};
 const toM=h=>{const m=/^(\d{1,2}):(\d{2})$/.exec(String(h||''));return m?+m[1]*60+ +m[2]:null};
 function openNow(days,dt){if(!Array.isArray(days)||days.length!==7)return null;const d=dt||new Date(),n=d.getHours()*60+d.getMinutes(),wd=d.getDay();
- const ivs=x=>!x||!x.on?[]:[x.a,x.b].filter(r=>Array.isArray(r)&&toM(r[0])!=null&&toM(r[1])!=null).map(r=>{const a=toM(r[0]);let b=toM(r[1]);if(b<=a)b+=1440;return [a,b,r[1]]});
+ const ivs=x=>!x||!x.on?[]:[x.a,x.b].filter(r=>Array.isArray(r)&&toM(r[0])!=null&&toM(r[1])!=null).map(r=>{const a=toM(r[0]);let b=toM(r[1]);if(b<=a)b+=1440;return [a,b,r[0]===r[1]?'':r[1]]});/* 00:00–00:00 = 24 horas */
  for(const [a,b,c] of ivs(days[wd]))if(n>=a&&n<b)return {on:true,until:c};
  for(const [a,b,c] of ivs(days[(wd+6)%7]))if(b>1440&&n<b-1440)return {on:true,until:c};
  return {on:false}}

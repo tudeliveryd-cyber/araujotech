@@ -1010,6 +1010,23 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     await a.fill('#qk_tel', '0983 111 223'); await a.act('qksave'); await a.w(3500);
     check(JSON.stringify((await doc()).gdir.find(x => x.n === 'Hotel Sol').dy) === JSON.stringify(hsd.dy), 'corregir otra cosa no borra el horario');
     check(await a.evaluate(() => qkDyTxt([0,1,2,3,4,5,6].map(() => ({ on: true, a: ['08:00', '18:00'], b: ['', ''] }))) .includes('08:00–18:00')), 'horario de catálogos (mismo formato) se lee igual');
+    check(hsd.dy[(wd + 2) % 7].a.join('-') === '07:00-12:00' && hsd.dy[(wd + 2) % 7].b.join('-') === '14:00-19:00', 'poner el horario en un día lo copia a los demás días abiertos');
+    // 24 horas e sem horário fixo (táxi)
+    await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'form'; ui.qkBack = 'home'; qkSheet(); }); await a.w(300);
+    await a.fill('#qk_n', 'Taxi Nocturno Test'); await a.w(700); await a.act('qkhm', '[data-m="24"]'); await a.w(300);
+    check(await a.evaluate(() => !document.querySelector('.sheet[data-k="qk"] .gu-dy') && /24 horas/.test(document.getElementById('qk_rest').textContent)), '"24 horas" esconde los días y explica');
+    await a.fill('#qk_tel', '0971 222 333'); await a.act('qksave', '[data-next]'); await a.w(3500);
+    d = await doc(); const tn = d.gdir.find(x => x.n === 'Taxi Nocturno Test');
+    check(tn && tn.dy && tn.dy.every(x => x.on && x.a[0] === '00:00' && x.a[1] === '00:00'), '24 horas guardado (todos los días 00:00–00:00)');
+    await a.fill('#qk_n', 'Remis Sin Horario Test'); await a.w(700); await a.act('qkhm', '[data-m="no"]'); await a.w(300); await a.fill('#qk_h', 'Atiende de noche'); await a.fill('#qk_tel', '0971 222 334'); await a.act('qksave', '[data-next]'); await a.w(3500);
+    d = await doc(); const rs = d.gdir.find(x => x.n === 'Remis Sin Horario Test');
+    check(rs && !rs.dy && rs.hrs === 'Atiende de noche', 'sin horario fijo: sin días, con el texto "Atiende de noche"');
+    await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkQ = 'nocturno test'; qkSheet(); }); await a.w(300);
+    check(await a.evaluate(() => /24 horas/.test(document.getElementById('qk_ls').textContent)), 'la lista muestra "24 horas"');
+    await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
+    check(await a.evaluate(() => document.querySelector('[data-act="qkhm"][data-m="24"]').classList.contains('pri')), 'al corregir, abre en "24 horas"');
+    await a.act('qkhm', '[data-m="no"]'); await a.w(200); await a.act('qksave'); await a.w(3500);
+    check(!(await doc()).gdir.find(x => x.n === 'Taxi Nocturno Test').dy, 'cambiar a "Sin horario fijo" quita los días');
     // trocar de tipo ao corrigir e apagar
     await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkBack = 'home'; ui.qkQ = ''; qkSheet(); }); await a.w(300);
     await a.fill('#qk_q', 'farmacia paga'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
