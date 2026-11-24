@@ -957,13 +957,13 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkBack = 'home'; qkSheet(); }); await a.w(300);
     await a.fill('#qk_q', 'cyber alfa'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
     const e0 = await a.evaluate(() => ({ h: document.querySelector('.sheet[data-k="qk"] h2').textContent, n: document.getElementById('qk_n').value, hrs: document.getElementById('qk_h').value, tipos: document.querySelectorAll('[data-act="qktipo"]').length, next: !!document.querySelector('[data-act="qksave"][data-next]'), cancel: !!document.querySelector('[data-act="qkcancel"]') }));
-    check(e0.n === 'Cyber Alfa' && e0.hrs === 'Lun a sáb 8:00 – 20:00' && e0.tipos === 2 && !e0.next && e0.cancel && /Corregir/.test(e0.h), 'tocar el nombre abre el formulario lleno para corregir', JSON.stringify(e0));
+    check(e0.n === 'Cyber Alfa' && e0.hrs === 'Lun a sáb 8:00 – 20:00' && e0.tipos === 3 && !e0.next && e0.cancel && /Corregir/.test(e0.h), 'tocar el nombre abre el formulario lleno para corregir', JSON.stringify(e0));
     await a.fill('#qk_tel', '0985 777 888'); await a.fill('#qk_n', 'Cyber Alfa Center'); await a.act('qksave'); await a.w(3500);
     d = await doc(); const cy2 = d.gdir.find(x => x.id === cy.id);
     check(cy2 && cy2.n === 'Cyber Alfa Center' && cy2.tel === '0985 777 888' && cy2.wa === '595985777888' && cy2.hrs === cy.hrs && cy2.g === 'shop' && d.gdir.length === dirN + 6 && !d.gdir.some(x => x.n === 'Cyber Alfa'), 'corrección guardada en la misma ficha (no duplica)', JSON.stringify({ n: cy2 && cy2.n, len: d.gdir.length, want: dirN + 6 }));
     check(await a.evaluate(() => !ui.qk.ed && ui.qkV === 'home' && !!document.getElementById('qk_q')), 'después de corregir vuelve a donde estaba (inicio)');
     await a.fill('#qk_q', 'plaza rap'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
-    check(await a.evaluate(() => document.querySelectorAll('[data-act="qktipo"]').length === 1 && document.getElementById('qk_uc').value === 'ocio'), 'lugar público se corrige como público');
+    check(await a.evaluate(() => document.querySelectorAll('[data-act="qktipo"].pri').length === 1 && document.querySelector('[data-act="qktipo"][data-k="pub"]').classList.contains('pri') && document.getElementById('qk_uc').value === 'ocio'), 'lugar público se corrige como público');
     await a.fill('#qk_h', 'Siempre abierta'); await a.act('qksave'); await a.w(3500);
     check((await doc()).gutil.find(x => x.n === 'Plaza Rápida').h === 'Siempre abierta', 'horario del lugar público guardado');
     // entrar na categoria: ver o que tem, corrigir, "Agregar aquí"
@@ -991,6 +991,49 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     await a.act('qkaddhere'); await a.w(400);
     check(await a.evaluate(() => ui.qk.t === 'pub' && document.getElementById('qk_uc').value === 'salpri' && document.querySelector('[data-act="qkpp"][data-k="salpri"]').classList.contains('pri')), '"Agregar aquí" en Privados abre como Salud privada');
     await a.act('qkback'); await a.w(300);
+    // trocar de tipo ao corrigir e apagar
+    await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkBack = 'home'; ui.qkQ = ''; qkSheet(); }); await a.w(300);
+    await a.fill('#qk_q', 'farmacia paga'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
+    await a.act('qktipo', '[data-k="pub"]'); await a.w(900);
+    check(await a.evaluate(() => document.getElementById('qk_uc').value === 'far'), 'al pasar una empresa a Lugar, elige sola la carpeta (Farmacias)');
+    await a.act('qksave'); await a.w(3500);
+    d = await doc(); const fu2 = d.gutil.find(x => x.n === 'Farmacia Paga');
+    check(fu2 && fu2.c === 'far' && !d.gdir.some(x => x.n === 'Farmacia Paga'), 'pasó de Empresa a Lugar (Farmacias) sin quedar repetida');
+    await a.fill('#qk_q', 'juan ramirez'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
+    await a.act('qkdel'); await a.w(300);
+    check(await a.evaluate(() => !!document.querySelector('[data-act="qkdelok"]') && !!document.querySelector('[data-act="qkdelno"]')), '"Borrar" pide confirmación');
+    check((await doc()).gdir.some(x => x.n === 'Juan Ramírez'), 'sin confirmar no borra nada');
+    await a.act('qkdelok'); await a.w(3500);
+    d = await doc(); check(!d.gdir.some(x => x.n === 'Juan Ramírez') && d.gdir.some(x => x.n === 'Hotel Sol') && d.gcat.neg.some(c => c.n.es === 'Lan house'), 'confirmado: borra solo ese registro (la categoría y lo demás quedan)');
+    // o que já aparece na Guía entra nas listas (lista da cidade, contas próprias, catálogos Vitrix)
+    await a.evaluate(() => { ui.qkUtilBk = JSON.parse(JSON.stringify(ui.gu.util)); ui.gu.util.forEach(u => delete u.o); ui.lpJ = [{ c: 'igl', n: 'Parroquia Ciudad Test', tel: '0673 111' }, { c: 'seg', n: 'Comisaría Ciudad Test', a: 'Centro' }, { c: 'ocio', n: 'Plaza Rápida' }];
+      ui.qkPub = { dir: [{ id: 'fdono1', n: 'Dueño Propio Test', g: 'food', sub: '', tel: '0981 9' }], fu: [{ id: 'fu1', c: 'igl', n: 'Iglesia Cuenta Test' }] }; ui.qkPubAt = Date.now(); ui.qkV = 'home'; ui.qkBack = 'home'; qkSheet(); }); await a.w(400);
+    check(await a.evaluate(() => /2 lugares/.test(document.querySelector('.sheet[data-k="qk"]').textContent) && !!document.querySelector('[data-act="qkimpv"]')), 'inicio avisa los lugares de la lista de la ciudad (sin repetir los que ya están)');
+    const ik = await a.evaluate(() => ui.gu.cat.pub.find(c => guFam(c).includes('igl')).k);
+    await a.act('qkcat', `[data-sec="pub"][data-k="${ik}"]`); await a.w(400);
+    const ig = await a.evaluate(() => ({ city: [...document.querySelectorAll('[data-act="qkcity"]')].map(b => b.dataset.n), txt: document.querySelector('.sheet[data-k="qk"]').textContent }));
+    check(ig.city.join() === 'Parroquia Ciudad Test' && /Iglesia Cuenta Test/.test(ig.txt) && /el dueño edita/.test(ig.txt), 'Iglesias muestra el de la lista de la ciudad (para corregir) y el de cuenta propia', JSON.stringify(ig.city));
+    await a.act('qkhome'); await a.w(200); await a.act('qkcat', '[data-sec="neg"][data-k="food"]'); await a.w(400);
+    check(await a.evaluate(() => /Dueño Propio Test/.test(document.querySelector('.sheet[data-k="qk"]').textContent)), 'Comida muestra el negocio con cuenta propia');
+    const vx = await a.evaluate(() => { const v = qkVx()[0]; return v ? { sid: v.id, g: v.g } : null; });
+    if (vx) { await a.act('qkhome'); await a.w(200); await a.act('qkcat', `[data-sec="neg"][data-k="${vx.g}"]`); await a.w(400);
+      check(await a.locator(`[data-act="qkvx"][data-sid="${vx.sid}"]`).count() === 1, 'el catálogo Vitrix aparece en su categoría, con editar'); }
+    else info('sin catálogos Vitrix en los datos de prueba');
+    await a.act('qkhome'); await a.w(200); await a.act('qkcat', `[data-sec="pub"][data-k="${ik}"]`); await a.w(400);
+    await a.act('qkcity', '[data-n="Parroquia Ciudad Test"]'); await a.w(400);
+    const pv = await a.evaluate(() => ({ v: ui.qkV, txt: document.querySelector('.sheet[data-k="qk"]').textContent }));
+    check(pv.v === 'imp' && /Parroquia Ciudad Test/.test(pv.txt) && /Comisaría Ciudad Test/.test(pv.txt) && /Traer los 2/.test(pv.txt), 'antes de traer muestra la lista completa para aprobar');
+    const un0 = (await doc()).gutil.length;
+    await a.act('qkimp'); await a.w(3500);
+    d = await doc(); const pc = d.gutil.find(x => x.n === 'Parroquia Ciudad Test');
+    check(pc && pc.o === 1 && d.gutil.length === un0 + 2 && d.gutil.every(x => x.o === 1) && d.gutil.filter(x => x.n === 'Plaza Rápida').length === 1, 'trae los 2 lugares (sin duplicar) y la Guía pasa a usar la lista del panel', JSON.stringify({ un0, len: d.gutil.length }));
+    check(await a.evaluate(() => ui.qkV === 'form' && ui.qk.ed && document.getElementById('qk_n').value === 'Parroquia Ciudad Test' && document.getElementById('qk_tel').value === '0673 111'), 'después de traer abre para corregir el lugar que tocaste');
+    await a.act('qkback'); await a.w(300);
+    check(await a.evaluate(() => ui.qkV === 'cat' && !document.querySelector('[data-act="qkcity"]') && [...document.querySelectorAll('[data-act="qkedit"] b')].some(b => b.textContent === 'Parroquia Ciudad Test')), 'en la categoría ya aparece como registro del panel');
+    // fechar a janela por fora não trava o painel grande da Guía
+    await a.evaluate(() => closeSheet()); await a.w(300); await a.act('gusite'); await a.w(1500);
+    check(await a.evaluate(() => !!document.querySelector('.sheet[data-k="gu"]')), 'cerrar el registro rápido de otra forma no traba el panel completo');
+    await a.evaluate(() => closeSheet()); await a.w(300); await a.act('guquick'); await a.w(800);
     await a.act('qkclose'); await a.w(300);
     check(await a.evaluate(() => { const i = ui.gu.dir.findIndex(x => x.n === 'Hotel Rápido'); return i >= 0 && /data-gu="dir\.\d+\.qk" checked/.test(gdItem(ui.gu, ui.gu.dir[i], i)); }), 'en el panel completo la ficha muestra "Publicada en la Guía sin plan" marcado');
     await a.evaluate(() => closeSheet()); }
