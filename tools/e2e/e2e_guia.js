@@ -382,7 +382,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(v2.cat && v2.info.includes('ic-ev') && v2.info.includes('ic-tel') && v2.tel[0] === 'tel:911', 'início novo: Categorías principales e a linha com eventos e teléfonos útiles (911 para ligar)');
   check(v2.ord === 'z1,z2,z3', 'slider na ordem da lista quando o painel pede (' + v2.ord + ')');
   check(v2.vfOk && v2.vfFn, 'selo verificado: clientes Vitrix e aliados Tu Delivery têm; ficha simples sem relação não tem');
-  check(v2.pb === '/guia/negocios/' && v2.hq >= 3 && /Santa Rita/.test(v2.h1), 'início novo: os 3 blocos (Dónde comer, Qué hacer, Dónde quedarse), cartão Publicá tu negocio e o título da página (h1)');
+  check(v2.pb === '/guia/anunciar/' && v2.hq >= 3 && /Santa Rita/.test(v2.h1), 'início novo: os 3 blocos (Dónde comer, Qué hacer, Dónde quedarse), cartão Publicá tu negocio e o título da página (h1)');
   check(/O que fazer\|Passeios e eventos/.test(v2.ttPt || '') && !/Qué hacer|Paseos/.test(v2.ttPt || ''), 'em português os 3 atalhos do início também ficam em português (O que fazer, Passeios e eventos)', v2.ttPt);
   check(v2.tq, '"Dónde quedarse" e "Qué hacer" abrem as páginas deles');
   check(v2.find && v2.acc && v2.home, 'Categorías (barra de baixo) leva às categorias, Mi cuenta (topo) abre o menu e Inicio (topo) volta ao começo');
@@ -410,7 +410,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     r.ap = [...document.querySelectorAll('.jb a.pri')].map(a => a.getAttribute('href'))[0] || '';
     document.querySelector('[data-ja="coc"]').click(); await W(20); r.f = [...document.querySelectorAll('.jb-t b')].map(b => b.textContent);
     goHome(); render(); for (const k of ['igl', 'edu']) { document.querySelector('#atl [data-a="' + k + '"]').click(); await W(30); r[k] = (document.querySelector('.spv h2') || {}).textContent || ''; r[k + 'n'] = document.querySelectorAll('.spv .pc').length; goHome(); render(); }
-    r.pub = document.querySelectorAll('#todas [data-pk]').length; document.querySelector('#todas [data-pk="fin"]').click(); await W(30); r.fin = document.querySelectorAll('.spv .pc').length; r.sug = !!document.querySelector('.spv .sug2 a[href*="wa.me"]');
+    r.pub0 = document.querySelectorAll('#todas [data-pk]').length; { const mb = document.querySelector('#todas [data-more="pub"]'); if (mb) { mb.click(); await W(30); } } r.pub = document.querySelectorAll('#todas [data-pk]').length; document.querySelector('#todas [data-pk="fin"]').click(); await W(30); r.fin = document.querySelectorAll('.spv .pc').length; r.sug = !!document.querySelector('.spv .sug2 a[href*="wa.me"]');
     const C0 = G.clas; G.clas = [{ id: 'c1', k: 'inm', op: 'alq', t: 'Casa en alquiler', pr: 'Gs. 2.500.000', z: 'Centro', d: '3 dormitorios', wa: '595981000444', until: day(20), ph: '' }, { id: 'c2', k: 'veh', op: 'venta', t: 'Moto 150cc', pr: 'Gs. 9.000.000', z: '', d: '', wa: '595981000555', until: day(20), ph: '' }]; goHome(); render(); go('cla'); await W(30);
     r.cl = document.querySelectorAll('.cl').length; r.clwa = (document.querySelector('.cl a.pri') || {}).href || ''; const cb = document.querySelector('[data-clk="veh"]'); if (cb) { cb.click(); await W(20); } r.clf = [...document.querySelectorAll('.cl-b > b')].map(b => b.textContent); G.clas = C0; CLF = '';
     const E0 = G.ev; G.ev = [{ t: 'Culto de jóvenes', k: 'rel', d: day(3), h: '19:30', l: 'Iglesia', u: '' }, { t: 'Torneo de futsal', k: 'dep', d: day(4), h: '', l: 'Polideportivo', u: '' }]; goHome(); render(); await W(20);
@@ -422,14 +422,27 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(/Iglesias/.test(v5.igl) && v5.igln >= 1 && /Educación/.test(v5.edu) && v5.edun >= 5, 'Iglesias e Educación abrem com os lugares públicos (mapa aberto, com fonte)');
   check(v5.cl === 2 && /wa\.me\/595981000444/.test(v5.clwa) && v5.clf.join() === 'Moto 150cc', 'Clasificados e inmuebles: anúncios com consulta por WhatsApp e filtro por tipo');
   check(v5.evf && v5.evl.join() === 'Torneo de futsal', 'Agenda: filtro por tipo (religioso, deportivo, cultural…)');
-  check(v5.pub >= 12 && v5.fin >= 5 && v5.sug, 'categorias públicas gratuitas com página própria e "Ayudá a completar la Guía"');
+  check(v5.pub0 <= 8 && v5.pub >= 12 && v5.fin >= 5 && v5.sug, 'categorias públicas gratuitas com página própria e "Ayudá a completar la Guía"');
+  const mo = await gr3.evaluate(async () => { const W = ms => new Promise(f => setTimeout(f, ms)); const N0 = NEWS, E0 = G.ev, r = {};
+    NEWS = { n: 'Diario', site: 'https://ejemplo.com', items: Array.from({ length: 8 }, (_, i) => ({ t: 'Noticia ' + i, u: 'https://ejemplo.com/' + i })) };
+    G.ev = Array.from({ length: 8 }, (_, i) => ({ id: 'e' + i, t: 'Evento ' + i, d: '2099-01-' + String(i + 10), k: 'otr' }));
+    MO.nw = MO.ev = MO.pub = false; goHome(); render(); await W(30);
+    r.n0 = document.querySelectorAll('#noticias .nw').length; r.e0 = document.querySelectorAll('#agenda .ev:not(.fer)').length; r.p0 = document.querySelectorAll('.tg.pub .tile[data-pk]').length; r.btn = [...document.querySelectorAll('[data-more]')].map(b => b.dataset.more);
+    { const b = document.querySelector('[data-more="nw"]'); if (b) { b.click(); await W(30); } } r.n1 = document.querySelectorAll('#noticias .nw').length;
+    { const b = document.querySelector('[data-more="ev"]'); if (b) { b.click(); await W(30); } } r.e1 = document.querySelectorAll('#agenda .ev:not(.fer)').length;
+    const pb = document.querySelector('[data-more="pub"]'); if (pb) { pb.click(); await W(30); } r.p1 = document.querySelectorAll('.tg.pub .tile[data-pk]').length; r.left = document.querySelectorAll('[data-more]').length;
+    L = 'pt'; MO.nw = false; render(); await W(30); r.pt = (document.querySelector('[data-more="nw"]') || {}).textContent || ''; L = 'es';
+    NEWS = N0; G.ev = E0; MO.nw = MO.ev = MO.pub = false; goHome(); render(); return r; });
+  info(JSON.stringify(mo));
+  check(mo.n0 === 5 && mo.n1 === 8 && mo.e0 <= 5 && mo.e1 >= 8 && mo.btn.includes('nw') && mo.btn.includes('ev') && mo.left === 0 && /Ver mais notícias/.test(mo.pt), 'início enxuto: notícias e agenda mostram 5 e abrem o resto com "Ver más" (ES/PT)');
+  check(mo.p0 <= 8 && mo.p1 > mo.p0, 'informação pública: até 8 blocos e "Ver toda la información pública" quando há mais');
   const v3 = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms)); const L0 = LIST, G0 = G.dir, I0 = Object.assign({}, INFO);
     LIST = [{ id: 'vipx', name: 'Vip X', vip: true, dest: true, _g: 'food', segEs: 'Restaurante' }, { id: 'prex', name: 'Pre X', dest: true, _g: 'shop', segEs: 'Ropa' }, { id: 'comx', name: 'Com X', _g: 'shop', segEs: 'Ropa' }];
     INFO.vipx = { wa: '595981000000', rt: 4.8, rn: 12 }; INFO.comx = { wa: '595981000009', rt: 4.5, rn: 3, cv: '/img/x.jpg' }; G.dir = [{ id: 'td1', n: 'Aliado Uno', g: 'food', td: true, wa: '0981000001' }, { id: 'td2', n: 'Aliado Foto', g: 'food', td: true, ph: '/sitio/gimg.php?d=td2&k=ph&v=abc123' }, { id: 'nt1', n: 'Sin Aliado', g: 'food' }];
     goHome(); render(); await W(30);
     r.fd = [...document.querySelectorAll('#destacados .fc-t b')].map(b => b.textContent); r.tags = [...document.querySelectorAll('#destacados .fc-tg')].map(t => t.textContent);
     r.wa = [...document.querySelectorAll('#destacados .fc-wa')].map(a => a.getAttribute('href')); r.rt = (document.querySelector('#destacados em') || {}).textContent || '';
-    r.rc = [...document.querySelectorAll('#aliados .fc-t b')].map(b => b.textContent); r.rcwa = document.querySelectorAll('#aliados .fc-wa').length; r.rcph = [...document.querySelectorAll('#aliados .fc-cv > img')].map(i => i.getAttribute('src')); r.rclink = [...document.querySelectorAll('#aliados a.fc-a')].map(x => x.getAttribute('href')); r.vxlink = [...document.querySelectorAll('#destacados a.fc-a')].map(x => x.getAttribute('href')); r.sug = document.querySelectorAll('#sug [data-tq]').length; r.vxl = [...document.querySelectorAll('#catalogos .fc-t b')].map(b => b.textContent); { const cc = [...document.querySelectorAll('#catalogos .fc')].find(x => /Com X/.test(x.textContent)), cv = [...document.querySelectorAll('#catalogos .fc')].find(x => /Vip X/.test(x.textContent)); r.basic = cc ? { wa: !!cc.querySelector('.fc-wa'), cv: !!cc.querySelector('.fc-cv img'), rt: !!cc.querySelector('em') } : null; r.vipc = cv ? { wa: !!cv.querySelector('.fc-wa') } : null; } r.side = !!document.querySelector('a.pbn[href="/guia/negocios/"]');
+    r.rc = [...document.querySelectorAll('#aliados .fc-t b')].map(b => b.textContent); r.rcwa = document.querySelectorAll('#aliados .fc-wa').length; r.rcph = [...document.querySelectorAll('#aliados .fc-cv > img')].map(i => i.getAttribute('src')); r.rclink = [...document.querySelectorAll('#aliados a.fc-a')].map(x => x.getAttribute('href')); r.vxlink = [...document.querySelectorAll('#destacados a.fc-a')].map(x => x.getAttribute('href')); r.sug = document.querySelectorAll('#sug [data-tq]').length; r.vxl = [...document.querySelectorAll('#catalogos .fc-t b')].map(b => b.textContent); { const cc = [...document.querySelectorAll('#catalogos .fc')].find(x => /Com X/.test(x.textContent)), cv = [...document.querySelectorAll('#destacados .fc')].find(x => /Vip X/.test(x.textContent)); r.basic = cc ? { wa: !!cc.querySelector('.fc-wa'), cv: !!cc.querySelector('.fc-cv img'), rt: !!cc.querySelector('em') } : null; r.vipc = cv ? { wa: !!cv.querySelector('.fc-wa') } : null; } r.side = !!document.querySelector('a.pbn[href="/guia/anunciar/"]');
     document.getElementById('q').value = 'ropa'; document.getElementById('qgo').click(); await W(30); r.search = CAT === 'all' && [...document.querySelectorAll('#list .card h3')].some(h => /Pre X|Com X/.test(h.textContent));
     LIST = L0; G.dir = G0; INFO = Object.assign(INFO, I0); delete INFO.vipx; delete INFO.comx; goHome(); render(); return r; });
   info(JSON.stringify(v3));
@@ -437,8 +450,8 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(v3.wa.length === 1 && /wa\.me\/595981000000/.test(v3.wa[0]) && /4,8/.test(v3.rt), 'destacado com WhatsApp do catálogo e nota real (só quando existem)');
   check(v3.rc.join('|') === 'Aliado Foto|Aliado Uno' && v3.rcwa === 1 && v3.rcph[0] === '/sitio/gimg.php?d=td2&k=ph&v=abc123', 'Recomendados Aliado Tu Delivery: só clientes Tu Delivery, com WhatsApp; os com foto do local primeiro');
   check(v3.rclink.length === 1 && /wa\.me/.test(v3.rclink[0]) && v3.vxlink.every(h => !/wa\.me/.test(h)) && v3.vxlink.length === 2, 'aliado: tocar no card abre o WhatsApp; cliente Vitrix: abre a página dele na Guía');
-  check(v3.vxl.join('|') === 'Vip X|Pre X|Com X', '"Catálogos Vitrix": todos os clientes Vitrix, de qualquer plano (os destacados primeiro)', JSON.stringify(v3.vxl));
-  check(v3.basic && !v3.basic.wa && !v3.basic.cv && !v3.basic.rt && v3.vipc && v3.vipc.wa, 'plano básico em "Catálogos Vitrix": cartão simples (sem capa, WhatsApp e nota); VIP com o cartão completo', JSON.stringify([v3.basic, v3.vipc]));
+  check(v3.vxl.join('|') === 'Com X', '"Catálogos Vitrix": só os clientes Vitrix que ainda não aparecem em Negocios destacados (sem repetir)', JSON.stringify(v3.vxl));
+  check(v3.basic && !v3.basic.wa && !v3.basic.cv && !v3.basic.rt && v3.vipc && v3.vipc.wa, 'plano básico em "Catálogos Vitrix": cartão simples (sem capa, WhatsApp e nota); VIP com o cartão completo em Destacados', JSON.stringify([v3.basic, v3.vipc]));
   check(v3.sug >= 3 && v3.side, 'busca com sugestões tocáveis e cartão "Publicá tu negocio"');
   check(v3.search, 'botão Buscar mostra os resultados');
   check(simp.busShort && simp.busFull, 'Santa Rita útil resumido no início e abre o resto ao tocar');
