@@ -115,7 +115,7 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   const html = php("$_GET = ['id' => 'dr-teste-salinas']; include 'bio.php';", 'guia');
   if (process.env.SHOT) fs.writeFileSync(process.env.SHOT + '/bio.html', html);
   const order = ['data-c="wa"', 'data-c="map"', 'data-c="gu"'].map(k => html.indexOf(k));
-  check(/<h2>Servicios<\/h2>/.test(html) && /Limpieza dental/.test(html) && /Gs\. 150\.000/.test(html), 'link /l/: mostra os serviços com preço');
+  check(/<span>Servicios<\/span><\/h2>/.test(html) && /id="vc"/.test(html) && /Limpieza dental/.test(html) && /Gs\. 150\.000/.test(html), 'link /l/: mostra os serviços com preço');
   check(/id="sh"/.test(html) && order.every(i => i > 0) && order[0] < order[1] && order[1] < order[2], 'link /l/: botões no padrão da Guía');
   check(/theme-color" content="#24093F"/.test(html) && html.includes('CZ="' + hoy + '"'), 'link /l/: cor da Guía e aviso de fechado hoje');
 
