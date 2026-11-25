@@ -42,7 +42,9 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   check(/Acceso del cliente a su panel/.test(await a.txt()) && await a.locator('[data-act="qkinv"]').count() === 1, 'a ficha paga mostra "Acceso del cliente" com "Crear invitación"');
   { // 25/11 (Jean): "o logo está em péssima qualidade": além do logo pequeno (140 px) a Central guarda um em boa resolução (480 px) à parte
     const big = path.join(os.tmpdir(), 'e2e_logo_big.png'); cp.execFileSync('python3', ['-c', "from PIL import Image,ImageDraw;im=Image.new('RGB',(900,900),(20,20,20));d=ImageDraw.Draw(im);[d.ellipse((i*40,i*40,900-i*40,900-i*40),outline=(200,160,40),width=6) for i in range(10)];im.save('" + big + "')"]);
+    check(!/resolución/.test(await a.txt()), 'sem logo: nenhum aviso de resolução');
     await a.locator('input[data-qklogo]').setInputFiles(big); await a.w(1500);
+    check(/Logo en buena resolución/.test(await a.txt()), 'logo novo: avisa que está em boa resolução');
     await a.locator('[data-act="qksave"]').click(); await a.w(3500);
     const dd = (L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json).gdir || []).find(x => x.id === 'dj1') || {};
     const giR = await L.fsReq(P, 'GET', 'platform/sitio/gimg/lhdj1', 'owner'); info('gimg ' + giR.status + ' ' + JSON.stringify(giR.json).slice(0, 200)); const gl = await a.evaluate(async () => { try { return (await CLOUD.api.listGimg()).map(x => x.id || x); } catch (e) { return String(e); } }); info('list ' + JSON.stringify(gl).slice(0, 200));
