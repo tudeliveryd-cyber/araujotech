@@ -9,6 +9,7 @@ const { chromium, devices } = require('playwright');
   const shot = async n => out(n, await p.screenshot({ type: 'jpeg', quality: 85 }));
   await shot('top');
   for (const id of ['comer', 'cats', 'util', 'agenda']) { const s = p.locator('#' + id).first(); if (!(await s.count())) { console.log('SEM', id); continue; }
+if (id === 'comer' || id === 'cats') { const k = p.locator('#comer [data-qt]').first(); if (await k.count()) { await k.click(); await p.waitForTimeout(700); } }
     await s.scrollIntoViewIfNeeded(); await p.waitForTimeout(400);
     await p.evaluate(id => { const e = document.getElementById(id); const hd = document.querySelector('header'); const h = hd && getComputedStyle(hd).position.match(/sticky|fixed/) ? hd.getBoundingClientRect().height : 0; window.scrollTo(0, window.scrollY + e.getBoundingClientRect().top - h - 12); }, id);
     await p.waitForTimeout(1200); await shot(id); }
