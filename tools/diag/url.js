@@ -1,0 +1,2 @@
+// somente leitura: abre um endereço e diz o status e o título.  node tools/diag/url.js "https://..."
+(async () => { const r = await fetch(process.argv[2] + (process.argv[2].includes('?') ? '&' : '?') + 'v=' + Date.now(), { redirect: 'follow' }); const t = await r.text(); console.log('URLRES', r.status, r.url, (t.match(/<title>([^<]*)/) || [])[1] || '', t.includes('lead-anunciar') ? 'FORM-OK' : ''); })().catch(e => { console.log('ERRO', e.message); process.exit(1); });
