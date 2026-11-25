@@ -66,7 +66,10 @@ $ini = mb_strtoupper(mb_substr(preg_replace('/^(dr|dra|lic|ing)\.?\s+/i', '', $n
 *{box-sizing:border-box;margin:0}
 html{background:var(--night)}
 body{font-family:var(--text);color:#fff;min-height:100vh;line-height:1.45;background:radial-gradient(640px 420px at 50% -120px,color-mix(in srgb,var(--purple) 85%,transparent),transparent 72%),radial-gradient(480px 480px at -10% 110%,color-mix(in srgb,var(--deep) 80%,transparent),transparent 70%),var(--night);-webkit-font-smoothing:antialiased}
-.w{max-width:460px;margin:0 auto;padding:max(34px,env(safe-area-inset-top)) 18px 30px}
+.w{max-width:460px;margin:0 auto;padding:max(58px,calc(env(safe-area-inset-top) + 50px)) 18px 30px;position:relative}
+.lng{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--glass);border:1px solid var(--line)}
+.lng button{font:inherit;font-size:12.5px;font-weight:700;color:var(--mist);background:none;border:0;padding:6px 11px;border-radius:999px;cursor:pointer;min-width:40px}
+.lng button[aria-pressed="true"]{background:#fff;color:var(--night)}.lng button:focus-visible{outline:2px solid var(--yellow);outline-offset:1px}
 .hero{display:flex;flex-direction:column;align-items:center;text-align:center}
 .lgw{position:relative}
 .lg{width:116px;height:116px;border-radius:32px;background:#fff;overflow:hidden;display:grid;place-items:center;box-shadow:0 0 0 4px rgba(255,255,255,.95),0 0 0 10px rgba(255,255,255,.08),0 24px 60px rgba(0,0,0,.5)}
@@ -111,6 +114,7 @@ h1{font-family:var(--display);font-weight:900;font-size:29px;line-height:1.1;let
 @media (prefers-reduced-motion:no-preference){.hero,.cta,.tiles,.card,.gu{animation:up .5s ease-out both}.cta{animation-delay:.06s}.tiles{animation-delay:.1s}.card,.gu{animation-delay:.14s}@keyframes up{from{opacity:0;transform:translateY(10px)}}}
 </style></head><body>
 <main class="w">
+ <div class="lng" role="group" aria-label="Idioma"><button type="button" data-l="es" aria-pressed="true">ES</button><button type="button" data-l="pt" aria-pressed="false">PT</button></div>
  <header class="hero">
   <div class="lgw"><div class="lg"><?= $lgU ? '<img src="' . $e($lgU) . '" alt="Logo de ' . $e($n) . '">' : '<b>' . $e($ini) . '</b>' ?></div><span class="vf" title="En la Guía de Santa Rita"><?= $ic($I['ok']) ?></span></div>
   <h1><?= $e($n) ?></h1>
@@ -143,7 +147,8 @@ echo ' <div class="tiles">' . implode('', $T) . "</div>\n";
 <p class="tst" id="tst">Enlace copiado</p>
 <script>
 (()=>{const DY=<?= json_encode($dy, JSON_HEX_TAG | JSON_HEX_AMP) ?>,TR=<?= json_encode((object)$TR, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>,SL=<?= json_encode($id) ?>,CZ=<?= json_encode($cz) ?>,VC=<?= json_encode(['n' => $n, 't' => $w ? '+' . $w : $tel, 'u' => $self, 'a' => $addr], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
- let L='es';try{const s=localStorage.getItem('at_lang');L=s?s:(/^pt/i.test(navigator.language||'')?'pt':'es')}catch(e){L=/^pt/i.test(navigator.language||'')?'pt':'es'}
+ let L='es';const QL=new URLSearchParams(location.search).get('l');try{const s=QL==='pt'||QL==='es'?QL:localStorage.getItem('at_lang');L=s?s:(/^pt/i.test(navigator.language||'')?'pt':'es')}catch(e){L=/^pt/i.test(navigator.language||'')?'pt':'es'}
+ document.querySelectorAll('.lng [data-l]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.l===L));b.addEventListener('click',()=>{if(b.dataset.l===L)return;try{localStorage.setItem('at_lang',b.dataset.l)}catch(e){}const u=new URL(location.href);u.searchParams.set('l',b.dataset.l);location.replace(u.toString())})});
  const now=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Asuncion'})),wd=now.getDay(),mn=now.getHours()*60+now.getMinutes(),toM=s=>{const m=/^(\d{1,2}):(\d{2})$/.exec(s||'');return m?+m[1]*60+ +m[2]:null};
  const hoy=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0'),st=document.getElementById('st'),mark=()=>{const tr=document.querySelector('tr[data-d="'+wd+'"]');if(tr)tr.className='hoy'};
  if(CZ&&CZ>=hoy){st.hidden=false;st.classList.add('cz');st.querySelector('b').textContent=CZ===hoy?(L==='pt'?'Fechado hoje':'Cerrado hoy'):(L==='pt'?'Fechado até ':'Cerrado hasta ')+CZ.slice(8,10)+'/'+CZ.slice(5,7);mark()}

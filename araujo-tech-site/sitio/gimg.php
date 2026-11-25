@@ -20,7 +20,7 @@ if ($ff !== '' && $i === '') {
   }
   http_response_code(404); exit;
 }
-$dk = (($_GET['k'] ?? '') === 'ph') ? 'ph' : 'lg'; // ficha simples: logo (lg) ou foto do local (ph)
+$dk = (($_GET['k'] ?? '') === 'ph') ? 'ph' : ((($_GET['k'] ?? '') === 'h') ? 'lgh' : 'lg'); // h = logo em boa resolução // ficha simples: logo (lg) ou foto do local (ph)
 if ($i === '' && $dd !== '') $i = 'd' . $dd;
 if ($i === '' && $cc !== '') $i = 'c' . $cc;
 if ($i === '' && $tt !== '') $i = 't' . $tt;
@@ -49,6 +49,6 @@ if (preg_match('#^gimg:([A-Za-z0-9_]{1,60}):([a-f0-9]{1,16})$#', $src, $gm)) {
   }
 }
 if (!preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#s', $src, $m)) { http_response_code(404); exit; }
-$f = sys_get_temp_dir() . '/at_gimg_' . $i . ($fld === 'ph' && $dd !== '' ? 'ph' : '') . ($wd ? 'd' : '') . '_' . substr(md5($src), 0, 12) . '.img';
+$f = sys_get_temp_dir() . '/at_gimg_' . $i . ($fld === 'ph' && $dd !== '' ? 'ph' : '') . ($fld === 'lgh' ? 'h' : '') . ($wd ? 'd' : '') . '_' . substr(md5($src), 0, 12) . '.img';
 if (!is_file($f)) { $bin = base64_decode($m[2]); if (!$bin) { http_response_code(404); exit; } @file_put_contents($f, $bin); }
 header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $m[1]); header('Cache-Control: public, max-age=86400'); header('Content-Length: ' . filesize($f)); readfile($f);

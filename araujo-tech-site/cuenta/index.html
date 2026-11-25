@@ -218,7 +218,7 @@ function lkView(){const T=t(),f=FE,st=FICHA&&FICHA.st;
  const day=i=>`<div class="dyr${f.dy[i].on?'':' dyx'}"><label class="dyn"><input type="checkbox" data-dyon="${i}" ${f.dy[i].on?'checked':''}><b>${T.DN[i]}</b></label><div class="dyt"><span class="pr">${tm(i,'a',0)}<span>–</span>${tm(i,'a',1)}</span><span class="pr"><span class="dya">${T.lk_and}</span>${tm(i,'b',0)}<span>–</span>${tm(i,'b',1)}</span></div></div>`;
  const td=today(),czOn=f.cz&&f.cz>=td;
  const sv=f.sv.map((v,i)=>`<div class="svr"><input class="inp" data-sv="${i}.t" value="${esc(v.t)}" maxlength="60" placeholder="${esc(T.lk_svt)}" aria-label="${esc(T.lk_svt)} ${i+1}"><input class="inp svp" data-sv="${i}.p" value="${esc(v.p)}" maxlength="30" placeholder="${esc(T.lk_svpr)}" aria-label="${esc(T.lk_svpr)} ${i+1}"><button class="btn sm dng" type="button" data-a="svrm" data-i="${i}" aria-label="${esc(T.rm)}">${ic('trash',15)}</button></div>`).join('');
- const img=`<div class="fld"><span class="l">${T.lg}</span><div class="upl"><span class="thumb">${f.lg?`<img src="${esc(f.lg)}" alt="">`:ic('img',22)}</span><label class="btn sm filebtn">${ic('img',16)}${T.pick}<input type="file" accept="image/*" data-img="lg"></label></div></div>`;
+ const img=`<div class="fld"><span class="l">${T.lg}</span><div class="upl"><span class="thumb">${f.lg||f.lgp?`<img src="${esc(f.lg||f.lgp)}" alt="">`:ic('img',22)}</span><label class="btn sm filebtn">${ic('img',16)}${T.pick}<input type="file" accept="image/*" data-img="lg"></label></div></div>`;
  return `<div class="box">${whoBar()}<h2 style="margin-top:14px">${ic('store',22)}${T.lk_h}</h2>${st==='ok'?msg('o',T.lk_ok)+'<div class="fst" id="fst" hidden></div>':msg('i',T.lk_pend)}${st==='ok'?(setTimeout(fstLoad,0),''):''}
  ${f.lk?`<div class="fld"><span class="l">${T.lk_url}</span><div style="display:flex;gap:8px;flex-wrap:wrap"><input class="inp" readonly value="${esc(f.lk)}" style="flex:1 1 220px" aria-label="${esc(T.lk_url)}"><button class="btn" type="button" data-a="lkcopy">${ic('copy',16)}${T.lk_copy}</button><a class="btn" href="${esc(f.lk)}" target="_blank" rel="noopener">${ic('ext',16)}${T.lk_open}</a></div></div>`:''}
  <form id="ffi" novalidate>
@@ -311,7 +311,7 @@ async function loadMine(){
  FE=Object.assign(blankFicha(),FICHA?JSON.parse(JSON.stringify(FICHA)):{});['ev','jobs','cla'].forEach(k=>{if(!Array.isArray(FE[k]))FE[k]=[]});
  if(INV&&INVD===null)await invLoad();
  if(FICHA&&FICHA.inv)lkPrep(FE);
- else if(!FICHA&&INV&&INVD){const v=INVD;FE=lkPrep(Object.assign(blankFicha(),{tipo:'negocio',g:'serv',n:v.n||'',d:v.ds||'',wa:v.wa||'',tel:v.tel||'',a:v.a||'',map:v.map||'',ig:v.ig||'',web:v.web||'',lg:String(v.lg||'').length<=88000?(v.lg||''):'',dy:v.dy,inv:INV,lk:v.lk||'',sv:[],cor:'pur',cz:''}))}
+ else if(!FICHA&&INV&&INVD){const v=INVD;FE=lkPrep(Object.assign(blankFicha(),{tipo:'negocio',g:'serv',n:v.n||'',d:v.ds||'',wa:v.wa||'',tel:v.tel||'',a:v.a||'',map:v.map||'',ig:v.ig||'',web:v.web||'',lg:'',lgp:/^(https:\/\/|data:image\/)/.test(v.lgp||'')?v.lgp:'',dy:v.dy,inv:INV,lk:v.lk||'',sv:[],cor:'pur',cz:''}))}
  else if(FICHA&&INV&&INVD&&!FICHA.inv)NOTE=msg('w',t().inv_have);if(!FICHA&&/[?&]t=avisos\b/.test(location.search))FE.tipo='avisos';
  try{const q=await getDocs(query(collection(db,'gresenas'),where('uid','==',U.uid)));MY_RV=q.docs.map(d=>({id:d.id,...d.data()}))}catch(e){MY_RV=[]}
  render()}
@@ -347,7 +347,7 @@ app$.addEventListener('change',async e=>{const el=e.target;
  if(el.name==='tipo'&&FE){FE.tipo=el.value;render();return}
  if(el.dataset.f==='g'&&FE){FE.g=el.value;return}
  if(el.dataset.cl&&FE){const [i,k]=el.dataset.cl.split('.');FE.cla[+i][k]=el.value;if(k==='k'){FE.cla[+i].op=el.value==='per'?'perd':'na';render()}return}
- if(el.dataset.img&&el.files&&el.files[0]&&FE){const k=el.dataset.img;try{FE[k]=await shrink(el.files[0],k==='lg'?240:900,k==='lg'?.82:.72);if(FE[k].length>(k==='lg'?88000:158000))FE[k]=await shrink(el.files[0],k==='lg'?160:640,.62)}catch(x){}render()}});
+ if(el.dataset.img&&el.files&&el.files[0]&&FE){const k=el.dataset.img;try{FE[k]=await shrink(el.files[0],k==='lg'?440:900,k==='lg'?.86:.72);if(FE[k].length>(k==='lg'?88000:158000))FE[k]=await shrink(el.files[0],k==='lg'?320:640,.74);if(FE[k].length>(k==='lg'?88000:158000))FE[k]=await shrink(el.files[0],k==='lg'?220:480,.62)}catch(x){}render()}});
 app$.addEventListener('click',async e=>{const b=e.target.closest('button,[data-v]');if(!b)return;const T=t();
  if(b.dataset.v){VIEW=b.dataset.v;NOTE='';render();return}
  if(b.dataset.r&&b.closest('.stars')){RVE.r=+b.dataset.r;render();return}

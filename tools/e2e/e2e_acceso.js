@@ -40,6 +40,18 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   await a.act('guquick'); await a.w(3000);
   await a.fill('#qk_q', 'teste salinas'); await a.w(400); await a.locator('[data-act="qkedit"]').first().click(); await a.w(2500);
   check(/Acceso del cliente a su panel/.test(await a.txt()) && await a.locator('[data-act="qkinv"]').count() === 1, 'a ficha paga mostra "Acceso del cliente" com "Crear invitación"');
+  { // 25/11 (Jean): "o logo está em péssima qualidade": além do logo pequeno (140 px) a Central guarda um em boa resolução (480 px) à parte
+    const big = path.join(os.tmpdir(), 'e2e_logo_big.png'); cp.execFileSync('python3', ['-c', "from PIL import Image,ImageDraw;im=Image.new('RGB',(900,900),(20,20,20));d=ImageDraw.Draw(im);[d.ellipse((i*40,i*40,900-i*40,900-i*40),outline=(200,160,40),width=6) for i in range(10)];im.save('" + big + "')"]);
+    await a.locator('input[data-qklogo]').setInputFiles(big); await a.w(1500);
+    await a.locator('[data-act="qksave"]').click(); await a.w(3500);
+    const dd = (L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json).gdir || []).find(x => x.id === 'dj1') || {};
+    const giR = await L.fsReq(P, 'GET', 'platform/sitio/gimg/lhdj1', 'owner'); info('gimg ' + giR.status + ' ' + JSON.stringify(giR.json).slice(0, 200)); const gl = await a.evaluate(async () => { try { return (await CLOUD.api.listGimg()).map(x => x.id || x); } catch (e) { return String(e); } }); info('list ' + JSON.stringify(gl).slice(0, 200));
+    const gi = L.unfields(giR.json) || {};
+    const dim = await a.evaluate(src => new Promise(f => { const im = new Image(); im.onload = () => f(im.naturalWidth); im.onerror = () => f(0); im.src = src; }), gi.d || '');
+    info(JSON.stringify({ lg: (dd.lg || '').length, lgh: dd.lgh, dim, gi: Object.keys(gi), gil: String(gi.d || '').slice(0, 40) }));
+    check(/^data:image\/jpeg/.test(dd.lg || '') && /^gimg:lhdj1:[a-f0-9]+$/.test(dd.lgh || '') && dim === 480, 'logo novo: pequeno na ficha e um de 480 px guardado à parte (boa resolução)');
+    if (!(await a.locator('[data-act="qkinv"]').count())) { await a.evaluate(() => { ui.qkV = 'home'; qkSheet(); }); await a.w(500); await a.fill('#qk_q', 'teste salinas'); await a.w(400); await a.locator('[data-act="qkedit"]').first().click(); await a.w(2500); }
+  }
   await a.locator('[data-act="qkinv"]').click(); await a.w(2500);
   const invs = ((await L.fsReq(P, 'GET', 'ginv?pageSize=10', 'owner')).json.documents || []).map(d => ({ code: d.name.split('/').pop(), ...L.unfields(d) }));
   const iv = invs.find(x => x.id === 'dj1');
@@ -64,6 +76,7 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   info(JSON.stringify(f0));
   check(f0.n === 'Dr. Teste Salinas' && f0.wa === '0981 555 444' && f0.mon === '08:00' && f0.sun === false && !f0.tipo, 'abre "Mi negocio en la Guía" já preenchido com os dados da ficha e o horário (sem escolher tipo)');
   check(/guiadesantarita\.com\/l\/dr-teste-salinas/.test(f0.lk), 'mostra o link para o Instagram');
+  check(await c.locator('.thumb img[src*="gimg.php?d=dj1&k=h"]').count() === 1, 'mostra o logo atual da Guía (em boa resolução)');
   await c.locator('[data-dyon="6"]').check(); await c.w(300);
   await c.fill('[data-dy="6.a.0"]', '08:00'); await c.click('#ffi button[type=submit]'); await c.w(500);
   check(/Revisá el horario/.test(await c.txt('#am')), 'dia aberto só com a hora de abrir: avisa');
@@ -82,7 +95,7 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   const uid = (await L.signIn('dr@salinas.py', 'Senha#789')).localId;
   const fx = L.unfields((await L.fsReq(P, 'GET', 'gfichas/' + uid, 'owner')).json);
   info(JSON.stringify({ st: fx.st, inv: fx.inv, bt: fx.bt, cor: fx.cor, cz: fx.cz, sv: fx.sv, d1: fx.dy && fx.dy[1], d6: fx.dy && fx.dy[6] }));
-  check(fx.st === 'pend' && fx.inv === iv.code && fx.tipo === 'negocio' && !fx.dl, 'salvo em revisão, com o código do convite e sem ligação (a Guía ativa)');
+  check(fx.st === 'pend' && fx.inv === iv.code && fx.tipo === 'negocio' && !fx.dl && !fx.lg, 'salvo em revisão, com o código do convite e sem ligação (a Guía ativa)');
   check(fx.dy[1].a.join() === '08:00,12:00' && fx.dy[1].b.join() === '14:00,18:00' && fx.dy[6].on && fx.dy[6].a.join() === '08:00,11:30', 'horário por dia com dois turnos e o sábado novo');
   check(fx.sv.length === 2 && fx.sv[0].t === 'Limpieza dental' && fx.sv[0].p === 'Gs. 150.000' && fx.sv[1].p === '', 'serviços com e sem preço');
   check(!('bt' in fx) && !('cor' in fx) && fx.cz === hoy, 'fechado hoje salvo; sem botões nem cor (o link fica no padrão da Guía)');
@@ -113,8 +126,12 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   check(out2.n === 'Consultorio Salinas' && out2.sl === 'dr-teste-salinas' && !out2.tc && !out2.cz, 'o cliente muda o nome: a ficha muda, o link para o Instagram continua o mesmo; reaberto, não figura fechado');
   await L.fsReq(P, 'PATCH', 'gfichas/' + uid + '?updateMask.fieldPaths=cz', 'owner', L.fields({ cz: hoy }));
   const html = php("$_GET = ['id' => 'dr-teste-salinas']; include 'bio.php';", 'guia');
-  if (process.env.SHOT) fs.writeFileSync(process.env.SHOT + '/bio.html', html);
+  if (process.env.SHOT) fs.writeFileSync(process.env.SHOT + '/bio.html', html); info((html.match(/<div class="lg">.{0,160}/) || [''])[0]);
   const order = ['data-c="wa"', 'data-c="map"', 'data-c="gu"'].map(k => html.indexOf(k));
+  check(/class="lng"/.test(html) && /data-l="pt"/.test(html) && /gimg\.php\?d=dj1&amp;k=h&amp;v=/.test(html), 'link /l/: botão ES/PT e logo em boa resolução');
+  { const lgv = (/gimg\.php\?d=dj1&amp;k=h&amp;v=([a-f0-9]+)/.exec(html) || [])[1] || '';
+    const bin = cp.execFileSync('php', ['-r', "$_GET = ['d' => 'dj1', 'k' => 'h', 'v' => '" + lgv + "']; include 'gimg.php';"], { cwd: path.join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gacc-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) });
+    check(bin.length > 5000 && bin[0] === 0xFF && bin[1] === 0xD8, 'gimg.php entrega o logo grande (JPEG)'); }
   check(/<span>Servicios<\/span><\/h2>/.test(html) && /id="vc"/.test(html) && /Limpieza dental/.test(html) && /Gs\. 150\.000/.test(html), 'link /l/: mostra os serviços com preço');
   check(/id="sh"/.test(html) && order.every(i => i > 0) && order[0] < order[1] && order[1] < order[2], 'link /l/: botões no padrão da Guía');
   check(/theme-color" content="#24093F"/.test(html) && html.includes('CZ="' + hoy + '"'), 'link /l/: cor da Guía e aviso de fechado hoje');
