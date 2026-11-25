@@ -93,7 +93,7 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
   check(mine && /^data:image\/jpeg;base64,/.test(mine.lg) && !mine.ph, 'logo salvo como JPEG reduzido');
   check(/En revisión/.test(await c.txt()) && await c.locator('a.btn.wa[href*="wa.me/595982086171"]').count() === 1, 'mostra "En revisión" e o botão para avisar a Guía pelo WhatsApp');
   await c.locator('input[name=tipo][value=negocio]').check(); await c.w(300);
-  check(/200\.000/.test(await c.txt()) && await c.locator('#f_g').count() === 1, 'negócio: avisa que a ficha é paga e pede o rubro');
+  check(/300\.000/.test(await c.txt()) && await c.locator('#f_g').count() === 1, 'negócio: avisa que a ficha é paga e pede o rubro');
   await c.locator('input[name=tipo][value=iglesia]').check(); await c.w(200);
   await c.click('[data-l="pt"]'); await c.w(300);
   check(/Minha ficha/.test(await c.txt()) && /Em revisão/.test(await c.txt()), 'troca para português');
@@ -154,12 +154,12 @@ const tomorrow = (n => { const d = new Date(Date.now() + n * 864e5); return d.to
 
   sec('G2. Toques na própria ficha (guia_stats.php com ficha=1)');
   { const dr = fs.mkdtempSync(path.join(os.tmpdir(), 'gst-')); fs.mkdirSync(path.join(dr, 'datos'));
-    for (const f of ['guia_stats.php', 'prods_lib.php']) fs.copyFileSync(path.join(L.DIRS.site, 'sitio', f), path.join(dr, f));
+    for (const f of ['guia_stats.php', 'prods_lib.php', 'guia_lib.php']) fs.copyFileSync(path.join(L.DIRS.site, 'sitio', f), path.join(dr, f));
     const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Asuncion' })); const ym = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
     const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     fs.writeFileSync(path.join(dr, 'datos', 'hits-' + ym(now) + '.json'), JSON.stringify({ v: 9, c: { ['d-f' + a.uid.toLowerCase()]: 7, ['d-f' + b.uid.toLowerCase()]: 50, fogaomineiro: 99 } }));
     fs.writeFileSync(path.join(dr, 'datos', 'hits-' + ym(prev) + '.json'), JSON.stringify({ v: 3, c: { ['d-f' + a.uid.toLowerCase()]: 3 } }));
-    const srv = cp.spawn('php', ['-S', '127.0.0.1:8097', '-t', dr], { env: Object.assign({}, process.env, { GUIA_ID_BASE: AU + '/identitytoolkit.googleapis.com' }), stdio: 'ignore' });
+    const srv = cp.spawn('php', ['-S', '127.0.0.1:8097', '-t', dr], { env: Object.assign({}, process.env, { GUIA_ID_BASE: AU + '/identitytoolkit.googleapis.com', GUIA_FS_BASE: 'http://127.0.0.1:8080', TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gacc-')) }), stdio: 'ignore' });
     await new Promise(f => setTimeout(f, 700));
     const post = async body => { try { const r = await fetch('http://127.0.0.1:8097/guia_stats.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); return await r.json(); } catch (e) { return { err: String(e) }; } };
     const mineSt = await post({ t: a.tok, ficha: 1 }), other = await post({ t: b.tok, ficha: 1 }), bad = await post({ t: 'xyz', ficha: 1 }), all = await post({ t: a.tok }), shop = await post({ t: a.tok, shop: 'fogaomineiro' });

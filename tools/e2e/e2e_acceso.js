@@ -1,0 +1,144 @@
+// 25/11 (Jean): cliente pago da Guía ganha painel próprio. A Central cria o convite, o cliente aceita em /cuenta/?inv=<código>,
+// personaliza horário, serviços, botões, cor e "cerrado hoy"; a Central ativa; o servidor junta tudo na ficha da Guía e no link /l/<nome>.
+// Regras v20 (ginv + campos novos de gfichas).
+const L = require('./lib'); const P = 'araujotech-catalogos';
+const { sec, check, info } = L; const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
+const AU = 'http://127.0.0.1:9099';
+const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion' });
+(async () => {
+  const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026'];
+  await L.signUp(...ADM); const admTok = (await L.signIn(...ADM)).idToken;
+  const dy = Array.from({ length: 7 }, (_, i) => ({ on: i > 0 && i < 6, a: i > 0 && i < 6 ? ['08:00', '12:00'] : ['', ''], b: ['', ''] }));
+  await L.fsReq(P, 'PATCH', 'platform/sitio', 'owner', L.fields({ gdir: [
+    { id: 'dj1', n: 'Dr. Teste Salinas', g: 'health', d: 'Odontología', wa: '0981 555 444', tel: '', a: 'Centro', map: '', hrs: '', ig: '', lg: '', tu: [], td: false, pr: true, qk: true, on: true, dy },
+    { id: 'zz2', n: 'Otra Ficha Paga', g: 'serv', d: 'Servicios', wa: '0981 111 000', tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], td: false, pr: true, qk: true, on: true }] }));
+  const st = r => r.status;
+
+  sec('A. Regras v20: convites (ginv)');
+  const IV = 'abcdefghijkmnpqrstuvwx23';
+  const u1 = await L.signUp('curioso@teste.py', 'Senha#123'); await L.verifyEmail(u1.localId); const t1 = (await L.signIn('curioso@teste.py', 'Senha#123')).idToken;
+  check(st(await L.fsReq(P, 'PATCH', 'ginv/' + IV, t1, L.fields({ id: 'dj1', n: 'X' }))) === 403, 'cliente não cria convite');
+  check(st(await L.fsReq(P, 'PATCH', 'ginv/' + IV, admTok, L.fields({ id: 'dj1', n: 'Dr. Teste Salinas' }))) === 200, 'a Guía (admin) cria convite');
+  check(st(await L.fsReq(P, 'GET', 'ginv/' + IV, null)) === 200, 'quem tem o código lê o convite (sem login)');
+  check(st(await L.fsReq(P, 'GET', 'ginv?pageSize=10', t1)) === 403, 'ninguém lista os convites');
+  check(st(await L.fsReq(P, 'DELETE', 'ginv/' + IV, t1)) === 403, 'cliente não apaga convite');
+  const FF = o => L.fields(Object.assign({ tipo: 'negocio', g: 'serv', n: 'Curioso', wa: '0981000111', st: 'pend', at: '2026-11-25T10:00:00Z', inv: IV }, o));
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + u1.localId, t1, FF({ dl: 'dj1' }))) === 403, 'ninguém cria a ficha já ligada a um negócio da Guía (dl)');
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + u1.localId, t1, FF({ dy: [1, 2, 3] }))) === 403, 'horário precisa ter os 7 dias');
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + u1.localId, t1, FF({ sv: Array.from({ length: 13 }, () => ({ t: 'x' })) }))) === 403, 'no máximo 12 serviços');
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + u1.localId, t1, FF({ dy, sv: [{ t: 'Limpieza', p: '' }], bt: ['wa', 'map'], cor: 'ver', cz: hoy }))) === 200, 'cliente cria a ficha do convite em revisão, com horário, serviços, botões, cor e fechado');
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + u1.localId + '?updateMask.fieldPaths=st&updateMask.fieldPaths=dl', admTok, L.fields({ st: 'ok', dl: 'zz2' }))) === 200, 'a Guía ativa e liga a conta à ficha');
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + u1.localId, t1, FF({ st: 'ok', dl: 'dj1' }))) === 403, 'o dono não troca a ficha ligada (dl)');
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + u1.localId, t1, FF({ st: 'ok', dl: 'zz2', sv: [{ t: 'Plomería', p: '50.000' }] }))) === 200, 'o dono edita a ficha ativa mantendo a ligação');
+  await L.fsReq(P, 'DELETE', 'gfichas/' + u1.localId, 'owner'); await L.fsReq(P, 'DELETE', 'ginv/' + IV, 'owner');
+
+  sec('B. Central: criar o convite na ficha do cadastro rápido');
+  const A = await L.open({ w: 1366 }); const a = A.p;
+  await a.goto('https://araujotechsistemas.com/admin/'); await a.w(2500);
+  await a.fill('#lg_user', ADM[0]); await a.fill('#lg_pass', ADM[1]); await a.press('#lg_pass', 'Enter'); await a.w(5000);
+  await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(500);
+  await a.act('guquick'); await a.w(3000);
+  await a.fill('#qk_q', 'teste salinas'); await a.w(400); await a.locator('[data-act="qkedit"]').first().click(); await a.w(2500);
+  check(/Acceso del cliente a su panel/.test(await a.txt()) && await a.locator('[data-act="qkinv"]').count() === 1, 'a ficha paga mostra "Acceso del cliente" com "Crear invitación"');
+  await a.locator('[data-act="qkinv"]').click(); await a.w(2500);
+  const invs = ((await L.fsReq(P, 'GET', 'ginv?pageSize=10', 'owner')).json.documents || []).map(d => ({ code: d.name.split('/').pop(), ...L.unfields(d) }));
+  const iv = invs.find(x => x.id === 'dj1');
+  const shown = await a.evaluate(() => (document.querySelector('#qk_acc input') || {}).value || '');
+  info(JSON.stringify({ shown, iv: iv && { code: iv.code, n: iv.n, lk: iv.lk, dy: !!iv.dy } }));
+  check(iv && iv.code.length === 24 && iv.n === 'Dr. Teste Salinas' && iv.lk === 'https://guiadesantarita.com/l/dr-teste-salinas' && Array.isArray(iv.dy), 'convite salvo com o código, os dados da ficha e o link');
+  check(shown === 'https://araujotechsistemas.com/cuenta/?inv=' + (iv && iv.code) && await a.locator('#qk_acc a[href*="wa.me/595981555444"]').count() === 1, 'mostra o link do convite e o botão para mandar pelo WhatsApp do cliente');
+
+  sec('C. Cliente: aceitar o convite e personalizar');
+  const C = await L.open(); const c = C.p;
+  await c.goto('https://araujotechsistemas.com/cuenta/?inv=' + iv.code); await c.w(2500);
+  check(/te dio acceso a la ficha de Dr\. Teste Salinas/.test(await c.txt()) && await c.evaluate(() => document.querySelector('[data-v="up"]').getAttribute('aria-selected') === 'true'), 'abre com o nome do negócio e já em "Crear cuenta"');
+  await c.fill('#ae', 'dr@salinas.py'); await c.fill('#ap', 'Senha#789'); await c.click('#fau button[type=submit]'); await c.w(2500);
+  const oob = await (await fetch(AU + '/emulator/v1/projects/' + P + '/oobCodes')).json();
+  const code = (oob.oobCodes || []).find(o => o.email === 'dr@salinas.py' && o.requestType === 'VERIFY_EMAIL');
+  check(code && /inv=/.test(decodeURIComponent(code.oobLink || '')), 'o e-mail de confirmação volta para o convite');
+  await fetch(AU + '/identitytoolkit.googleapis.com/v1/accounts:update?key=x', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ oobCode: code.oobCode }) });
+  await c.click('[data-a="verdone"]'); await c.w(3000);
+  const f0 = await c.evaluate(() => ({ n: (document.getElementById('f_n') || {}).value, wa: (document.getElementById('f_wa') || {}).value, lk: [...document.querySelectorAll('input[readonly]')].map(i => i.value).join(), mon: (document.querySelector('[data-dy="1.a.0"]') || {}).value, sun: (document.querySelector('[data-dyon="0"]') || {}).checked, tipo: !!document.querySelector('input[name=tipo]') }));
+  info(JSON.stringify(f0));
+  check(f0.n === 'Dr. Teste Salinas' && f0.wa === '0981 555 444' && f0.mon === '08:00' && f0.sun === false && !f0.tipo, 'abre "Mi negocio en la Guía" já preenchido com os dados da ficha e o horário (sem escolher tipo)');
+  check(/guiadesantarita\.com\/l\/dr-teste-salinas/.test(f0.lk), 'mostra o link para o Instagram');
+  await c.locator('[data-dyon="6"]').check(); await c.w(300);
+  await c.fill('[data-dy="6.a.0"]', '08:00'); await c.click('#ffi button[type=submit]'); await c.w(500);
+  check(/Revisá el horario/.test(await c.txt('#am')), 'dia aberto só com a hora de abrir: avisa');
+  await c.fill('[data-dy="6.a.1"]', '11:30');
+  await c.fill('[data-dy="1.b.0"]', '14:00'); await c.fill('[data-dy="1.b.1"]', '18:00');
+  await c.click('[data-a="svadd"]'); await c.w(200); await c.fill('[data-sv="0.t"]', 'Limpieza dental'); await c.fill('[data-sv="0.p"]', 'Gs. 150.000');
+  await c.click('[data-a="svadd"]'); await c.w(200); await c.fill('[data-sv="1.t"]', 'Blanqueamiento');
+  await c.locator('[data-bton="sh"]').uncheck(); await c.w(100);
+  const mapI = await c.evaluate(() => [...document.querySelectorAll('[data-bton]')].findIndex(x => x.dataset.bton === 'map'));
+  await c.locator(`[data-a="btup"][data-i="${mapI}"]`).click(); await c.w(200);
+  await c.locator('label.cor', { hasText: 'Verde' }).click(); await c.w(100);
+  await c.click('[data-a="czhoy"]'); await c.w(300);
+  check(/Ahora figura cerrado hasta el/.test(await c.txt()), '"Cerrado hoy" avisa até quando fica fechado');
+  if (process.env.SHOT) await c.screenshot({ path: process.env.SHOT + '/cuenta.png', fullPage: true });
+  await c.click('#ffi button[type=submit]'); await c.w(2500);
+  const uid = (await L.signIn('dr@salinas.py', 'Senha#789')).localId;
+  const fx = L.unfields((await L.fsReq(P, 'GET', 'gfichas/' + uid, 'owner')).json);
+  info(JSON.stringify({ st: fx.st, inv: fx.inv, bt: fx.bt, cor: fx.cor, cz: fx.cz, sv: fx.sv, d1: fx.dy && fx.dy[1], d6: fx.dy && fx.dy[6] }));
+  check(fx.st === 'pend' && fx.inv === iv.code && fx.tipo === 'negocio' && !fx.dl, 'salvo em revisão, com o código do convite e sem ligação (a Guía ativa)');
+  check(fx.dy[1].a.join() === '08:00,12:00' && fx.dy[1].b.join() === '14:00,18:00' && fx.dy[6].on && fx.dy[6].a.join() === '08:00,11:30', 'horário por dia com dois turnos e o sábado novo');
+  check(fx.sv.length === 2 && fx.sv[0].t === 'Limpieza dental' && fx.sv[0].p === 'Gs. 150.000' && fx.sv[1].p === '', 'serviços com e sem preço');
+  check(!fx.bt.includes('sh') && fx.bt.indexOf('map') < fx.bt.indexOf('mu') && fx.cor === 'ver' && fx.cz === hoy, 'botões (sem Compartir, Cómo llegar subiu), cor verde e fechado hoje');
+  check(/avisamos a la Guía/.test(await c.txt()) && await c.locator('a.btn.wa[href*="wa.me/595982086171"]').count() === 1, 'mostra que falta a Guía ativar e o botão para avisar pelo WhatsApp');
+  const ctok = (await L.signIn('dr@salinas.py', 'Senha#789')).idToken;
+  check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + uid + '?updateMask.fieldPaths=dl', ctok, L.fields({ dl: 'dj1' }))) === 403, 'o cliente não se liga sozinho à ficha');
+
+  sec('D. Central: ativar o acesso');
+  await a.evaluate(() => { ui.qkAcc = null; qkAccPaint(); }); await a.w(2500);
+  if (process.env.SHOT) { const el = await a.$('#qk_acc'); if (el) { await el.scrollIntoViewIfNeeded(); await a.screenshot({ path: process.env.SHOT + '/central.png' }); } }
+  check(/dr@salinas\.py/.test(await a.txt('#qk_acc')) && await a.locator('[data-act="qkaccok"]').count() === 1, 'a Central mostra quem aceitou e o botão "Activar acceso"');
+  await a.locator('[data-act="qkaccok"]').click(); await a.w(2500);
+  const fy = L.unfields((await L.fsReq(P, 'GET', 'gfichas/' + uid, 'owner')).json);
+  check(fy.st === 'ok' && fy.dl === 'dj1' && fy.plan === 'paid', 'ativado: ficha da conta publicada e ligada à ficha da Guía');
+  check(st(await L.fsReq(P, 'GET', 'ginv/' + iv.code, null)) === 404, 'o convite usado é apagado (o link não serve de novo)');
+  check(/ya entra a su panel/.test(await a.txt('#qk_acc')) && await a.locator('[data-act="qkaccoff"]').count() === 1, 'mostra "ya entra a su panel" com "Quitar acceso"');
+  check(A.p.errs.length === 0, 'Central sem erros de JavaScript', A.p.errs.join(' | '));
+
+  sec('E. Servidor: a ficha da Guía usa o que o cliente mudou');
+  const php = (code, dir) => cp.execFileSync('php', ['-r', code], { cwd: path.join(L.DIRS.site, dir || 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gacc-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }), timeout: 40000 }).toString();
+  const out = JSON.parse(php("require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(guia_pub()['dir']);"));
+  const dj = out.filter(x => x.id === 'dj1' || /Salinas/.test(x.n));
+  info(JSON.stringify(dj.map(x => ({ id: x.id, n: x.n, sl: x.sl, own: x.own, tc: x.tc, cz: x.cz, cor: x.cor, bt: x.bt, sv: x.sv && x.sv.length }))));
+  check(dj.length === 1 && dj[0].id === 'dj1' && dj[0].own === 1 && dj[0].sl === 'dr-teste-salinas', 'uma ficha só (a da Guía), com o mesmo endereço');
+  check(dj[0].sv.length === 2 && dj[0].cor === 'ver' && dj[0].cz === hoy && dj[0].tc === 1 && dj[0].dy[6].on && !dj[0].bt.includes('sh'), 'traz serviços, cor, fechado hoje, horário novo e botões');
+  await L.fsReq(P, 'PATCH', 'gfichas/' + uid + '?updateMask.fieldPaths=n&updateMask.fieldPaths=cz', 'owner', L.fields({ n: 'Consultorio Salinas', cz: '' }));
+  const out2 = JSON.parse(php("require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(guia_pub()['dir']);")).find(x => x.id === 'dj1');
+  check(out2.n === 'Consultorio Salinas' && out2.sl === 'dr-teste-salinas' && !out2.tc && !out2.cz, 'o cliente muda o nome: a ficha muda, o link para o Instagram continua o mesmo; reaberto, não figura fechado');
+  await L.fsReq(P, 'PATCH', 'gfichas/' + uid + '?updateMask.fieldPaths=cz', 'owner', L.fields({ cz: hoy }));
+  const html = php("$_GET = ['id' => 'dr-teste-salinas']; include 'bio.php';", 'guia');
+  if (process.env.SHOT) fs.writeFileSync(process.env.SHOT + '/bio.html', html);
+  const order = ['data-c="wa"', 'data-c="map"', 'data-c="gu"'].map(k => html.indexOf(k));
+  check(/<h2>Servicios<\/h2>/.test(html) && /Limpieza dental/.test(html) && /Gs\. 150\.000/.test(html), 'link /l/: mostra os serviços com preço');
+  check(!/id="sh"/.test(html) && order.every(i => i > 0) && order[0] < order[1] && order[1] < order[2], 'link /l/: botões na ordem do cliente e sem "Compartir"');
+  check(/theme-color" content="#062B22"/.test(html) && html.includes('CZ="' + hoy + '"'), 'link /l/: cor verde e aviso de fechado hoje');
+
+  sec('F. Toques da ficha ligada (guia_stats.php)');
+  { const dr = fs.mkdtempSync(path.join(os.tmpdir(), 'gst-')); fs.mkdirSync(path.join(dr, 'datos'));
+    for (const f of ['guia_stats.php', 'prods_lib.php', 'guia_lib.php']) fs.copyFileSync(path.join(L.DIRS.site, 'sitio', f), path.join(dr, f));
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Asuncion' })); const ym = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    fs.writeFileSync(path.join(dr, 'datos', 'hits-' + ym(now) + '.json'), JSON.stringify({ c: { 'd-dj1': 5, 'bio-dr-teste-salinas': 2, 'd-zz2': 40 } }));
+    const srv = cp.spawn('php', ['-S', '127.0.0.1:8098', '-t', dr], { env: Object.assign({}, process.env, { GUIA_ID_BASE: AU + '/identitytoolkit.googleapis.com', GUIA_FS_BASE: 'http://127.0.0.1:8080', TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gacc-')) }), stdio: 'ignore' });
+    await new Promise(f => setTimeout(f, 800));
+    let r = {}; try { r = await (await fetch('http://127.0.0.1:8098/guia_stats.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: ctok, ficha: 1 }) })).json(); } catch (e) { r = { err: String(e) }; }
+    srv.kill(); info(JSON.stringify(r));
+    check(r.ok && r.mes === 7 && r.sl === 'dr-teste-salinas', 'o cliente vê os toques da ficha + do link dele (5 + 2), nada dos outros'); }
+
+  sec('G. Cliente depois de ativado');
+  await c.reload(); await c.w(3500);
+  check(/aparece en la Guía y en tu link en unos minutos/.test(await c.txt()) && await c.locator('#ffi').count() === 1, 'o cliente vê que já está ativo e continua editando');
+  await c.click('[data-l="pt"]'); await c.w(300);
+  check(/Meu negócio no Guia/.test(await c.txt()) && /Botões do seu link/.test(await c.txt()), 'painel do cliente em português');
+  check(c.errs.length === 0, 'página do cliente sem erros de JavaScript', c.errs.join(' | '));
+
+  sec('H. Central: tirar o acesso');
+  await a.evaluate(() => { window.confirm = () => true; }); await a.locator('[data-act="qkaccoff"]').click(); await a.w(2500);
+  const fz = L.unfields((await L.fsReq(P, 'GET', 'gfichas/' + uid, 'owner')).json);
+  const out3 = JSON.parse(php("require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(guia_pub()['dir']);"));
+  check(fz.st === 'off' && !fz.dl && out3.find(x => x.id === 'dj1').n === 'Dr. Teste Salinas' && !out3.some(x => x.n === 'Consultorio Salinas'), 'sem acesso: a ficha volta a ter só os dados da Guía e a conta não aparece sozinha');
+  L.done();
+})().catch(e => { console.log('ERRO', e && e.stack || e); process.exit(1); });

@@ -49,8 +49,33 @@ function guia_fsq($col, $limit) { // documentos aprovados de uma coleção (cons
   }
   return $out;
 }
+// 25/11 (Jean): cliente pago com painel próprio (convite da Guía). dl = id da ficha da Guía ligada (só o admin define ao aprovar).
+// O dono muda horário por dia, serviços, botões do link, cor e "cerrado hasta"; o resto da ficha (categoria, plano, selo) continua da Guía.
+const GUIA_BT = ['wa', 'tel', 'mu', 'map', 'ig', 'web', 'gu', 'sh'];
+const GUIA_COR = ['pur', 'azu', 'ver', 'roj', 'nar', 'neg'];
+function guia_lk($x) {
+  $dl = preg_replace('/[^a-z0-9]/i', '', (string)($x['dl'] ?? '')); if ($dl === '') return [];
+  $sv = [];
+  foreach (array_slice((array)($x['sv'] ?? []), 0, 12) as $v) { if (!is_array($v)) continue; $t = mb_substr(trim((string)($v['t'] ?? '')), 0, 60); if (mb_strlen($t) < 2) continue; $sv[] = ['t' => $t, 'p' => mb_substr(trim((string)($v['p'] ?? '')), 0, 30)]; }
+  $bt = []; foreach ((array)($x['bt'] ?? []) as $k) if (is_string($k) && in_array($k, GUIA_BT, true) && !in_array($k, $bt, true)) $bt[] = $k;
+  $cz = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($x['cz'] ?? '')) ? (string)$x['cz'] : '';
+  return ['dl' => $dl, 'dy' => guia_dy($x['dy'] ?? null), 'sv' => $sv, 'bt' => $bt, 'btx' => is_array($x['bt'] ?? null), 'cor' => in_array($x['cor'] ?? '', GUIA_COR, true) ? $x['cor'] : '', 'cz' => $cz];
+}
+// junta o que o dono mudou no painel dele com a ficha da Guía (só os campos preenchidos; o endereço do link não muda)
+function guia_own($y, $x, $day) {
+  $y['sn'] = $y['n'];
+  foreach (['n', 'tel', 'wa', 'a', 'map', 'ig', 'web', 'lg', 'ph'] as $k) if (($x[$k] ?? '') !== '') $y[$k] = $x[$k];
+  $dd = trim((string)($x['d'] ?? '')); if ($dd !== '') { $y['d'] = mb_substr(preg_split('/\R/', $dd)[0], 0, 60); if (mb_strlen($dd) > 60 || strpos($dd, "\n") !== false) $y['dx'] = mb_substr($dd, 0, 600); }
+  if (!empty($x['dy'])) { $y['dy'] = $x['dy']; $y['hrs'] = ''; }
+  if ($x['sv']) $y['sv'] = $x['sv'];
+  if (!empty($x['btx'])) $y['bt'] = $x['bt'];
+  if ($x['cor'] !== '') $y['cor'] = $x['cor'];
+  if ($x['cz'] !== '' && $x['cz'] >= $day) { $y['cz'] = $x['cz']; $y['tc'] = 1; }
+  $y['own'] = 1;
+  return $y;
+}
 function guia_acc() {
-  $cache = sys_get_temp_dir() . '/at_gacc1.json';
+  $cache = sys_get_temp_dir() . '/at_gacc2.json';
   if (is_file($cache) && time() - filemtime($cache) < 300) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) return $d; }
   $fi = guia_fsq('gfichas', 400); $re = guia_fsq('gresenas', 2000);
   if ($fi === null || $re === null) { if (is_file($cache)) { $d = json_decode((string)@file_get_contents($cache), true); if (is_array($d)) { @touch($cache); return $d; } } $e = ['fichas' => [], 'rv' => []]; @file_put_contents($cache, json_encode($e)); return $e; } // falhou: tenta de novo só daqui a 5 minutos
@@ -82,7 +107,8 @@ function guia_acc() {
     $fichas[] = ['uid' => $uid, 'tipo' => (string)($x['tipo'] ?? 'otro'), 'g' => (string)($x['g'] ?? ''), 'n' => mb_substr($n, 0, 80), 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 600),
       'wa' => preg_replace('/\D/', '', (string)($x['wa'] ?? '')), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 120),
       'map' => $https($x['map'] ?? ''), 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 200), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'web' => $https($x['web'] ?? ''),
-      'lg' => $img['lg'] ?? '', 'ph' => $img['ph'] ?? '', 'ev' => $ev, 'jobs' => array_slice(array_values(array_filter((array)($x['jobs'] ?? []), 'is_array')), 0, 10), 'cla' => $cla];
+      'lg' => $img['lg'] ?? '', 'ph' => $img['ph'] ?? '', 'ev' => $ev, 'jobs' => array_slice(array_values(array_filter((array)($x['jobs'] ?? []), 'is_array')), 0, 10), 'cla' => $cla]
+      + guia_lk($x);
   }
   // opiniões aprovadas: nota média e as 3 mais recentes com texto, por ficha/negócio
   $by = [];
@@ -216,7 +242,7 @@ function guia_pub() {
   }
   usort($ev, function ($a, $b) { return strcmp($a['d'] . $a['h'], $b['d'] . $b['h']); });
   // negócios sem catálogo (ficha simples cadastrada no Panel Araújo Tech)
-  $dir = [];
+  $dir = []; $own = []; foreach ($acc['fichas'] as $x) if (!empty($x['dl'])) $own[$x['dl']] = $x;
   foreach ((array)($d['gdir'] ?? []) as $x) {
     if (!is_array($x) || ($x['on'] ?? true) === false || trim((string)($x['n'] ?? '')) === '' || in_array($x['vs'] ?? '', ['cer', 'fue'], true)) continue; // cerrado ou fora de Santa Rita: não aparece
     $id = preg_replace('/[^a-z0-9]/i', '', (string)($x['id'] ?? '')); if ($id === '') continue;
@@ -226,10 +252,12 @@ function guia_pub() {
        'dy' => guia_dy($x['dy'] ?? null), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : '', 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&k=ph&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
     { $li = count($dir) - 1; if (!empty($x['pr'])) $dir[$li]['pr'] = 1; if (($x['vs'] ?? '') === 'tmp') { $dir[$li]['tc'] = 1; $dir[$li]['dy'] = null; } // cerrado temporalmente
       if (empty($dir[$li]['td']) && empty($x['pr']) && empty($x['qk'])) { array_pop($dir); continue; } } // 23/11 (Jean): ficha do cadastro rápido (qk) aparece mesmo sem plano // 20/11 (Jean): negócio comercial sem plano ativo (Premium) nem Aliado Tu Delivery não aparece; a ficha continua guardada no painel e volta ao ativar
+    if (isset($own[$id])) { $li = count($dir) - 1; if ($li >= 0 && $dir[$li]['id'] === $id) $dir[$li] = guia_own($dir[$li], $own[$id], $day); }
     if (count($dir) >= 300) break;
   }
   foreach ($acc['fichas'] as $x) { // negócios e profissionais com conta própria (aprovados pela Guía depois do pagamento)
     if (isset(GUIA_FU[$x['tipo']]) || $x['tipo'] === 'avisos') continue; // 'avisos': conta grátis só de vagas e avisos, sem ficha no diretório
+    if (!empty($x['dl'])) continue; // conta ligada a uma ficha da Guía: entra junto com a ficha (acima), não como outra
     $dir[] = ['id' => 'f' . $x['uid'], 'n' => $x['n'], 'g' => in_array($x['g'], ['food', 'shop', 'health', 'home', 'car', 'serv'], true) ? $x['g'] : 'serv', 'd' => mb_substr(preg_split('/\R/', $x['d'])[0], 0, 60), 'tel' => $x['tel'], 'wa' => $x['wa'], 'a' => $x['a'], 'map' => $x['map'], 'hrs' => mb_substr($x['hrs'], 0, 80), 'ig' => $x['ig'], 'td' => false, 'dy' => null, 'mt' => 'menu', 'mu' => '', 'web' => $x['web'], 'tu' => [], 'lg' => $x['lg'], 'ph' => $x['ph'], 'acc' => 1];
   }
   $clas = []; // clasificados e inmuebles publicados pela Guía (só os ativos e dentro da data)
@@ -251,7 +279,7 @@ function guia_pub() {
     $atl[] = ['k' => $k, 'es' => mb_substr(trim((string)($x['es'] ?? '')), 0, 24), 'pt' => mb_substr(trim((string)($x['pt'] ?? '')), 0, 24), 'ic' => preg_replace('/[^a-z]/', '', (string)($x['ic'] ?? '')), 'q' => mb_substr(trim((string)($x['q'] ?? '')), 0, 60)]; }
   // endereço próprio de cada negócio sem catálogo: /negocio/<nome> (único; se repetir, leva o começo do id)
   $seen = [];
-  foreach ($dir as $i => $x) { $sl = guia_nslug($x['n']); if ($sl === '') $sl = 'negocio'; if (isset($seen[$sl])) $sl .= '-' . strtolower(substr($x['id'], 0, 5)); $seen[$sl] = 1; $dir[$i]['sl'] = $sl; }
+  foreach ($dir as $i => $x) { $sl = guia_nslug($x['sn'] ?? $x['n']); unset($dir[$i]['sn']); if ($sl === '') $sl = 'negocio'; if (isset($seen[$sl])) $sl .= '-' . strtolower(substr($x['id'], 0, 5)); $seen[$sl] = 1; $dir[$i]['sl'] = $sl; }
   foreach ($dir as $i => $x) if ($ll = guia_dir_ll($x['map'] ?? '')) $dir[$i]['ll'] = $ll; // ponto no mapa e 'Cerca de mí' (link curto do Maps convertido no servidor)
   foreach ($dir as &$dd) foreach (['d' => 'dP', 'hrs' => 'hP'] as $a => $b) { $tp = guia_tr($dd[$a] ?? ''); if ($tp !== '' && $tp !== ($dd[$a] ?? '')) $dd[$b] = $tp; } unset($dd); // português automático (ver guia_tr)
   return ['ads' => $ads, 'util' => $util, 'pros' => $pros, 'bus' => $bus, 'turno' => $turno, 'ev' => array_slice($ev, 0, 30), 'dir' => $dir, 'soc' => (object)$soc, 'clas' => $clas, 'fu' => $fu, 'rv' => (object)$acc['rv'], 'at' => substr((string)($d['at'] ?? ''), 0, 10), 'cat' => $cat, 'atl' => $atl, 'promo' => $promo];

@@ -21,10 +21,14 @@ if (!empty($in['on'])) { // "Ahora en la Guía": solo el admin
 if (!empty($in['ficha'])) {
   $uid = (string)($r['users'][0]['localId'] ?? '');
   if (!preg_match('/^[A-Za-z0-9]{6,64}$/', $uid)) { echo '{"ok":false}'; exit; }
-  $key = 'd-f' . strtolower($uid); $tz = new DateTimeZone('America/Asuncion'); $now = new DateTime('now', $tz); $res = ['ok' => true, 'mes' => 0, 'ant' => 0];
+  $keys = ['d-f' . strtolower($uid)]; $tz = new DateTimeZone('America/Asuncion'); $now = new DateTime('now', $tz); $res = ['ok' => true, 'mes' => 0, 'ant' => 0];
+  // 25/11: conta ligada a uma ficha da Guía (convite): os toques da ficha e do link para o Instagram
+  require_once __DIR__ . '/guia_lib.php'; $dl = '';
+  foreach (guia_acc()['fichas'] as $f) if ($f['uid'] === preg_replace('/[^a-z0-9]/i', '', $uid) && !empty($f['dl'])) { $dl = $f['dl']; break; }
+  if ($dl !== '') { $keys = ['d-' . $dl]; foreach (guia_pub()['dir'] as $y) if ($y['id'] === $dl) { $keys[] = substr('bio-' . $y['sl'], 0, 70); $res['sl'] = $y['sl']; break; } }
   foreach (['mes' => $now->format('Y-m'), 'ant' => (clone $now)->modify('first day of last month')->format('Y-m')] as $k => $m) {
     $d = json_decode((string)@file_get_contents(__DIR__ . '/datos/hits-' . $m . '.json'), true);
-    if (is_array($d)) $res[$k] = (int)($d['c'][$key] ?? 0);
+    if (is_array($d)) foreach ($keys as $key) $res[$k] += (int)($d['c'][$key] ?? 0);
   }
   echo json_encode($res); exit;
 }
