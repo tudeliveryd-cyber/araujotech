@@ -1027,6 +1027,25 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     check(await a.evaluate(() => document.querySelector('[data-act="qkhm"][data-m="24"]').classList.contains('pri')), 'al corregir, abre en "24 horas"');
     await a.act('qkhm', '[data-m="no"]'); await a.w(200); await a.act('qksave'); await a.w(3500);
     check(!(await doc()).gdir.find(x => x.n === 'Taxi Nocturno Test').dy, 'cambiar a "Sin horario fijo" quita los días');
+    // pacote Recomendado no plano pago
+    { await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'form'; ui.qkBack = 'home'; qkSheet(); }); await a.w(300);
+      await a.act('qktipo', '[data-k="paga"]'); await a.w(300); await a.fill('#qk_n', 'Clinica Recomendada Test'); await a.w(700);
+      check(await a.evaluate(() => document.querySelectorAll('[data-act="qkpk"]').length === 3), 'plano pago mostra os pacotes Presencia, Recomendado e Portada');
+      await a.act('qkpk', '[data-k="rec"]'); await a.w(200); await a.fill('#qk_tel', '0981 555 666'); await a.act('qksave'); await a.w(3500);
+      const cr = (await doc()).gdir.find(x => x.n === 'Clinica Recomendada Test');
+      check(cr && cr.pr === true && cr.rc === true, 'pacote Recomendado grava o selo (rc) junto com o plano pago');
+      const rc = JSON.parse(require('child_process').execFileSync('php', ['-r', "require 'prods_lib.php'; require 'guia_lib.php'; $p = guia_pub(); foreach ($p['dir'] as $x) if ($x['n'] === 'Clinica Recomendada Test' || $x['n'] === 'Hotel Sol') $o[$x['n']] = $x['rc'] ?? null; echo json_encode($o);"], { cwd: require('path').join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'grc-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString());
+      check(rc['Clinica Recomendada Test'] === true && rc['Hotel Sol'] === false, 'a Guía recebe o Recomendado só de quem tem o pacote', JSON.stringify(rc)); }
+    // link para o Instagram do negócio (guiadesantarita.com/l/<nome>)
+    { await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkQ = 'hotel sol'; qkSheet(); }); await a.w(300);
+      await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
+      const bu = await a.evaluate(() => { const b = document.querySelector('[data-act="qkbio"]'); return b ? b.dataset.u : ''; });
+      check(bu === 'https://guiadesantarita.com/l/hotel-sol', 'ficha publicada mostra o link para o Instagram, com "Copiar"', bu);
+      const bio = require('child_process').execFileSync('php', ['-r', "$_GET = ['id' => 'hotel-sol']; include 'bio.php';"], { cwd: require('path').join(L.DIRS.site, 'guia'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gb-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString();
+      check(/<h1>Hotel Sol<\/h1>/.test(bio) && /wa\.me\/595983111223/.test(bio) && /Cómo llegar/.test(bio) && /<td>07:00–12:00 · 14:00–19:00<\/td>|07:00–12:00 · 14:00–19:00/.test(bio) && /\/l\/hotel-sol/.test(bio) && /negocio\/hotel-sol/.test(bio), 'página /l/hotel-sol: logo/nome, WhatsApp, como chegar, horários e link para a ficha da Guía');
+      const no = require('child_process').execFileSync('php', ['-r', "$_GET = ['id' => 'nao-existe-x']; include 'bio.php';"], { cwd: require('path').join(L.DIRS.site, 'guia'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gb-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) }).toString();
+      check(/ya no está disponible/.test(no), 'link de negócio que saiu da Guía avisa e manda para a Guía');
+      await a.act('qkcancel'); await a.w(300); }
     // trocar de tipo ao corrigir e apagar
     await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkBack = 'home'; ui.qkQ = ''; qkSheet(); }); await a.w(300);
     await a.fill('#qk_q', 'farmacia paga'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
