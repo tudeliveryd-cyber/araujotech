@@ -56,7 +56,7 @@ const GUIA_COR = ['pur', 'azu', 'ver', 'roj', 'nar', 'neg'];
 function guia_lk($x) {
   $dl = preg_replace('/[^a-z0-9]/i', '', (string)($x['dl'] ?? '')); if ($dl === '') return [];
   $sv = [];
-  foreach (array_slice((array)($x['sv'] ?? []), 0, 12) as $v) { if (!is_array($v)) continue; $t = mb_substr(trim((string)($v['t'] ?? '')), 0, 60); if (mb_strlen($t) < 2) continue; $sv[] = ['t' => $t, 'p' => mb_substr(trim((string)($v['p'] ?? '')), 0, 30)]; }
+  foreach (array_slice((array)($x['sv'] ?? []), 0, 5) as $v) { if (!is_array($v)) continue; $t = mb_substr(trim((string)($v['t'] ?? '')), 0, 60); if (mb_strlen($t) < 2) continue; $sv[] = ['t' => $t, 'p' => mb_substr(trim((string)($v['p'] ?? '')), 0, 30)]; }
   $bt = []; foreach ((array)($x['bt'] ?? []) as $k) if (is_string($k) && in_array($k, GUIA_BT, true) && !in_array($k, $bt, true)) $bt[] = $k;
   $cz = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($x['cz'] ?? '')) ? (string)$x['cz'] : '';
   return ['dl' => $dl, 'dy' => guia_dy($x['dy'] ?? null), 'sv' => $sv, 'bt' => $bt, 'btx' => is_array($x['bt'] ?? null), 'cor' => in_array($x['cor'] ?? '', GUIA_COR, true) ? $x['cor'] : '', 'cz' => $cz];

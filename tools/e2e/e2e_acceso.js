@@ -46,7 +46,9 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   const shown = await a.evaluate(() => (document.querySelector('#qk_acc input') || {}).value || '');
   info(JSON.stringify({ shown, iv: iv && { code: iv.code, n: iv.n, lk: iv.lk, dy: !!iv.dy } }));
   check(iv && iv.code.length === 24 && iv.n === 'Dr. Teste Salinas' && iv.lk === 'https://guiadesantarita.com/l/dr-teste-salinas' && Array.isArray(iv.dy), 'convite salvo com o código, os dados da ficha e o link');
-  check(shown === 'https://araujotechsistemas.com/cuenta/?inv=' + (iv && iv.code) && await a.locator('#qk_acc a[href*="wa.me/595981555444"]').count() === 1, 'mostra o link do convite e o botão para mandar pelo WhatsApp do cliente');
+  check(shown === 'https://araujotechsistemas.com/cuenta/?inv=' + (iv && iv.code) && await a.locator('#qk_acc a[href*="wa.me/595981555444"]').count() === 2, 'mostra o link do convite e os botões para mandar pelo WhatsApp do cliente (espanhol e português)');
+  { const w = decodeURIComponent(await a.locator('#qk_acc a[href*="wa.me/595981555444"]').first().getAttribute('href'));
+    check(w.includes('https://guiadesantarita.com/l/dr-teste-salinas') && w.includes('https://araujotechsistemas.com/cuenta/?inv=' + iv.code) && /Cómo entrar/.test(w), 'a mensagem do WhatsApp já leva o link do Instagram, o link do acesso e como entrar'); }
 
   sec('C. Cliente: aceitar o convite e personalizar');
   const C = await L.open(); const c = C.p;
@@ -69,10 +71,10 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   await c.fill('[data-dy="1.b.0"]', '14:00'); await c.fill('[data-dy="1.b.1"]', '18:00');
   await c.click('[data-a="svadd"]'); await c.w(200); await c.fill('[data-sv="0.t"]', 'Limpieza dental'); await c.fill('[data-sv="0.p"]', 'Gs. 150.000');
   await c.click('[data-a="svadd"]'); await c.w(200); await c.fill('[data-sv="1.t"]', 'Blanqueamiento');
-  await c.locator('[data-bton="sh"]').uncheck(); await c.w(100);
-  const mapI = await c.evaluate(() => [...document.querySelectorAll('[data-bton]')].findIndex(x => x.dataset.bton === 'map'));
-  await c.locator(`[data-a="btup"][data-i="${mapI}"]`).click(); await c.w(200);
-  await c.locator('label.cor', { hasText: 'Verde' }).click(); await c.w(100);
+  { const tx = await c.txt(); check(!/Botones de tu link|Color de tu link/.test(tx) && /Eso es Vitrix/.test(tx) && await c.locator('a.btn.wa[href*="saber%20de%20Vitrix"]').count() === 1, 'painel simples: sem botões nem cor do link; convida para o Vitrix (catálogo completo)'); }
+  for (let k = 2; k < 5; k++) { await c.click('[data-a="svadd"]'); await c.w(150); }
+  check(await c.locator('[data-a="svadd"]').count() === 0 && await c.locator('[data-sv$=".t"]').count() === 5, 'no máximo 5 serviços principais');
+  for (let k = 4; k >= 2; k--) { await c.locator(`[data-a="svrm"][data-i="${k}"]`).click(); await c.w(150); }
   await c.click('[data-a="czhoy"]'); await c.w(300);
   check(/Ahora figura cerrado hasta el/.test(await c.txt()), '"Cerrado hoy" avisa até quando fica fechado');
   if (process.env.SHOT) await c.screenshot({ path: process.env.SHOT + '/cuenta.png', fullPage: true });
@@ -83,8 +85,8 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   check(fx.st === 'pend' && fx.inv === iv.code && fx.tipo === 'negocio' && !fx.dl, 'salvo em revisão, com o código do convite e sem ligação (a Guía ativa)');
   check(fx.dy[1].a.join() === '08:00,12:00' && fx.dy[1].b.join() === '14:00,18:00' && fx.dy[6].on && fx.dy[6].a.join() === '08:00,11:30', 'horário por dia com dois turnos e o sábado novo');
   check(fx.sv.length === 2 && fx.sv[0].t === 'Limpieza dental' && fx.sv[0].p === 'Gs. 150.000' && fx.sv[1].p === '', 'serviços com e sem preço');
-  check(!fx.bt.includes('sh') && fx.bt.indexOf('map') < fx.bt.indexOf('mu') && fx.cor === 'ver' && fx.cz === hoy, 'botões (sem Compartir, Cómo llegar subiu), cor verde e fechado hoje');
-  check(/avisamos a la Guía/.test(await c.txt()) && await c.locator('a.btn.wa[href*="wa.me/595982086171"]').count() === 1, 'mostra que falta a Guía ativar e o botão para avisar pelo WhatsApp');
+  check(!('bt' in fx) && !('cor' in fx) && fx.cz === hoy, 'fechado hoje salvo; sem botões nem cor (o link fica no padrão da Guía)');
+  check(/avisamos a la Guía/.test(await c.txt()) && await c.locator('a.btn.wa[href*="wa.me/595982086171"][href*="Acept"]').count() === 1, 'mostra que falta a Guía ativar e o botão para avisar pelo WhatsApp');
   const ctok = (await L.signIn('dr@salinas.py', 'Senha#789')).idToken;
   check(st(await L.fsReq(P, 'PATCH', 'gfichas/' + uid + '?updateMask.fieldPaths=dl', ctok, L.fields({ dl: 'dj1' }))) === 403, 'o cliente não se liga sozinho à ficha');
 
@@ -105,7 +107,7 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   const dj = out.filter(x => x.id === 'dj1' || /Salinas/.test(x.n));
   info(JSON.stringify(dj.map(x => ({ id: x.id, n: x.n, sl: x.sl, own: x.own, tc: x.tc, cz: x.cz, cor: x.cor, bt: x.bt, sv: x.sv && x.sv.length }))));
   check(dj.length === 1 && dj[0].id === 'dj1' && dj[0].own === 1 && dj[0].sl === 'dr-teste-salinas', 'uma ficha só (a da Guía), com o mesmo endereço');
-  check(dj[0].sv.length === 2 && dj[0].cor === 'ver' && dj[0].cz === hoy && dj[0].tc === 1 && dj[0].dy[6].on && !dj[0].bt.includes('sh'), 'traz serviços, cor, fechado hoje, horário novo e botões');
+  check(dj[0].sv.length === 2 && dj[0].cz === hoy && dj[0].tc === 1 && dj[0].dy[6].on && !dj[0].cor && !dj[0].bt, 'traz serviços, fechado hoje e horário novo');
   await L.fsReq(P, 'PATCH', 'gfichas/' + uid + '?updateMask.fieldPaths=n&updateMask.fieldPaths=cz', 'owner', L.fields({ n: 'Consultorio Salinas', cz: '' }));
   const out2 = JSON.parse(php("require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(guia_pub()['dir']);")).find(x => x.id === 'dj1');
   check(out2.n === 'Consultorio Salinas' && out2.sl === 'dr-teste-salinas' && !out2.tc && !out2.cz, 'o cliente muda o nome: a ficha muda, o link para o Instagram continua o mesmo; reaberto, não figura fechado');
@@ -114,8 +116,8 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   if (process.env.SHOT) fs.writeFileSync(process.env.SHOT + '/bio.html', html);
   const order = ['data-c="wa"', 'data-c="map"', 'data-c="gu"'].map(k => html.indexOf(k));
   check(/<h2>Servicios<\/h2>/.test(html) && /Limpieza dental/.test(html) && /Gs\. 150\.000/.test(html), 'link /l/: mostra os serviços com preço');
-  check(!/id="sh"/.test(html) && order.every(i => i > 0) && order[0] < order[1] && order[1] < order[2], 'link /l/: botões na ordem do cliente e sem "Compartir"');
-  check(/theme-color" content="#062B22"/.test(html) && html.includes('CZ="' + hoy + '"'), 'link /l/: cor verde e aviso de fechado hoje');
+  check(/id="sh"/.test(html) && order.every(i => i > 0) && order[0] < order[1] && order[1] < order[2], 'link /l/: botões no padrão da Guía');
+  check(/theme-color" content="#24093F"/.test(html) && html.includes('CZ="' + hoy + '"'), 'link /l/: cor da Guía e aviso de fechado hoje');
 
   sec('F. Toques da ficha ligada (guia_stats.php)');
   { const dr = fs.mkdtempSync(path.join(os.tmpdir(), 'gst-')); fs.mkdirSync(path.join(dr, 'datos'));
@@ -132,7 +134,7 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   await c.reload(); await c.w(3500);
   check(/aparece en la Guía y en tu link en unos minutos/.test(await c.txt()) && await c.locator('#ffi').count() === 1, 'o cliente vê que já está ativo e continua editando');
   await c.click('[data-l="pt"]'); await c.w(300);
-  check(/Meu negócio no Guia/.test(await c.txt()) && /Botões do seu link/.test(await c.txt()), 'painel do cliente em português');
+  check(/Meu negócio no Guia/.test(await c.txt()) && /Serviços principais/.test(await c.txt()), 'painel do cliente em português');
   check(c.errs.length === 0, 'página do cliente sem erros de JavaScript', c.errs.join(' | '));
 
   sec('H. Central: tirar o acesso');
