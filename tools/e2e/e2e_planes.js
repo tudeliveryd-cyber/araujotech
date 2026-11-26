@@ -52,6 +52,8 @@ const L = require('./lib'); const { sec, check, info } = L;
     check(r3.gas, 'Gastronomía: botão Ver toda la gastronomía');
     check(r3.rc === 8 && r3.rcAll, 'Aliados Tu Delivery no computador: 2 fileiras e o botão para ver todos');
     check(r3.cat === 'car', 'Ver todos abre a categoria');
+    const sl = await d.evaluate(() => { const tg = [...document.querySelectorAll('.sd.cl .tg.vip')].map(e => e.textContent); return { tg, vip: /\bVIP\b/.test(document.querySelector('#atl') ? document.body.innerText : '') }; });
+    check(sl.tg.every(x => x === 'Portada') && !sl.vip, 'auditoria: slider mostra "Portada" (nunca o nome interno VIP do Vitrix)', JSON.stringify(sl));
     check(r3.locf === 3 && !r3.srOnly.includes('Abogado X'), 'filtro por localização: Santa Rita esconde quem é de outra cidade');
     check(!d.errs.length, 'sem erros de JavaScript (computador)', d.errs.join(' | ')); }
   sec('Início: En portada e Qué comer');
