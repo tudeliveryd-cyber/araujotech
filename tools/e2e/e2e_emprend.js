@@ -5,7 +5,8 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026']; await L.signUp(...ADM);
   await L.fsReq(P, 'PATCH', 'platform/sitio', 'owner', L.fields({ gdir: [
     { id: 'fis1', n: 'Ferretería Centro', g: 'shop', d: 'Ferretería', wa: '0981 300 001', tel: '', a: 'Av. Central 50', map: '', hrs: '', ig: '', lg: '', tu: [], td: false, pr: true, on: true },
-    { id: 'out1', n: 'Taller Monday', g: 'car', d: 'Taller mecánico', wa: '0981 300 002', tel: '', a: 'Ruta 6', map: '', hrs: '', ig: '', lg: '', tu: [], td: false, pr: true, on: true, ci: 'Santa Rosa del Monday' }] }));
+    { id: 'out1', n: 'Taller Monday', g: 'car', d: 'Taller mecánico', wa: '0981 300 002', tel: '', a: 'Ruta 6', map: '', hrs: '', ig: '', lg: '', tu: [], td: false, pr: true, on: true, ci: 'Santa Rosa del Monday' },
+    { id: 'sina1', n: 'Cocina de Lu', g: 'food', d: 'Comidas por pedido', wa: '0981 300 005', tel: '', a: '', map: 'https://maps.app.goo.gl/abc123', hrs: '', ig: '', lg: '', tu: [], td: true, pr: false, on: true }] }));
   sec('A. Central: "Cómo atiende" no registro rápido e na ficha');
   const A = await L.open({ w: 1366 }); const a = A.p; const doc = async () => L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json);
   await a.goto('https://araujotechsistemas.com/admin/'); await a.w(2500);
@@ -38,6 +39,10 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   const hv = h.replace(/'(Cómo llegar|Ubicación|Dirección)':/g, ''); check(/Venta por pedido/.test(h) && !/Cómo llegar/.test(hv) && !/class="sh2">Ubicación/.test(h) && !/"streetAddress":"/.test(h) && !/hasMap":"/.test(h) && /"areaServed":"Santa Rita"/.test(h), 'página do negócio: mostra "Venta por pedido", sem "Cómo llegar", sem mapa e sem endereço falso no Google');
   const hf = php(`$_SERVER['HTTP_HOST'] = 'guiadesantarita.com'; $_GET = ['k' => 'negocio', 'id' => '${fe.sl}']; include 'p.php';`, 'guia');
   check(/Cómo llegar/.test(hf) && /Av\. Central 50/.test(hf), 'loja física continua com "Cómo llegar" e endereço');
+  const lu = dir.find(x => x.id === 'sina1') || {}; const hl = php(`$_SERVER['HTTP_HOST'] = 'guiadesantarita.com'; $_GET = ['k' => 'negocio', 'id' => '${lu.sl}']; include 'p.php';`, 'guia');
+  check(!/Cómo llegar/.test(hl.replace(/'(Cómo llegar|Ubicación)':/g, '')) && !/class="sh2">Ubicación/.test(hl) && !/output=embed/.test(hl) && /Cocina de Lu/.test(hl), 'sem endereço cadastrado (só link do mapa): página sem mapa e sem "Cómo llegar"');
+  check(!/class="sh2">Horarios/.test(h) && !/class="sh2">Horarios/.test(hl), 'sem horário cadastrado: a página não mostra horários inventados');
+  const hlb = php(`$_GET = ['id' => '${lu.sl}']; include 'bio.php';`, 'guia'); check(!/Cómo llegar/.test(hlb.replace(/'Cómo llegar':/g, '')), 'link do Instagram sem "Cómo llegar" quando não há endereço');
   const bio = php(`$_GET = ['id' => '${an.sl}']; include 'bio.php';`, 'guia');
   const bv = bio.replace(/'(Cómo llegar|Dirección)':/g, ''); check(!/Cómo llegar/.test(bv) && !/Dirección/.test(bv) && /Dulces de Ana/.test(bio), 'link do Instagram (/l/) sem "Cómo llegar" nem endereço');
 
@@ -51,6 +56,9 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
     CAT = 'all'; document.getElementById('q').value = ''; render(); await W(80); o.allLoc = document.querySelectorAll('#list [data-locf]').length;
     document.querySelector('#list [data-locf="out"]') && document.querySelector('#list [data-locf="out"]').click(); await W(80); o.out = [...document.querySelectorAll('#list .cc h3, #list .card h3')].map(x => x.textContent.trim()); LOCF = '';
     CAT = 'food'; render(); await W(80); const c = [...document.querySelectorAll('.cc.dir')].find(x => /Dulces de Ana/.test(x.textContent)); o.card = c ? { map: [...c.querySelectorAll('.cc-ac a')].some(a => /Mapa/.test(a.textContent)), moc: (c.querySelector('.moc') || {}).textContent || '' } : null;
+    CAT = 'car'; G.dir = G.dir.concat([{ id: 'sr2', n: 'Taller Centro', g: 'car', d: 'Taller', wa: '0981 300 006', a: 'Calle 1', pr: true }]); render(); await W(80);
+    const gr = document.querySelector('.cpg .grid'); const kids = gr ? [...gr.children].map(e => e.classList.contains('lc-sep') ? 'SEP' : (e.querySelector('h3') || {}).textContent) : []; o.sep = kids.join('|');
+    const pin = document.querySelector('.locf [data-locf="sr"] svg'); o.pin = pin ? Math.round(pin.getBoundingClientRect().height) : -1;
     L = 'pt'; render(); await W(50); const c2 = [...document.querySelectorAll('.cc.dir')].find(x => /Dulces de Ana/.test(x.textContent)); o.pt = c2 ? (c2.querySelector('.moc') || {}).textContent : ''; L = 'es';
     CAT = 'home'; G.dir = D0; render(); return o; }, dir);
   info(JSON.stringify(r));
@@ -60,6 +68,8 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   check(r.city.includes('Taller Monday') && !r.city.includes('Ferretería Centro'), 'busca pela cidade ("santa rosa")');
   check(r.allLoc === 3 && r.out.join() === 'Taller Monday', 'filtro por cidade também em "todos": Otras ciudades mostra só quem é de fora');
   check(r.card && !r.card.map && r.card.moc === 'Venta por pedido' && r.pt === 'Venda por encomenda', 'cartão sem botão de mapa e com "Venta por pedido" (PT: "Venda por encomenda")');
+  check(/^Taller Centro\|SEP\|Taller Monday$/.test(r.sep), 'categoria: Santa Rita primeiro e "Otras ciudades cercanas" separado', r.sep);
+  check(r.pin > 0 && r.pin <= 18, 'ícone do filtro Santa Rita / Otras ciudades no tamanho do texto', String(r.pin));
   check(!g.errs.length, 'Guía sem erros de JavaScript', g.errs.join(' | '));
   L.done();
 })().catch(e => { console.log('ERRO', e && e.stack || e); process.exit(1); });

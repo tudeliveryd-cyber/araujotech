@@ -863,6 +863,8 @@ footer .ft-cols>div:nth-child(3){grid-column:auto}
 /* Santa Rita al día */
 .ald{margin:6px 0 36px}.ald-h h2{display:flex;align-items:center;gap:10px;margin:0}.ald-h h2 svg{width:24px;height:24px;color:#7A2BD1}.ald-h p{margin:4px 0 12px;color:#5F566B;font-size:14.5px}
 .ald-f{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}.ald-f button{flex:none;border:1px solid #E7DEF2;background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;font:inherit;font-weight:700;font-size:13.5px;cursor:pointer}.ald-f button[aria-pressed=true]{background:#4A0A80;border-color:#4A0A80;color:#fff}
+.ald-f button{display:inline-flex;align-items:center;gap:6px}.ald-f button svg{width:15px;height:15px;flex:none}/* 26/11: ícone do filtro de cidade no tamanho certo */
+.lc-sep{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:14px 0 2px;padding-top:14px;border-top:1px solid #E7DEF2;font-weight:800;font-size:15px;color:#4A0A80}.lc-sep svg{width:17px;height:17px;flex:none}
 .ald-g{display:grid;gap:12px}.ald-b{position:relative;display:block;border-radius:20px;overflow:hidden;min-height:230px;background:linear-gradient(135deg,#4A0A80,#8A12D6);color:#fff;text-decoration:none}
 .ald-b img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.ald-b:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,6,36,0) 25%,rgba(20,6,36,.88) 100%)}
 .ald-b .ald-ph{position:absolute;right:18px;top:18px;opacity:.35}.ald-b .ald-ph svg{width:64px;height:64px}
@@ -1430,8 +1432,8 @@ function portHTML(){const t=TX[L];const it=(G.ads||[]).filter(a=>a&&a.img&&!a.ow
 Object.assign(TX.es,{ti_po:'Portada',ti_vx:'Catálogo online',sec_all:'Ver todos',gas_all:'Ver toda la gastronomía',lc_all:'Todas',lc_sr:'Santa Rita',lc_out:'Otras ciudades',lc_h:'Ubicación',tdl_all:'Ver los {n} aliados'});
 Object.assign(TX.pt,{ti_po:'Capa',ti_vx:'Catálogo online',sec_all:'Ver todos',gas_all:'Ver toda a gastronomia',lc_all:'Todas',lc_sr:'Santa Rita',lc_out:'Outras cidades',lc_h:'Localização',tdl_all:'Ver os {n} aliados'});
 /* 26/11: negócio sem local físico — modalidade (a domicilio, por pedido, con cita, solo delivery); sem mapa nem endereço de loja */
-Object.assign(TX.es,{mo_dom:'Servicio a domicilio',mo_ped:'Venta por pedido',mo_cit:'Con cita previa',mo_del:'Solo delivery'});
-Object.assign(TX.pt,{mo_dom:'Serviço a domicílio',mo_ped:'Venda por encomenda',mo_cit:'Com hora marcada',mo_del:'Só delivery'});
+Object.assign(TX.es,{mo_dom:'Servicio a domicilio',lc_sep:'Otras ciudades cercanas',mo_ped:'Venta por pedido',mo_cit:'Con cita previa',mo_del:'Solo delivery'});
+Object.assign(TX.pt,{mo_dom:'Serviço a domicílio',lc_sep:'Outras cidades próximas',mo_ped:'Venda por encomenda',mo_cit:'Com hora marcada',mo_del:'Só delivery'});
 const MO_KW={dom:'a domicilio domicilio servicio a domicilio em domicilio atendimento em casa',ped:'por pedido pedido encomienda encargo por encargo encomenda caseiro casero hecho en casa',cit:'con cita previa cita turno agenda agendamiento hora marcada agendamento',del:'solo delivery delivery entrega a domicilio envio'};
 const moTag=c=>c&&c.mo?`<span class="moc">${ic(c.mo==='del'?'bike':c.mo==='cit'?'cal':c.mo==='ped'?'tag':'home')}${TX[L]['mo_'+c.mo]}</span>`:'';
 const cityOf=c=>{const v=String((c&&(c._dir?c.ci:c.city))||'').trim();return v&&norm(v)!=='santa rita'?v:''};/* cidade só aparece quando NÃO é Santa Rita */
@@ -1580,7 +1582,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-locf]');if(!b)return;LOCF=b.dataset.locf;render()});
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='ccsort'){SORTM=e.target.value;if(SORTM==='near'&&!NEAR)locate(()=>render());else render()}});
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-vmap]');if(!b)return;if(GCOL[CAT])MAPF='g:'+CAT;MAPON=true;render();mapShow();goTo('gmw',90)});
-function grpBody(k,l){const so=a=>(CCARD?ccSort(a):a.slice().sort((x,y)=>(y.dest?1:0)-(x.dest?1:0))).map(card).join('');let sf=c=>c._sub;let tb=(GSUB[k]||[]).filter(([tk])=>l.some(c=>c._sub===tk));
+function grpBody(k,l){const so=a=>{const r=CCARD?ccSort(a):a.slice().sort((x,y)=>(y.dest?1:0)-(x.dest?1:0)),sr=r.filter(c=>!cityOf(c)),ou=r.filter(cityOf);/* 26/11: Santa Rita primeiro; cidades vizinhas depois, separadas */return sr.map(card).join('')+(sr.length&&ou.length?`<p class="lc-sep">${ic('pin')}${esc(TX[L].lc_sep)}</p>`:'')+ou.map(card).join('')};let sf=c=>c._sub;let tb=(GSUB[k]||[]).filter(([tk])=>l.some(c=>c._sub===tk));
  if(!tb.length){const au=autoSub(l);if(au.length){const mp=new Map();au.forEach(g=>g.c.forEach(c=>mp.set(c,g.k)));tb=au.map(g=>[g.k,g.n]);sf=c=>mp.get(c)||''}}
  if(!tb.length)return `<div class="grid">${so(l)}</div>`;const rest=l.filter(c=>!tb.some(([tk])=>tk===sf(c)));
  const cur=SUBT[k]&&tb.some(([tk])=>tk===SUBT[k])?SUBT[k]:'';const chips=`<div class="subt" role="tablist">${[['',{es:TX.es.all,pt:TX.pt.all},l.length]].concat(tb.map(([tk,n])=>[tk,n,l.filter(c=>sf(c)===tk).length])).map(([tk,n,c])=>`<button type="button" role="tab" data-subt="${esc(k)}" data-tk="${esc(tk)}" aria-selected="${cur===tk}">${esc(n[L])}<small>${c}</small></button>`).join('')}</div>`;

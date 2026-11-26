@@ -49,7 +49,7 @@ $NG = ['food' => 'Comida y bebidas', 'shop' => 'Tiendas y moda', 'health' => 'Sa
 foreach (guia_cat(guia_doc()['gcat'] ?? [])['neg'] as $cg) { if ($cg['n']['es'] !== '') $NG[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '' && $ct['k'] === ($x['sub'] ?? '')) $NG['_sub'] = $ct['n']['es']; }
 $kind = $NG['_sub'] ?? ($NG[$x['g'] ?? ''] ?? '');
 if ($kind !== '' && ($tp = guia_tr($kind)) !== '') $TR[$kind] = $tp;
-$nolocal = in_array($x['mo'] ?? '', ['dom', 'ped', 'cit', 'del'], true); // 26/11: sem local físico
+$nolocal = in_array($x['mo'] ?? '', ['dom', 'ped', 'cit', 'del'], true) || trim((string)($x['a'] ?? '')) === ''; // 26/11 (Jean): "Cómo llegar" só com endereço físico // 26/11: sem local físico
 $addr = $nolocal ? '' : trim((string)($x['a'] ?? ''));
 $ini = mb_strtoupper(mb_substr(preg_replace('/^(dr|dra|lic|ing)\.?\s+/i', '', $n), 0, 1));
 ?><!doctype html>
