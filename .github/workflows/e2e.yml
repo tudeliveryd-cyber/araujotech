@@ -82,7 +82,7 @@ jobs:
           echo "######## CATÁLOGO AINDA SEM PRODUTOS (aviso \"Estamos preparando\", logos e botão de WhatsApp) · regras v19"; tools/e2e/run.sh e2e_preparando.js firestore-v19.rules || F=1
           echo "######## GARÇOM LANÇA PEDIDO NA MESA · regras v13"; tools/e2e/run.sh e2e_mozo.js firestore-v13.rules || F=1
           echo "######## FOTOS GRANDES E LOGO LARGO · regras v13"; CAPA=$PWD/tools/e2e/fix/capa-grande.jpg LOGO=$PWD/tools/e2e/fix/logo-largo.png tools/e2e/run.sh e2e_fotos.js firestore-v13.rules || F=1
-          echo "######## GALERIA DE FOTOS DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_galeria.js firestore-v13.rules || F=1
+          echo "######## GALERIA DE FOTOS DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_galeria_prod.js firestore-v13.rules || F=1
           echo "######## CORES DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_cores.js firestore-v13.rules || F=1
           echo "######## VÍDEO DO PRODUTO (video.php no PHP local) · regras v13"; tools/e2e/run.sh e2e_video.js firestore-v13.rules || F=1
           echo "######## COZINHA SÓ PARA COMIDA · regras v13"; tools/e2e/run.sh e2e_cozinha.js firestore-v13.rules || F=1
