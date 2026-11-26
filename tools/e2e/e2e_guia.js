@@ -402,7 +402,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
   check(/Salud/.test(v4.sal) && v4.salPub.some(x => /Hospital/.test(x)), 'Salud: abre hospitais e saúde');
   check(v4.dedup.filter(x => /Hospital/.test(x)).length === 1, 'dado do painel não aparece repetido com o do mapa aberto');
   check(/Mi cuenta/.test(v4.accTitle) && v4.biz && v4.dark && v4.light && v4.hist[0] === 'pizza', 'Mi cuenta: favoritos, buscas recentes, modo escuro e entrada do painel do negócio');
-  check(v4.soc.join('|') === 's-wa|s-ig', 'rodapé mostra só as redes com link válido (configuradas no painel)');
+  check(v4.soc.join('|') === 's-wa|s-ch|s-ig', 'rodapé mostra só as redes com link válido (configuradas no painel)');
   const v5 = await gr3.evaluate(async () => { const r = {}; const W = ms => new Promise(f => setTimeout(f, ms)); const day = d => { const x = new Date(); x.setDate(x.getDate() + d); return x.toISOString().slice(0, 10) };
     JOBS = [{ id: 'lojax:a1', t: 'Cajera', a: 'ven', k: 'full', d: 'Atención y caja', r: 'Secundaria', sal: 'Gs. 2.900.000', n: 2, wa: '595981000222', until: day(5), co: { n: 'Super X', id: 'lojax', logo: '' } }, { id: 'g:b2', t: 'Cocinero', a: 'coc', k: 'part', d: 'Cocina de lomitos', r: '', sal: '', n: 1, wa: '595981000333', until: day(9), co: { n: 'Lomitería Y', id: '', logo: '' } }];
     goHome(); render(); document.querySelector('#atl [data-a="job"]').click(); await W(40);
