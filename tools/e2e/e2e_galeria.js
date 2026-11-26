@@ -29,9 +29,11 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   check(pre.ph > 0 && pre.phh.startsWith('data:image/jp') && pre.gl === 3 && pre.th === 3, 'capa (pequena + grande) e 3 fotos carregadas, com miniaturas');
   await a.act('gudirglrm', `[data-i="${di}"][data-n="1"]`); await a.w(400);
   check(await a.evaluate(i => ui.gu.dir[i].gl.length, di) === 2, 'quitar uma foto');
+  await a.locator(`input[data-gu="dir.${di}.po"]`).check(); await a.fill(`[data-gu="dir.${di}.ci"]`, 'Santa Rosa del Monday'); await a.w(300);
   await a.act('gusave'); await a.w(5000);
   const doc = L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json); const gx = (doc.gdir || []).find(x => x.id === 'gx1') || {};
   info(JSON.stringify({ phh: gx.phh, gl: gx.gl, ph: (gx.ph || '').length }));
+  check(gx.po === true && gx.ci === 'Santa Rosa del Monday', 'rev3: Portada marcada e cidade da ficha salvas pela Central', JSON.stringify([gx.po, gx.ci]));
   check(/^gimg:pcgx1:[a-f0-9]+$/.test(gx.phh || '') && Array.isArray(gx.gl) && gx.gl.length === 2 && gx.gl.every(v => /^gimg:glgx1_\d_[a-f0-9]+:[a-f0-9]+$/.test(v)) && /^data:image\/jpeg/.test(gx.ph || ''), 'salvo: capa grande e fotos guardadas à parte; o documento da Guía só leva a referência');
   const gid = /^gimg:([A-Za-z0-9_]+):/.exec(gx.gl[0])[1]; const gi = L.unfields((await L.fsReq(P, 'GET', 'platform/sitio/gimg/' + gid, 'owner')).json) || {};
   const dim = await a.evaluate(src => new Promise(f => { const im = new Image(); im.onload = () => f(im.naturalWidth); im.onerror = () => f(0); im.src = src; }), gi.d || '');
@@ -54,6 +56,7 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   if (process.env.SHOT) fs.writeFileSync(process.env.SHOT + '/negocio.html', html);
   check((html.match(/data-lb="\/sitio\/gimg\.php\?d=gx1&amp;k=g\d/g) || []).length === 2 && /<dialog class="lb" id="lb">/.test(html) && /<h2 class="sh2">Fotos<\/h2>/.test(html), 'página do negócio: galeria com as 2 fotos e visor em tela cheia');
   check(/<img class="ph" src="\/sitio\/gimg\.php\?d=gx1&amp;k=c&amp;v=/.test(html) && /og:image" content="https:\/\/guiadesantarita\.com\/sitio\/gimg\.php\?d=gx1&amp;k=c/.test(html), 'capa grande no topo e na prévia do WhatsApp');
+  check(/<span>Santa Rosa del Monday<\/span>/.test(html) && /"addressLocality":"Santa Rosa del Monday"/.test(html) && /— Santa Rosa del Monday \| Guía/.test(html), 'página do negócio de outra cidade: mostra a cidade certa (não Santa Rita)');
   check(/<h2 class="sh2">Ubicación<\/h2>/.test(html) && /Av\. Central 123/.test(html) && /maps\.google\.com\/maps\?q=-25\.79,-55\.08&amp;z=16&amp;output=embed/.test(html), 'endereço e mapa (pelas coordenadas do link)');
   check(/id="nst"/.test(html) && /class="rc"><svg[^>]*>.*?<\/svg>Recomendado<\/span>/.test(html), 'selo Recomendado e espaço do "abierto ahora"');
 
@@ -63,10 +66,10 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   const r = await g.evaluate(async (dd) => { const W = ms => new Promise(f => setTimeout(f, ms)); G.dir = dd; CAT = 'home'; render(); await W(80);
     const o = { fd: [...document.querySelectorAll('#destacados .fc-t b')].map(b => b.textContent), tag: (document.querySelector('#destacados .fc-tg.rcg') || {}).textContent || '', cv: (document.querySelector('#destacados .fc-cv > img') || { getAttribute: () => '' }).getAttribute('src') || '' };
     CAT = 'food'; render(); await W(80); o.rec = [...document.querySelectorAll('.cpr .fc-t b')].map(b => b.textContent);
-    const c = [...document.querySelectorAll('.cc.dir')].find(x => /Panadería Galería/.test(x.textContent)); o.card = c ? { open: !!c.querySelector('.bd.on'), seal: !!c.querySelector('.bd.st'), cover: !!c.querySelector('.cc-ph img[src*="k=c"]'), vn: (c.querySelector('a.vn') || { getAttribute: () => '' }).getAttribute('href'), ad: /Av\. Central 123/.test(c.textContent), nb: c.querySelectorAll('.bd').length } : null;
+    const c = [...document.querySelectorAll('.cc.dir')].find(x => /Panadería Galería/.test(x.textContent)); o.card = c ? { open: !!c.querySelector('.bd.on'), seal: !!c.querySelector('.bd.st, .bd.tt-po'), cover: !!c.querySelector('.cc-ph img[src*="k=c"]'), vn: (c.querySelector('a.vn') || { getAttribute: () => '' }).getAttribute('href'), ad: /Av\. Central 123/.test(c.textContent), nb: c.querySelectorAll('.bd').length } : null;
     CAT = 'home'; render(); return o; }, dir);
   info(JSON.stringify(r));
-  check(r.fd.includes('Panadería Galería') && !r.fd.includes('Ficha Sin Plan') && /Recomendado/.test(r.tag) && /k=c/.test(r.cv), 'Recomendado da Guía entra em Negocios destacados com a foto de capa');
+  check(r.fd.includes('Panadería Galería') && !r.fd.includes('Ficha Sin Plan') && /Portada/.test(r.tag) && /k=c/.test(r.cv), 'Recomendado da Guía entra em Negocios destacados com a foto de capa');
   check(r.rec.includes('Panadería Galería'), 'e em "Recomendados en esta categoría"');
   check(r.card && r.card.open && r.card.seal && r.card.cover && /negocio\/panaderia-galeria/.test(r.card.vn) && r.card.ad && r.card.nb <= 2, 'cartão novo: capa, aberto agora, selo, endereço e "Ver negocio" (no máximo dois selos)');
   if (process.env.SHOT) { // fotos para revisar o visual (não fazem parte das verificações)

@@ -17,11 +17,11 @@ P = [
  dict(k='rc', tag='Más visibilidad', n='Recomendado', ex='Para destacar: más lugar y prioridad dentro de la Guía.',
       pr='Gs. 450.000', per='por mes', ins='',
       b=['Todo lo de Presencia', 'Sello Recomendado', 'Lugar en Negocios destacados con foto de portada', 'Primero en las listas'],
-      pl='Recomendado + link (Gs. 450.000 por mes)'),
+      pl='Recomendado (Gs. 450.000 por mes)'),
  dict(k='po', tag='Máxima visibilidad', n='Portada', ex='Para que te vea todo el que entra: tu anuncio arriba de todo.',
       pr='Gs. 800.000', per='por mes', ins='',
       b=['Todo lo de Recomendado', 'Tu anuncio en el slider de la portada', 'Lo primero que ve quien entra a la Guía'],
-      pl='Portada + link (Gs. 800.000 por mes)'),
+      pl='Portada (Gs. 800.000 por mes)'),
 ]
 MOCK = {
  'vx': '<div class="pz-m pz-mvx" aria-hidden="true"><div class="mh"><i></i><b>Tu negocio</b><span>Abierto</span></div><div class="mg"><span><em></em><b>Producto</b><small>Gs. 25.000</small></span><span><em></em><b>Producto</b><small>Gs. 40.000</small></span><span><em></em><b>Producto</b><small>Gs. 18.000</small></span></div><div class="mb">Pedir por WhatsApp</div></div>',
@@ -42,7 +42,7 @@ HTML = ('<!-- PLANES-GUIA:INICIO (gerado por tools/guia/planes_block.py) -->\n'
  '<div class="pz" id="precios"><div class="pz-g">' + ''.join(card(p) for p in P) + '</div>'
  '<p class="pz-inc">' + CK + '<span><b>Incluido en Presencia, Recomendado y Portada:</b> tu link propio para el Instagram y tu panel para cambiar horarios, servicios y fotos cuando quieras.</span></p>'
  '<p class="pz-cnd">Planes de la Guía: pago adelantado, mínimo 3 meses. En 6 meses pagás 5; en 12 meses pagás 10. Vitrix tiene sus propias condiciones.</p></div>\n'
- '<script>(function(){document.querySelectorAll(\'.pz-wa[data-wpl]\').forEach(function(a){a.addEventListener(\'click\',function(){var pt=document.documentElement.lang===\'pt\',pl=a.getAttribute(\'data-wpl\');var PL={\'Catálogo Vitrix (desde Gs. 150.000 por mes + instalación)\':\'Catálogo Vitrix (a partir de Gs. 150.000 por mês + instalação)\',\'Presencia + link (Gs. 300.000 por mes)\':\'Presença + link (Gs. 300.000 por mês)\',\'Recomendado + link (Gs. 450.000 por mes)\':\'Recomendado + link (Gs. 450.000 por mês)\',\'Portada + link (Gs. 800.000 por mes)\':\'Capa + link (Gs. 800.000 por mês)\'};a.href=\'https://wa.me/' + WA + '?text=\'+encodeURIComponent(pt?\'Olá! Quero contratar \'+(PL[pl]||pl)+\' no Guia de Santa Rita.\':\'¡Hola! Quiero contratar \'+pl+\' en la Guía de Santa Rita.\')})})})();</script>\n'
+ '<script>(function(){document.querySelectorAll(\'.pz-wa[data-wpl]\').forEach(function(a){a.addEventListener(\'click\',function(){var pt=document.documentElement.lang===\'pt\',pl=a.getAttribute(\'data-wpl\');var PL={\'Catálogo Vitrix (desde Gs. 150.000 por mes + instalación)\':\'Catálogo Vitrix (a partir de Gs. 150.000 por mês + instalação)\',\'Presencia + link (Gs. 300.000 por mes)\':\'Presença + link (Gs. 300.000 por mês)\',\'Recomendado (Gs. 450.000 por mes)\':\'Recomendado (Gs. 450.000 por mês)\',\'Portada (Gs. 800.000 por mes)\':\'Capa (Gs. 800.000 por mês)\'};a.href=\'https://wa.me/' + WA + '?text=\'+encodeURIComponent(pt?\'Olá! Quero contratar \'+(PL[pl]||pl)+\' no Guia de Santa Rita.\':\'¡Hola! Quiero contratar \'+pl+\' en la Guía de Santa Rita.\')})})})();</script>\n'
  '<!-- PLANES-GUIA:FIM -->')
 CSS = '''/* PLANES-GUIA:CSS */
 .pz{margin-top:22px}.pz-g{display:grid;gap:16px;grid-template-columns:1fr}

@@ -50,19 +50,19 @@ if (!$x) {
   } elseif ($k === 'negocio') {
     $NG = ['food' => 'Comida y bebidas', 'shop' => 'Tiendas y moda', 'health' => 'Salud y belleza', 'home' => 'Hogar y construcción', 'car' => 'Autos, motos y náutica', 'serv' => 'Servicios'];
     foreach (guia_cat(guia_doc()['gcat'] ?? [])['neg'] as $cg) { if ($cg['n']['es'] !== '') $NG[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '' && $ct['k'] === ($x['sub'] ?? '')) $NG['_sub'] = $ct['n']['es']; }
-    $kind = $NG['_sub'] ?? ($NG[$x['g']] ?? 'Negocio');
+    $kind = $NG['_sub'] ?? ($NG[$x['g']] ?? 'Negocio'); $cty = trim((string)($x['ci'] ?? '')) ?: 'Santa Rita'; // rev3: cidade da ficha (vazio = Santa Rita)
     foreach ([$kind, $x['d'] ?? '', $x['hrs'] ?? ''] as $tt) if (($tp = guia_tr($tt)) !== '') $TRPT[$tt] = $tp; // português automático
     $x['t'] = $x['n'];
     if (($x['phh'] ?? '') !== '') $x['ph'] = $x['phh']; // 25/11 (etapa 3): capa em boa resolução (plano pago)
     $nll = null; if (is_array($x['ll'] ?? null) && count($x['ll']) === 2) $nll = [(float)$x['ll'][0], (float)$x['ll'][1]]; elseif (preg_match('/[?&](?:q|query)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/', (string)$x['map'], $mm) || preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', (string)$x['map'], $mm)) $nll = [(float)$mm[1], (float)$mm[2]];
-    $emb = $nll ? 'https://maps.google.com/maps?q=' . $nll[0] . ',' . $nll[1] . '&z=16&output=embed' : (trim((string)$x['a']) !== '' ? 'https://maps.google.com/maps?q=' . rawurlencode($x['n'] . ', ' . $x['a'] . ', Santa Rita, Alto Paraná, Paraguay') . '&z=16&output=embed' : '');
-    $title = $x['n'] . ' — Santa Rita';
+    $emb = $nll ? 'https://maps.google.com/maps?q=' . $nll[0] . ',' . $nll[1] . '&z=16&output=embed' : (trim((string)$x['a']) !== '' ? 'https://maps.google.com/maps?q=' . rawurlencode($x['n'] . ', ' . $x['a'] . ', ' . $cty . ', Alto Paraná, Paraguay') . '&z=16&output=embed' : '');
+    $title = $x['n'] . ' — ' . $cty;
     $DN = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']; $hrsL = [];
     if (is_array($x['dy'] ?? null)) foreach ([1, 2, 3, 4, 5, 6, 0] as $di) { $dd = $x['dy'][$di] ?? null; if (!is_array($dd)) continue; $rg = []; foreach (['a', 'b'] as $kk) if (!empty($dd['on']) && !empty($dd[$kk][0]) && !empty($dd[$kk][1])) $rg[] = $dd[$kk][0] === $dd[$kk][1] ? '24 horas' : $dd[$kk][0] . '–' . $dd[$kk][1]; $hrsL[] = [$DN[$di], $rg ? implode(' · ', $rg) : 'Cerrado', $di, $rg]; }
-    $desc = mb_substr(trim(($x['d'] ? $x['d'] . '. ' : '') . $kind . ' en Santa Rita, Alto Paraná.' . ($x['a'] ? ' ' . $x['a'] . '.' : '') . ($x['hrs'] ? ' Horario: ' . $x['hrs'] . '.' : '')), 0, 160);
-    $tags = array_filter([!empty($x['td']) ? 'Aliado Tu Delivery' : '', $x['hrs']]);
+    $desc = mb_substr(trim(($x['d'] ? $x['d'] . '. ' : '') . $kind . ' en ' . $cty . ', Alto Paraná.' . ($x['a'] ? ' ' . $x['a'] . '.' : '') . ($x['hrs'] ? ' Horario: ' . $x['hrs'] . '.' : '')), 0, 160);
+    $tags = array_filter([$cty !== 'Santa Rita' ? $cty : '', !empty($x['td']) ? 'Aliado Tu Delivery' : '', $x['hrs']]);
     $body = (string)(($x['dx'] ?? '') ?: ($x['d'] ?? ''));
-    $mq = preg_match('#^https://#', (string)$x['map']) ? $x['map'] : 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($x['n'] . ($x['a'] ? ' ' . $x['a'] : '') . ' Santa Rita, Alto Paraná, Paraguay');
+    $mq = preg_match('#^https://#', (string)$x['map']) ? $x['map'] : 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($x['n'] . ($x['a'] ? ' ' . $x['a'] : '') . ' ' . $cty . ', Alto Paraná, Paraguay');
     $tel = preg_replace('/[^\d+]/', '', (string)$x['tel']); $wn = $x['wa'] ? $wa($x['wa']) : '';
     $wmsg = !empty($x['td']) ? 'Hola, quiero hacer un pedido. Te encontré en la Guía de Santa Rita.' : 'Hola, te encontré en la Guía de Santa Rita y quiero más información.';
     $ico = function ($p) { return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p . '</svg>'; };
@@ -74,7 +74,7 @@ if (!$x) {
       . (preg_match('#^https://#', (string)($x['web'] ?? '')) ? '<a class="btn" href="' . $e($x['web']) . '" target="_blank" rel="noopener">Sitio web</a>' : '');
     $oh = []; foreach ($hrsL as $h) foreach ($h[3] as $r) { [$o, $c] = $r === '24 horas' ? ['00:00', '23:59'] : explode('–', $r); $oh[] = ['@type' => 'OpeningHoursSpecification', 'dayOfWeek' => 'https://schema.org/' . ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][$h[2]], 'opens' => $o, 'closes' => $c]; }
     $ld = json_encode(array_filter(['@context' => 'https://schema.org', '@type' => $x['g'] === 'food' ? 'FoodEstablishment' : 'LocalBusiness', 'name' => $x['n'], 'description' => $x['d'] ?: null, 'url' => $self, 'telephone' => $x['tel'] ?: ($wn ? '+' . $wn : null), 'image' => ($im0 = array_values(array_filter(array_map(function ($u) { return $u !== '' ? 'https://guiadesantarita.com' . $u : ''; }, array_merge([($x['ph'] ?? '') ?: ($x['lg'] ?? '')], (array)($x['gl'] ?? [])))))) ? (count($im0) === 1 ? $im0[0] : $im0) : null, 'logo' => ($x['lg'] ?? '') !== '' ? 'https://guiadesantarita.com' . $x['lg'] : null,
-      'address' => ['@type' => 'PostalAddress', 'streetAddress' => $x['a'] ?: null, 'addressLocality' => 'Santa Rita', 'addressRegion' => 'Alto Paraná', 'addressCountry' => 'PY'], 'hasMap' => $mq, 'openingHoursSpecification' => $oh ?: null, 'sameAs' => ($x['ig'] ?? '') ? ['https://instagram.com/' . $x['ig']] : null]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+      'address' => ['@type' => 'PostalAddress', 'streetAddress' => $x['a'] ?: null, 'addressLocality' => $cty, 'addressRegion' => 'Alto Paraná', 'addressCountry' => 'PY'], 'hasMap' => $mq, 'openingHoursSpecification' => $oh ?: null, 'sameAs' => ($x['ig'] ?? '') ? ['https://instagram.com/' . $x['ig']] : null]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if (($x['ph'] ?? '') !== '') $img = 'https://guiadesantarita.com' . $x['ph']; elseif (($x['lg'] ?? '') !== '') $img = 'https://guiadesantarita.com' . $x['lg'];
   } elseif ($k === 'nota') {
     $kind = GUIA_NK[$x['k']][0] ?? 'Noticia';
