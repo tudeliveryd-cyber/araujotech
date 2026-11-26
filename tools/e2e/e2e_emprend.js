@@ -52,9 +52,10 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   sec('C. Guía: cartões, busca e filtro por cidade');
   const G = await L.open(); const g = G.p; await g.goto('https://araujotechsistemas.com/guia/'); await g.w(2500);
   const r = await g.evaluate(async (dd) => { const W = ms => new Promise(f => setTimeout(f, ms)); const D0 = G.dir;
-    G.dir = dd.concat([{ id: 'sv1', n: 'Clara Uñas', g: 'health', d: 'Manicura', wa: '0981 300 004', mo: 'dom', sv: [{ t: 'Esmaltado semipermanente' }], pr: true }]);
+    G.dir = dd.concat([{ id: 'sv1', n: 'Clara Uñas', g: 'health', d: 'Manicura', wa: '0981 300 004', mo: 'dom', sv: [{ t: 'Esmaltado semipermanente' }], pr: true }, { id: 'rs1', n: 'Parrilla Sol', g: 'food', d: 'Restaurante', wa: '0981 300 008', pr: true }, { id: 'pz1', n: 'Pizzería Roma', g: 'food', d: 'Pizzería', wa: '0981 300 009', pr: true }]);
     const find = async q => { document.getElementById('q').value = q; document.getElementById('q').dispatchEvent(new Event('input', { bubbles: true })); await W(350); return [...document.querySelectorAll('#list .cc h3, #list .card h3')].map(x => x.textContent.trim()); };
-    const o = {}; o.enc = await find('encomienda'); o.ped = await find('por pedido'); o.dom = await find('a domicilio'); o.sv = await find('semipermanente'); o.multi = await find('ana tortas'); o.city = await find('santa rosa');
+    const o = {}; o.enc = await find('encomienda'); o.ped = await find('por pedido'); o.dom = await find('a domicilio'); o.sv = await find('semipermanente'); o.multi = await find('ana tortas'); o.city = await find('santa rosa'); o.rest = await find('restaurantes'); o.pizza = await find('pizza'); o.comida = await find('comida'); o.cenc = await find('comida por encomienda');
+    o.far = await find('farmacia'); o.farb = !!document.querySelector('#list .qsc [data-tt="far"]'); o.prof = (G.pros || []).length ? [...document.querySelectorAll('#list .pro')].length : -1; await find('profesional'); o.prof2 = (G.pros || []).length ? [...document.querySelectorAll('#list .pro')].length === (G.pros || []).length : true;
     o.loc = document.querySelectorAll('#list [data-locf]').length;
     CAT = 'all'; document.getElementById('q').value = ''; render(); await W(80); o.allLoc = document.querySelectorAll('#list [data-locf]').length;
     document.querySelector('#list [data-locf="out"]') && document.querySelector('#list [data-locf="out"]').click(); await W(80); o.out = [...document.querySelectorAll('#list .cc h3, #list .card h3')].map(x => x.textContent.trim()); LOCF = '';
@@ -71,6 +72,12 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   check(r.enc.includes('Dulces de Ana') && r.ped.includes('Dulces de Ana'), 'busca "encomienda" e "por pedido" encontram quem vende por pedido');
   check(r.dom.includes('Clara Uñas') && r.sv.includes('Clara Uñas'), 'busca por "a domicilio" e por um serviço da ficha');
   check(r.multi.includes('Dulces de Ana'), 'busca com várias palavras (nome + o que vende)');
+  check(r.rest.includes('Parrilla Sol'), 'busca no plural ("restaurantes") acha os restaurantes', JSON.stringify(r.rest));
+  check(r.pizza.join() === 'Pizzería Roma', 'busca "pizza" mostra a pizzaria, não toda a gastronomia', JSON.stringify(r.pizza));
+  check(r.comida.length >= 4 && r.comida.includes('Parrilla Sol'), 'busca genérica "comida" continua mostrando a gastronomia toda', String(r.comida.length));
+  check(r.cenc.includes('Cocina de Lu') && r.cenc.includes('Dulces de Ana') && !r.cenc.includes('Parrilla Sol'), '"comida por encomienda" acha quem vende por pedido', JSON.stringify(r.cenc));
+  check(r.farb, 'busca "farmacia" oferece o atalho para as farmácias de turno');
+  check(r.prof2, 'busca "profesional" lista os profissionais');
   check(r.city.includes('Taller Monday') && !r.city.includes('Ferretería Centro'), 'busca pela cidade ("santa rosa")');
   check(r.allLoc === 3 && r.out.join() === 'Taller Monday', 'filtro por cidade também em "todos": Otras ciudades mostra só quem é de fora');
   check(r.card && !r.card.map && r.card.moc === 'Venta por pedido' && r.pt === 'Venda por encomenda', 'cartão sem botão de mapa e com "Venta por pedido" (PT: "Venda por encomenda")');
