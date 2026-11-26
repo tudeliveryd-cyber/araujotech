@@ -65,6 +65,7 @@ function guia_lk($x) {
 function guia_own($y, $x, $day) {
   $y['sn'] = $y['n'];
   foreach (['n', 'tel', 'wa', 'a', 'map', 'ig', 'web', 'lg', 'ph'] as $k) if (($x[$k] ?? '') !== '') $y[$k] = $x[$k];
+  if (($x['ph'] ?? '') !== '') unset($y['phh']); // o dono trocou a foto de capa: vale a dele
   $dd = trim((string)($x['d'] ?? '')); if ($dd !== '') { $y['d'] = mb_substr(preg_split('/\R/', $dd)[0], 0, 60); if (mb_strlen($dd) > 60 || strpos($dd, "\n") !== false) $y['dx'] = mb_substr($dd, 0, 600); }
   if (!empty($x['dy'])) { $y['dy'] = $x['dy']; $y['hrs'] = ''; }
   if ($x['sv']) $y['sv'] = $x['sv'];
@@ -250,7 +251,10 @@ function guia_pub() {
     $g = (string)($x['g'] ?? 'serv'); if (!in_array($g, $negk, true)) $g = 'serv';
     $dir[] = ['id' => $id, 'n' => mb_substr(trim((string)$x['n']), 0, 80), 'g' => $g, 'sub' => preg_match('/^[a-z][a-z0-9]{0,15}$/', (string)($x['sub'] ?? '')) ? (string)$x['sub'] : '', 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 60), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'wa' => preg_replace('/[^\d+]/', '', (string)($x['wa'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 140), 'map' => $m, 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 80), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'td' => !empty($x['td']), 'rc' => !empty($x['rc']) && !empty($x['pr']), // 25/11: pacote Recomendado/Portada (só com plano pago)
        'dy' => guia_dy($x['dy'] ?? null), 'mt' => (($x['mt'] ?? '') === 'cat') ? 'cat' : 'menu', 'mu' => preg_match('#^https://[^\s"\'<>]+$#i', (string)($x['mu'] ?? '')) ? (string)$x['mu'] : '', 'tu' => array_values(array_intersect(['de', 'al', 'me', 'ce'], array_map('strval', (array)($x['tu'] ?? [])))), 'lg' => preg_match('#^gimg:[A-Za-z0-9_]{1,60}:([a-f0-9]{1,16})$#', (string)($x['lgh'] ?? ''), $hm) ? '/sitio/gimg.php?d=' . $id . '&k=h&v=' . $hm[1] : (preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['lg'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&v=' . substr(md5((string)$x['lg']), 0, 8) : ''), 'ph' => preg_match('#^data:image/(jpeg|png|webp);base64,#', (string)($x['ph'] ?? '')) ? '/sitio/gimg.php?d=' . $id . '&k=ph&v=' . substr(md5((string)$x['ph']), 0, 8) : ''];
-    { $li = count($dir) - 1; if (!empty($x['pr'])) $dir[$li]['pr'] = 1; if (($x['vs'] ?? '') === 'tmp') { $dir[$li]['tc'] = 1; $dir[$li]['dy'] = null; } // cerrado temporalmente
+    { $li = count($dir) - 1; if (!empty($x['pr'])) { $dir[$li]['pr'] = 1; // 25/11 (etapa 3): plano pago — capa em boa resolução e galeria de até 6 fotos (imagens guardadas à parte, em platform/sitio/gimg)
+        if (preg_match('#^gimg:[A-Za-z0-9_]{1,60}:([a-f0-9]{1,16})$#', (string)($x['phh'] ?? ''), $cm)) $dir[$li]['phh'] = '/sitio/gimg.php?d=' . $id . '&k=c&v=' . $cm[1];
+        $gl = []; foreach (array_slice(array_values((array)($x['gl'] ?? [])), 0, 6) as $gi => $gv) if (preg_match('#^gimg:[A-Za-z0-9_]{1,60}:([a-f0-9]{1,16})$#', (string)$gv, $cm)) $gl[] = '/sitio/gimg.php?d=' . $id . '&k=g' . $gi . '&v=' . $cm[1];
+        if ($gl) $dir[$li]['gl'] = $gl; } if (($x['vs'] ?? '') === 'tmp') { $dir[$li]['tc'] = 1; $dir[$li]['dy'] = null; } // cerrado temporalmente
       if (empty($dir[$li]['td']) && empty($x['pr']) && empty($x['qk'])) { array_pop($dir); continue; } } // 23/11 (Jean): ficha do cadastro rápido (qk) aparece mesmo sem plano // 20/11 (Jean): negócio comercial sem plano ativo (Premium) nem Aliado Tu Delivery não aparece; a ficha continua guardada no painel e volta ao ativar
     if (isset($own[$id])) { $li = count($dir) - 1; if ($li >= 0 && $dir[$li]['id'] === $id) $dir[$li] = guia_own($dir[$li], $own[$id], $day); }
     if (count($dir) >= 300) break;

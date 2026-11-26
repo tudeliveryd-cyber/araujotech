@@ -1,123 +1,82 @@
-// Galeria do produto: foto principal + fotos extras; ao abrir, o cliente vê a foto inteira (sem cortar), em boa qualidade, e pode ampliar.
+// 25/11 (etapa 3 do redesign da Guía): ficha paga ganha capa em boa resolução e galeria de até 6 fotos (a Central sobe,
+// guarda à parte em platform/sitio/gimg); a página do negócio mostra galeria, mapa e "abierto ahora"; o Recomendado entra em Negocios destacados.
 const L = require('./lib'); const P = 'araujotech-catalogos';
-const { info, sec, check } = L;
-const FX = __dirname + '/fix/';
+const { sec, check, info } = L; const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 (async () => {
   const ADM = ['admin@araujotechsistemas.com', 'AdminTeste#2026'];
   await L.signUp(...ADM);
-  const hoje = new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10);
-  await L.fsReq(P, 'PATCH', 'billing/loja-teste', 'owner', L.fields({ id: 'loja-teste', name: 'Loja Teste', status: 'ativo', due: hoje, plan: 'basico', pays: [], sys: 'catalogo', contact: '0981000111', created: hoje }));
+  const dy = Array.from({ length: 7 }, () => ({ on: true, a: ['00:00', '23:59'], b: ['', ''] }));
+  await L.fsReq(P, 'PATCH', 'platform/sitio', 'owner', L.fields({ gdir: [
+    { id: 'gx1', n: 'Panadería Galería', g: 'food', d: 'Panadería', wa: '0981 222 333', tel: '', a: 'Av. Central 123', map: 'https://www.google.com/maps/search/?api=1&query=-25.79,-55.08', hrs: '', ig: '', lg: '', tu: [], td: false, pr: true, rc: true, qk: false, on: true, dy },
+    { id: 'gx2', n: 'Ficha Sin Plan', g: 'food', d: 'Bar', wa: '0981 222 444', tel: '', a: '', map: '', hrs: '', ig: '', lg: '', tu: [], td: true, pr: false, on: true }] }));
+  const mk = (n, c) => { const f = path.join(os.tmpdir(), 'e2e_gal_' + n + '.jpg'); cp.execFileSync('python3', ['-c', `from PIL import Image,ImageDraw;im=Image.new('RGB',(1800,1200),${c});d=ImageDraw.Draw(im);[d.rectangle((i*60,i*40,1800-i*60,1200-i*40),outline=(255,255,255),width=5) for i in range(12)];im.save('${f}',quality=92)`]); return f; };
+  const cover = mk('cv', '(140,40,200)'), ph = [mk('a', '(200,80,40)'), mk('b', '(40,120,90)'), mk('c', '(30,60,160)')];
+
+  sec('A. Central: capa e galeria da ficha paga');
   const A = await L.open({ w: 1366 }); const a = A.p;
   await a.goto('https://araujotechsistemas.com/admin/'); await a.w(2500);
   await a.fill('#lg_user', ADM[0]); await a.fill('#lg_pass', ADM[1]); await a.press('#lg_pass', 'Enter'); await a.w(5000);
-  await a.act('newshop'); await a.w(300);
-  await a.set('#ns_name', 'Galeria E2E'); await a.set('#ns_wa', '595981000962');
-  await a.act('createshop'); await a.w(4000);
-  const shop = await a.evaluate(() => { const s = PL.shops.find(x => x.name === 'Galeria E2E'); return s && { id: s.id, user: s.user, pass: s.pass }; });
-  let tk = {}; for (let i = 0; i < 15 && !tk.idToken; i++) { await a.w(1000); tk = await L.signIn(shop.user + '@araujotechsistemas.com', shop.pass); }
-  const HOST = 'https://' + shop.id + '.araujotechsistemas.com';
-  const O = await L.open({ w: 390 }); const o = O.p;
-  await o.goto(HOST + '/painel/'); await o.waitForFunction(() => { const b = document.querySelector('#loginForm button[type=submit]'); return b && !b.disabled; }, null, { timeout: 20000 }).catch(() => {});
-  for (let k = 0; k < 3 && !(await o.locator('#np_a').count()); k++) { if (await o.locator('#lg_user').count()) { await o.fill('#lg_user', shop.user); await o.fill('#lg_pass', shop.pass); await o.press('#lg_pass', 'Enter'); } await o.waitForSelector('#np_a', { timeout: 15000 }).catch(() => {}); } // no CI o primeiro login às vezes demora: tenta de novo
-  await o.fill('#np_a', 'DonoNovo#77'); await o.fill('#np_b', 'DonoNovo#77'); await o.press('#np_b', 'Enter'); await o.waitForSelector('#np_a', { state: 'detached', timeout: 45000 }).catch(() => {}); await o.w(2500);
-  await o.evaluate(() => { ui.tab = 'products'; render(); }); await o.w(600);
+  await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(500);
+  await a.act('gusite'); await a.w(2500);
+  await a.evaluate(() => { ui.guSt = null; ui.guNav = { sec: 'neg', g: 'food', t: '*' }; guSheet(); }); await a.w(800);
+  const di = await a.evaluate(() => ui.gu.dir.findIndex(x => x.id === 'gx1')), dj = await a.evaluate(() => ui.gu.dir.findIndex(x => x.id === 'gx2'));
+  check(await a.locator(`input[data-gudirgl="${di}"]`).count() === 1 && await a.locator(`input[data-gudirgl="${dj}"]`).count() === 0, 'galeria aparece só na ficha com plano pago');
+  check(/Plan pago activo \(Presencia, Recomendado o Portada\)/.test(await a.txt()) && /Negocios destacados con foto de portada/.test(await a.txt()), 'rótulos dos planos iguais aos pacotes novos');
+  await a.locator(`input[data-gudirph="${di}"]`).setInputFiles(cover); await a.w(2500);
+  await a.locator(`input[data-gudirgl="${di}"]`).setInputFiles(ph); await a.w(4000);
+  const pre = await a.evaluate(i => { const x = ui.gu.dir[i]; return { ph: (x.ph || '').length, phh: (x.phh || '').slice(0, 15), gl: (x.gl || []).length, th: document.querySelectorAll(`[data-act="gudirglrm"][data-i="${i}"]`).length }; }, di);
+  info(JSON.stringify(pre));
+  check(pre.ph > 0 && pre.phh.startsWith('data:image/jp') && pre.gl === 3 && pre.th === 3, 'capa (pequena + grande) e 3 fotos carregadas, com miniaturas');
+  await a.act('gudirglrm', `[data-i="${di}"][data-n="1"]`); await a.w(400);
+  check(await a.evaluate(i => ui.gu.dir[i].gl.length, di) === 2, 'quitar uma foto');
+  await a.act('gusave'); await a.w(5000);
+  const doc = L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json); const gx = (doc.gdir || []).find(x => x.id === 'gx1') || {};
+  info(JSON.stringify({ phh: gx.phh, gl: gx.gl, ph: (gx.ph || '').length }));
+  check(/^gimg:pcgx1:[a-f0-9]+$/.test(gx.phh || '') && Array.isArray(gx.gl) && gx.gl.length === 2 && gx.gl.every(v => /^gimg:glgx1_\d_[a-f0-9]+:[a-f0-9]+$/.test(v)) && /^data:image\/jpeg/.test(gx.ph || ''), 'salvo: capa grande e fotos guardadas à parte; o documento da Guía só leva a referência');
+  const gid = /^gimg:([A-Za-z0-9_]+):/.exec(gx.gl[0])[1]; const gi = L.unfields((await L.fsReq(P, 'GET', 'platform/sitio/gimg/' + gid, 'owner')).json) || {};
+  const dim = await a.evaluate(src => new Promise(f => { const im = new Image(); im.onload = () => f(im.naturalWidth); im.onerror = () => f(0); im.src = src; }), gi.d || '');
+  check(dim === 1200, 'foto da galeria guardada com 1200 px (nítida na tela cheia)', String(dim));
+  // sem a foto apagada: o servidor limpa o que não é mais usado
+  const ids = await a.evaluate(async () => { try { return (await CLOUD.api.listGimg()).map(x => x.id || x); } catch (e) { return []; } });
+  check(ids.filter(x => /^glgx1_/.test(x)).length === 2, 'a foto quitada não fica guardada', JSON.stringify(ids));
 
-  sec('0. Título da aba do painel');
-  const ttl = await o.evaluate(() => document.title); info(ttl);
-  check(ttl === 'Galeria E2E · Panel del local', 'a aba do painel mostra o nome da loja (não "Fogão Mineiro")');
-  const cl = await o.evaluate(() => [...document.querySelectorAll('a.btn')].filter(a => /Catálogo|Catalogo/i.test(a.textContent)).map(a => a.getAttribute('href'))); info(JSON.stringify(cl));
-  check(cl.length && cl.every(h => h === HOST + '/'), 'o botão Catálogo do painel abre o endereço próprio da loja (não fogaomineiro.../loja/)');
+  sec('B. Servidor: ficha com capa, galeria e página do negócio');
+  const env = () => Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'ggal-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' });
+  const php = (code, dir) => cp.execFileSync('php', ['-r', code], { cwd: path.join(L.DIRS.site, dir || 'sitio'), env: env(), timeout: 40000 });
+  const dir = JSON.parse(php("require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(guia_pub()['dir']);").toString());
+  const g1 = dir.find(x => x.id === 'gx1') || {}, g2 = dir.find(x => x.id === 'gx2') || {};
+  info(JSON.stringify({ phh: g1.phh, gl: g1.gl, sl: g1.sl, g2: Object.keys(g2) }));
+  check(/^\/sitio\/gimg\.php\?d=gx1&k=c&v=[a-f0-9]+$/.test(g1.phh || '') && (g1.gl || []).length === 2 && /k=g0&v=/.test(g1.gl[0]) && /k=g1&v=/.test(g1.gl[1]) && !g2.gl && !g2.phh, 'ficha paga sai com capa grande e 2 fotos; ficha sem plano, sem galeria');
+  for (const [k, lab] of [['g1', 'foto 2 da galeria'], ['c', 'capa grande']]) { const bin = php(`$_GET = ['d' => 'gx1', 'k' => '${k}', 'v' => 'x']; include 'gimg.php';`);
+    check(bin.length > 3000 && bin[0] === 0xFF && bin[1] === 0xD8, 'gimg.php entrega a ' + lab + ' (JPEG)'); }
+  { let n = -1; try { n = php("$_GET = ['d' => 'gx2', 'k' => 'g0', 'v' => 'x']; include 'gimg.php';").length; } catch (e) { n = -2; } check(n === 0, 'ficha sem galeria: gimg.php não entrega nada (404)', String(n)); }
+  const html = php(`$_SERVER['HTTP_HOST'] = 'guiadesantarita.com'; $_GET = ['k' => 'negocio', 'id' => '${g1.sl}']; include 'p.php';`, 'guia').toString();
+  if (process.env.SHOT) fs.writeFileSync(process.env.SHOT + '/negocio.html', html);
+  check((html.match(/data-lb="\/sitio\/gimg\.php\?d=gx1&amp;k=g\d/g) || []).length === 2 && /<dialog class="lb" id="lb">/.test(html) && /<h2 class="sh2">Fotos<\/h2>/.test(html), 'página do negócio: galeria com as 2 fotos e visor em tela cheia');
+  check(/<img class="ph" src="\/sitio\/gimg\.php\?d=gx1&amp;k=c&amp;v=/.test(html) && /og:image" content="https:\/\/guiadesantarita\.com\/sitio\/gimg\.php\?d=gx1&amp;k=c/.test(html), 'capa grande no topo e na prévia do WhatsApp');
+  check(/<h2 class="sh2">Ubicación<\/h2>/.test(html) && /Av\. Central 123/.test(html) && /maps\.google\.com\/maps\?q=-25\.79,-55\.08&amp;z=16&amp;output=embed/.test(html), 'endereço e mapa (pelas coordenadas do link)');
+  check(/id="nst"/.test(html) && /class="rc"><svg[^>]*>.*?<\/svg>Recomendado<\/span>/.test(html), 'selo Recomendado e espaço do "abierto ahora"');
 
-  sec('0b. Asistencia: o cliente fala com a Araújo Tech');
-  check(await o.locator('[data-act=help]').count() >= 1, 'o painel tem o botão Asistencia');
-  await o.evaluate(() => { window.__wo = []; window.open = u => { window.__wo.push(u); return null; }; });
-  await o.locator('[data-act=help]:visible').first().click(); await o.w(400);
-  check(await o.locator('.hp-opt').count() === 3, 'mostra as 3 opções: duda, ayuda y agendar');
-  await o.locator('[data-act=hpk][data-k=agenda]').click(); await o.w(300);
-  await o.selectOption('#hp_when', 't'); await o.selectOption('#hp_how', 'call'); await o.fill('#hp_txt', 'cargar productos');
-  await o.locator('[data-act=hpsend]').click(); await o.w(300);
-  const wo = await o.evaluate(() => window.__wo[0] || ''); const msg = decodeURIComponent((wo.split('text=')[1] || ''));
-  info(msg.replace(/\n/g, ' | '));
-  check(/^https:\/\/wa\.me\/595982086171\?text=/.test(wo) && /Galeria E2E/.test(msg) && /galeriae2e\.araujotechsistemas\.com/.test(msg) && /agendar una asistencia/.test(msg) && /por la tarde/.test(msg) && /por llamada/.test(msg) && /cargar productos/.test(msg), 'abre o WhatsApp da Araújo Tech com a loja, o dia, o horário, como e o tema');
-  await o.evaluate(() => { ui.tab = 'products'; render(); }); await o.w(300);
-  sec('A. Painel: produto com foto principal e 2 fotos a mais');
-  await o.evaluate(() => acts.newprod()); await o.w(500);
-  await o.set('#ed_nes', 'Campera Galería'); await o.set('#ed_pr', '150000');
-  await o.setInputFiles('#prodFile', FX + 'prod-alto.jpg'); await o.w(4000);
-  check(await o.locator('.phx').count() === 1, 'o editor mostra o campo "Más fotos"');
-  await o.setInputFiles('#prodMore', [FX + 'prod-extra1.jpg', FX + 'prod-extra2.jpg']); await o.w(5000);
-  const ed = await o.evaluate(() => ({ ph: !!ui.edit.photo, hq: (ui.edit.hq || '').length, hqk: ui.edit.hqk === hashStr(ui.edit.photo), n: (ui.edit.photos || []).length, th: document.querySelectorAll('.phx .thumb img').length }));
-  info(JSON.stringify(ed));
-  check(ed.ph && ed.hq > 50000 && ed.hqk, 'a foto principal ganha uma versão grande (para ver ao abrir)');
-  check(ed.n === 2 && ed.th === 2, 'as 2 fotos a mais aparecem no editor');
-  await o.evaluate(() => acts.saveprod()); await o.w(6000);
-  const pid = await o.evaluate(() => (pub.products.find(p => tr(p.n) === 'Campera Galería') || {}).id);
-  const sv = await o.evaluate(id => { const p = pub.products.find(x => x.id === id); return { hq: p.hq, ph: p.photos, ls: (localStorage.getItem(K.pub) || '').length }; }, pid);
-  info(JSON.stringify({ hq: sv.hq, ph: sv.ph, ls: sv.ls }));
-  check(/^x:x/.test(sv.hq) && sv.ph.length === 2 && sv.ph.every(v => /^x:x/.test(v)), 'na nuvem, as fotos grandes viram documentos separados (o catálogo não fica pesado)');
-  check(sv.ls < 400000, 'a memória do celular não guarda as fotos grandes');
-  const shopDoc = L.unfields((await L.fsReq(P, 'GET', 'shops/' + shop.id, 'owner')).json);
-  const cfg = JSON.parse(shopDoc.cfg); const cp = cfg.products.find(x => x.id === pid);
-  check(cp && cp.hq === sv.hq && cp.photos.length === 2, 'o catálogo publicado guarda só as referências das fotos');
-  const xs = []; for (const r of [sv.hq, ...sv.ph]) { const d = await L.fsReq(P, 'GET', 'shops/' + shop.id + '/media/' + r.slice(2), null); xs.push(d.status === 200 && (L.unfields(d.json).x || '').length); }
-  info('tamanhos: ' + xs.join(', '));
-  check(xs.every(n => n > 50000 && n < 1000000), 'cada foto grande fica no seu documento (legível pelo público, abaixo do limite)');
-
-  sec('B. Catálogo do cliente: abrir o produto');
-  const C = await L.open({ w: 390 }); const c = C.p;
-  await c.goto(HOST + '/'); await c.w(5000);
-  const card = c.locator('.pcard[data-pid="' + pid + '"]');
-  check(await card.count() === 1, 'o produto aparece no catálogo');
-  await card.first().click(); await c.w(3500);
-  const g = await c.evaluate(() => { const s = [...document.querySelectorAll('.sheet .pgal .gs')]; return { n: s.length, imgs: s.map(b => { const i = b.querySelector('img'); const r = i && i.getBoundingClientRect(), rb = b.getBoundingClientRect(); return i ? { w: i.naturalWidth, h: i.naturalHeight, fit: getComputedStyle(i).objectFit, pend: !!i.dataset.xr, inside: r.height <= rb.height + 1 && r.width <= rb.width + 1 } : null; }), dots: document.querySelectorAll('.sheet .pgal .dots i').length, gn: (document.querySelector('.sheet [data-gn]') || {}).textContent }; });
-  info(JSON.stringify(g));
-  check(g.n === 3 && g.dots === 3 && g.gn === '1 / 3', 'a ficha do produto mostra as 3 fotos, com indicador 1 / 3');
-  check(g.imgs[0] && g.imgs[0].inside && g.imgs[0].fit === 'contain' && g.imgs[0].h >= 1500 && !g.imgs[0].pend, 'a foto principal aparece inteira (sem cortar) e em alta resolução');
-  check(g.imgs.slice(1).every(x => x && x.w >= 1500 && x.fit === 'contain'), 'as fotos extras carregam em boa qualidade');
-  await c.evaluate(() => { const t = document.querySelector('.sheet [data-gal]'); t.scrollLeft = t.clientWidth * 2; }); await c.w(500);
-  check(await c.evaluate(() => document.querySelector('.sheet [data-gn]').textContent) === '3 / 3', 'deslizar troca a foto e o indicador');
-  await c.evaluate(() => acts.pq({ dataset: { d: '1' } })); await c.w(400);
-  check(await c.evaluate(() => { const t = document.querySelector('.sheet [data-gal]'); return Math.round(t.scrollLeft / t.clientWidth); }) === 2, 'mudar a quantidade não volta para a primeira foto');
-
-  sec('C. Ampliar em tela cheia');
-  await c.locator('.sheet .pgal .gs').nth(2).click(); await c.w(1200);
-  if (process.env.SHOT2) await c.screenshot({ path: process.env.SHOT2 });
-  const pv = await c.evaluate(() => { const v = document.getElementById('pv'); if (!v) return null; const t = v.querySelector('.pvtrack'); return { n: v.querySelectorAll('.pvs').length, at: Math.round(t.scrollLeft / t.clientWidth), lbl: document.getElementById('pvn').textContent, full: v.getBoundingClientRect().height, fitv: [...v.querySelectorAll('.pvs')].every(s => { const i = s.querySelector('img'), a = i.getBoundingClientRect(), b = s.getBoundingClientRect(); return a.height <= b.height + 1 && a.width <= b.width + 1; }), imgs: [...v.querySelectorAll('.pvs img')].filter(i => Math.max(i.naturalWidth, i.naturalHeight) >= 1500).length }; });
-  info(JSON.stringify(pv));
-  check(pv && pv.n === 3 && pv.at === 2 && pv.lbl === '3 / 3' && pv.full === 844, 'abre em tela cheia na mesma foto, com as 3 para deslizar');
-  check(pv && pv.fitv, 'em tela cheia a foto cabe inteira na tela');
-  check(pv && pv.imgs === 3, 'em tela cheia as fotos estão em alta resolução');
-  await c.locator('#pv .pvs').nth(2).click(); await c.w(300);
-  const z = await c.evaluate(() => { const s = document.querySelectorAll('#pv .pvs')[2]; return { z: s.classList.contains('z'), w: s.querySelector('img').getBoundingClientRect().width }; });
-  check(z.z && z.w > 390 * 2, 'tocar na foto amplia (zoom)');
-  await c.locator('#pv [data-act=pvclose]').click(); await c.w(300);
-  check(await c.locator('#pv').count() === 0 && await c.locator('.sheet .pgal').count() === 1, 'fechar volta para o produto');
-
-  sec('D. Opção de foto inteira nos cartões');
-  await o.evaluate(() => { ui.tab = 'custom'; render(); }); await o.w(500);
-  check(await o.locator('#lay_fit').count() === 1, 'o painel tem "Mostrar la foto entera en las tarjetas"');
-  await o.locator('#lay_fit').check(); await o.w(300);
-  check(await o.evaluate(() => draft.layout.phfit === true), 'a opção fica no rascunho do layout');
-
-  sec('E. Tirar uma foto extra apaga o documento dela');
-  await o.evaluate(() => { ui.tab = 'products'; render(); }); await o.w(400);
-  await o.evaluate(id => acts.editprod({ dataset: { pid: id } }), pid); await o.w(1500);
-  check(await o.evaluate(() => document.querySelectorAll('.phx .thumb img').length) === 2, 'ao editar, as fotos extras aparecem (carregadas da nuvem)');
-  await o.locator('[data-act=rmxph][data-i="0"]').click(); await o.w(300);
-  await o.evaluate(() => acts.saveprod()); await o.w(6000);
-  const gone = await L.fsReq(P, 'GET', 'shops/' + shop.id + '/media/' + sv.ph[0].slice(2), null);
-  const kept = await L.fsReq(P, 'GET', 'shops/' + shop.id + '/media/' + sv.ph[1].slice(2), null);
-  check(gone.status === 404 && kept.status === 200, 'a foto removida sai da nuvem e a outra continua');
-
-  sec('F. Produtos antigos (sem fotos extras) continuam iguais');
-  await c.reload(); await c.w(4500);
-  const old = await c.evaluate(id => { const p = pub.products.find(x => x.id === id); delete p.hq; delete p.hqk; delete p.photos; /* só nesta página: simula um produto antigo */ productSheet(p.id); const s = document.querySelectorAll('.sheet .pgal .gs').length; const i = document.querySelector('.sheet .pgal img'); return { s, fit: i && getComputedStyle(i).objectFit, dots: document.querySelectorAll('.sheet .pgal .dots i').length }; }, pid);
-  info(JSON.stringify(old));
-  check(old.s === 1 && old.fit === 'contain' && old.dots === 0, 'produto com 1 foto: aparece inteira, sem indicador de várias');
-  sec('G. Link direto para o produto (usado pelo site padrão)');
-  await c.goto(HOST + '/?p=' + encodeURIComponent(pid)); await c.w(5000);
-  check(await c.evaluate(id => !!document.querySelector('.sheet') && typeof pick !== 'undefined' && pick && pick.pid === id, pid), 'abrir o catálogo com ?p= já mostra o produto');
-  check(!o.errs.length && !c.errs.length, 'sem erros de JavaScript', o.errs.concat(c.errs).join(' | '));
-  if (process.env.SHOT) { await c.evaluate(id => productSheet(id), pid); await c.w(2000); await c.screenshot({ path: process.env.SHOT }); }
-  L.done();
-})().catch(e => { L.bad('exceção: ' + (e && e.stack || e)); L.done(); });
+  sec('C. Guía: Recomendado em Negocios destacados e cartão novo');
+  const G = await L.open(); const g = G.p;
+  await g.goto('https://araujotechsistemas.com/guia/'); await g.w(3000);
+  const r = await g.evaluate(async (dd) => { const W = ms => new Promise(f => setTimeout(f, ms)); G.dir = dd; CAT = 'home'; render(); await W(80);
+    const o = { fd: [...document.querySelectorAll('#destacados .fc-t b')].map(b => b.textContent), tag: (document.querySelector('#destacados .fc-tg.rcg') || {}).textContent || '', cv: (document.querySelector('#destacados .fc-cv > img') || { getAttribute: () => '' }).getAttribute('src') || '' };
+    CAT = 'food'; render(); await W(80); o.rec = [...document.querySelectorAll('.cpr .fc-t b')].map(b => b.textContent);
+    const c = [...document.querySelectorAll('.cc.dir')].find(x => /Panadería Galería/.test(x.textContent)); o.card = c ? { open: !!c.querySelector('.bd.on'), seal: !!c.querySelector('.bd.st'), cover: !!c.querySelector('.cc-ph img[src*="k=c"]'), vn: (c.querySelector('a.vn') || { getAttribute: () => '' }).getAttribute('href'), ad: /Av\. Central 123/.test(c.textContent), nb: c.querySelectorAll('.bd').length } : null;
+    CAT = 'home'; render(); return o; }, dir);
+  info(JSON.stringify(r));
+  check(r.fd.includes('Panadería Galería') && !r.fd.includes('Ficha Sin Plan') && /Recomendado/.test(r.tag) && /k=c/.test(r.cv), 'Recomendado da Guía entra em Negocios destacados com a foto de capa');
+  check(r.rec.includes('Panadería Galería'), 'e em "Recomendados en esta categoría"');
+  check(r.card && r.card.open && r.card.seal && r.card.cover && /negocio\/panaderia-galeria/.test(r.card.vn) && r.card.ad && r.card.nb <= 2, 'cartão novo: capa, aberto agora, selo, endereço e "Ver negocio" (no máximo dois selos)');
+  if (process.env.SHOT) { // fotos para revisar o visual (não fazem parte das verificações)
+    await g.evaluate(async (dd) => { G.dir = dd; CAT = 'food'; render(); scrollTo(0, 0); }, dir); await g.w(1200);
+    await g.evaluate(() => { const c = [...document.querySelectorAll('.cc.dir')].find(x => /Panadería Galería/.test(x.textContent)); if (c) c.scrollIntoView({ block: 'start' }); scrollBy(0, -80); }); await g.w(500);
+    await g.screenshot({ path: process.env.SHOT + '/cards.png' });
+    await g.evaluate(() => { CAT = 'home'; render(); document.getElementById('destacados').scrollIntoView({ block: 'start' }); }); await g.w(800); await g.screenshot({ path: process.env.SHOT + '/destacados.png' });
+    let h = html; for (const u of [...new Set(h.match(/\/sitio\/gimg\.php\?d=gx1&amp;k=(?:c|g\d)&amp;v=[a-f0-9]+/g) || [])]) { const k = /k=(\w+)/.exec(u)[1]; const b = php(`$_GET = ['d' => 'gx1', 'k' => '${k}', 'v' => 'x']; include 'gimg.php';`); h = h.split(u).join('data:image/jpeg;base64,' + b.toString('base64')); }
+    const Pg = await L.open(); await Pg.p.setContent(h.replace('<footer id="gft"></footer>', ''), { waitUntil: 'load' }); await Pg.p.w(800); await Pg.p.screenshot({ path: process.env.SHOT + '/negocio.png', fullPage: true });
+    await Pg.p.click('[data-lb]'); await Pg.p.w(500); await Pg.p.screenshot({ path: process.env.SHOT + '/visor.png' }); }
+  check(!g.errs.length && !a.errs.length, 'sem erros de JavaScript', g.errs.concat(a.errs).join(' | '));
+  await L.done();
+})().catch(e => { console.log("ERRO", e && e.stack || e); process.exit(1); });
