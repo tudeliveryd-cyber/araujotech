@@ -49,7 +49,8 @@ $NG = ['food' => 'Comida y bebidas', 'shop' => 'Tiendas y moda', 'health' => 'Sa
 foreach (guia_cat(guia_doc()['gcat'] ?? [])['neg'] as $cg) { if ($cg['n']['es'] !== '') $NG[$cg['k']] = $cg['n']['es']; foreach ($cg['tabs'] as $ct) if ($ct['n']['es'] !== '' && $ct['k'] === ($x['sub'] ?? '')) $NG['_sub'] = $ct['n']['es']; }
 $kind = $NG['_sub'] ?? ($NG[$x['g'] ?? ''] ?? '');
 if ($kind !== '' && ($tp = guia_tr($kind)) !== '') $TR[$kind] = $tp;
-$addr = trim((string)($x['a'] ?? ''));
+$nolocal = in_array($x['mo'] ?? '', ['dom', 'ped', 'cit', 'del'], true) || trim((string)($x['a'] ?? '')) === ''; // 26/11 (Jean): "Cómo llegar" só com endereço físico // 26/11: sem local físico
+$addr = $nolocal ? '' : trim((string)($x['a'] ?? ''));
 $ini = mb_strtoupper(mb_substr(preg_replace('/^(dr|dra|lic|ing)\.?\s+/i', '', $n), 0, 1));
 ?><!doctype html>
 <html lang="es"><head>
@@ -130,7 +131,7 @@ echo ' ' . $prim . "\n";
 $T = [];
 $tl = function ($k, $href, $lab, $ext = true) use ($e, $ic, $I) { return '<a class="tl" data-c="' . $k . '" href="' . $e($href) . '"' . ($ext ? ' target="_blank" rel="noopener"' : '') . '><i>' . $ic($I[$k]) . '</i><span>' . $lab . '</span></a>'; };
 if ($w && $tel !== '') $T[] = $tl('tel', 'tel:' . $tel, 'Llamar', false);
-$T[] = $tl('map', $map, 'Cómo llegar');
+if (!$nolocal) $T[] = $tl('map', $map, 'Cómo llegar');
 if ($mu) $T[] = $tl('mu', $mu, 'Ver menú');
 if ($igU) $T[] = $tl('ig', $igU, 'Instagram');
 if ($web) $T[] = $tl('web', $web, 'Sitio web');
