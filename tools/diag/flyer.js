@@ -2,8 +2,9 @@
 const { chromium } = require('playwright'); const fs = require('fs'), path = require('path');
 (async () => { const [k, lg] = (process.argv[2] || 'al es').split(/\s+/);
   const src = fs.readFileSync(path.join(__dirname, '..', '..', 'admin', 'index.html'), 'utf8');
-  const a = src.indexOf('const CG_TU='), b = src.indexOf('\n', src.indexOf("openSheet(`<div class=\"sh-top\"><h2>${esc(lang==='pt'?'Flyer do horário'"));
-  const code = src.slice(a, b + 1) + '}';
+  const a = src.indexOf('const CG_TU='), s0 = src.indexOf('async function cgMeal'); let i = src.indexOf('{', s0), d = 0, q = null;
+  for (; i < src.length; i++) { const c = src[i]; if (q) { if (c === '\\') { i++; continue } if (c === q) q = null; continue } if (c === "'" || c === '"' || c === '`') { q = c; continue } if (c === '{') d++; else if (c === '}') { d--; if (!d) break } }
+  const code = src.slice(a, i + 1);
   const br = await chromium.launch(); const p = await br.newPage(); await p.goto('https://araujotechsistemas.com/?v=' + Date.now(), { waitUntil: 'networkidle' });
   await p.addStyleTag({ url: 'https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;600;800;900&display=swap' }).catch(() => {}); await p.waitForTimeout(1500);
   const out = await p.evaluate(async ([code, k, lg]) => { window.ui = {}; window.lang = lg || 'es'; window.toast = m => { window.__err = m }; window.isoDay = t => new Date(t).toISOString().slice(0, 10); window.esc = s => String(s); window.t = s => s; window.ic = () => '';
