@@ -887,6 +887,14 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     await a.fill('#qk_nc', 'Taxis'); await a.fill('#qk_tel', '0971 555 444'); await a.act('qksave'); await a.w(3500);
     d = await doc(); const fp = d.gdir.find(x => x.n === 'Farmacia Paga'); const ncat = ((d.gcat || {}).neg || []).find(c => c.n && c.n.es === 'Taxis');
     check(fp && fp.pr === true && !fp.qk && fp.on === true && !fp.map && ncat && fp.g === ncat.k, 'empresa con plan pago: Premium, sin ubicación, en la categoría nueva "Taxis"', JSON.stringify({ fp: fp && { pr: fp.pr, qk: fp.qk, g: fp.g }, ncat }));
+    // 26/11: opção "Aliado Tu Delivery" no registro rápido (e Portada marca po)
+    await a.act('qkclose'); await a.w(200); await a.act('guquick'); await a.w(800); await a.act('qknew'); await a.w(300);
+    check(await a.locator('[data-act="qktipo"][data-k="td"]').count() === 1 && /Presencia, Recomendado o Portada/.test(await a.txt()), 'registro rápido: opção Aliado Tu Delivery e plano pago com os nomes novos');
+    await a.act('qktipo', '[data-k="td"]'); await a.w(300); await a.fill('#qk_n', 'Aliado Rapido'); await a.fill('#qk_tel', '0971 555 777'); await a.act('qksave'); await a.w(3500);
+    { const ar = (await doc()).gdir.find(x => x.n === 'Aliado Rapido'); check(ar && ar.td === true && !ar.pr && !ar.qk && ar.on === true, 'Aliado Tu Delivery salvo como aliado (td), sem plano pago', JSON.stringify(ar && { td: ar.td, pr: ar.pr, qk: ar.qk })); }
+    await a.act('qkclose'); await a.w(200); await a.act('guquick'); await a.w(800); await a.act('qknew'); await a.w(300);
+    await a.act('qktipo', '[data-k="paga"]'); await a.w(300); await a.fill('#qk_n', 'Portada Rapida'); await a.fill('#qk_tel', '0971 555 778'); await a.act('qkpk', '[data-k="port"]'); await a.w(200); await a.act('qksave'); await a.w(3500);
+    { const pr = (await doc()).gdir.find(x => x.n === 'Portada Rapida'); check(pr && pr.pr === true && pr.rc === true && pr.po === true, 'plano Portada no registro rápido marca Recomendado + Portada', JSON.stringify(pr && { pr: pr.pr, rc: pr.rc, po: pr.po })); }
     await a.act('qkclose'); await a.w(200); await a.act('guquick'); await a.w(800); await a.act('qknew'); await a.w(300); await a.act('qktipo', '[data-k="pub"]'); await a.w(300);
     await a.fill('#qk_n', 'Balneario Apagado'); await a.locator('#qk_uc').selectOption('ocio'); await a.locator('#qk_on').uncheck(); await a.act('qksave', ':not([data-next])'); await a.w(3500);
     d = await doc(); const ba = d.gutil.find(x => x.n === 'Balneario Apagado');
@@ -897,7 +905,7 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     await a.locator('#qk_ls [data-qkon]').first().check(); await a.w(3500);
     check(!(await doc()).gutil.find(x => x.n === 'Balneario Apagado').of, 'marcar "Activo" lo activa y guarda');
     await a.fill('#qk_q', 'hotel rap'); await a.w(300); await a.locator('#qk_ls [data-qkon]').first().uncheck(); await a.w(3500);
-    d = await doc(); check(d.gdir.find(x => x.n === 'Hotel Rápido').on === false && d.gdir.length === dirN + 2, 'desmarcar "Activo" desactiva la empresa (no se borra)');
+    d = await doc(); check(d.gdir.find(x => x.n === 'Hotel Rápido').on === false && d.gdir.length === dirN + 4, 'desmarcar "Activo" desactiva la empresa (no se borra)');
     await a.act('qknew'); await a.w(300); await a.act('qktipo', '[data-k="neg"]'); await a.w(300);
     await a.evaluate(() => { ui.qk.mant = false; ui.qk.manc = false; ui.qk.d = ''; ui.qk.dAuto = ''; });
     await a.locator('#qk_n').pressSequentially('Hotel Sol', { delay: 20 }); await a.w(900);
@@ -971,10 +979,10 @@ const { info, sec, check } = L; const fs = require('fs'), path = require('path')
     await a.evaluate(() => { ui.qk = qkNew(null); ui.qkV = 'home'; ui.qkBack = 'home'; qkSheet(); }); await a.w(300);
     await a.fill('#qk_q', 'cyber alfa'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
     const e0 = await a.evaluate(() => ({ h: document.querySelector('.sheet[data-k="qk"] h2').textContent, n: document.getElementById('qk_n').value, hrs: document.getElementById('qk_h').value, tipos: document.querySelectorAll('[data-act="qktipo"]').length, next: !!document.querySelector('[data-act="qksave"][data-next]'), cancel: !!document.querySelector('[data-act="qkcancel"]') }));
-    check(e0.n === 'Cyber Alfa' && e0.hrs === 'Lun a sáb 8:00 – 20:00' && e0.tipos === 3 && !e0.next && e0.cancel && /Corregir/.test(e0.h), 'tocar el nombre abre el formulario lleno para corregir', JSON.stringify(e0));
+    check(e0.n === 'Cyber Alfa' && e0.hrs === 'Lun a sáb 8:00 – 20:00' && e0.tipos === 4 && !e0.next && e0.cancel && /Corregir/.test(e0.h), 'tocar el nombre abre el formulario lleno para corregir', JSON.stringify(e0));
     await a.fill('#qk_tel', '0985 777 888'); await a.fill('#qk_n', 'Cyber Alfa Center'); await a.act('qksave'); await a.w(3500);
     d = await doc(); const cy2 = d.gdir.find(x => x.id === cy.id);
-    check(cy2 && cy2.n === 'Cyber Alfa Center' && cy2.tel === '0985 777 888' && cy2.wa === '595985777888' && cy2.hrs === cy.hrs && cy2.g === 'shop' && d.gdir.length === dirN + 6 && !d.gdir.some(x => x.n === 'Cyber Alfa'), 'corrección guardada en la misma ficha (no duplica)', JSON.stringify({ n: cy2 && cy2.n, len: d.gdir.length, want: dirN + 6 }));
+    check(cy2 && cy2.n === 'Cyber Alfa Center' && cy2.tel === '0985 777 888' && cy2.wa === '595985777888' && cy2.hrs === cy.hrs && cy2.g === 'shop' && d.gdir.length === dirN + 8 && !d.gdir.some(x => x.n === 'Cyber Alfa'), 'corrección guardada en la misma ficha (no duplica)', JSON.stringify({ n: cy2 && cy2.n, len: d.gdir.length, want: dirN + 8 }));
     check(await a.evaluate(() => !ui.qk.ed && ui.qkV === 'home' && !!document.getElementById('qk_q')), 'después de corregir vuelve a donde estaba (inicio)');
     await a.fill('#qk_q', 'plaza rap'); await a.w(300); await a.locator('#qk_ls [data-act="qkedit"]').first().click(); await a.w(500);
     check(await a.evaluate(() => document.querySelectorAll('[data-act="qktipo"].pri').length === 1 && document.querySelector('[data-act="qktipo"][data-k="pub"]').classList.contains('pri') && document.getElementById('qk_uc').value === 'ocio'), 'lugar público se corrige como público');
