@@ -70,6 +70,7 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   check(r.rec.includes('Panadería Galería'), 'e em "Recomendados en esta categoría"');
   check(r.card && r.card.open && r.card.seal && r.card.cover && /negocio\/panaderia-galeria/.test(r.card.vn) && r.card.ad && r.card.nb <= 2, 'cartão novo: capa, aberto agora, selo, endereço e "Ver negocio" (no máximo dois selos)');
   if (process.env.SHOT) { // fotos para revisar o visual (não fazem parte das verificações)
+    await g.route(u => /\/sitio\/gimg\.php/.test(u.pathname), async rt => { const q = new URL(rt.request().url()).searchParams; try { const b = php(`$_GET = ['d' => '${(q.get('d') || '').replace(/\W/g, '')}', 'k' => '${(q.get('k') || '').replace(/\W/g, '')}', 'v' => 'x']; include 'gimg.php';`); rt.fulfill({ status: 200, contentType: 'image/jpeg', body: b }); } catch (e) { rt.fulfill({ status: 404, body: '' }); } });
     await g.evaluate(async (dd) => { G.dir = dd; CAT = 'food'; render(); scrollTo(0, 0); }, dir); await g.w(1200);
     await g.evaluate(() => { const c = [...document.querySelectorAll('.cc.dir')].find(x => /Panadería Galería/.test(x.textContent)); if (c) c.scrollIntoView({ block: 'start' }); scrollBy(0, -80); }); await g.w(500);
     await g.screenshot({ path: process.env.SHOT + '/cards.png' });
