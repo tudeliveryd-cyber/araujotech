@@ -87,6 +87,7 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   await c.click('[data-a="svadd"]'); await c.w(200); await c.fill('[data-sv="0.t"]', 'Limpieza dental'); await c.fill('[data-sv="0.p"]', 'Gs. 150.000');
   await c.click('[data-a="svadd"]'); await c.w(200); await c.fill('[data-sv="1.t"]', 'Blanqueamiento');
   { const tx = await c.txt(); check(!/Botones de tu link|Color de tu link/.test(tx) && /Eso es Vitrix/.test(tx) && await c.locator('a.btn.wa[href*="saber%20de%20Vitrix"]').count() === 1, 'painel simples: sem botões nem cor do link; convida para o Vitrix (catálogo completo)'); }
+  check(/Las fotos se habilitan cuando la Guía active tu ficha/.test(await c.txt()) && await c.locator('input[data-gl]').count() === 0, 'fotos do negócio: só depois que a Guía ativa');
   for (let k = 2; k < 5; k++) { await c.click('[data-a="svadd"]'); await c.w(150); }
   check(await c.locator('[data-a="svadd"]').count() === 0 && await c.locator('[data-sv$=".t"]').count() === 5, 'no máximo 5 serviços principais');
   for (let k = 4; k >= 2; k--) { await c.locator(`[data-a="svrm"][data-i="${k}"]`).click(); await c.w(150); }
@@ -155,6 +156,40 @@ const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Asuncion
   await c.click('[data-l="pt"]'); await c.w(300);
   check(/Meu negócio no Guia/.test(await c.txt()) && /Serviços principais/.test(await c.txt()), 'painel do cliente em português');
   check(c.errs.length === 0, 'página do cliente sem erros de JavaScript', c.errs.join(' | '));
+
+  sec('G2. Fotos do negócio pelo painel (regras v21, gfotos)');
+  { const mk = (n, col) => { const f = path.join(os.tmpdir(), 'e2e_acc_' + n + '.jpg'); cp.execFileSync('python3', ['-c', `from PIL import Image,ImageDraw;im=Image.new('RGB',(2400,1600),${col});d=ImageDraw.Draw(im);[d.rectangle((i*80,i*50,2400-i*80,1600-i*50),outline=(255,255,255),width=7) for i in range(14)];im.save('${f}',quality=95)`]); return f; };
+    const fa = mk('a', '(190,60,40)'), fb = mk('b', '(40,110,80)'), fc = mk('c', '(40,60,170)'), fcv = mk('cv', '(120,30,170)');
+    await c.click('[data-l="es"]'); await c.w(300);
+    check(/Fotos de tu negocio/.test(await c.txt()) && await c.locator('input[data-gl]').count() === 1 && await c.locator('input[data-img="ph"]').count() === 1, 'ativado: aparece "Fotos de tu negocio" com portada e galería');
+    await c.locator('input[data-img="ph"]').setInputFiles(fcv); await c.w(1500);
+    await c.locator('input[data-gl]').setInputFiles([fa, fb, fc]); await c.w(3000);
+    check(await c.locator('[data-a="glrm"]').count() === 3, '3 fotos carregadas (reduzidas no celular)');
+    await c.locator('[data-a="glrm"][data-i="1"]').click(); await c.w(300);
+    await c.click('#ffi button[type=submit]'); await c.w(3000);
+    const gf = L.unfields((await L.fsReq(P, 'GET', 'gfotos/' + uid, 'owner')).json) || {}; const fq = L.unfields((await L.fsReq(P, 'GET', 'gfichas/' + uid, 'owner')).json);
+    info(JSON.stringify({ n: (gf.f || []).length, sz: (gf.f || []).map(x => x.length), ph: (fq.ph || '').length, note: (await c.txt('#am')).slice(0, 80) }));
+    check(Array.isArray(gf.f) && gf.f.length === 2 && gf.f.every(x => /^data:image\/jpeg/.test(x) && x.length <= 150000) && /^data:image\/jpeg/.test(fq.ph || '') && fq.dl === 'dj1' && fq.st === 'ok', 'salvo: 2 fotos em gfotos e a portada na ficha (continua ligada e ativa)');
+    check(/Guardado|guardad/i.test(await c.txt('#am')), 'mensagem de salvo');
+    const img = gf.f[0];
+    check(st(await L.fsReq(P, 'PATCH', 'gfotos/' + uid, t1, L.fields({ f: [img] }))) === 403, 'outra pessoa não grava as fotos do negócio');
+    check(st(await L.fsReq(P, 'PATCH', 'gfotos/' + u1.localId, t1, L.fields({ f: [img] }))) === 403, 'conta sem negócio pago (sem dl) não grava fotos');
+    check(st(await L.fsReq(P, 'PATCH', 'gfotos/' + uid, ctok, L.fields({ f: Array(7).fill(img) }))) === 403, 'no máximo 6 fotos');
+    check(st(await L.fsReq(P, 'PATCH', 'gfotos/' + uid, ctok, L.fields({ f: ['data:image/jpeg;base64,' + 'A'.repeat(150100)] }))) === 403, 'foto grande demais é recusada');
+    check(st(await L.fsReq(P, 'PATCH', 'gfotos/' + uid, ctok, L.fields({ f: ['javascript:alert(1)'] }))) === 403, 'só imagem (data:image) é aceita');
+    check(st(await L.fsReq(P, 'PATCH', 'gfotos/' + uid, ctok, L.fields({ f: [img], x: 'y' }))) === 403, 'campos estranhos recusados');
+    check(st(await L.fsReq(P, 'GET', 'gfotos/' + uid, null)) === 200 && st(await L.fsReq(P, 'GET', 'gfotos?pageSize=5', null)) === 403, 'qualquer um vê as fotos do negócio ativo, ninguém lista todas');
+    const out4 = JSON.parse(php("require 'prods_lib.php'; require 'guia_lib.php'; echo json_encode(guia_pub()['dir']);")).find(x => x.id === 'dj1') || {};
+    info(JSON.stringify({ gl: out4.gl, ph: out4.ph }));
+    check((out4.gl || []).length === 2 && out4.gl.every((u, i) => u.startsWith('/sitio/gimg.php?f=' + uid + '&k=g' + i + '&v=')) && /gimg\.php\?f=/.test(out4.ph || ''), 'servidor: a ficha da Guía usa as fotos e a portada do dono');
+    const v1 = /v=([a-f0-9]+)/.exec(out4.gl[1])[1];
+    const bin = cp.execFileSync('php', ['-r', "$_GET = ['f' => '" + uid + "', 'k' => 'g1', 'v' => '" + v1 + "']; include 'gimg.php';"], { cwd: path.join(L.DIRS.site, 'sitio'), env: Object.assign({}, process.env, { TMPDIR: fs.mkdtempSync(path.join(os.tmpdir(), 'gacc-')), GUIA_FS_BASE: 'http://127.0.0.1:8080' }) });
+    check(bin.length > 3000 && bin[0] === 0xFF && bin[1] === 0xD8, 'gimg.php entrega a foto 2 do dono (JPEG)');
+    const ph2 = php("$_SERVER['HTTP_HOST'] = 'guiadesantarita.com'; $_GET = ['k' => 'negocio', 'id' => 'dr-teste-salinas']; include 'p.php';", 'guia');
+    check((ph2.match(/data-lb="\/sitio\/gimg\.php\?f=/g) || []).length === 2, 'página do negócio mostra as 2 fotos do dono');
+    await c.reload(); await c.w(3500);
+    check(await c.locator('[data-a="glrm"]').count() === 2, 'ao voltar ao painel, as fotos salvas aparecem');
+    check(c.errs.length === 0, 'painel sem erros de JavaScript', c.errs.join(' | ')); }
 
   sec('H. Central: tirar o acesso');
   await a.evaluate(() => { window.confirm = () => true; }); await a.locator('[data-act="qkaccoff"]').click(); await a.w(2500);

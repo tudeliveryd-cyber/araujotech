@@ -11,9 +11,10 @@ $tt = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['t'] ?? '')); // t = foto 
 $ff = preg_replace('/[^a-z0-9]/i', '', (string)($_GET['f'] ?? '')); // f = logo/foto de uma conta própria aprovada (gfichas)
 if ($ff !== '' && $i === '') {
   require __DIR__ . '/prods_lib.php'; require __DIR__ . '/guia_lib.php';
-  $k = (($_GET['k'] ?? '') === 'ph') ? 'ph' : 'lg'; $want = '/sitio/gimg.php?f=' . $ff . '&k=' . $k . '&v=';
+  $kq = (string)($_GET['k'] ?? ''); $k = $kq === 'ph' ? 'ph' : (preg_match('/^g[0-5]$/', $kq) ? $kq : 'lg'); $want = '/sitio/gimg.php?f=' . $ff . '&k=' . $k . '&v=';
   foreach (guia_acc()['fichas'] as $x) {
-    if ($x['uid'] !== $ff || strpos((string)$x[$k], $want) !== 0) continue;
+    $gla = (array)($x['gl'] ?? []); $xv = $k[0] === 'g' ? (string)($gla[(int)substr($k, 1)] ?? '') : (string)($x[$k] ?? '');
+    if ($x['uid'] !== $ff || strpos($xv, $want) !== 0) continue; $x[$k] = $xv;
     $h = substr((string)$x[$k], strlen($want)); $g = glob(sys_get_temp_dir() . '/at_gfimg_' . $ff . '_' . $k . '_' . $h . '.*');
     if (!$g) break; $ext = pathinfo($g[0], PATHINFO_EXTENSION);
     header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $ext); header('Cache-Control: public, max-age=' . ((($_GET['v'] ?? '') !== '') ? '2592000' : '86400'));/* endereço com versão (v=) muda quando a imagem muda: o celular guarda 30 dias */ header('Content-Length: ' . filesize($g[0])); readfile($g[0]); exit;

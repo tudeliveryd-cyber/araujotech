@@ -66,6 +66,7 @@ function guia_own($y, $x, $day) {
   $y['sn'] = $y['n'];
   foreach (['n', 'tel', 'wa', 'a', 'map', 'ig', 'web', 'lg', 'ph'] as $k) if (($x[$k] ?? '') !== '') $y[$k] = $x[$k];
   if (($x['ph'] ?? '') !== '') unset($y['phh']); // o dono trocou a foto de capa: vale a dele
+  if (!empty($x['gl'])) $y['gl'] = $x['gl']; // v21: fotos que o dono subiu no painel valem no lugar das da Central
   $dd = trim((string)($x['d'] ?? '')); if ($dd !== '') { $y['d'] = mb_substr(preg_split('/\R/', $dd)[0], 0, 60); if (mb_strlen($dd) > 60 || strpos($dd, "\n") !== false) $y['dx'] = mb_substr($dd, 0, 600); }
   if (!empty($x['dy'])) { $y['dy'] = $x['dy']; $y['hrs'] = ''; }
   if ($x['sv']) $y['sv'] = $x['sv'];
@@ -105,7 +106,18 @@ function guia_acc() {
       $cla[] = ['id' => 'f' . $uid . 'x' . $i, 'k' => in_array($c['k'] ?? '', ['per', 'inm', 'veh', 'var', 'ser'], true) ? $c['k'] : 'var', 'op' => in_array($c['op'] ?? '', ['venta', 'alq', 'perd', 'enc', 'na'], true) ? $c['op'] : 'na',
         't' => mb_substr($t, 0, 80), 'pr' => mb_substr(trim((string)($c['pr'] ?? '')), 0, 40), 'z' => mb_substr(trim((string)($c['z'] ?? '')), 0, 60), 'd' => mb_substr(trim((string)($c['d'] ?? '')), 0, 400), 'wa' => $wa, 'until' => $u, 'ph' => ''];
     }
-    $fichas[] = ['uid' => $uid, 'tipo' => (string)($x['tipo'] ?? 'otro'), 'g' => (string)($x['g'] ?? ''), 'n' => mb_substr($n, 0, 80), 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 600),
+    $gl = []; // v21: fotos que o dono do negócio pago subiu no painel (gfotos/<uid>), guardadas em cache como as outras
+    if (!empty($x['dl']) && ($x['st'] ?? '') === 'ok' && function_exists('at_get')) {
+      $gr = at_get((getenv('GUIA_FS_BASE') ?: 'https://firestore.googleapis.com') . '/v1/projects/araujotech-catalogos/databases/(default)/documents/gfotos/' . $uid . '?key=' . AT_KEY);
+      $gf = $gr === null ? [] : (array)(guia_fv(['mapValue' => ['fields' => (array)(json_decode($gr, true)['fields'] ?? [])]])['f'] ?? []);
+      foreach (array_slice(array_values($gf), 0, 6) as $gi => $gv) {
+        if (!is_string($gv) || !preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#s', $gv, $m)) continue;
+        $h = substr(md5($gv), 0, 10); $f = sys_get_temp_dir() . '/at_gfimg_' . $uid . '_g' . count($gl) . '_' . $h . '.' . $m[1];
+        if (!is_file($f)) { $bin = base64_decode($m[2]); if ($bin) @file_put_contents($f, $bin); }
+        if (is_file($f)) $gl[] = '/sitio/gimg.php?f=' . $uid . '&k=g' . count($gl) . '&v=' . $h;
+      }
+    }
+    $fichas[] = ['gl' => $gl, 'uid' => $uid, 'tipo' => (string)($x['tipo'] ?? 'otro'), 'g' => (string)($x['g'] ?? ''), 'n' => mb_substr($n, 0, 80), 'd' => mb_substr(trim((string)($x['d'] ?? '')), 0, 600),
       'wa' => preg_replace('/\D/', '', (string)($x['wa'] ?? '')), 'tel' => preg_replace('/[^\d+ ()-]/', '', (string)($x['tel'] ?? '')), 'a' => mb_substr(trim((string)($x['a'] ?? '')), 0, 120),
       'map' => $https($x['map'] ?? ''), 'hrs' => mb_substr(trim((string)($x['hrs'] ?? '')), 0, 200), 'ig' => preg_replace('/[^\w.]/', '', (string)($x['ig'] ?? '')), 'web' => $https($x['web'] ?? ''),
       'lg' => $img['lg'] ?? '', 'ph' => $img['ph'] ?? '', 'ev' => $ev, 'jobs' => array_slice(array_values(array_filter((array)($x['jobs'] ?? []), 'is_array')), 0, 10), 'cla' => $cla]
