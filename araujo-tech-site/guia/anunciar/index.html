@@ -203,7 +203,7 @@ main{padding-top:0}
  const PH={n:["Ej.: Pizzería Don Juan","Ex.: Pizzaria Don Juan"],p:["Tu nombre","Seu nome"],m:["Qué vendés, horario, si ya tenés logo…","O que vende, horário, se já tem logo…"]};
  const ES=new Map();let L='es';try{L=localStorage.getItem('at_lang')==='pt'?'pt':'es'}catch(e){}
  const nodes=()=>{const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),a=[];while(w.nextNode())a.push(w.currentNode);return a};
- function apply(){document.documentElement.lang=L==='pt'?'pt':'es';nodes().forEach(n=>{if(!ES.has(n))ES.set(n,n.nodeValue);const o=ES.get(n),k=o.trim();n.nodeValue=L==='pt'&&PT[k]?o.replace(k,PT[k]):o});
+ function apply(){document.documentElement.lang=L==='pt'?'pt':'es';document.title=L==='pt'?'Anuncie no Guia de Santa Rita · Planos para negócios':'Anunciá en la Guía de Santa Rita · Planes para negocios';nodes().forEach(n=>{if(!ES.has(n))ES.set(n,n.nodeValue);const o=ES.get(n),k=o.trim();n.nodeValue=L==='pt'&&PT[k]?o.replace(k,PT[k]):o});
   Object.keys(PH).forEach(id=>{document.getElementById(id).placeholder=PH[id][L==='pt'?1:0]});document.querySelectorAll('.lg button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.l===L)));document.querySelectorAll('img[data-pt]').forEach(i=>{if(!i.dataset.es)i.dataset.es=i.getAttribute('src');i.src=L==='pt'?i.dataset.pt:i.dataset.es})}
  document.querySelectorAll('.lg button').forEach(b=>b.addEventListener('click',()=>{L=b.dataset.l;try{localStorage.setItem('at_lang',L)}catch(e){}apply()}));apply();
  const tr=s=>L==='pt'?({'Completá los datos marcados.':'Complete os dados marcados.','Revisá tu número de WhatsApp.':'Confira seu número de WhatsApp.'}[s]||s):s;
