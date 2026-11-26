@@ -19,6 +19,7 @@ const { info, sec, check } = L;
   for (let k = 0; k < 3 && !(await o.locator('#np_a').count()); k++) { if (await o.locator('#lg_user').count()) { await o.fill('#lg_user', shop.user); await o.fill('#lg_pass', shop.pass); await o.press('#lg_pass', 'Enter'); } await o.waitForSelector('#np_a', { timeout: 15000 }).catch(() => {}); } // no CI o primeiro login às vezes demora: tenta de novo
   await o.fill('#np_a', 'DonoNovo#77'); await o.fill('#np_b', 'DonoNovo#77');
   await o.press('#np_b', 'Enter'); await o.waitForSelector('#np_a', { state: 'detached', timeout: 45000 }).catch(() => {}); await o.w(2500);
+  for (let k = 0; k < 2 && await o.locator('#np_a').count(); k++) { await o.fill('#np_a', 'DonoNovo#77'); await o.fill('#np_b', 'DonoNovo#77'); await o.press('#np_b', 'Enter'); await o.waitForSelector('#np_a', { state: 'detached', timeout: 45000 }).catch(() => {}); await o.w(2500); } // no CI a troca de senha às vezes não pega na primeira
 
   sec('A. O vencimento e o valor do plano chegam à loja');
   let lim = {}; for (let i = 0; i < 10 && !lim.due; i++) { await a.w(1000); lim = (L.unfields((await L.fsReq(P, 'GET', 'shops/' + shop.id, 'owner')).json) || {}).lim || {}; }

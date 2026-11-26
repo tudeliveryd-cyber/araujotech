@@ -48,6 +48,7 @@ jobs:
           mkdir -p ferramentas/sdk && cd ferramentas
           npm init -y >/dev/null
           npm i firebase-tools@13.29.1 playwright@1.49.1 >/dev/null 2>&1
+          python3 -c 'import PIL' 2>/dev/null || pip install --quiet pillow || pip install --quiet --break-system-packages pillow # testes de fotos geram imagens com o Pillow
           npx playwright install --with-deps chromium >/dev/null || { echo "dependências do sistema indisponíveis no momento; instalando só o navegador"; npx playwright install chromium >/dev/null; }
           for f in firebase-app.js firebase-firestore.js firebase-auth.js firebase-app-compat.js firebase-firestore-compat.js firebase-auth-compat.js; do curl -sf -o sdk/$f https://www.gstatic.com/firebasejs/10.12.2/$f; done
           curl -sf -o sdk/zxing.min.js https://cdn.jsdelivr.net/npm/@zxing/library@0.20.0/umd/index.min.js || true
@@ -81,7 +82,7 @@ jobs:
           echo "######## CATÁLOGO AINDA SEM PRODUTOS (aviso \"Estamos preparando\", logos e botão de WhatsApp) · regras v19"; tools/e2e/run.sh e2e_preparando.js firestore-v19.rules || F=1
           echo "######## GARÇOM LANÇA PEDIDO NA MESA · regras v13"; tools/e2e/run.sh e2e_mozo.js firestore-v13.rules || F=1
           echo "######## FOTOS GRANDES E LOGO LARGO · regras v13"; CAPA=$PWD/tools/e2e/fix/capa-grande.jpg LOGO=$PWD/tools/e2e/fix/logo-largo.png tools/e2e/run.sh e2e_fotos.js firestore-v13.rules || F=1
-          echo "######## GALERIA DE FOTOS DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_galeria.js firestore-v13.rules || F=1
+          echo "######## GALERIA DE FOTOS DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_galeria_prod.js firestore-v13.rules || F=1
           echo "######## CORES DO PRODUTO · regras v13"; tools/e2e/run.sh e2e_cores.js firestore-v13.rules || F=1
           echo "######## VÍDEO DO PRODUTO (video.php no PHP local) · regras v13"; tools/e2e/run.sh e2e_video.js firestore-v13.rules || F=1
           echo "######## COZINHA SÓ PARA COMIDA · regras v13"; tools/e2e/run.sh e2e_cozinha.js firestore-v13.rules || F=1
