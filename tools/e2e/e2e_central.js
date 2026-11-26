@@ -51,6 +51,7 @@ const { sec, check, info } = L;
   check(/1 para revisar/.test(md) && /Cajero/.test(md), 'aviso de publicações esperando revisão na visão geral');
   check(/Últimos 7 días: 7 visitas/.test(await a.txt('.cg-gu')), 'resumo da semana com as visitas dos últimos 7 dias');
   check(await a.locator('.cg-mi', { hasText: 'Cajero' }).count() === 1, 'a publicação aparece na própria Central, com Aprobar e Rechazar');
+  { const wh = await a.evaluate(() => [...document.querySelectorAll('.cg-mi a[href*="wa.me"]')].map(x => decodeURIComponent(x.href))); L.info(JSON.stringify(wh)); check(wh.every(h => /\?text=¡Hola.*Guía de Santa Rita: «.+»/.test(h)), 'WhatsApp de quem enviou já abre com a mensagem pronta', String(wh.length)); }
   await a.click('.cg-mi [data-act="cgsubok"]'); await a.w(3000);
   const st1 = L.unfields((await L.fsReq(P, 'GET', 'platform/sitio', 'owner')).json) || {};
   check((st1.gjobs || []).some(j => j.t === 'Cajero' && j.co === 'Empresa X' && j.on) && ((await L.fsReq(P, 'GET', 'gsub?pageSize=20', 'owner')).json.documents || []).length === 0 && !(await a.evaluate(() => !!document.querySelector('.cg-mod'))), 'aprovar pela Central publica a vaga e tira da fila');

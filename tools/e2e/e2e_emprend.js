@@ -59,7 +59,7 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
     CAT = 'car'; G.dir = G.dir.concat([{ id: 'sr2', n: 'Taller Centro', g: 'car', d: 'Taller', wa: '0981 300 006', a: 'Calle 1', pr: true }]); render(); await W(80);
     const gr = document.querySelector('.cpg .grid'); const kids = gr ? [...gr.children].map(e => e.classList.contains('lc-sep') ? 'SEP' : (e.querySelector('h3') || {}).textContent) : []; o.sep = kids.join('|');
     const pin = document.querySelector('.locf [data-locf="sr"] svg'); o.pin = pin ? Math.round(pin.getBoundingClientRect().height) : -1;
-    L = 'pt'; render(); await W(50); const c2 = [...document.querySelectorAll('.cc.dir')].find(x => /Dulces de Ana/.test(x.textContent)); o.pt = c2 ? (c2.querySelector('.moc') || {}).textContent : ''; L = 'es';
+    CAT = 'food'; L = 'pt'; render(); await W(50); const c2 = [...document.querySelectorAll('.cc.dir')].find(x => /Dulces de Ana/.test(x.textContent)); o.pt = c2 ? (c2.querySelector('.moc') || {}).textContent : ''; L = 'es';
     CAT = 'home'; G.dir = D0; render(); return o; }, dir);
   info(JSON.stringify(r));
   check(r.enc.includes('Dulces de Ana') && r.ped.includes('Dulces de Ana'), 'busca "encomienda" e "por pedido" encontram quem vende por pedido');
