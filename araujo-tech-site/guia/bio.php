@@ -68,7 +68,7 @@ html{background:var(--night)}
 body{font-family:var(--text);color:#fff;min-height:100vh;line-height:1.45;background:radial-gradient(640px 420px at 50% -120px,color-mix(in srgb,var(--purple) 85%,transparent),transparent 72%),radial-gradient(480px 480px at -10% 110%,color-mix(in srgb,var(--deep) 80%,transparent),transparent 70%),var(--night);-webkit-font-smoothing:antialiased}
 .w{max-width:460px;margin:0 auto;padding:max(58px,calc(env(safe-area-inset-top) + 50px)) 18px 30px;position:relative}
 .lng{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--glass);border:1px solid var(--line)}
-.lng button{font:inherit;font-size:12.5px;font-weight:700;color:var(--mist);background:none;border:0;padding:6px 11px;border-radius:999px;cursor:pointer;min-width:40px}
+.lng button{font:inherit;font-size:12.5px;font-weight:700;color:var(--mist);background:none;border:0;padding:9px 12px;border-radius:999px;cursor:pointer;min-width:44px}
 .lng button[aria-pressed="true"]{background:#fff;color:var(--night)}.lng button:focus-visible{outline:2px solid var(--yellow);outline-offset:1px}
 .hero{display:flex;flex-direction:column;align-items:center;text-align:center}
 .lgw{position:relative}

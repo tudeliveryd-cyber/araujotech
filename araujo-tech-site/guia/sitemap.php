@@ -8,6 +8,7 @@ $d = date('Y-m-d');
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 echo "<url><loc>https://guiadesantarita.com/</loc><lastmod>$d</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>\n";
 echo "<url><loc>https://guiadesantarita.com/sobre/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq></url>";
+echo "<url><loc>https://guiadesantarita.com/anunciar/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>\n";
 echo "<url><loc>https://guiadesantarita.com/negocios/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>\n";
 echo "<url><loc>https://guiadesantarita.com/llegar/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>\n";
 echo "<url><loc>https://guiadesantarita.com/conoce/</loc><lastmod>$d</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>\n";
