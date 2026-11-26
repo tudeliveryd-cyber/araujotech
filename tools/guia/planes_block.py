@@ -9,7 +9,7 @@ P = [
  dict(k='vx', tag='Catálogo online', n='Vitrix', ex='Para vender online: tu catálogo con fotos y precios, y los pedidos te llegan por WhatsApp.',
       pr='Desde Gs. 150.000', per='por mes', ins='+ instalación desde Gs. 350.000',
       b=['Página propia en la Guía', 'Catálogo con fotos y precios', 'Pedidos por WhatsApp, sin comisión por pedido', 'Panel, caja y stock'],
-      pl='Catálogo Vitrix (desde Gs. 150.000 por mes + instalación)', more=('Ver los planes Vitrix', '/negocios/#planes')),
+      pl='Vitrix — Catálogo online (desde Gs. 150.000 por mes + instalación)', more=('Ver los planes Vitrix', '/negocios/#planes')),
  dict(k='pr', tag='Publicidad en la Guía', n='Presencia + link', ex='Para que te encuentren: tu ficha completa en la Guía y tu link para el Instagram.',
       pr='Gs. 300.000', per='por mes', ins='',
       b=['Tu ficha en la Guía: logo, rubro, WhatsApp, horarios, dirección y mapa', 'Aparecés en la búsqueda y en tu categoría', 'Tu link propio para el Instagram'],
@@ -24,10 +24,10 @@ P = [
       pl='Portada (Gs. 800.000 por mes)'),
 ]
 MOCK = {
- 'vx': '<div class="pz-m pz-mvx" aria-hidden="true"><div class="mh"><i></i><b>Tu negocio</b><span>Abierto</span></div><div class="mg"><span><em></em><b>Producto</b><small>Gs. 25.000</small></span><span><em></em><b>Producto</b><small>Gs. 40.000</small></span><span><em></em><b>Producto</b><small>Gs. 18.000</small></span></div><div class="mb">Pedir por WhatsApp</div></div>',
- 'pr': '<div class="pz-m pz-mpr" aria-hidden="true"><div class="mc"><i></i><span><b>Tu negocio</b><small>Tu rubro</small><em>Abierto ahora</em></span></div><div class="mw"><span>WhatsApp</span><span>Mapa</span></div><div class="ml">guiadesantarita.com/l/tu-negocio</div></div>',
- 'rc': '<div class="pz-m pz-mrc" aria-hidden="true"><div class="mv"><span class="st">Recomendado</span></div><div class="mn"><i></i><span><b>Tu negocio</b><small>Tu rubro</small></span><em></em></div><p class="mt">Negocios destacados</p></div>',
- 'po': '<div class="pz-m pz-mpo" aria-hidden="true"><div class="mt"><i></i><span></span><span></span></div><div class="ms"><small>Publicidad</small><b>Tu anuncio acá</b><span>Lo primero que ve la ciudad</span></div><div class="md"><i class="on"></i><i></i><i></i></div></div>',
+ 'vx': '<div class="pz-m pz-mvx" aria-hidden="true"><span class="mx">Ejemplo</span><div class="mh"><i></i><b>Tu negocio</b><span>Abierto</span></div><div class="mg"><span><em></em><b>Producto</b><small>Gs. 25.000</small></span><span><em></em><b>Producto</b><small>Gs. 40.000</small></span><span><em></em><b>Producto</b><small>Gs. 18.000</small></span></div><div class="mb">Pedir por WhatsApp</div></div>',
+ 'pr': '<div class="pz-m pz-mpr" aria-hidden="true"><span class="mx">Ejemplo</span><div class="mc"><i></i><span><b>Tu negocio</b><small>Tu rubro</small><em>Abierto ahora</em></span></div><div class="mw"><span>WhatsApp</span><span>Mapa</span></div><div class="ml">guiadesantarita.com/l/tu-negocio</div></div>',
+ 'rc': '<div class="pz-m pz-mrc" aria-hidden="true"><span class="mx">Ejemplo</span><div class="mv"><span class="st">Recomendado</span></div><div class="mn"><i></i><span><b>Tu negocio</b><small>Tu rubro</small></span><em></em></div><p class="mt">Negocios destacados</p></div>',
+ 'po': '<div class="pz-m pz-mpo" aria-hidden="true"><span class="mx">Ejemplo</span><div class="mt"><i></i><span></span><span></span></div><div class="ms"><small>Publicidad</small><b>Tu anuncio acá</b><span>Lo primero que ve la ciudad</span></div><div class="md"><i class="on"></i><i></i><i></i></div></div>',
 }
 def card(p):
     msg = '¡Hola! Quiero contratar ' + p['pl'] + ' en la Guía de Santa Rita.'
@@ -42,7 +42,7 @@ HTML = ('<!-- PLANES-GUIA:INICIO (gerado por tools/guia/planes_block.py) -->\n'
  '<div class="pz" id="precios"><div class="pz-g">' + ''.join(card(p) for p in P) + '</div>'
  '<p class="pz-inc">' + CK + '<span><b>Incluido en Presencia, Recomendado y Portada:</b> tu link propio para el Instagram y tu panel para cambiar horarios, servicios y fotos cuando quieras.</span></p>'
  '<p class="pz-cnd">Planes de la Guía: pago adelantado, mínimo 3 meses. En 6 meses pagás 5; en 12 meses pagás 10. Vitrix tiene sus propias condiciones.</p></div>\n'
- '<script>(function(){document.querySelectorAll(\'.pz-wa[data-wpl]\').forEach(function(a){a.addEventListener(\'click\',function(){var pt=document.documentElement.lang===\'pt\',pl=a.getAttribute(\'data-wpl\');var PL={\'Catálogo Vitrix (desde Gs. 150.000 por mes + instalación)\':\'Catálogo Vitrix (a partir de Gs. 150.000 por mês + instalação)\',\'Presencia + link (Gs. 300.000 por mes)\':\'Presença + link (Gs. 300.000 por mês)\',\'Recomendado (Gs. 450.000 por mes)\':\'Recomendado (Gs. 450.000 por mês)\',\'Portada (Gs. 800.000 por mes)\':\'Capa (Gs. 800.000 por mês)\'};a.href=\'https://wa.me/' + WA + '?text=\'+encodeURIComponent(pt?\'Olá! Quero contratar \'+(PL[pl]||pl)+\' no Guia de Santa Rita.\':\'¡Hola! Quiero contratar \'+pl+\' en la Guía de Santa Rita.\')})})})();</script>\n'
+ '<script>(function(){document.querySelectorAll(\'.pz-wa[data-wpl]\').forEach(function(a){a.addEventListener(\'click\',function(){var pt=document.documentElement.lang===\'pt\',pl=a.getAttribute(\'data-wpl\');var PL={\'Vitrix — Catálogo online (desde Gs. 150.000 por mes + instalación)\':\'Vitrix — Catálogo online (a partir de Gs. 150.000 por mês + instalação)\',\'Presencia + link (Gs. 300.000 por mes)\':\'Presença + link (Gs. 300.000 por mês)\',\'Recomendado (Gs. 450.000 por mes)\':\'Recomendado (Gs. 450.000 por mês)\',\'Portada (Gs. 800.000 por mes)\':\'Capa (Gs. 800.000 por mês)\'};a.href=\'https://wa.me/' + WA + '?text=\'+encodeURIComponent(pt?\'Olá! Quero contratar \'+(PL[pl]||pl)+\' no Guia de Santa Rita.\':\'¡Hola! Quiero contratar \'+pl+\' en la Guía de Santa Rita.\')})})})();</script>\n'
  '<!-- PLANES-GUIA:FIM -->')
 CSS = '''/* PLANES-GUIA:CSS */
 .pz{margin-top:22px}.pz-g{display:grid;gap:16px;grid-template-columns:1fr}
@@ -81,6 +81,7 @@ CSS = '''/* PLANES-GUIA:CSS */
 .pz-mpo{background:#2E0F4F}.pz-mpo .mt{display:flex;align-items:center;gap:6px}.pz-mpo .mt i{width:42px;height:14px;border-radius:5px;background:rgba(255,255,255,.85)}.pz-mpo .mt span{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.18);margin-left:auto}.pz-mpo .mt span+span{margin-left:0}
 .pz-mpo .ms{margin-top:10px;height:88px;border-radius:12px;background:linear-gradient(120deg,var(--yellow),#FF8A3D);padding:10px 12px;display:grid;align-content:center;gap:2px;color:var(--night)}.pz-mpo .ms small{font-size:9.5px;font-weight:800;opacity:.75}.pz-mpo .ms b{font-family:var(--display);font-weight:900;font-size:19px;line-height:1.05}.pz-mpo .ms span{font-size:11px;font-weight:700}
 .pz-mpo .md{display:flex;gap:5px;justify-content:center;margin-top:7px}.pz-mpo .md i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35)}.pz-mpo .md i.on{width:16px;background:var(--yellow)}
+.pz-m .mx{position:absolute;top:8px;right:8px;z-index:2;font-size:10.5px;font-weight:800;letter-spacing:.02em;background:rgba(255,255,255,.92);color:#4A0A80;border-radius:999px;padding:2px 8px}.pz-mpr .mx{top:auto;bottom:8px}.pz-mvx .mx{top:13px}.pz-mvx .mh span{visibility:hidden}
 /* PLANES-GUIA:CSS-FIM */'''
 PT = {
  'Catálogo online':'Catálogo online','Para vender online: tu catálogo con fotos y precios, y los pedidos te llegan por WhatsApp.':'Para vender online: seu catálogo com fotos e preços, e os pedidos chegam pelo WhatsApp.',
@@ -94,7 +95,7 @@ PT = {
  'Contratar por WhatsApp':'Contratar pelo WhatsApp','Incluido en Presencia, Recomendado y Portada:':'Incluído no Presença, Recomendado e Capa:',
  'tu link propio para el Instagram y tu panel para cambiar horarios, servicios y fotos cuando quieras.':'seu link próprio para o Instagram e seu painel para mudar horários, serviços e fotos quando quiser.',
  'Planes de la Guía: pago adelantado, mínimo 3 meses. En 6 meses pagás 5; en 12 meses pagás 10. Vitrix tiene sus propias condiciones.':'Planos do Guia: pagamento adiantado, mínimo 3 meses. Em 6 meses você paga 5; em 12 meses paga 10. O Vitrix tem condições próprias.',
- 'Así aparecés':'Assim você aparece',
+ 'Así aparecés':'Assim você aparece','Ejemplo':'Exemplo',
  'Tu negocio':'Seu negócio','Producto':'Produto','Abierto':'Aberto','Pedir por WhatsApp':'Pedir pelo WhatsApp','Tu rubro':'Seu ramo','Abierto ahora':'Aberto agora','Negocios destacados':'Negócios em destaque','Publicidad':'Publicidade','Tu anuncio acá':'Seu anúncio aqui','Lo primero que ve la ciudad':'A primeira coisa que a cidade vê',
 }
 if __name__ == '__main__' and '--inject' not in sys.argv:

@@ -22,7 +22,7 @@ const L = require('./lib'); const { sec, check, info } = L;
       const fo = await p.evaluate(() => { const card = [...document.querySelectorAll('.pz-c h3')].map(h => h.textContent); const rad = [...document.querySelectorAll('input[name=pl]')].map(i => i.value); return { card, rad }; });
       info(JSON.stringify(fo));
       check(!fo.rad.some(v => /^(Premium|VIP|Esencial o Crecimiento)$/.test(v) || /\+ link \(Gs\. (450|800)/.test(v)), 'formulário sem opções antigas (Premium/VIP soltos, "Recomendado + link")');
-      check(['Presencia + link (Gs. 300.000 por mes)', 'Recomendado (Gs. 450.000 por mes)', 'Portada (Gs. 800.000 por mes)', 'Catálogo Vitrix (desde Gs. 150.000 por mes + instalación)'].every(v => fo.rad.includes(v)), 'formulário com os mesmos nomes e preços dos cartões');
+      check(['Presencia + link (Gs. 300.000 por mes)', 'Recomendado (Gs. 450.000 por mes)', 'Portada (Gs. 800.000 por mes)', 'Vitrix — Catálogo online (desde Gs. 150.000 por mes + instalación)'].every(v => fo.rad.includes(v)), 'formulário com os mesmos nomes e preços dos cartões');
       // envio: escolhe Recomendado e confere a mensagem que vai ao WhatsApp
       await p.fill('#n', 'Negocio Prueba'); await p.locator('#r').selectOption({ index: 1 }); await p.fill('#p', 'Ana'); await p.fill('#w', '0981 123 456');
       await p.check('input[name=pl][value="Recomendado (Gs. 450.000 por mes)"]');
@@ -31,7 +31,7 @@ const L = require('./lib'); const { sec, check, info } = L;
       check(/wa\.me\/595982086171/.test(url) && /Negocio Prueba/.test(msg) && /Ana/.test(msg) && /0981 123 456/.test(msg) && /Recomendado \(Gs\. 450\.000 por mes\)/.test(msg), 'formulário: os dados e o plano certo chegam no WhatsApp'); }
     await p.goto('https://araujotechsistemas.com/guia/' + pg + '/'); await p.w(1200);
     if (pg === 'anunciar') {
-      check(await p.locator('input[name=pl][value="Catálogo Vitrix (desde Gs. 150.000 por mes + instalación)"]').count() === 1, 'formulário: opção Catálogo Vitrix'); }
+      check(await p.locator('input[name=pl][value="Vitrix — Catálogo online (desde Gs. 150.000 por mes + instalación)"]').count() === 1, 'formulário: opção Catálogo Vitrix'); }
   }
   sec('Início (rev3): seções, nível do anúncio e cidade');
   { const D = await L.open({ w: 1366 }); const d = D.p; await d.goto('https://araujotechsistemas.com/guia/'); await d.w(2500);
@@ -61,7 +61,7 @@ const L = require('./lib'); const { sec, check, info } = L;
     const dd = [0,1,2,3,4,5,6].map(() => ({ on: true, a: ['00:00', '23:59'], b: ['', ''] }));
     G.dir = [{ id: 'q1', n: 'Comida Teste', g: 'food', td: true, wa: '0981000001', tu: ['de', 'al', 'me', 'ce'], dy: dd }];
     CAT = 'home'; render(); await W(80);
-    const r = { por: [...document.querySelectorAll('#portada .por-c b')].map(b => b.textContent), ext: (document.querySelector('#portada a.por-c') || {}).target, qcv: document.querySelectorAll('#comer .qcv').length, ord: ['comer', 'portada', 'destacados'].map(id => { const e = document.getElementById(id); return e ? Math.round(e.getBoundingClientRect().top) : -1; }) };
+    const r = { por: [...document.querySelectorAll('#portada .por-c b')].map(b => b.textContent), ext: (document.querySelector('#portada a.por-c') || {}).target, qcv: document.querySelectorAll('#comer .qcv').length, ord: ['portada', 'destacados', 'comer'].map(id => { const e = document.getElementById(id); return e ? Math.round(e.getBoundingClientRect().top) : -1; }) };
     G.ads = []; render(); await W(50); r.none = !document.getElementById('portada') || !/Anuncio Pago/.test(document.getElementById('portada').textContent);
     G.ads = A0; G.dir = D0; render(); return r; });
   info(JSON.stringify(h));
