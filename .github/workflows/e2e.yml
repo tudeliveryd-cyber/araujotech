@@ -101,6 +101,7 @@ jobs:
           echo "######## GUÍA: PAINEL DO CLIENTE PAGO, CONVITE E FOTOS DO DONO · regras v21"; tools/e2e/run.sh e2e_acceso.js firestore-v21.rules || F=1
           echo "######## GUÍA: CAPA, GALERIA E PÁGINA DO NEGÓCIO · regras v21"; tools/e2e/run.sh e2e_galeria.js firestore-v21.rules || F=1
           echo "######## GUÍA: PLANOS, PREÇOS E EN PORTADA · regras v21"; tools/e2e/run.sh e2e_planes.js firestore-v21.rules || F=1
+          echo "######## GUÍA: EMPREENDEDORES SEM LOCAL FÍSICO, BUSCA E CIDADE · regras v21"; tools/e2e/run.sh e2e_emprend.js firestore-v21.rules || F=1
           echo "######## VISITAS AO CATÁLOGO · regras v14"; tools/e2e/run.sh e2e_visitas.js firestore-v14.rules || F=1
           echo "######## AVISO DE VENCIMENTO E RESUMO DO DIA · regras v14"; tools/e2e/run.sh e2e_aviso.js firestore-v14.rules || F=1
           echo "######## CATÁLOGO PELO DOMÍNIO PRINCIPAL (/loja/<nome>/) · regras v14"; tools/e2e/run.sh e2e_loja.js firestore-v14.rules || F=1
