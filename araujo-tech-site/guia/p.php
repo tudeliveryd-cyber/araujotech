@@ -56,7 +56,7 @@ if (!$x) {
     $x['t'] = $x['n'];
     if (($x['phh'] ?? '') !== '') $x['ph'] = $x['phh']; // 25/11 (etapa 3): capa em boa resolução (plano pago)
     $nll = null; if (is_array($x['ll'] ?? null) && count($x['ll']) === 2) $nll = [(float)$x['ll'][0], (float)$x['ll'][1]]; elseif (preg_match('/[?&](?:q|query)=(-?\d+\.\d+),\s*(-?\d+\.\d+)/', (string)$x['map'], $mm) || preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', (string)$x['map'], $mm)) $nll = [(float)$mm[1], (float)$mm[2]];
-    $sl0 = $mo !== '' || trim((string)$x['a']) === ''; // 26/11 (Jean): mapa e "Cómo llegar" só com endereço físico cadastrado
+    $sl0 = $mo !== '' || (trim((string)$x['a']) === '' && !preg_match('#^https://#i', trim((string)$x['map'])) && !$nll); // 26/11 (Jean): mapa e "Cómo llegar" só com local cadastrado (endereço ou ubicación) e nunca para quem atende sem local físico — nada de mapa adivinhado pelo nome
     if ($sl0) { $nll = null; }
     $emb = $sl0 ? '' : ($nll ? 'https://maps.google.com/maps?q=' . $nll[0] . ',' . $nll[1] . '&z=16&output=embed' : (trim((string)$x['a']) !== '' ? 'https://maps.google.com/maps?q=' . rawurlencode($x['n'] . ', ' . $x['a'] . ', ' . $cty . ', Alto Paraná, Paraguay') . '&z=16&output=embed' : ''));
     $title = $x['n'] . ' — ' . $cty;
