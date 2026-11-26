@@ -60,9 +60,9 @@ $ini = mb_strtoupper(mb_substr(preg_replace('/^(dr|dra|lic|ing)\.?\s+/i', '', $n
 <meta property="og:type" content="profile"><meta property="og:title" content="<?= $e($n) ?>"><meta property="og:description" content="<?= $e($desc) ?>"><meta property="og:url" content="<?= $e($self) ?>"><meta property="og:image" content="<?= $e($lgU ?: 'https://araujotechsistemas.com/img/guia/og-guia.jpg?v=3') ?>">
 <link rel="icon" href="<?= $e($lgU ?: '/img/guia/favicon.png?v=4') ?>"><meta name="theme-color" content="<?= $C[0] ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@700;900&family=Red+Hat+Text:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
 <style>
-:root{--night:<?= $C[0] ?>;--deep:<?= $C[2] ?>;--purple:<?= $C[1] ?>;--yellow:#FFC21A;--ok:#16A34A;--line:rgba(255,255,255,.14);--glass:rgba(255,255,255,.07);--mist:#D9C9F2;--display:"Red Hat Display",system-ui,sans-serif;--text:"Red Hat Text",system-ui,sans-serif}
+:root{--night:<?= $C[0] ?>;--deep:<?= $C[2] ?>;--purple:<?= $C[1] ?>;--yellow:#FFC21A;--ok:#15803D;--line:rgba(255,255,255,.14);--glass:rgba(255,255,255,.07);--mist:#D9C9F2;--display:"Red Hat Display",system-ui,sans-serif;--text:"Red Hat Text",system-ui,sans-serif}
 *{box-sizing:border-box;margin:0}
 html{background:var(--night)}
 body{font-family:var(--text);color:#fff;min-height:100vh;line-height:1.45;background:radial-gradient(640px 420px at 50% -120px,color-mix(in srgb,var(--purple) 85%,transparent),transparent 72%),radial-gradient(480px 480px at -10% 110%,color-mix(in srgb,var(--deep) 80%,transparent),transparent 70%),var(--night);-webkit-font-smoothing:antialiased}
@@ -141,7 +141,7 @@ echo ' <div class="tiles">' . implode('', $T) . "</div>\n";
  <?php if ($sv): ?><section class="card"><h2><?= $ic($I['sv']) ?><span>Servicios</span></h2><ul class="sv"><?php foreach ($sv as $v): ?><li><span><?= $e($v['t'] ?? '') ?></span><?= ($v['p'] ?? '') !== '' ? '<b>' . $e($v['p']) . '</b>' : '' ?></li><?php endforeach; ?></ul></section><?php endif; ?>
  <?php if ($rows || $hrs !== ''): ?><section class="card"><h2><?= $ic($I['clk']) ?><span>Horarios</span></h2><?php if ($rows): ?><table><?php foreach ($rows as [$k, $dn, $v]): ?><tr data-d="<?= $k ?>"><td><?= $e($dn) ?></td><td><?= $e($v) ?></td></tr><?php endforeach; ?></table><?php endif; ?><?= $hrs !== '' ? '<p' . ($rows ? ' style="margin-top:8px"' : '') . '>' . $e($hrs) . '</p>' : '' ?></section><?php endif; ?>
  <?php if ($addr !== ''): ?><section class="card"><h2><?= $ic($I['pin']) ?><span>Dirección</span></h2><div class="ad"><p><?= $e($addr) ?></p><a href="<?= $e($map) ?>" target="_blank" rel="noopener"><span>Abrir mapa</span><?= $ic($I['go']) ?></a></div></section><?php endif; ?>
- <a class="gu" data-c="gu" href="<?= $e($ficha) ?>"><img src="/img/guia/guia-logo.webp" alt="" width="62" height="30"><span><b>Ver en la Guía de Santa Rita</b>Opiniones, fotos y más negocios de la ciudad</span><?= $ic($I['go']) ?></a>
+ <a class="gu" data-c="gu" href="<?= $e($ficha) ?>"><img src="/img/guia/guia-logo-s.webp" alt="" width="62" height="30"><span><b>Ver en la Guía de Santa Rita</b>Opiniones, fotos y más negocios de la ciudad</span><?= $ic($I['go']) ?></a>
  <p class="ft">¿Tenés un negocio en Santa Rita? <a href="<?= $G ?>anunciar/">Quiero mi link como este</a></p>
 </main>
 <p class="tst" id="tst">Enlace copiado</p>

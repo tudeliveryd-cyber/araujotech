@@ -16,7 +16,7 @@ if ($ff !== '' && $i === '') {
     if ($x['uid'] !== $ff || strpos((string)$x[$k], $want) !== 0) continue;
     $h = substr((string)$x[$k], strlen($want)); $g = glob(sys_get_temp_dir() . '/at_gfimg_' . $ff . '_' . $k . '_' . $h . '.*');
     if (!$g) break; $ext = pathinfo($g[0], PATHINFO_EXTENSION);
-    header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $ext); header('Cache-Control: public, max-age=86400'); header('Content-Length: ' . filesize($g[0])); readfile($g[0]); exit;
+    header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $ext); header('Cache-Control: public, max-age=' . ((($_GET['v'] ?? '') !== '') ? '2592000' : '86400'));/* endereço com versão (v=) muda quando a imagem muda: o celular guarda 30 dias */ header('Content-Length: ' . filesize($g[0])); readfile($g[0]); exit;
   }
   http_response_code(404); exit;
 }
@@ -52,4 +52,4 @@ if (preg_match('#^gimg:([A-Za-z0-9_]{1,60}):([a-f0-9]{1,16})$#', $src, $gm)) {
 if (!preg_match('#^data:image/(jpeg|png|webp);base64,(.+)$#s', $src, $m)) { http_response_code(404); exit; }
 $f = sys_get_temp_dir() . '/at_gimg_' . $i . ($fld === 'ph' && $dd !== '' ? 'ph' : '') . ($fld === 'lgh' ? 'h' : '') . ($fld === 'phh' ? 'c' : '') . ($fld === 'gl' ? 'g' . $gn : '') . ($wd ? 'd' : '') . '_' . substr(md5($src), 0, 12) . '.img';
 if (!is_file($f)) { $bin = base64_decode($m[2]); if (!$bin) { http_response_code(404); exit; } @file_put_contents($f, $bin); }
-header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $m[1]); header('Cache-Control: public, max-age=86400'); header('Content-Length: ' . filesize($f)); readfile($f);
+header('X-Content-Type-Options: nosniff'); header('Content-Type: image/' . $m[1]); header('Cache-Control: public, max-age=' . ((($_GET['v'] ?? '') !== '') ? '2592000' : '86400'));/* endereço com versão (v=) muda quando a imagem muda: o celular guarda 30 dias */ header('Content-Length: ' . filesize($f)); readfile($f);

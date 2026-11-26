@@ -142,7 +142,7 @@ h1{font-family:var(--display);font-weight:900;font-size:clamp(26px,5vw,36px);lin
 .tx{margin-top:16px;font-size:16px;white-space:pre-line}
 .act{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:700;font-size:15px;text-decoration:none;border-radius:14px;padding:12px 16px;border:1px solid var(--line);background:#fff;color:var(--deep);cursor:pointer}
-.btn.pri{background:#1FA855;border-color:#1FA855;color:#fff}
+.btn.pri{background:#15803D;border-color:#15803D;color:#fff}
 .nlg{width:72px;height:72px;border-radius:18px;object-fit:cover;border:1px solid var(--line);background:#fff;display:block;margin-bottom:12px}
 .box .ph+.in .nlg{margin-top:-58px;position:relative;box-shadow:0 0 0 4px #fff}
 .sh2{font-family:var(--display);font-weight:900;font-size:19px;margin-top:22px}
@@ -163,7 +163,7 @@ dialog.lb{margin:auto;border:0;padding:0;background:transparent;max-width:min(94
 </style>
 </head>
 <body>
-<header class="hdr"><div class="nav"><a class="bk" href="<?= $e($back) ?>">Volver a la Guía</a><span class="sp"></span><a href="<?= $e($G) ?>" aria-label="Guía de Santa Rita"><img src="/img/guia/guia-logo.webp" alt="Guía de Santa Rita" width="83" height="40"></a></div></header>
+<header class="hdr"><div class="nav"><a class="bk" href="<?= $e($back) ?>">Volver a la Guía</a><span class="sp"></span><a href="<?= $e($G) ?>" aria-label="Guía de Santa Rita"><img src="/img/guia/guia-logo-s.webp" alt="Guía de Santa Rita" width="83" height="40"></a></div></header>
 <main>
 <?php if (!$x): ?>
 <div class="box empty"><h1>Esta publicación ya no está disponible</h1><p>Venció o fue retirada por quien la publicó.</p><div class="act" style="justify-content:center"><a class="btn pri" style="background:var(--deep);border-color:var(--deep)" href="<?= $e($G) ?>">Ver lo que hay hoy en la Guía</a></div></div>

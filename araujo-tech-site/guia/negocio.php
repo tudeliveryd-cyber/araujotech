@@ -143,7 +143,7 @@ footer{padding:22px 0 36px;text-align:center;color:var(--muted);font-size:14px;b
 .hero.pm{box-shadow:inset 0 -4px 0 #FFC21A}.hero.pm .lg{box-shadow:0 0 0 4px #FFC21A,0 14px 30px -12px rgba(0,0,0,.6)}
 </style></head>
 <body>
-<header class="hdr"><div class="wrap nav"><a class="bk" href="/guia/" aria-label="Volver a la Guía"><?= $ic($I['back'], 18) ?><span>Volver a la Guía</span></a><span class="sp"></span><a class="gsr" href="/guia/" aria-label="Guía de Santa Rita" style="display:flex;align-items:center;gap:10px;text-decoration:none"><img class="gsl" src="/img/guia/guia-logo.webp" alt="Guía de Santa Rita" width="83" height="40" style="height:40px;width:auto;display:block"></a></div></header>
+<header class="hdr"><div class="wrap nav"><a class="bk" href="/guia/" aria-label="Volver a la Guía"><?= $ic($I['back'], 18) ?><span>Volver a la Guía</span></a><span class="sp"></span><a class="gsr" href="/guia/" aria-label="Guía de Santa Rita" style="display:flex;align-items:center;gap:10px;text-decoration:none"><img class="gsl" src="/img/guia/guia-logo-s.webp" alt="Guía de Santa Rita" width="83" height="40" style="height:40px;width:auto;display:block"></a></div></header>
 <section class="hero<?= $pm ? ' pm' : '' ?>"><?php if ($cover): ?><img class="cv" src="<?= $e($cover) ?>" alt="" fetchpriority="high" onerror="this.remove()"><?php endif; ?>
 <div class="wrap">
 <span class="lg"><?php if ($logo): ?><img src="<?= $e($logo) ?>" alt="Logo de <?= $e($name) ?>"><?php else: ?><b><?= $e($ini($name)) ?></b><?php endif; ?></span>
