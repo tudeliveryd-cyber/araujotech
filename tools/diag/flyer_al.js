@@ -22,13 +22,13 @@ const { chromium } = require('playwright');
     .c{background:#fff;color:#1E0A3C;border-radius:28px;padding:20px 16px 18px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
     .c img,.ini{width:128px;height:128px;border-radius:24px;object-fit:contain;background:#fff}.st .c img,.st .ini{width:190px;height:190px}
     .ini{display:flex;align-items:center;justify-content:center;background:#EFE6FA;color:#4A0A80;font-weight:900;font-size:80px}
-    .c b{font-size:27px;font-weight:800;line-height:1.15}.st .c b{font-size:32px}
+    .c.more{background:transparent;border:3px dashed rgba(255,255,255,.45);color:#fff}.c.more .ini{background:rgba(255,255,255,.12);color:#FFC21A}.c b{font-size:27px;font-weight:800;line-height:1.15}.st .c b{font-size:32px}
     .ft{margin-top:auto;padding-bottom:0;display:flex;align-items:flex-end;justify-content:space-between;gap:30px;border-top:2px solid rgba(255,255,255,.18);padding-top:36px}
     .ft p{font-size:30px;font-weight:600;color:#E9DEFA;max-width:600px;line-height:1.25}.ft .u{display:block;font-size:44px;font-weight:900;color:#fff;margin-top:6px}
     .ft .w{display:block;font-size:30px;font-weight:700;color:#FFC21A;margin-top:14px}.lg{display:flex;flex-direction:column;align-items:flex-end;gap:18px}.lg img{height:84px;width:auto}.lg img.td{height:96px;background:#fff;border-radius:18px;padding:8px 14px}.lg img.gu{height:70px}`;
     const dots = Array.from({ length: 22 }, (_, i) => `<i style="left:${(i * 137) % 1040}px;top:${(i * 263) % 520 + 30}px;opacity:${.25 + (i % 4) * .15}"></i>`).join('');
-    const one = cls => `<div class="f ${cls}"><div class="moon">${moon}</div><p class="k">${T.k}</p><h1>${T.h}</h1><p class="s">${T.s}</p><div class="g">${l.map(card).join('')}</div>
-      <div class="ft"><p>${T.f}<span class="u">guiadesantarita.com</span><span class="w">${T.w}</span></p><div class="lg"><img class="gu" src="/img/guia/guia-logo-blanco-hd.png" style="height:96px"></div></div></div>`;
+    const one = cls => `<div class="f ${cls}"><div class="moon">${moon}</div><p class="k">${T.k}</p><h1>${T.h}</h1><p class="s">${T.s}</p><div class="g">${l.map(card).join('')}${l.length % 3 ? `<div class="c more"><div class="ini">+</div><b>${lg === 'pt' ? 'e mais opções no Guia' : 'y más opciones en la Guía'}</b></div>` : ''}</div>
+      <div class="ft"><p>${T.f}<span class="u">guiadesantarita.com</span></p><div class="lg"><img class="gu" src="/img/guia/guia-logo-blanco-hd.png" style="height:96px"></div></div></div>`;
     document.head.innerHTML = `<meta charset="utf-8"><style>${css}</style>`; document.body.innerHTML = one('fe') + one('st');
     await document.fonts.ready; await Promise.all([...document.images].map(i => i.decode().catch(() => {}))); await new Promise(r => setTimeout(r, 800));
     return l.map(x => x.n + ' | ' + (x.tu || []).join(',') + ' | lg:' + (x.lg ? 1 : 0)).concat(['imgs ok ' + [...document.images].filter(i => i.naturalWidth).length + '/' + document.images.length]);
