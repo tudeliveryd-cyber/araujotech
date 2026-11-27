@@ -14,7 +14,7 @@ const { chromium } = require('playwright');
     .bd{display:inline-flex;align-items:center;gap:12px;background:#FFC21A;color:#2A0650;font-weight:900;font-size:30px;border-radius:999px;padding:14px 30px}
     .bd svg{width:30px;height:30px}
     .h{font-size:36px;font-weight:700;color:#EADCFB;margin-top:40px}.st .h{margin-top:80px;font-size:40px}
-    .card{margin-top:26px;background:#fff;border-radius:40px;padding:30px;width:640px;height:640px;display:flex;align-items:center;justify-content:center;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}.fe .card{width:520px;height:520px}
+    .card{margin-top:60px;background:#fff;border-radius:40px;padding:30px;width:640px;height:640px;display:flex;align-items:center;justify-content:center;box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}.fe .card{width:560px;height:560px}.st .card{margin-top:110px}
     .card img{max-width:100%;max-height:100%;object-fit:contain}
     h1{font-size:76px;font-weight:900;line-height:1;margin-top:40px;letter-spacing:-.01em}.st h1{font-size:88px;margin-top:60px}
     .d{font-size:36px;font-weight:600;color:#EADCFB;margin-top:16px}.st .d{font-size:40px}
@@ -23,7 +23,7 @@ const { chromium } = require('playwright');
     .ft p{font-size:26px;font-weight:600;color:#EADCFB}.ft p b{display:block;font-size:30px;color:#fff;font-weight:800;margin-top:4px}.ft img{height:84px}
     .r{display:flex;flex-direction:column;align-items:flex-end;gap:14px;text-align:right}`;
     const star = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>`;
-    const one = cls => `<div class="f ${cls}"><span class="bd">${star}${T.k}</span><p class="h">${T.h}</p><div class="card"><img src="${esc(x.lg)}"></div><h1>${esc(x.n)}</h1><p class="d">${esc(T.d)}</p>
+    const one = cls => `<div class="f ${cls}"><span class="bd">${star}${T.k}</span><div class="card"><img src="${esc(x.lg)}"></div><h1>${esc(x.n)}</h1><p class="d">${esc(T.d)}</p>
       <div class="ft">${wa ? `<div class="wa"><small>${T.c}</small>${waF}</div>` : '<div></div>'}<div class="r"><img src="/img/guia/guia-logo-blanco-hd.png"><p>${T.u}<b>guiadesantarita.com</b></p></div></div></div>`;
     document.head.innerHTML = `<meta charset="utf-8"><style>${css}</style>`; document.body.innerHTML = one('fe') + one('st');
     await document.fonts.ready; await Promise.all([...document.images].map(i => i.decode().catch(() => {}))); await new Promise(r => setTimeout(r, 800));
