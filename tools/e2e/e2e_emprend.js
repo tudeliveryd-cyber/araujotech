@@ -15,6 +15,9 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   await a.evaluate(() => { ui.view = 'platform'; render(); }); await a.w(400);
   await a.act('guquick'); await a.w(2500); await a.act('qknew'); await a.w(400);
   check(await a.locator('[data-act="qkmo"]').count() === 5 && /Venta por pedido/.test(await a.txt()) && /Atención con cita previa/.test(await a.txt()), 'registro rápido: 5 formas de atender (físico, a domicilio, por pedido, con cita, solo delivery)');
+  { const r = await a.evaluate(() => { const el = document.querySelector('[data-qkdy="1"][data-f="a0"]'); if (!el) return 'sem campo'; el.value = '07:30'; el.dispatchEvent(new Event('input', { bubbles: true })); return [ui.qk.dy && ui.qk.dy[1].a[0], ui.qk.dy && ui.qk.dy[3].a[0], document.querySelector('[data-qkdy="3"][data-f="a0"]').value, document.querySelector('[data-qkdy="1"][data-f="a0"]').required].join(','); });
+    check(r === '07:30,07:30,07:30,true', 'registro rápido (iPhone, só "input"): o horário da segunda fica salvo e vai para os outros dias', r);
+    await a.evaluate(() => { ui.qk.dy = null; ui.qk.dyT = false; }); }
   await a.fill('#qk_n', 'Dulces de Ana'); await a.fill('#qk_d', 'Tortas y bocaditos por encargo'); await a.locator('#qk_g').selectOption('food'); await a.w(200); await a.fill('#qk_tel', '0981 300 003');
   await a.act('qkmo', '[data-k="ped"]'); await a.w(300);
   check(/no son obligatorias/.test(await a.txt()) && await a.evaluate(() => document.getElementById('qk_n').value) === 'Dulces de Ana', 'aviso de que endereço/ubicação não são obrigatórios, sem perder o que foi digitado');
@@ -25,6 +28,9 @@ const { sec, check, info } = L; const fs = require('fs'), path = require('path')
   await a.act('gusite'); await a.w(2500); await a.evaluate(() => { ui.guSt = null; ui.guNav = { sec: 'neg', g: 'shop', t: '*' }; guSheet(); }); await a.w(600);
   const fi = await a.evaluate(() => ui.gu.dir.findIndex(x => x.id === 'fis1'));
   await a.act('gudirmo', `[data-i="${fi}"][data-k="dom"]`); await a.w(300); await a.act('gudirmo', `[data-i="${fi}"][data-k=""]`); await a.w(300);
+  { const r = await a.evaluate(fi => { const q = s => document.querySelector(s); const m = q(`[data-gudy="${fi}"][data-day="1"][data-f="a0"]`); if (!m) return 'sem campo'; const t = q(`[data-gudy="${fi}"][data-day="2"][data-f="a0"]`); t.value = '09:00'; t.dispatchEvent(new Event('input', { bubbles: true }));
+      m.value = '07:30'; m.dispatchEvent(new Event('input', { bubbles: true })); const dy = ui.gu.dir[fi].dy; return [dy[1].a[0], dy[3].a[0], dy[2].a[0], q(`[data-gudy="${fi}"][data-day="4"][data-f="a0"]`).value].join(','); }, fi);
+    check(r === '07:30,07:30,09:00,07:30', 'ficha completa (iPhone, só "input"): segunda salva e copia para os dias iguais, sem apagar o dia diferente', r); }
   await a.act('gusave'); await a.w(4000); d = await doc();
   check(((d.gdir || []).find(x => x.id === 'fis1') || {}).mo === '' && ((d.gdir || []).find(x => x.n === 'Dulces de Ana') || {}).mo === 'ped', 'ficha completa: trocar a forma de atender e voltar a "Establecimiento físico"');
   { const tm = (d.gdir || []).find(x => x.id === 'out1') || {}; check(tm.ci === 'Santa Rosa del Monday', 'abrir e salvar a Guía completa não apaga a cidade de outras fichas', JSON.stringify(tm.ci)); }
