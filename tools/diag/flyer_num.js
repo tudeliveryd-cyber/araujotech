@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
       : { k: 'Para negocios de Santa Rita', h: 'Tu negocio<br>donde la gente<br>ya busca', n: [['+1.400', 'visitas a la Guía en los últimos 30 días'], ['+4.000', 'veces que se vieron los anuncios'], ['+200', 'toques en negocios de la Guía']], c: 'Aparecé en la Guía con fotos, WhatsApp y ubicación.', f: 'Planes desde Gs. 300.000 por mes', w: 'Pedí información por WhatsApp' };
     const css = `@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@500;700;800;900&display=swap');*{box-sizing:border-box;margin:0}body{background:#000}
     .f{width:1080px;position:relative;overflow:hidden;font-family:'Red Hat Display',system-ui,sans-serif;color:#fff;background:radial-gradient(900px 700px at 90% 0%,#7B1FA2 0%,transparent 60%),linear-gradient(165deg,#4A0A80 0%,#33075C 60%,#1E0438 100%);padding:80px;display:flex;flex-direction:column}
-    .fe{height:1350px}.st{height:1920px;padding:150px 80px 130px}
+    .fe{height:1350px;padding:70px 80px 70px}.fe h1{font-size:90px;margin:34px 0 34px}.fe .r{padding:20px 34px}.fe .c{margin-top:30px}.st{height:1920px;padding:150px 80px 130px}
     .top{display:flex;justify-content:space-between;align-items:center}.top img{height:92px}.k{font-weight:800;font-size:30px;color:#FFC21A}
     h1{font-weight:900;font-size:96px;line-height:.98;margin:46px 0 44px;letter-spacing:-.02em}.st h1{font-size:112px;margin:80px 0 70px}
     .n{display:flex;flex-direction:column;gap:18px}.st .n{gap:26px}
